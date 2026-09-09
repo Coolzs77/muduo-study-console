@@ -195,15 +195,14 @@
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
                         <i class="fa-solid fa-calendar-days text-amber-700"></i> 28 天定向攻坚打卡索引网格
                     </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">点击单元格可切换打卡状态，亦可直接跳转定位至对应日期的任务与 Demo。</p>
+                    <p class="text-xs text-stone-500 mt-0.5">点击单元格快速定位对应日期的详细任务与 Demo，打卡进度自动同步。</p>
                 </div>
-                <!-- 图例说明与分级含义 -->
+                <!-- 优雅雅致的图例说明：无视觉噪音，克制呈现 -->
                 <div class="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-serifMono text-stone-600">
-                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-700 inline-block"></span> 已攻克</span>
-                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-white border border-stone-300 inline-block"></span> 待学习</span>
-                    <span class="flex items-center gap-1.5"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">A</span> 绝对核心 (25天)</span>
-                    <span class="flex items-center gap-1.5"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">B</span> 概念理解 (3天)</span>
-                    <span class="flex items-center gap-1.5 text-stone-400 line-through" title="已从28天攻坚日程中剔除，不排课"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-stone-100 text-stone-400 border border-stone-200">C</span> 战略跳过 (0天)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-700 inline-block"></span> 已攻克</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span> A级核心 (25天)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> B级泛读 (3天)</span>
+                    <span class="flex items-center gap-1.5 text-stone-400 line-through">C级跳过 (0天)</span>
                 </div>
             </div>
 
@@ -1724,29 +1723,36 @@ function renderCalendarGrid() {
 
     DAYS_DATASET.forEach(item => {
         const isDone = appState.completedDays.includes(item.day);
+        const isBtier = item.tier === 'B';
         const cell = document.createElement('div');
-        cell.className = `p-2 sm:p-2.5 rounded-xl border text-center cursor-pointer transition-all duration-200 font-serifMono relative flex flex-col justify-between h-16 sm:h-18 ${
+        
+        // 告别满屏重复字块：采用内敛的“顶部极细重度色条 + 右上角微圆点”，既能秒辨重点，又保留纯净呼吸感
+        cell.className = `p-2 sm:p-2.5 rounded-xl border text-center cursor-pointer transition-all duration-200 font-serifMono relative flex flex-col justify-between h-15 sm:h-16 group ${
             isDone 
-            ? 'bg-emerald-700 border-emerald-800 text-white shadow-xs' 
-            : 'bg-white border-stone-200 hover:border-sky-600 text-stone-700 hover:bg-stone-50'
+            ? 'bg-emerald-700 border-emerald-800 text-white shadow-xs hover:bg-emerald-800' 
+            : isBtier
+                ? 'bg-stone-50/60 border-stone-200/90 hover:border-amber-500 text-stone-700 hover:bg-amber-50/20'
+                : 'bg-white border-stone-200/80 hover:border-sky-600 text-stone-700 hover:bg-stone-50'
         }`;
 
         cell.onclick = () => {
             scrollToDay(item.day);
         };
 
-        // A级与B级徽标配色渲染
-        const badgeClass = item.tier === 'A'
-            ? (isDone ? 'bg-rose-950/60 text-rose-200 border border-rose-300/30' : 'bg-rose-50 text-rose-700 border border-rose-200')
-            : (isDone ? 'bg-amber-950/60 text-amber-200 border border-amber-300/30' : 'bg-amber-50 text-amber-800 border border-amber-200');
+        // A 级核心以清爽微点示意，B 级概念以浅琥珀微点标示，已打卡直接转为对勾
+        const statusIndicator = isDone 
+            ? '<i class="fa-solid fa-check text-emerald-200 text-[10px]"></i>' 
+            : isBtier
+                ? '<span class="inline-flex items-center gap-1 text-[9px] text-amber-600 font-bold" title="B级：概念理解，快速通读"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>B</span>'
+                : '<span class="w-1.5 h-1.5 rounded-full bg-rose-400/80 inline-block" title="A级：绝对核心，动手写Demo"></span>';
 
         cell.innerHTML = `
-            <div class="flex justify-between items-center text-[10px] sm:text-xs opacity-85">
-                <span class="font-bold">D${item.day < 10 ? '0' + item.day : item.day}</span>
-                <span class="text-[9px] font-bold px-1 rounded ${badgeClass}" title="${item.tier === 'A' ? 'A级·绝对核心' : 'B级·概念理解'}">${item.tier}</span>
+            <div class="flex justify-between items-center text-[10px] sm:text-xs">
+                <span class="font-bold tracking-wider ${isDone ? 'text-emerald-100' : 'text-stone-900'}">D${item.day < 10 ? '0' + item.day : item.day}</span>
+                <span>${statusIndicator}</span>
             </div>
-            <div class="text-[10.5px] sm:text-xs font-bold truncate mt-0.5">${item.tags[0]}</div>
-            <div class="text-[9px] sm:text-[10px] opacity-75 truncate">W${item.week}</div>
+            <div class="text-[11px] sm:text-xs font-semibold truncate mt-0.5 ${isDone ? 'text-white' : 'text-stone-800'}">${item.tags[0]}</div>
+            <div class="text-[9px] truncate ${isDone ? 'text-emerald-200/80' : 'text-stone-400'} font-serifHeading">${item.title.slice(0, 7)}...</div>
         `;
         grid.appendChild(cell);
     });
