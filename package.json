@@ -4,8 +4,8 @@
   "version": "5.2.0",
   "type": "module",
   "scripts": {
-    "dev": "vite dev.html",
-    "build": "tsc && vite build && node scripts/copy_dist.js",
+    "dev": "node scripts/restore_dev_html.js && vite",
+    "build": "node scripts/restore_dev_html.js && tsc && vite build && node scripts/copy_dist.js",
     "preview": "vite preview"
   },
   "dependencies": {

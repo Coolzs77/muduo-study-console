@@ -10,7 +10,8 @@ import {
   X,
   Compass,
   Copy,
-  Sparkles
+  Sparkles,
+  Workflow
 } from 'lucide-react';
 import { DAYS_DATASET } from '../data/muduo28Days';
 import { CHEN_SHUO_BOOK, generatePdfBrowserUrl } from '../data/booksMapping';
@@ -227,15 +228,50 @@ export const DailyMasteryView: React.FC<DailyMasteryViewProps> = ({
               </ul>
             </div>
 
+            {/* muduo 架构映射 */}
+            {activeModalDay.muduoMap && (
+              <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 text-xs font-serifHeading space-y-1">
+                <span className="font-bold text-sky-950 flex items-center gap-1">
+                  <Workflow className="w-3.5 h-3.5 text-sky-700" />
+                  <span>muduo 架构设计映射：</span>
+                </span>
+                <p className="text-sky-900 font-serifMono">{activeModalDay.muduoMap}</p>
+              </div>
+            )}
+
+            {/* 达标自测标准 */}
+            {activeModalDay.check && (
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs font-serifHeading space-y-1">
+                <span className="font-bold text-amber-950 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-700" />
+                  <span>今日达标检阅准则：</span>
+                </span>
+                <p className="text-amber-900 font-serifMono">{activeModalDay.check}</p>
+              </div>
+            )}
+
             {/* 典型工业代码切片 */}
-            {activeModalDay.codeSnippet && (
+            {(activeModalDay.code || activeModalDay.codeSnippet) && (
               <div className="space-y-1.5">
-                <h4 className="text-xs font-bold text-stone-500 uppercase font-serifHeading flex items-center gap-1.5">
-                  <Code2 className="w-3.5 h-3.5 text-sky-700" />
-                  <span>典型工业级规范代码：</span>
-                </h4>
-                <pre className="p-3.5 rounded-xl bg-stone-950 text-sky-100 font-mono text-xs overflow-x-auto leading-relaxed border border-stone-800">
-                  <code>{activeModalDay.codeSnippet}</code>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-stone-500 uppercase font-serifHeading flex items-center gap-1.5">
+                    <Code2 className="w-3.5 h-3.5 text-sky-700" />
+                    <span>典型工业级规范代码：</span>
+                  </h4>
+                  <button
+                    onClick={() => {
+                      const codeText = activeModalDay.code || activeModalDay.codeSnippet || '';
+                      navigator.clipboard.writeText(codeText);
+                      onShowToast('工业代码已成功复制到剪贴板！');
+                    }}
+                    className="px-2 py-0.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer transition"
+                  >
+                    <Copy className="w-3 h-3" />
+                    <span>复制代码</span>
+                  </button>
+                </div>
+                <pre className="p-3.5 rounded-xl bg-stone-950 text-sky-100 font-mono text-xs overflow-x-auto leading-relaxed border border-stone-800 max-h-72">
+                  <code>{activeModalDay.code || activeModalDay.codeSnippet}</code>
                 </pre>
               </div>
             )}

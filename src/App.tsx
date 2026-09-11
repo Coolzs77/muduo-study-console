@@ -30,6 +30,7 @@ const INITIAL_STATE: AppState = {
     primerPlusCurrentPage: 795,
     notesByChapter: {},
   },
+  reviews: {},
 };
 
 export default function App() {
@@ -251,6 +252,51 @@ export default function App() {
     reader.readAsText(file);
   };
 
+  const handleRecordReview = (dayNum: number, result: 'forgot' | 'fuzzy' | 'mastered') => {
+    const stages = [1, 3, 7, 14, 30];
+    const today = new Date().toISOString().slice(0, 10);
+    const existing = state.reviews[dayNum] || {
+      stage: 0,
+      nextReviewDate: today,
+      lastReviewDate: today,
+      intervalDays: 1,
+      reviewCount: 0
+    };
+
+    let newStage = existing.stage;
+    let intervalDays = existing.intervalDays;
+
+    if (result === 'forgot') {
+      newStage = 0;
+      intervalDays = 1;
+    } else if (result === 'fuzzy') {
+      intervalDays = stages[newStage] || 1;
+    } else if (result === 'mastered') {
+      newStage = Math.min(newStage + 1, 4);
+      intervalDays = stages[newStage];
+    }
+
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + intervalDays);
+    const nextReviewDate = nextDate.toISOString().slice(0, 10);
+
+    setState(prev => ({
+      ...prev,
+      reviews: {
+        ...prev.reviews,
+        [dayNum]: {
+          stage: newStage,
+          nextReviewDate,
+          lastReviewDate: today,
+          intervalDays,
+          reviewCount: existing.reviewCount + 1
+        }
+      }
+    }));
+
+    showToast(`Day ${dayNum} 艾宾浩斯复习已记录：下次复习在 ${nextReviewDate}`);
+  };
+
   const handleResetData = () => {
     if (window.confirm("确定将所有打卡与掌握度重置为初始状态吗？此操作无法撤销。")) {
       localStorage.removeItem(STORAGE_KEY);
@@ -294,7 +340,19 @@ export default function App() {
 
           {/* 7大核心视图动态渲染 */}
           {state.currentView === 'dashboard' && (
-            <DashboardView appState={state} onSelectDay={handleJumpToDay} />
+            <DashboardView 
+              appState={state} 
+              onSelectDay={handleJumpToDay}
+              onRecordReview={handleRecordReview}
+              onShowToast={showToast}
+              onSwitchToReadingChapter={(day) => {
+                setState(prev => ({
+                  ...prev,
+                  currentView: 'reading',
+                  activeTimer: { ...prev.activeTimer, selectedDay: day, selectedType: 'reading' }
+                }));
+              }}
+            />
           )}
 
           {state.currentView === 'daily' && (

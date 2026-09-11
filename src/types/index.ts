@@ -91,9 +91,17 @@ export interface StudySession {
   note: string;
 }
 
+export interface ReviewItem {
+  stage: number; // 0..4, index into [1, 3, 7, 14, 30]
+  nextReviewDate: string; // YYYY-MM-DD
+  lastReviewDate: string;
+  intervalDays: number;
+  reviewCount: number;
+}
+
 export interface AppState {
   currentView: 'dashboard' | 'daily' | 'reading' | 'mapping' | 'source' | 'pitfalls' | 'quiz';
-  mastery: Record<number, { level: number; lastReview: string; notes?: string }>;
+  mastery: Record<number, { level: number; lastReview: string; notes?: string; steps?: { theory: boolean; code: boolean; practice: boolean } }>;
   studySessions: StudySession[];
   activeTimer: {
     running: boolean;
@@ -108,4 +116,5 @@ export interface AppState {
     primerPlusCurrentPage: number;
     notesByChapter: Record<string, string>;
   };
+  reviews: Record<number, ReviewItem>;
 }

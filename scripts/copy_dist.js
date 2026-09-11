@@ -14,18 +14,15 @@ if (!fs.existsSync(distDir)) {
   process.exit(1);
 }
 
-// 1. Copy dist/dev.html or dist/index.html to root index.html
-let srcHtml = path.join(distDir, 'index.html');
-if (!fs.existsSync(srcHtml)) {
-  srcHtml = path.join(distDir, 'dev.html');
-}
-
-if (fs.existsSync(srcHtml)) {
+// 1. Check dist/index.html
+const distHtml = path.join(distDir, 'index.html');
+if (fs.existsSync(distHtml)) {
   const destHtml = path.join(rootDir, 'index.html');
-  fs.copyFileSync(srcHtml, destHtml);
-  console.log(`[OK] Copied ${srcHtml} -> ${destHtml}`);
+  fs.copyFileSync(distHtml, destHtml);
+  console.log(`[OK] Copied ${distHtml} -> ${destHtml}`);
 } else {
-  console.error('[ERROR] No built HTML file found in dist!');
+  console.error('[ERROR] dist/index.html not found!');
+  process.exit(1);
 }
 
 // 2. Copy dist/assets/ to root assets/
@@ -51,4 +48,4 @@ if (fs.existsSync(distAssets)) {
   }
 }
 
-console.log('[DONE] Sync completed successfully. Repository root is ready for GitHub Pages!');
+console.log('[DONE] Dual sync completed successfully! Both dist/ and root are production ready.');
