@@ -274,7 +274,7 @@ function calculateRealStreak() {
 // 视图切换
 function switchView(viewName) {
     appState.currentView = viewName;
-    const views = ['dashboard', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
+    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -293,6 +293,8 @@ function switchView(viewName) {
 
     if (viewName === 'daily') {
         renderDailyCards();
+    } else if (viewName === 'knowledge') {
+        if (typeof renderYuqueExplorer === 'function') renderYuqueExplorer();
     } else if (viewName === 'mapping') {
         renderMappingTable();
     } else if (viewName === 'quiz') {
@@ -1927,6 +1929,10 @@ function openResetModal() {
         appState.dayNotes = {};
         appState.experimentNotes = {};
         appState.globalNotes = "";
+        appState.knowledgeMastery = {};
+        appState.knowledgeFavorites = [];
+        appState.knowledgeRecent = [];
+        if (typeof saveYuqueState === 'function') saveYuqueState();
         persistState();
         updateDashboardMetrics();
         renderDailyCards();
@@ -1949,7 +1955,10 @@ function exportDataBackup() {
         studySessions: appState.studySessions,
         dayNotes: appState.dayNotes,
         experimentNotes: appState.experimentNotes,
-        globalNotes: appState.globalNotes
+        globalNotes: appState.globalNotes,
+        knowledgeMastery: appState.knowledgeMastery || {},
+        knowledgeFavorites: appState.knowledgeFavorites || [],
+        knowledgeRecent: appState.knowledgeRecent || []
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -2043,6 +2052,24 @@ function executeImportMerge(imported) {
             if (!existSessIds.has(s.id)) appState.studySessions.push(s);
         });
     }
+    // 合并语雀专栏知识库掌握度
+    if (imported.knowledgeMastery && typeof imported.knowledgeMastery === 'object') {
+        if (!appState.knowledgeMastery) appState.knowledgeMastery = {};
+        Object.keys(imported.knowledgeMastery).forEach(k => {
+            const oldLvl = appState.knowledgeMastery[k] || 0;
+            const newLvl = imported.knowledgeMastery[k] || 0;
+            if (newLvl >= oldLvl) {
+                appState.knowledgeMastery[k] = newLvl;
+            }
+        });
+    }
+    if (Array.isArray(imported.knowledgeFavorites)) {
+        appState.knowledgeFavorites = [...new Set([...(appState.knowledgeFavorites || []), ...imported.knowledgeFavorites])];
+    }
+    if (Array.isArray(imported.knowledgeRecent)) {
+        appState.knowledgeRecent = [...new Set([...(appState.knowledgeRecent || []), ...imported.knowledgeRecent])].slice(0, 10);
+    }
+    if (typeof saveYuqueState === 'function') saveYuqueState();
 
     persistState();
     updateDashboardMetrics();
@@ -2061,6 +2088,10 @@ function executeImportOverwrite(imported) {
     appState.dayNotes = imported.dayNotes || {};
     appState.experimentNotes = imported.experimentNotes || {};
     appState.globalNotes = imported.globalNotes || "";
+    appState.knowledgeMastery = imported.knowledgeMastery || {};
+    appState.knowledgeFavorites = imported.knowledgeFavorites || [];
+    appState.knowledgeRecent = imported.knowledgeRecent || [];
+    if (typeof saveYuqueState === 'function') saveYuqueState();
 
     persistState();
     updateDashboardMetrics();
@@ -2160,6 +2191,7 @@ document.addEventListener('keydown', (e) => {
     else if (e.key === '4') switchView('quiz');
     else if (e.key === '5') switchView('source');
     else if (e.key === '6') switchView('pitfalls');
+    else if (e.key === '7' || e.key === 'k' || e.key === 'K') switchView('knowledge');
     else if (e.key === '/') {
         e.preventDefault();
         switchView('daily');
@@ -2186,6 +2218,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try { updateDashboardMetrics(); } catch(e) { console.error('updateDashboardMetrics error:', e); }
     try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
     try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
+    try { if (typeof loadYuqueState === 'function') loadYuqueState(); } catch(e) { console.error('loadYuqueState error:', e); }
 
     // 绑定笔记本自动存盘
     try {

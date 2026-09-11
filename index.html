@@ -203,6 +203,9 @@
         <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="攻坚大盘与架构拓扑">
             <i class="fa-solid fa-chart-pie text-sky-700"></i> 攻坚大盘与架构拓扑
         </button>
+        <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="CppAIService 专栏知识库">
+            <i class="fa-solid fa-book-bookmark text-blue-600"></i> CppAIService 知识库
+        </button>
         <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
             <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
         </button>
@@ -761,6 +764,130 @@
         </div>
     </section>
 
+    <!-- ==================== VIEW: CppAIService 语雀知识库与面试专栏 ==================== -->
+    <section id="view-knowledge" class="hidden space-y-6">
+        <!-- 专栏顶部统计与检索条 -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-100 pb-4 mb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-900 text-[10px] font-bold font-serifMono">
+                            KNOWLEDGE REPOSITORY
+                        </span>
+                        <span class="text-xs text-stone-400 font-serifMono">17 篇完整专栏 · 68,091 字精析</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-black text-stone-900 mt-1 font-serifHeading flex items-center gap-2">
+                        <i class="fa-solid fa-book-bookmark text-blue-600"></i>
+                        CppAIService 核心架构与设计模式专栏
+                    </h2>
+                    <p class="text-xs text-stone-600 mt-1 max-w-3xl leading-relaxed">
+                        基于程序员 Carl《HTTP服务框架》完整专栏，深度剖析现代 C++ 高性能网络库与大模型工程接入。已建立 <strong>文章 ➔ 源码行级 ➔ 面试考点</strong> 闭环链接。
+                    </p>
+                </div>
+                <!-- 右侧掌握度指标卡 -->
+                <div class="flex items-center gap-3 shrink-0 font-serifMono">
+                    <div class="bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-center">
+                        <div class="text-[10px] text-stone-500 font-bold">深度掌握</div>
+                        <div class="text-base font-bold text-blue-700 mt-0.5" id="yq-mastered-stat">0 / 17 篇</div>
+                    </div>
+                    <div class="bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-center">
+                        <div class="text-[10px] text-stone-500 font-bold">重点收藏</div>
+                        <div class="text-base font-bold text-amber-600 mt-0.5" id="yq-fav-stat">0 篇</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 搜索与标签过滤器 -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-serifMono">
+                    <button onclick="filterYuqueTag('all')" data-tag="all" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-bold bg-amber-800 text-white shadow-xs transition cursor-pointer">全部 (17)</button>
+                    <button onclick="filterYuqueTag('架构设计')" data-tag="架构设计" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">架构设计</button>
+                    <button onclick="filterYuqueTag('设计模式')" data-tag="设计模式" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">设计模式</button>
+                    <button onclick="filterYuqueTag('协议解析')" data-tag="协议解析" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">协议解析</button>
+                    <button onclick="filterYuqueTag('核心组件')" data-tag="核心组件" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">核心组件</button>
+                    <button onclick="filterYuqueTag('高级特性')" data-tag="高级特性" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">高级特性</button>
+                    <button onclick="filterYuqueTag('fav')" data-tag="fav" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer text-amber-700"><i class="fa-solid fa-star text-[10px] mr-1"></i>收藏</button>
+                    <button onclick="filterYuqueTag('pending')" data-tag="pending" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer text-rose-700"><i class="fa-solid fa-hourglass-half text-[10px] mr-1"></i>待攻坚</button>
+                </div>
+                <div class="relative w-full sm:w-64 shrink-0">
+                    <input type="text" oninput="handleYuqueSearch(this.value)" placeholder="搜索章节、源码类、关键字..." class="w-full bg-stone-50 border border-stone-200 rounded-xl pl-8 pr-3 py-1.5 text-xs text-stone-800 placeholder-stone-400 focus:outline-none focus:border-blue-500 transition font-serifMono">
+                    <span class="absolute left-2.5 top-2 text-stone-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主体双栏布局：左侧专栏目录树 + 右侧沉浸式阅读器 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- 左栏：目录树与最近阅读 (4 cols) -->
+            <div class="lg:col-span-4 space-y-4">
+                <!-- 最近阅读小条 -->
+                <div class="bg-white rounded-2xl p-3.5 border border-stone-200 academic-card">
+                    <div class="text-[10.5px] font-serifMono text-stone-400 font-bold mb-2 flex items-center justify-between">
+                        <span><i class="fa-solid fa-clock-rotate-left mr-1 text-stone-500"></i>最近浏览:</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5" id="yq-recent-pills">
+                        <!-- JS 填充 -->
+                    </div>
+                </div>
+
+                <!-- 章节列表卡片 (自适应限高滚动) -->
+                <div class="bg-white rounded-2xl p-4 border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between pb-3 border-b border-stone-100 mb-3">
+                        <span class="font-bold text-xs text-stone-700 font-serifMono flex items-center gap-1.5">
+                            <i class="fa-solid fa-list-ul text-blue-700"></i> 专栏目录索引
+                        </span>
+                        <span class="text-[10px] font-serifMono text-stone-400">点击阅读章节</span>
+                    </div>
+                    <div class="space-y-2 max-h-[640px] overflow-y-auto pr-1" id="yq-directory-list">
+                        <!-- 由 JS 填充 17 篇文章卡片 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右栏：沉浸式阅读器与行级源码溯源卡 (8 cols) -->
+            <div class="lg:col-span-8 space-y-4">
+                <!-- 顶栏与掌握度打分条 -->
+                <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card space-y-3.5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                        <div>
+                            <h3 class="text-base sm:text-lg font-black text-stone-900 font-serifHeading" id="yq-reader-title">
+                                正在加载专栏内容...
+                            </h3>
+                            <div class="flex items-center gap-2 mt-1 text-[11px] font-serifMono text-stone-500 flex-wrap" id="yq-reader-meta">
+                                <!-- JS 填充元数据 -->
+                            </div>
+                        </div>
+                        <a id="yq-open-external-link" href="#" target="_blank" rel="noopener noreferrer" class="text-xs font-serifMono text-stone-500 hover:text-blue-700 transition flex items-center gap-1 shrink-0 self-start sm:self-auto" title="打开语雀在线页面">
+                            <span>语雀原著</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- 6 阶掌握度评定工具栏 -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-stone-50/80 p-2.5 rounded-xl border border-stone-200/80">
+                        <span class="text-[11px] font-serifMono font-bold text-stone-600 flex items-center gap-1 shrink-0">
+                            <i class="fa-solid fa-gauge-high text-amber-600"></i> 掌握评级:
+                        </span>
+                        <div class="flex flex-wrap items-center gap-1.5" id="yq-mastery-selector">
+                            <!-- JS 填充 L0~L5 按钮 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 源码行级与工程调用链路锚定卡片 -->
+                <div id="yq-source-trace-card">
+                    <!-- JS 填充源码文件、核心类、关键调用与面试深挖考点 -->
+                </div>
+
+                <!-- Markdown 正文阅读区 -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-stone-200 academic-card max-h-[850px] overflow-y-auto" id="yq-reader-scroll">
+                    <div id="yq-reader-body" class="prose prose-stone max-w-none text-stone-800 text-xs sm:text-sm leading-relaxed space-y-3 font-serifHeading">
+                        <!-- JS 安全渲染 Markdown 正文 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- 底部持久化与备份状态栏 -->
     <footer class="mt-8 bg-white border border-stone-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500 font-serifMono">
         <div class="flex items-center gap-2">
@@ -1244,7 +1371,9 @@ add_executable(my_server ${SOURCES})</pre>
     <!-- 模块化外部脚本加载（无打包依赖，原生静态秒开） -->
     <script src="js/dataset-28days.js?v=5.4.1"></script>
     <script src="js/dataset-mappings.js?v=5.4.1"></script>
+    <script src="js/dataset-yuque.js?v=6.0.0"></script>
     <script src="js/timer.js?v=5.4.1"></script>
-    <script src="js/app.js?v=5.4.1"></script>
+    <script src="js/yuque-explorer.js?v=6.0.0"></script>
+    <script src="js/app.js?v=6.0.0"></script>
 </body>
 </html>
