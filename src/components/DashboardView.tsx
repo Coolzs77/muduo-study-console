@@ -39,7 +39,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onShowToast,
   onSwitchToReadingChapter
 }) => {
-  const [activeNodeKey, setActiveNodeKey] = useState<string>('loop');
+  const [activeNodeKey, setActiveNodeKey] = useState<string>('eventloop');
   const [activeReviewModalDay, setActiveReviewModalDay] = useState<DayItem | null>(null);
   const [showReviewAnswer, setShowReviewAnswer] = useState(false);
 
@@ -97,7 +97,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const totalAllMins = appState.studySessions.reduce((acc, s) => acc + (s.duration || 0), 0);
 
   // 5. 拓扑透视抽屉数据
-  const activeNode = TOPOLOGY_DRAWER_DATA[activeNodeKey] || TOPOLOGY_DRAWER_DATA['loop'];
+  const activeNode = TOPOLOGY_DRAWER_DATA[activeNodeKey] || TOPOLOGY_DRAWER_DATA['eventloop'] || {};
 
   // 打卡矩阵颜色阶梯 (0 ~ 5 级)
   const levelStyles: Record<number, { bg: string; border: string; text: string; badge: string; label: string }> = {
@@ -529,10 +529,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
               {/* 主节点 1: EventLoop */}
               <g 
-                onClick={() => setActiveNodeKey('loop')} 
+                onClick={() => setActiveNodeKey('eventloop')} 
                 className="cursor-pointer transition hover:opacity-90"
               >
-                <rect x="220" y="140" width="110" height="80" rx="12" fill="url(#gradMain)" stroke={activeNodeKey === 'loop' ? '#f59e0b' : '#38bdf8'} strokeWidth={activeNodeKey === 'loop' ? 3 : 1} />
+                <rect x="220" y="140" width="110" height="80" rx="12" fill="url(#gradMain)" stroke={activeNodeKey === 'eventloop' ? '#f59e0b' : '#38bdf8'} strokeWidth={activeNodeKey === 'eventloop' ? 3 : 1} />
                 <text x="275" y="175" textAnchor="middle" fill="#ffffff" fontWeight="bold" fontSize="13" fontFamily="sans-serif">EventLoop</text>
                 <text x="275" y="195" textAnchor="middle" fill="#bae6fd" fontSize="10" fontFamily="sans-serif">Reactor 核心循环</text>
               </g>
@@ -559,20 +559,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
               {/* 主节点 4: TcpConnection */}
               <g 
-                onClick={() => setActiveNodeKey('conn')} 
+                onClick={() => setActiveNodeKey('tcpconnection')} 
                 className="cursor-pointer transition hover:opacity-90"
               >
-                <rect x="610" y="140" width="120" height="80" rx="12" fill="url(#gradSub)" stroke={activeNodeKey === 'conn' ? '#f59e0b' : '#60a5fa'} strokeWidth={activeNodeKey === 'conn' ? 3 : 1} />
+                <rect x="610" y="140" width="120" height="80" rx="12" fill="url(#gradSub)" stroke={activeNodeKey === 'tcpconnection' ? '#f59e0b' : '#60a5fa'} strokeWidth={activeNodeKey === 'tcpconnection' ? 3 : 1} />
                 <text x="670" y="175" textAnchor="middle" fill="#ffffff" fontWeight="bold" fontSize="13" fontFamily="sans-serif">TcpConnection</text>
                 <text x="670" y="195" textAnchor="middle" fill="#dbeafe" fontSize="10" fontFamily="sans-serif">TCP 连接全周期</text>
               </g>
 
               {/* 上方节点: TcpServer & ThreadPool */}
               <g 
-                onClick={() => setActiveNodeKey('server')} 
+                onClick={() => setActiveNodeKey('tcpserver')} 
                 className="cursor-pointer transition hover:opacity-90"
               >
-                <rect x="400" y="30" width="130" height="60" rx="10" fill="#faf5ff" stroke={activeNodeKey === 'server' ? '#f59e0b' : '#d8b4fe'} strokeWidth={activeNodeKey === 'server' ? 3 : 2} />
+                <rect x="400" y="30" width="130" height="60" rx="10" fill="#faf5ff" stroke={activeNodeKey === 'tcpserver' ? '#f59e0b' : '#d8b4fe'} strokeWidth={activeNodeKey === 'tcpserver' ? 3 : 2} />
                 <text x="465" y="58" textAnchor="middle" fill="#6b21a8" fontWeight="bold" fontSize="12" fontFamily="sans-serif">TcpServer</text>
                 <text x="465" y="76" textAnchor="middle" fill="#9333ea" fontSize="9" fontFamily="sans-serif">EventLoopThreadPool</text>
               </g>
@@ -599,46 +599,56 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <span>架构节点透视 (Inspector)</span>
               </span>
               <span className="text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded font-mono">
-                {activeNode.file}
+                {activeNode?.tag || 'Muduo 核心架构'}
               </span>
             </div>
 
             <div className="mt-3">
               <h4 className="text-lg font-bold text-stone-900 font-serifHeading">
-                {activeNode.title}
+                {activeNode?.title || 'EventLoop'}
               </h4>
               <p className="text-xs text-stone-600 font-serifMono mt-1 leading-relaxed">
-                {activeNode.desc}
+                {activeNode?.role || ''}
               </p>
             </div>
 
             <div className="mt-4 space-y-2">
-              <span className="text-xs font-bold text-stone-700 font-serifHeading">线程归属与并发戒律：</span>
-              <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs font-serifMono text-sky-900">
-                {activeNode.threadRule}
+              <span className="text-xs font-bold text-stone-700 font-serifHeading">核心成员与关键契约：</span>
+              <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                {(activeNode?.members || []).map((m: string, i: number) => (
+                  <div key={i} className="p-2 bg-stone-50 rounded-lg border border-stone-200 text-xs font-mono text-sky-950">
+                    {m}
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="mt-4 space-y-2">
-              <span className="text-xs font-bold text-stone-700 font-serifHeading">核心关键方法：</span>
+              <span className="text-xs font-bold text-stone-700 font-serifHeading">核心关键方法 (Core Methods)：</span>
               <div className="flex flex-wrap gap-1.5">
-                {activeNode.coreMethods.map((m: string, i: number) => (
+                {(activeNode?.functions || []).map((f: string, i: number) => (
                   <span key={i} className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 border border-stone-200">
-                    {m}
+                    {f}
                   </span>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-stone-100 text-center">
-            <button
-              onClick={() => onSelectDay(activeNode.relatedDay || 1)}
-              className="w-full py-2 rounded-xl bg-sky-900 hover:bg-sky-950 text-white font-bold text-xs transition flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <span>直达对应实战：Day {activeNode.relatedDay || 1}</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
+          <div className="pt-3 border-t border-stone-100">
+            <div className="text-xs text-stone-500 font-bold mb-2">关联实战天数：</div>
+            <div className="flex flex-wrap gap-2">
+              {(activeNode?.relatedDays || [1]).map((dayNum: number) => (
+                <button
+                  key={dayNum}
+                  onClick={() => onSelectDay(dayNum)}
+                  className="flex-1 min-w-[100px] py-1.5 px-3 rounded-xl bg-sky-900 hover:bg-sky-950 text-white font-bold text-xs transition flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>直达 Day {dayNum}</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
