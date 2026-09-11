@@ -903,6 +903,9 @@ function renderDailyCards() {
     document.querySelectorAll('pre code').forEach((el) => {
         if (typeof hljs !== "undefined") hljs.highlightElement(el);
     });
+
+    // 彻底防御性清除任何残留或旧缓存注入的直跳与 Readest 按钮
+    document.querySelectorAll('button[onclick*="quickJumpByDay"], button[onclick*="quickReadestByDay"]').forEach(el => el.remove());
 }
 
 function escapeJsString(str) {
