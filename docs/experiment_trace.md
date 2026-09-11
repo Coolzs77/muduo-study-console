@@ -193,3 +193,47 @@ Timer Ticked: true
    - `live_decoupled_verified.png`：攻坚大盘与 28 天日历矩阵渲染截图；
    - `live_reading_view.png`：书卷伴读与页码直跳视图截图；
    - `live_full_verification.png`：全功能回归测试完成状态截图。
+
+---
+
+## 六、书籍直跳与 Readest 呼起深度修复排错档案
+
+### 6.1 缺陷排查：为何“光有提示也不跳转”？
+经过深入排查与调试，发现原先书卷伴读视图与卡片跳转存在以下三重阻断因素：
+1. **真实文件路径不匹配**：
+   `E:\workspace\C++_learning\` 下两本 PDF 文件的实际命名包含特殊后缀：
+   - `Linux 多线程服务端编程 使用muduo C++网络库 (陈硕) (z-library.sk, 1lib.sk, z-lib.sk).pdf`
+   - `C++ Primer Plus：中文版（第六版） (Stephen Prata) (z-library.sk, 1lib.sk, z-lib.sk).pdf`
+   原代码中硬编码的文件名缺失空格与 Z-library 标识符，导致浏览器即使打开了 `file:///` 协议也指向了 404 不存在的资源。
+2. **Readest 协议唤起的用户手势丢失（Transient User Activation Loss）**：
+   旧版本 `openInReadest` 中，将协议触发放入了 `navigator.clipboard.writeText().finally(...)` 异步回调中。现代 Chromium 内核严格限制只有在用户原始点击的同一次主调用栈（User Activation 持续约数秒内）才允许唤起系统定制协议；一旦进入异步 Promise 回调，用户手势失效，且通过创建隐藏 iframe 的协议唤起在现代 Edge/Chrome 中已被安全拦截。
+3. **公网 HTTPS 与本地 `file:///` 协议的浏览器安全沙箱铁律**：
+   当用户在 GitHub Pages（`https://coolzs77.github.io/...`）上点击“浏览器直跳”时，现代浏览器（Edge、Chrome、Firefox）出于系统隐私安全考虑，强制执行 **跨协议安全沙箱规则（Not allowed to load local resource）**，严禁任何公网网页直接发起对用户本地磁盘 `file:///` 路径的加载或跳转。
+
+### 6.2 技术解决方案与双模交互架构
+针对上述三重阻断，系统在 `js/books-integration.js` 中实施了如下针对性增强：
+1. **物理路径校准与标准化 URL 编码**：
+   将 `BOOKS_CONFIG` 中的系统路径和 URI 编码更新为本地磁盘真实全名，确保物理印刷页码补正后的 URL 100% 精确映射到实际文件与页码；
+2. **同步主调用栈协议唤起**：
+   在用户点击处理函数中，第一步立即创建带有 `readest://` 的动态 `<a>` 标签并同步执行 `.click()`，最大程度保留用户激活态；随后异步执行剪贴板写入，两不耽误；
+3. **环境智能嗅探与「本地阅读助手」双模机制**：
+   - **本地环境（`file:` 或 `localhost`）**：检测到本地运行时，自动通过动态新标签页无缝拉起 Edge 内置 PDF 阅读器并跳转至加权绝对物理页（如陈硕 P.255 -> #page=278）；
+   - **公网生产环境（HTTPS）**：检测到运行在 GitHub Pages 上时，自动弹出精心设计的**「本地阅读助手」模态框（#local-reader-modal）**。模态框中提供：
+     - 一键呼起本地 Readest 客户端（无跨域限制，且剪贴板已注入书籍章节信息，在客户端中按 Ctrl+G 即可秒达）；
+     - 一键复制 Edge 专用原生直跳命令（例如 `start msedge "file:///E:/workspace/C++_learning/..."#page=278`，在 Win+R 中粘贴即可秒开 Edge 并翻至目标页）；
+     - 一键复制本地 PDF 完整绝对路径；
+     - 清晰的浏览器安全拦截说明与本地零限制运行建议。
+
+### 6.3 冗余历史文件彻底出清与极简原生架构
+为了彻底根除老旧编译工程对开发和部署的干扰，彻底清理了 GitHub 仓库中残留的所有 React/Vite 遗留文件：
+- 删除 `src/`（20+ 个组件及旧数据文件）、`assets/`、`vite.config.ts`、`tsconfig.json`、`tailwind.config.js`、`postcss.config.js` 等；
+- 将 `package.json` 精简为仅保留静态预览与无编译拷贝脚本（`npm run build` 即运行 `scripts/build_static.cjs`）；
+- 单文件兜底 `classic.html` 与原文件 `muduo_4.html` 亦同步植入了最新的书目映射、阅读模态框与计时引擎。
+
+### 6.4 实机自动化 CDP 回归验证
+使用 Edge 无头调试端口运行 `scratch/test_jump_and_views.js`：
+- PDF 本地 Edge 原生跳转检测：**PASSED**（成功打开 `...#page=278` 页面目标）；
+- Readest 唤起指令与协议：**PASSED**（成功触发 `readest://`）；
+- 本地阅读助手模态框：**PASSED**（正确显示书名、页码补偿信息及复制命令）；
+- 28天大纲、15项语法映射、8阶源码路线、12大避坑案例与计时器核心引擎：**100% 通过**。
+

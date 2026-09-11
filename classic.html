@@ -5263,13 +5263,20 @@ window.PITFALLS_DATASET = PITFALLS_DATASET;
 // 深度绑定 E:\workspace\C++_learning\ 书目
 // ==========================================================================
 
+// ==========================================================================
+// muduo C++ 工业实战个人控制台 - 权威参考书目与 Readest 伴读流集成
+// 深度绑定 E:\workspace\C++_learning\ 书目与 E:\soft\Readest 桌面客户端
+// ==========================================================================
+
 const BOOKS_CONFIG = {
     chenShuo: {
         id: 'chenShuo',
         title: 'Linux 多线程服务端编程：使用 muduo C++ 网络库',
         shortTitle: '陈硕《Linux多线程服务端编程》',
         author: '陈硕',
-        localPath: 'file:///E:/workspace/C++_learning/Linux多线程服务端编程使用muduo%20C++网络库%20(陈硕)%20(Z-Library).pdf',
+        fileName: 'Linux 多线程服务端编程 使用muduo C++网络库 (陈硕) (z-library.sk, 1lib.sk, z-lib.sk).pdf',
+        systemPath: 'E:\\workspace\\C++_learning\\Linux 多线程服务端编程 使用muduo C++网络库 (陈硕) (z-library.sk, 1lib.sk, z-lib.sk).pdf',
+        fileUri: 'file:///E:/workspace/C++_learning/' + encodeURIComponent('Linux 多线程服务端编程 使用muduo C++网络库 (陈硕) (z-library.sk, 1lib.sk, z-lib.sk).pdf'),
         totalPages: 607,
         pageOffset: 23, // 印刷 P.1 对应 PDF 物理 P.24 (23页前言与目录)
         chapters: [
@@ -5288,7 +5295,9 @@ const BOOKS_CONFIG = {
         title: 'C++ Primer Plus (第6版) 中文版',
         shortTitle: '《C++ Primer Plus (第6版)》',
         author: 'Stephen Prata',
-        localPath: 'file:///E:/workspace/C++_learning/C++PrimerPlus中文版第6版.pdf',
+        fileName: 'C++ Primer Plus：中文版（第六版） (Stephen Prata) (z-library.sk, 1lib.sk, z-lib.sk).pdf',
+        systemPath: 'E:\\workspace\\C++_learning\\C++ Primer Plus：中文版（第六版） (Stephen Prata) (z-library.sk, 1lib.sk, z-lib.sk).pdf',
+        fileUri: 'file:///E:/workspace/C++_learning/' + encodeURIComponent('C++ Primer Plus：中文版（第六版） (Stephen Prata) (z-library.sk, 1lib.sk, z-lib.sk).pdf'),
         totalPages: 1400,
         pageOffset: 30, // 印刷 P.1 对应 PDF 物理 P.31 (30页前言与目录)
         chapters: [
@@ -5310,58 +5319,138 @@ function getBookPhysicalPage(bookKey, bookPage) {
     return pageNum + cfg.pageOffset;
 }
 
+// 核心 PDF 直跳：智能区分本地协议与公网 HTTPS 安全沙箱
 function openPdfAtPage(bookKey, bookPage) {
     const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
     const pPage = getBookPhysicalPage(bookKey, bookPage);
-    const targetUrl = `${cfg.localPath}#page=${pPage}`;
-    window.open(targetUrl, '_blank');
-    if (typeof showToast === 'function') {
-        showToast(`已在浏览器新标签页打开《${cfg.shortTitle}》第 ${pPage} 页 (正文 P.${bookPage})`);
+    const targetUrl = `${cfg.fileUri}#page=${pPage}`;
+    const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    if (isLocal) {
+        // 1. 本地环境下：动态创建真实 <a> 标签模拟点击，唤起 Edge 内置 PDF 阅读器并直达指定页码
+        try {
+            const a = document.createElement('a');
+            a.href = targetUrl;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            if (typeof showToast === 'function') {
+                showToast(`已在 Edge 新标签页翻开《${cfg.shortTitle}》第 ${pPage} 页 (正文 P.${bookPage})`);
+            }
+        } catch(e) {
+            window.open(targetUrl, '_blank');
+        }
+    } else {
+        // 2. 公网 HTTPS 环境下：由于浏览器安全沙箱限制，打开本地阅读助手弹窗
+        openLocalReaderModal(bookKey, bookPage, pPage);
     }
 }
 
+// 核心 Readest 桌面应用唤起：同步触发 readest:// 协议与剪贴板注入
 function openInReadest(bookKey, bookPage, chapterTitle = '') {
     const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
     const pPage = getBookPhysicalPage(bookKey, bookPage);
-    const clipText = `【Readest 研读定位】\n书目：${cfg.title}\n章节：${chapterTitle}\n正文印刷页：P.${bookPage}\nPDF 物理页：第 ${pPage} 页`;
+    const clipText = `【Readest 研读定位】\n书目：${cfg.title}\n章节：${chapterTitle || '核心章节'}\n正文印刷页：P.${bookPage}\nPDF 物理页：第 ${pPage} 页\n本地路径：${cfg.systemPath}`;
 
+    // 1. 核心关键：必须在用户点击事件的同步主调用栈中执行唤起，保持浏览器用户激活态 (User Activation)
+    try {
+        const a = document.createElement('a');
+        a.href = 'readest://';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    } catch(e) {
+        try {
+            window.location.href = 'readest://';
+        } catch(err) {}
+    }
+
+    // 2. 并行将研读信息写入剪贴板 (异步，不阻碍协议呼起)
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(clipText).finally(() => {
-            triggerReadestProtocol(cfg.shortTitle, bookPage, pPage);
-        });
-    } else {
-        triggerReadestProtocol(cfg.shortTitle, bookPage, pPage);
+        navigator.clipboard.writeText(clipText).catch(() => {});
+    }
+
+    // 3. 弹出 Toast 提示
+    if (typeof showToast === 'function') {
+        showToast(`已唤起 Readest！已复制《${cfg.shortTitle}》P.${bookPage} (物理第 ${pPage} 页) 到剪贴板，按 Ctrl+G 即可秒达`);
     }
 }
 
-function triggerReadestProtocol(bookTitle, bookPage, physicalPage) {
-    try {
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = 'readest://';
-        document.body.appendChild(iframe);
-        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1000);
-    } catch (e) {}
+// 打开公网 HTTPS 下的「本地阅读助手」模态框
+function openLocalReaderModal(bookKey, bookPage, pPage) {
+    const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
+    const modal = document.getElementById('local-reader-modal');
+    if (!modal) {
+        // 兜底降级处理
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(cfg.systemPath);
+        }
+        alert(`【浏览器安全拦截提示】\n出于隐私安全，现代浏览器严禁公网 HTTPS 网页直接读取本地磁盘文件 (file:///)。\n\n已将本地路径复制到您的剪贴板：\n${cfg.systemPath}\n\n推荐解决方案：\n1. 点击【呼起 Readest】使用桌面客户端阅读\n2. 在本地双击运行 index.html 享受无限制极速直跳！`);
+        return;
+    }
 
-    if (typeof showToast === 'function') {
-        showToast(`已将《${bookTitle}》P.${bookPage} (物理第 ${physicalPage} 页) 复制到剪贴板，已尝试呼起 Readest！`);
+    document.getElementById('lrm-book-title').innerText = cfg.title;
+    document.getElementById('lrm-page-info').innerText = `正文印刷页 P.${bookPage} ➔ 绝对物理第 ${pPage} 页 (加权偏移 +${cfg.pageOffset})`;
+    document.getElementById('lrm-path-input').value = cfg.systemPath;
+    document.getElementById('lrm-cmd-input').value = `start msedge "${cfg.systemPath}#page=${pPage}"`;
+
+    // 自动复制打开命令
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(`start msedge "${cfg.systemPath}#page=${pPage}"`).catch(() => {});
+    }
+
+    // 绑定唤起 Readest 按钮
+    const btnReadest = document.getElementById('lrm-btn-readest');
+    if (btnReadest) {
+        btnReadest.onclick = () => {
+            openInReadest(bookKey, bookPage, `正文 P.${bookPage}`);
+            closeLocalReaderModal();
+        };
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeLocalReaderModal() {
+    document.getElementById('local-reader-modal')?.classList.add('hidden');
+}
+
+function copyLocalReaderCmd() {
+    const cmd = document.getElementById('lrm-cmd-input')?.value;
+    if (cmd && navigator.clipboard) {
+        navigator.clipboard.writeText(cmd).then(() => {
+            if (typeof showToast === 'function') showToast('已复制 Edge 打开命令！在 Win+R 运行窗口粘贴回车即可秒开！');
+        });
+    }
+}
+
+function copyLocalReaderPath() {
+    const p = document.getElementById('lrm-path-input')?.value;
+    if (p && navigator.clipboard) {
+        navigator.clipboard.writeText(p).then(() => {
+            if (typeof showToast === 'function') showToast('已复制本地文件完整路径！');
+        });
     }
 }
 
 function extractBookPageFromDay(dayItem) {
     if (!dayItem || !dayItem.bookRange) return 255;
-    const m = dayItem.bookRange.match(/P\.(\d+)/i);
+    const m = dayItem.bookRange.match(/P\.([0-9]+)/i);
     return m ? parseInt(m[1]) : 255;
 }
 
 function quickJumpByDay(dayNum) {
-    const dayItem = (typeof DAYS_DATASET !== 'undefined' ? DAYS_DATASET : []).find(d => d.day === dayNum);
+    const days = (typeof getDaysDataset === 'function' ? getDaysDataset() : (window.DAYS_DATASET || []));
+    const dayItem = days.find(d => d.day === dayNum);
     const page = extractBookPageFromDay(dayItem);
     openPdfAtPage('chenShuo', page);
 }
 
 function quickReadestByDay(dayNum) {
-    const dayItem = (typeof DAYS_DATASET !== 'undefined' ? DAYS_DATASET : []).find(d => d.day === dayNum);
+    const days = (typeof getDaysDataset === 'function' ? getDaysDataset() : (window.DAYS_DATASET || []));
+    const dayItem = days.find(d => d.day === dayNum);
     const page = extractBookPageFromDay(dayItem);
     const title = dayItem ? dayItem.title : `Day ${dayNum}`;
     openInReadest('chenShuo', page, title);
@@ -5509,9 +5598,21 @@ function handleCustomReadestJump() {
         if (typeof showToast === 'function') showToast('请输入有效的印刷正文页码', false);
         return;
     }
-    const cfg = BOOKS_CONFIG[bookKey];
     openInReadest(bookKey, parseInt(pageVal), `自定义精读 P.${pageVal}`);
 }
+
+window.BOOKS_CONFIG = BOOKS_CONFIG;
+window.openPdfAtPage = openPdfAtPage;
+window.openInReadest = openInReadest;
+window.openLocalReaderModal = openLocalReaderModal;
+window.closeLocalReaderModal = closeLocalReaderModal;
+window.copyLocalReaderCmd = copyLocalReaderCmd;
+window.copyLocalReaderPath = copyLocalReaderPath;
+window.quickJumpByDay = quickJumpByDay;
+window.quickReadestByDay = quickReadestByDay;
+window.renderBookReadingView = renderBookReadingView;
+window.handleCustomPageJump = handleCustomPageJump;
+window.handleCustomReadestJump = handleCustomReadestJump;
 
 
 // ==========================================================================
@@ -7947,5 +8048,84 @@ function switchEnvModalTab(tabId) {
 
 
     </script>
+
+<!-- 5. 本地阅读助手模态框 (Local Reader Modal - 用于公网 HTTPS 环境安全导流) -->
+<div id="local-reader-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-label="本地阅读助手">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-stone-200 font-serifHeading space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center text-base">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-stone-900 text-base" id="lrm-book-title">参考书目研读直达</h4>
+                    <p class="text-[11px] text-sky-800 font-serifMono font-semibold" id="lrm-page-info">正文印刷页 P.255 ➔ 物理第 278 页</p>
+                </div>
+            </div>
+            <button onclick="closeLocalReaderModal()" class="text-stone-400 hover:text-stone-600 text-sm" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1.5 leading-relaxed">
+            <div class="font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-shield-halved text-amber-700"></i> 浏览器安全沙箱限制说明
+            </div>
+            <p class="text-[11.5px] text-amber-800 font-serifMono">
+                您当前正通过公网 <strong>HTTPS</strong> 访问控制台。现代浏览器出于隐私安全，<strong>严禁公网网页直接打开本地磁盘文件 (file:///)</strong>。系统已为您备妥以下秒级直达方案：
+            </p>
+        </div>
+
+        <div class="space-y-3 font-serifMono text-xs">
+            <!-- 方案一：呼起 Readest -->
+            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between gap-3">
+                <div class="space-y-0.5">
+                    <div class="font-bold text-stone-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt text-amber-500"></i> 方案 A：一键唤起 Readest 桌面端
+                    </div>
+                    <p class="text-[11px] text-stone-500 font-serifHeading">系统已自动将页码信息复制到剪贴板，按 Ctrl+G 秒达</p>
+                </div>
+                <button id="lrm-btn-readest" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold rounded-lg transition shadow-xs shrink-0 cursor-pointer">
+                    呼起 Readest
+                </button>
+            </div>
+
+            <!-- 方案二：复制 Edge 打开命令 -->
+            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
+                <div class="flex items-center justify-between">
+                    <div class="font-bold text-stone-900 flex items-center gap-1.5">
+                        <i class="fa-brands fa-edge text-sky-700"></i> 方案 B：复制 Edge 秒开命令
+                    </div>
+                    <button onclick="copyLocalReaderCmd()" class="px-2.5 py-1 bg-sky-700 hover:bg-sky-800 text-white font-semibold rounded-lg transition cursor-pointer text-[11px] flex items-center gap-1">
+                        <i class="fa-solid fa-copy"></i> 复制命令
+                    </button>
+                </div>
+                <input type="text" id="lrm-cmd-input" readonly class="w-full bg-white border border-stone-200 rounded-lg p-2 text-[11px] text-stone-600 font-mono-code select-all">
+                <p class="text-[11px] text-stone-500 font-serifHeading">按 <kbd class="px-1 py-0.5 bg-stone-200 rounded text-[10px]">Win + R</kbd> 呼出运行窗口，粘贴并回车，Edge 将直接翻到对应页！</p>
+            </div>
+
+            <!-- 方案三：本地运行提示 -->
+            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 space-y-1.5">
+                <div class="font-bold text-stone-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-laptop-code text-emerald-700"></i> 方案 C：使用本地控制台（最爽体验）
+                </div>
+                <p class="text-[11px] text-stone-600 font-serifHeading leading-relaxed">
+                    在您的电脑直接双击打开 <code class="text-sky-900 bg-white px-1.5 py-0.5 rounded border border-stone-200">e:\\workspace\\muduo-study-console\\index.html</code>，即可彻底解除浏览器安全限制，享受<strong>一键点击直接在新标签页翻开 PDF</strong> 的原生快感！
+                </p>
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="text" id="lrm-path-input" readonly class="w-full bg-white border border-stone-200 rounded-lg p-1.5 text-[11px] text-stone-600 font-mono-code select-all">
+                    <button onclick="copyLocalReaderPath()" class="px-2 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-semibold rounded-lg transition shrink-0 text-[11px]">
+                        复制路径
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-2 border-t border-stone-100 flex justify-end font-serifMono">
+            <button onclick="closeLocalReaderModal()" class="px-4 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl transition">
+                关闭
+            </button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
