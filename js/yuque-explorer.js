@@ -43,11 +43,39 @@ function safeEscape(str) {
         .replace(/'/g, "&#039;");
 }
 
+// 纯文本化 Markdown（提取纯净字符串，专用于 HTML 属性如 data-title、alt 等，杜绝双引号与标签泄露）
+function stripMarkdown(str, inlineCodes) {
+    if (!str) return "";
+    let s = str;
+    s = s.replace(/__INLINE_CODE_(\d+)__/g, (m, idx) => {
+        return inlineCodes[parseInt(idx, 10)] || "";
+    });
+    s = s.replace(/\*\*(.*?)\*\*/g, '$1');
+    s = s.replace(/\*(.*?)\*/g, '$1');
+    s = s.replace(/\[(.*?)\]\([^\)]*\)/g, '$1');
+    s = s.replace(/<[^>]*>/g, '');
+    return safeEscape(s.trim());
+}
+
+// 行内样式安全格式化器（只针对纯文本内容节点，绝对不作用于外层 HTML 标签属性）
+function formatInline(str, inlineCodes) {
+    if (!str) return "";
+    let s = safeEscape(str);
+    s = s.replace(/\*\*(.*?)\*\*/g, '<strong class="text-stone-900 font-bold">$1</strong>');
+    s = s.replace(/\*(.*?)\*/g, '<em class="text-stone-700 italic">$1</em>');
+    s = s.replace(/\[(.*?)\]\((https?:\/\/[^\s\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-sky-700 underline font-semibold hover:text-sky-900 transition">$1 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>');
+    s = s.replace(/__INLINE_CODE_(\d+)__/g, (m, idx) => {
+        const code = inlineCodes[parseInt(idx, 10)];
+        return `<code class="bg-stone-100 text-amber-900 border border-stone-200 px-1.5 py-0.5 rounded text-[11px] font-mono">${safeEscape(code)}</code>`;
+    });
+    return s;
+}
+
 // 轻量防弹级 Markdown 转 HTML 渲染器 (支持 C++ 高亮、代码一键复制、表格与图片)
 function renderMarkdownSafe(mdText) {
     if (!mdText) return "<p class='text-stone-400'>暂无正文内容</p>";
 
-    // 先保护代码块，避免代码块内的内容被 Markdown 规则误伤
+    // 1. 先保护代码块，避免代码块内的内容被 Markdown 规则误伤
     const codeBlocks = [];
     let text = mdText.replace(/```([a-zA-Z0-9_\+\-#]*)\n([\s\S]*?)```/g, function(match, lang, code) {
         const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`;
@@ -55,7 +83,7 @@ function renderMarkdownSafe(mdText) {
         return placeholder;
     });
 
-    // 保护行内代码
+    // 2. 保护行内代码
     const inlineCodes = [];
     text = text.replace(/`([^`\n]+)`/g, function(match, code) {
         const placeholder = `__INLINE_CODE_${inlineCodes.length}__`;
@@ -63,30 +91,37 @@ function renderMarkdownSafe(mdText) {
         return placeholder;
     });
 
-    // 转义普通文本中的 HTML，杜绝脚本注入
-    text = safeEscape(text);
-
-    // 标题解析 (附带唯一锚点与大纲导航元数据)
+    // 3. 标题解析 (data-title 严格使用纯净文本 stripMarkdown，内部正文使用 formatInline，彻底解决属性闭合泄露)
     let headingIdx = 0;
-    text = text.replace(/^#### (.*?)$/gm, '<h4 class="text-xs sm:text-sm font-bold text-stone-900 mt-4 mb-2 font-serifHeading">$1</h4>');
+    text = text.replace(/^#### (.*?)$/gm, function(m, title) {
+        const displayTitle = formatInline(title, inlineCodes);
+        return `<h4 class="text-xs sm:text-sm font-bold text-stone-900 mt-4 mb-2 font-serifHeading">${displayTitle}</h4>`;
+    });
     text = text.replace(/^### (.*?)$/gm, function(m, title) {
         headingIdx++;
         const id = `yq-heading-${headingIdx}`;
-        return `<h3 id="${id}" data-level="3" data-title="${safeEscape(title)}" class="yq-doc-heading text-sm sm:text-base font-bold text-stone-900 mt-5 mb-2.5 font-serifHeading flex items-center gap-1.5 scroll-mt-6"><i class="fa-solid fa-angle-right text-amber-600 text-xs"></i>${title}</h3>`;
+        const cleanTitle = stripMarkdown(title, inlineCodes);
+        const displayTitle = formatInline(title, inlineCodes);
+        return `<h3 id="${id}" data-level="3" data-title="${cleanTitle}" class="yq-doc-heading text-sm sm:text-base font-bold text-stone-900 mt-5 mb-2.5 font-serifHeading flex items-center gap-1.5 scroll-mt-6"><i class="fa-solid fa-angle-right text-amber-600 text-xs"></i>${displayTitle}</h3>`;
     });
     text = text.replace(/^## (.*?)$/gm, function(m, title) {
         headingIdx++;
         const id = `yq-heading-${headingIdx}`;
-        return `<h2 id="${id}" data-level="2" data-title="${safeEscape(title)}" class="yq-doc-heading text-base sm:text-lg font-bold text-stone-900 mt-6 mb-3 pb-1 border-b border-stone-200 font-serifHeading flex items-center gap-2 scroll-mt-6"><span class="w-1.5 h-4 bg-sky-700 rounded-full inline-block"></span>${title}</h2>`;
+        const cleanTitle = stripMarkdown(title, inlineCodes);
+        const displayTitle = formatInline(title, inlineCodes);
+        return `<h2 id="${id}" data-level="2" data-title="${cleanTitle}" class="yq-doc-heading text-base sm:text-lg font-bold text-stone-900 mt-6 mb-3 pb-1 border-b border-stone-200 font-serifHeading flex items-center gap-2 scroll-mt-6"><span class="w-1.5 h-4 bg-sky-700 rounded-full inline-block"></span>${displayTitle}</h2>`;
     });
-    text = text.replace(/^# (.*?)$/gm, '<h1 class="text-lg sm:text-xl font-black text-stone-900 mt-4 mb-3 font-serifHeading">$1</h1>');
+    text = text.replace(/^# (.*?)$/gm, function(m, title) {
+        const displayTitle = formatInline(title, inlineCodes);
+        return `<h1 class="text-lg sm:text-xl font-black text-stone-900 mt-4 mb-3 font-serifHeading">${displayTitle}</h1>`;
+    });
 
-    // 分割线
+    // 4. 分割线
     text = text.replace(/^---$/gm, '<hr class="my-6 border-stone-200">');
 
-    // 图片渲染 (支持本地离线嵌入、图文居中、放大模态框预览)
+    // 5. 图片渲染 (支持本地离线嵌入、图文居中、放大模态框预览)
     text = text.replace(/!\[(.*?)\]\((.*?)\)/g, function(m, alt, src) {
-        const cleanAlt = safeEscape(alt || '架构与技术全景图');
+        const cleanAlt = stripMarkdown(alt || '架构与技术全景图', inlineCodes);
         return `<div class="my-5 p-3 bg-white border border-stone-200 rounded-2xl text-center shadow-xs">
             <div class="overflow-hidden rounded-xl bg-stone-50/60 p-2 border border-stone-100 flex items-center justify-center">
                 <img src="${src}" alt="${cleanAlt}" class="max-w-full max-h-[580px] object-contain mx-auto rounded-lg shadow-xs hover:scale-[1.01] transition cursor-zoom-in" loading="lazy" onclick="openYuqueImageModal(this.src, '${cleanAlt}')" onerror="handleImageLoadError(this)" />
@@ -100,17 +135,12 @@ function renderMarkdownSafe(mdText) {
         </div>`;
     });
 
-    // 超链接安全渲染 (添加 noopener noreferrer)
-    text = text.replace(/\[(.*?)\]\((https?:\/\/.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-sky-700 underline font-semibold hover:text-sky-900 transition">$1 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>');
+    // 6. 引用块
+    text = text.replace(/^> (.*?)$/gm, function(m, quote) {
+        return `<blockquote class="border-l-4 border-amber-500 bg-amber-50/70 px-3.5 py-2 my-2.5 rounded-r-lg text-xs text-stone-800 font-serifMono">${formatInline(quote, inlineCodes)}</blockquote>`;
+    });
 
-    // 粗体与斜体
-    text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-stone-900 font-bold">$1</strong>');
-    text = text.replace(/\*(.*?)\*/g, '<em class="text-stone-700 italic">$1</em>');
-
-    // 引用块
-    text = text.replace(/^> (.*?)$/gm, '<blockquote class="border-l-4 border-amber-500 bg-amber-50/70 px-3.5 py-2 my-2.5 rounded-r-lg text-xs text-stone-800 font-serifMono">$1</blockquote>');
-
-    // 简单表格解析
+    // 7. 表格解析
     const lines = text.split('\n');
     let inTable = false;
     let tableHtml = "";
@@ -127,11 +157,11 @@ function renderMarkdownSafe(mdText) {
             if (!inTable) {
                 inTable = true;
                 tableHtml = '<div class="overflow-x-auto my-4"><table class="w-full text-left text-xs border-collapse border border-stone-200 rounded-xl overflow-hidden font-serifMono"><thead class="bg-stone-100 text-stone-800 font-bold"><tr>';
-                cells.forEach(c => { tableHtml += `<th class="p-2.5 border border-stone-200">${c}</th>`; });
+                cells.forEach(c => { tableHtml += `<th class="p-2.5 border border-stone-200">${formatInline(c, inlineCodes)}</th>`; });
                 tableHtml += '</tr></thead><tbody class="divide-y divide-stone-100 bg-white">';
             } else {
                 tableHtml += '<tr class="hover:bg-amber-50/40 transition">';
-                cells.forEach(c => { tableHtml += `<td class="p-2.5 border border-stone-200 text-stone-700">${c}</td>`; });
+                cells.forEach(c => { tableHtml += `<td class="p-2.5 border border-stone-200 text-stone-700">${formatInline(c, inlineCodes)}</td>`; });
                 tableHtml += '</tr>';
             }
         } else {
@@ -150,11 +180,15 @@ function renderMarkdownSafe(mdText) {
     }
     text = processedLines.join('\n');
 
-    // 列表解析
-    text = text.replace(/^- (.*?)$/gm, '<li class="ml-4 list-disc text-stone-700 my-0.5">$1</li>');
-    text = text.replace(/^([0-9]+)\. (.*?)$/gm, '<li class="ml-4 list-decimal text-stone-700 my-0.5">$2</li>');
+    // 8. 列表解析
+    text = text.replace(/^- (.*?)$/gm, function(m, item) {
+        return `<li class="ml-4 list-disc text-stone-700 my-0.5">${formatInline(item, inlineCodes)}</li>`;
+    });
+    text = text.replace(/^([0-9]+)\. (.*?)$/gm, function(m, num, item) {
+        return `<li class="ml-4 list-decimal text-stone-700 my-0.5">${formatInline(item, inlineCodes)}</li>`;
+    });
 
-    // 段落包裹 (非标签开头的普通文本行)
+    // 9. 段落包裹 (非标签开头的普通文本行)
     text = text.split('\n\n').map(para => {
         para = para.trim();
         if (!para) return "";
@@ -163,15 +197,10 @@ function renderMarkdownSafe(mdText) {
             para.startsWith('__CODE_BLOCK_')) {
             return para;
         }
-        return `<p class="my-2 leading-relaxed text-stone-800 text-xs sm:text-sm font-serifHeading">${para}</p>`;
+        return `<p class="my-2 leading-relaxed text-stone-800 text-xs sm:text-sm font-serifHeading">${formatInline(para, inlineCodes)}</p>`;
     }).join('\n\n');
 
-    // 还原行内代码
-    inlineCodes.forEach((code, idx) => {
-        text = text.replace(`__INLINE_CODE_${idx}__`, `<code class="bg-stone-100 text-amber-900 border border-stone-200 px-1.5 py-0.5 rounded text-[11px] font-mono">${safeEscape(code)}</code>`);
-    });
-
-    // 还原代码块并执行高亮 (完全对齐 28 天任务实验代码块纸质白底高亮风格)
+    // 10. 还原代码块并执行高亮 (完全对齐 28 天任务实验代码块纸质白底高亮风格)
     codeBlocks.forEach((block, idx) => {
         const lang = (block.lang || "cpp").toLowerCase();
         let highlightedCode = safeEscape(block.code);
