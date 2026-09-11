@@ -66,10 +66,19 @@ function renderMarkdownSafe(mdText) {
     // 转义普通文本中的 HTML，杜绝脚本注入
     text = safeEscape(text);
 
-    // 标题解析
+    // 标题解析 (附带唯一锚点与大纲导航元数据)
+    let headingIdx = 0;
     text = text.replace(/^#### (.*?)$/gm, '<h4 class="text-xs sm:text-sm font-bold text-stone-900 mt-4 mb-2 font-serifHeading">$1</h4>');
-    text = text.replace(/^### (.*?)$/gm, '<h3 class="text-sm sm:text-base font-bold text-stone-900 mt-5 mb-2.5 font-serifHeading flex items-center gap-1.5"><i class="fa-solid fa-angle-right text-amber-600 text-xs"></i>$1</h3>');
-    text = text.replace(/^## (.*?)$/gm, '<h2 class="text-base sm:text-lg font-bold text-stone-900 mt-6 mb-3 pb-1 border-b border-stone-200 font-serifHeading flex items-center gap-2"><span class="w-1.5 h-4 bg-sky-700 rounded-full inline-block"></span>$1</h2>');
+    text = text.replace(/^### (.*?)$/gm, function(m, title) {
+        headingIdx++;
+        const id = `yq-heading-${headingIdx}`;
+        return `<h3 id="${id}" data-level="3" data-title="${safeEscape(title)}" class="yq-doc-heading text-sm sm:text-base font-bold text-stone-900 mt-5 mb-2.5 font-serifHeading flex items-center gap-1.5 scroll-mt-6"><i class="fa-solid fa-angle-right text-amber-600 text-xs"></i>${title}</h3>`;
+    });
+    text = text.replace(/^## (.*?)$/gm, function(m, title) {
+        headingIdx++;
+        const id = `yq-heading-${headingIdx}`;
+        return `<h2 id="${id}" data-level="2" data-title="${safeEscape(title)}" class="yq-doc-heading text-base sm:text-lg font-bold text-stone-900 mt-6 mb-3 pb-1 border-b border-stone-200 font-serifHeading flex items-center gap-2 scroll-mt-6"><span class="w-1.5 h-4 bg-sky-700 rounded-full inline-block"></span>${title}</h2>`;
+    });
     text = text.replace(/^# (.*?)$/gm, '<h1 class="text-lg sm:text-xl font-black text-stone-900 mt-4 mb-3 font-serifHeading">$1</h1>');
 
     // 分割线
@@ -406,6 +415,9 @@ function renderYuqueReader(artId) {
     // 滚动至顶部
     const scrollContainer = document.getElementById('yq-reader-scroll');
     if (scrollContainer) scrollContainer.scrollTop = 0;
+
+    // 渲染悬浮大纲导航与首尾章节速查
+    renderFloatingNavWidget(art);
 }
 
 // 渲染 6 阶掌握度评级选择器
@@ -617,6 +629,172 @@ function saveYuqueState() {
     }
 }
 
+// ==========================================================================
+// 侧边栏折叠与全宽专注阅读模式
+// ==========================================================================
+window.toggleYuqueSidebar = function(forceState) {
+    const sidebar = document.getElementById('yq-sidebar-col');
+    const reader = document.getElementById('yq-reader-col');
+    const expandBtn = document.getElementById('yq-sidebar-expand-btn');
+    if (!sidebar || !reader) return;
+
+    const isCurrentlyCollapsed = sidebar.classList.contains('hidden');
+    const willCollapse = typeof forceState === 'boolean' ? forceState : !isCurrentlyCollapsed;
+
+    if (willCollapse) {
+        sidebar.classList.add('hidden');
+        reader.classList.remove('lg:col-span-8');
+        reader.classList.add('lg:col-span-12');
+        if (expandBtn) {
+            expandBtn.classList.remove('hidden');
+            expandBtn.classList.add('flex');
+        }
+        localStorage.setItem('cppai_sidebar_collapsed', 'true');
+        if (typeof showToast === 'function' && typeof forceState === 'undefined') {
+            showToast("已开启专注全宽阅读模式 (按 [ 键恢复)");
+        }
+    } else {
+        sidebar.classList.remove('hidden');
+        reader.classList.remove('lg:col-span-12');
+        reader.classList.add('lg:col-span-8');
+        if (expandBtn) {
+            expandBtn.classList.add('hidden');
+            expandBtn.classList.remove('flex');
+        }
+        localStorage.setItem('cppai_sidebar_collapsed', 'false');
+        if (typeof showToast === 'function' && typeof forceState === 'undefined') {
+            showToast("已恢复双栏目录模式 (按 [ 键折叠)");
+        }
+    }
+};
+
+// ==========================================================================
+// 悬浮大纲窗格交互与平滑滚动定位
+// ==========================================================================
+window.toggleFloatingNav = function(open) {
+    const pill = document.getElementById('yq-floating-pill');
+    const panel = document.getElementById('yq-floating-panel');
+    if (!panel) return;
+
+    const shouldOpen = typeof open === 'boolean' ? open : panel.classList.contains('hidden');
+    if (shouldOpen) {
+        panel.classList.remove('hidden');
+        if (pill) pill.classList.add('opacity-0', 'pointer-events-none');
+    } else {
+        panel.classList.add('hidden');
+        if (pill) pill.classList.remove('opacity-0', 'pointer-events-none');
+    }
+};
+
+window.scrollToHeading = function(headingId) {
+    const el = document.getElementById(headingId);
+    const scrollContainer = document.getElementById('yq-reader-scroll');
+    if (!el || !scrollContainer) return;
+
+    // 计算相对于滚动容器视口的准确目标位置
+    const elRect = el.getBoundingClientRect();
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const targetScrollTop = scrollContainer.scrollTop + (elRect.top - containerRect.top) - 16;
+
+    scrollContainer.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth'
+    });
+
+    // 焦点标题闪烁高亮提示
+    el.classList.add('bg-amber-100/80', 'px-1.5', 'rounded-lg', 'transition-all', 'duration-300');
+    setTimeout(() => {
+        el.classList.remove('bg-amber-100/80');
+    }, 1800);
+};
+
+window.scrollToReaderTop = function() {
+    const scrollContainer = document.getElementById('yq-reader-scroll');
+    if (scrollContainer) {
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+window.navToAdjacentArticle = function(direction) {
+    const dataset = getYuqueDataset();
+    if (!dataset || dataset.length === 0) return;
+    const currentId = appState.currentYuqueArticleId;
+    const currentIdx = dataset.findIndex(d => d.id === currentId);
+    if (currentIdx === -1) return;
+    const nextIdx = currentIdx + direction;
+    if (nextIdx >= 0 && nextIdx < dataset.length) {
+        selectYuqueArticle(dataset[nextIdx].id);
+    }
+};
+
+function renderFloatingNavWidget(art) {
+    const container = document.getElementById('yq-floating-nav-container');
+    if (!container || !art) return;
+
+    // 更新章节标题与上一章/下一章禁用态
+    const titleEl = document.getElementById('yq-floating-title');
+    if (titleEl) titleEl.innerText = art.title;
+
+    const dataset = getYuqueDataset();
+    const currentIdx = dataset.findIndex(d => d.id === art.id);
+    const prevBtn = document.getElementById('yq-btn-prev-doc');
+    const nextBtn = document.getElementById('yq-btn-next-doc');
+    if (prevBtn) {
+        prevBtn.disabled = currentIdx <= 0;
+        prevBtn.title = currentIdx > 0 ? `上一章: ${dataset[currentIdx - 1].title}` : '已是第一章';
+    }
+    if (nextBtn) {
+        nextBtn.disabled = currentIdx >= dataset.length - 1;
+        nextBtn.title = currentIdx < dataset.length - 1 ? `下一章: ${dataset[currentIdx + 1].title}` : '已是最后一章';
+    }
+
+    // 收集正文所有二级与三级标题
+    const headings = document.querySelectorAll('#yq-reader-body .yq-doc-heading');
+    const countEl = document.getElementById('yq-floating-heading-count');
+    if (countEl) countEl.innerText = `${headings.length} 节`;
+
+    const tocList = document.getElementById('yq-floating-toc-list');
+    if (!tocList) return;
+
+    if (headings.length === 0) {
+        tocList.innerHTML = `<div class="py-6 text-center text-stone-400 text-xs font-serifMono">
+            <i class="fa-regular fa-compass mb-1 text-base block text-stone-300"></i>
+            本篇为总论/导学，暂无二级与三级细分节
+        </div>`;
+        return;
+    }
+
+    let tocHtml = "";
+    headings.forEach(h => {
+        const id = h.id;
+        const level = parseInt(h.getAttribute('data-level') || '2', 10);
+        const title = h.getAttribute('data-title') || h.innerText.trim();
+
+        if (level === 2) {
+            tocHtml += `
+                <div onclick="scrollToHeading('${id}')" class="group flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-stone-100 text-stone-800 font-semibold cursor-pointer transition select-none">
+                    <span class="flex items-center gap-1.5 truncate text-xs">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-700 shrink-0"></span>
+                        <span class="truncate">${title}</span>
+                    </span>
+                    <i class="fa-solid fa-angle-right text-[10px] text-stone-300 group-hover:text-sky-700 transition"></i>
+                </div>
+            `;
+        } else {
+            tocHtml += `
+                <div onclick="scrollToHeading('${id}')" class="group flex items-center justify-between py-1 px-2 pl-4 rounded-lg hover:bg-stone-50 text-stone-600 cursor-pointer transition select-none">
+                    <span class="flex items-center gap-1.5 truncate text-[11px]">
+                        <i class="fa-solid fa-angle-right text-[9px] text-amber-600 shrink-0"></i>
+                        <span class="truncate">${title}</span>
+                    </span>
+                </div>
+            `;
+        }
+    });
+
+    tocList.innerHTML = tocHtml;
+}
+
 // 启动时自动恢复持久化
 function loadYuqueState() {
     ensureYuqueState();
@@ -627,6 +805,12 @@ function loadYuqueState() {
         if (f) appState.knowledgeFavorites = JSON.parse(f);
         const r = localStorage.getItem('cppai_knowledge_recent');
         if (r) appState.knowledgeRecent = JSON.parse(r);
+
+        // 恢复侧边栏折叠状态
+        const isCollapsed = localStorage.getItem('cppai_sidebar_collapsed');
+        if (isCollapsed === 'true') {
+            toggleYuqueSidebar(true);
+        }
     } catch (e) {
         console.warn("恢复语雀状态失败:", e);
     }
@@ -666,5 +850,11 @@ if (typeof window !== 'undefined') {
     window.openYuqueImageModal = openYuqueImageModal;
     window.closeYuqueImageModal = closeYuqueImageModal;
     window.handleImageLoadError = handleImageLoadError;
+    window.toggleYuqueSidebar = toggleYuqueSidebar;
+    window.toggleFloatingNav = toggleFloatingNav;
+    window.scrollToHeading = scrollToHeading;
+    window.scrollToReaderTop = scrollToReaderTop;
+    window.navToAdjacentArticle = navToAdjacentArticle;
+    window.renderFloatingNavWidget = renderFloatingNavWidget;
     loadYuqueState();
 }

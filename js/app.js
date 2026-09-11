@@ -2181,6 +2181,7 @@ document.addEventListener('keydown', (e) => {
         closeModal();
         closeNewPitfallModal();
         if (typeof closeYuqueImageModal === 'function') closeYuqueImageModal();
+        if (typeof toggleFloatingNav === 'function') toggleFloatingNav(false);
         return;
     }
 
@@ -2208,6 +2209,14 @@ document.addEventListener('keydown', (e) => {
         }
     } else if (e.key === 'r' || e.key === 'R') {
         openReviewModal();
+    } else if (e.key === '[' || e.key === ']') {
+        if (typeof toggleYuqueSidebar === 'function') {
+            toggleYuqueSidebar();
+        }
+    } else if (e.key === 'o' || e.key === 'O') {
+        if (typeof toggleFloatingNav === 'function') {
+            toggleFloatingNav();
+        }
     }
 });
 

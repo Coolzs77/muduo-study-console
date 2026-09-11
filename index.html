@@ -818,9 +818,9 @@
         </div>
 
         <!-- 主体双栏布局：左侧专栏目录树 + 右侧沉浸式阅读器 -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6" id="yq-main-grid">
             <!-- 左栏：目录树与最近阅读 (4 cols) -->
-            <div class="lg:col-span-4 space-y-4">
+            <div class="lg:col-span-4 space-y-4 transition-all duration-300" id="yq-sidebar-col">
                 <!-- 最近阅读小条 -->
                 <div class="bg-white rounded-2xl p-3.5 border border-stone-200 academic-card">
                     <div class="text-[10.5px] font-serifMono text-stone-400 font-bold mb-2 flex items-center justify-between">
@@ -837,7 +837,12 @@
                         <span class="font-bold text-xs text-stone-700 font-serifMono flex items-center gap-1.5">
                             <i class="fa-solid fa-list-ul text-blue-700"></i> 专栏目录索引
                         </span>
-                        <span class="text-[10px] font-serifMono text-stone-400">点击阅读章节</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-serifMono text-stone-400">点击阅读章节</span>
+                            <button onclick="toggleYuqueSidebar()" class="p-1 rounded-md text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition cursor-pointer" title="折叠左侧目录 (快捷键 [ )">
+                                <i class="fa-solid fa-angles-left text-xs"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-2 max-h-[640px] overflow-y-auto pr-1" id="yq-directory-list">
                         <!-- 由 JS 填充 17 篇文章卡片 -->
@@ -845,22 +850,35 @@
                 </div>
             </div>
 
-            <!-- 右栏：沉浸式阅读器与行级源码溯源卡 (8 cols) -->
-            <div class="lg:col-span-8 space-y-4">
+            <!-- 右栏：沉浸式阅读器与行级源码溯源卡 (8 cols / 折叠后 12 cols) -->
+            <div class="lg:col-span-8 space-y-4 transition-all duration-300" id="yq-reader-col">
                 <!-- 顶栏与掌握度打分条 -->
                 <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card space-y-3.5">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
-                        <div>
-                            <h3 class="text-base sm:text-lg font-black text-stone-900 font-serifHeading" id="yq-reader-title">
-                                正在加载专栏内容...
-                            </h3>
-                            <div class="flex items-center gap-2 mt-1 text-[11px] font-serifMono text-stone-500 flex-wrap" id="yq-reader-meta">
-                                <!-- JS 填充元数据 -->
+                        <div class="flex items-start gap-2.5">
+                            <!-- 展开侧边栏按钮 (折叠时显示) -->
+                            <button id="yq-sidebar-expand-btn" onclick="toggleYuqueSidebar()" class="hidden mt-0.5 px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-serifMono font-semibold border border-stone-200 transition items-center gap-1.5 shrink-0 cursor-pointer" title="展开目录树 (快捷键 [ )">
+                                <i class="fa-solid fa-bars"></i>
+                                <span>展开目录</span>
+                            </button>
+                            <div>
+                                <h3 class="text-base sm:text-lg font-black text-stone-900 font-serifHeading" id="yq-reader-title">
+                                    正在加载专栏内容...
+                                </h3>
+                                <div class="flex items-center gap-2 mt-1 text-[11px] font-serifMono text-stone-500 flex-wrap" id="yq-reader-meta">
+                                    <!-- JS 填充元数据 -->
+                                </div>
                             </div>
                         </div>
-                        <a id="yq-open-external-link" href="#" target="_blank" rel="noopener noreferrer" class="text-xs font-serifMono text-stone-500 hover:text-blue-700 transition flex items-center gap-1 shrink-0 self-start sm:self-auto" title="打开语雀在线页面">
-                            <span>语雀原著</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                        </a>
+                        <div class="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                            <button id="yq-quick-toc-btn" onclick="toggleFloatingNav()" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-serifMono transition flex items-center gap-1 cursor-pointer" title="查看本章大纲目录">
+                                <i class="fa-solid fa-list text-amber-700 text-[11px]"></i>
+                                <span>大纲</span>
+                            </button>
+                            <a id="yq-open-external-link" href="#" target="_blank" rel="noopener noreferrer" class="text-xs font-serifMono text-stone-500 hover:text-blue-700 transition flex items-center gap-1" title="打开语雀在线页面">
+                                <span>语雀原著</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                        </div>
                     </div>
 
                     <!-- 6 阶掌握度评定工具栏 -->
@@ -868,15 +886,15 @@
                         <span class="text-[11px] font-serifMono font-bold text-stone-600 flex items-center gap-1 shrink-0">
                             <i class="fa-solid fa-gauge-high text-amber-600"></i> 掌握评级:
                         </span>
-                        <div class="flex flex-wrap items-center gap-1.5" id="yq-mastery-selector">
-                            <!-- JS 填充 L0~L5 按钮 -->
+                        <div class="flex flex-wrap gap-1.5" id="yq-mastery-selector">
+                            <!-- 由 JS 渲染 6 阶打分按钮 -->
                         </div>
                     </div>
-                </div>
 
-                <!-- 源码行级与工程调用链路锚定卡片 -->
-                <div id="yq-source-trace-card">
-                    <!-- JS 填充源码文件、核心类、关键调用与面试深挖考点 -->
+                    <!-- 源码行级锚定卡片 -->
+                    <div id="yq-source-trace-card">
+                        <!-- JS 填充源码与考点信息 -->
+                    </div>
                 </div>
 
                 <!-- Markdown 正文阅读区 -->
@@ -884,6 +902,49 @@
                     <div id="yq-reader-body" class="prose prose-stone max-w-none text-stone-800 text-xs sm:text-sm leading-relaxed space-y-3 font-serifHeading">
                         <!-- JS 安全渲染 Markdown 正文 -->
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CppAIService 专栏大纲悬浮导航窗格 (无感贴边停靠，点击展开，支持平滑滚动定位与首尾章节速查) -->
+        <div id="yq-floating-nav-container" class="fixed bottom-6 right-6 z-40">
+            <!-- 贴边悬浮药丸/停靠胶囊 (默认轻盈半透明，绝不遮挡文档) -->
+            <div id="yq-floating-pill" onclick="toggleFloatingNav(true)" class="flex items-center gap-2 bg-stone-900/85 hover:bg-stone-950 text-white backdrop-blur-md px-3.5 py-2 rounded-full shadow-xl border border-stone-700/50 cursor-pointer transition select-none group" title="点击展开章节大纲导航">
+                <i class="fa-solid fa-compass text-amber-400 group-hover:rotate-45 transition duration-300 text-xs"></i>
+                <span class="text-xs font-serifMono font-medium">大纲导航</span>
+                <span class="text-[10px] bg-stone-700/80 px-1.5 py-0.5 rounded-full text-stone-200 font-serifMono font-bold" id="yq-floating-heading-count">0</span>
+            </div>
+
+            <!-- 展开态悬浮窗格卡片 -->
+            <div id="yq-floating-panel" class="hidden absolute bottom-0 right-0 w-80 max-w-[90vw] bg-white/95 backdrop-blur-md border border-stone-200 rounded-2xl shadow-2xl p-4 font-serifMono z-50 flex flex-col max-h-[75vh]">
+                <!-- 窗格顶栏 -->
+                <div class="flex items-center justify-between pb-2.5 border-b border-stone-200 shrink-0">
+                    <div class="flex items-center gap-1.5 text-xs font-bold text-stone-800">
+                        <i class="fa-solid fa-compass text-sky-700"></i>
+                        <span class="font-serifHeading truncate max-w-[170px]" id="yq-floating-title">本章导览</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="scrollToReaderTop()" class="p-1 rounded text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition text-[11px]" title="回到顶部">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+                        <button onclick="toggleFloatingNav(false)" class="p-1 rounded text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition text-xs cursor-pointer" title="收起大纲 (Esc)">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- 章节快速跳跃条 (上一章 / 下一章) -->
+                <div class="flex items-center justify-between py-2 border-b border-stone-100 text-[11px] shrink-0 text-stone-600">
+                    <button id="yq-btn-prev-doc" onclick="navToAdjacentArticle(-1)" class="hover:text-sky-700 transition flex items-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left text-[10px]"></i> 上一章
+                    </button>
+                    <span class="text-stone-300">|</span>
+                    <button id="yq-btn-next-doc" onclick="navToAdjacentArticle(1)" class="hover:text-sky-700 transition flex items-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                        下一章 <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                </div>
+                <!-- 大纲目录树 -->
+                <div class="overflow-y-auto pr-1 mt-2 flex-1 space-y-1 text-xs" id="yq-floating-toc-list">
+                    <!-- 动态生成 h2 / h3 链接 -->
                 </div>
             </div>
         </div>
