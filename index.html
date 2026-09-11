@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -231,12 +230,23 @@
                 <span id="timer-display" class="font-bold text-sky-900 bg-white px-2.5 py-1 rounded-lg border border-stone-200 text-sm tracking-widest">
                     00:00
                 </span>
-                <button id="btn-timer-toggle" onclick="toggleStudyTimer()" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-xs cursor-pointer">
-                    开始专注
+                <button id="btn-timer-toggle" onclick="toggleStudyTimer()" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-xs cursor-pointer flex items-center gap-1.5">
+                    <i id="btn-timer-icon" class="fa-solid fa-play"></i>
+                    <span id="btn-timer-text">开始专注</span>
                 </button>
-                <button onclick="resetStudyTimer()" class="px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-700 transition cursor-pointer">
-                    重置
+                <button onclick="resetStudyTimer()" class="px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-700 transition cursor-pointer flex items-center gap-1">
+                    <i class="fa-solid fa-rotate-left"></i> <span>重置</span>
                 </button>
+                <button onclick="saveActiveSession()" class="px-2.5 py-1 rounded-lg bg-sky-700 hover:bg-sky-800 text-white font-bold transition cursor-pointer flex items-center gap-1">
+                    <i class="fa-solid fa-check"></i> <span>归档会话</span>
+                </button>
+                <select id="timer-day" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="关联攻坚Day">
+                </select>
+                <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="攻坚类型">
+                    <option value="coding">代码攻坚</option>
+                    <option value="reading">书目研读(Readest)</option>
+                    <option value="debug">排错调试</option>
+                </select>
             </div>
             <div class="flex items-center gap-2 text-stone-500 text-[11px]">
                 <i class="fa-solid fa-shield text-amber-600"></i>
@@ -5840,9 +5850,9 @@ function toggleStudyTimer() {
 
     if (!appState.activeTimer.running) {
         appState.activeTimer.running = true;
-        btn.className = "px-3 py-1 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold transition flex items-center gap-1";
-        icon.className = "fa-solid fa-pause";
-        text.innerText = "暂停专注";
+        if (btn) btn.className = "px-3 py-1 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
+        if (icon) icon.className = "fa-solid fa-pause";
+        if (text) text.innerText = "暂停专注";
 
         appState.activeTimer.timerId = setInterval(() => {
             appState.activeTimer.seconds++;
@@ -5852,11 +5862,28 @@ function toggleStudyTimer() {
     } else {
         appState.activeTimer.running = false;
         clearInterval(appState.activeTimer.timerId);
-        btn.className = "px-3 py-1 rounded-lg bg-sky-800 hover:bg-sky-900 text-white font-bold transition flex items-center gap-1";
-        icon.className = "fa-solid fa-play";
-        text.innerText = "继续专注";
+        if (btn) btn.className = "px-3 py-1 rounded-lg bg-sky-800 hover:bg-sky-900 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
+        if (icon) icon.className = "fa-solid fa-play";
+        if (text) text.innerText = "继续专注";
         showToast("专注计时已暂停", false);
     }
+}
+
+function resetStudyTimer() {
+    if (appState.activeTimer.running) {
+        clearInterval(appState.activeTimer.timerId);
+        appState.activeTimer.running = false;
+    }
+    appState.activeTimer.seconds = 0;
+    updateTimerDisplay();
+
+    const btn = document.getElementById('btn-timer-toggle');
+    const icon = document.getElementById('btn-timer-icon');
+    const text = document.getElementById('btn-timer-text');
+    if (btn) btn.className = "px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
+    if (icon) icon.className = "fa-solid fa-play";
+    if (text) text.innerText = "开始专注";
+    showToast("专注计时已重置", false);
 }
 
 function updateTimerDisplay() {
@@ -6344,17 +6371,20 @@ function renderMappingTable() {
 
 // 笔记本与沙盒 (View 4)
 const debouncedSaveGlobalNotes = debounce(() => {
-    const text = document.getElementById('notebook-textarea').value;
-    appState.globalNotes = text;
+    const el = document.getElementById('notebook-textarea');
+    if (!el) return;
+    appState.globalNotes = el.value;
     persistState();
     const statusEl = document.getElementById('notebook-status');
     if (statusEl) statusEl.innerText = `已在 ${new Date().toLocaleTimeString()} 自动存盘`;
 }, 600);
 
 function saveGlobalNotesManual() {
-    const text = document.getElementById('notebook-textarea').value;
-    appState.globalNotes = text;
-    persistState();
+    const el = document.getElementById('notebook-textarea');
+    if (el) {
+        appState.globalNotes = el.value;
+        persistState();
+    }
     const statusEl = document.getElementById('notebook-status');
     if (statusEl) statusEl.innerText = `已在 ${new Date().toLocaleTimeString()} 手动存盘`;
     showToast("全局实验笔记已成功保存");
@@ -6362,7 +6392,8 @@ function saveGlobalNotesManual() {
 
 function clearGlobalNotes() {
     openModal("清空全局笔记", "确定清空备忘录文本域的所有内容吗？", () => {
-        document.getElementById('notebook-textarea').value = "";
+        const el = document.getElementById('notebook-textarea');
+        if (el) el.value = "";
         appState.globalNotes = "";
         persistState();
         showToast("笔记内容已清空");
@@ -7182,7 +7213,8 @@ function openResetModal() {
         persistState();
         updateDashboardMetrics();
         renderDailyCards();
-        document.getElementById('notebook-textarea').value = "";
+        const nbResetEl = document.getElementById('notebook-textarea');
+        if (nbResetEl) nbResetEl.value = "";
         showToast("系统已重置为初始纯净状态");
     });
 }
@@ -7439,7 +7471,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 绑定笔记本自动存盘
     const notebookEl = document.getElementById('notebook-textarea');
-    if (!notebookEl) return;
     if (notebookEl) {
         if (appState.globalNotes) notebookEl.value = appState.globalNotes;
         notebookEl.addEventListener('input', debouncedSaveGlobalNotes);
