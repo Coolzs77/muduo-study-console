@@ -47,4 +47,10 @@ if (fs.existsSync(path.join(rootDir, 'js'))) {
   console.log('✓ Copied js/ -> dist/js/');
 }
 
+// 5. Copy images/
+if (fs.existsSync(path.join(rootDir, 'images'))) {
+  copyRecursive(path.join(rootDir, 'images'), path.join(distDir, 'images'));
+  console.log('✓ Copied images/ -> dist/images/');
+}
+
 console.log('[BUILD SUCCESS] Production ready static build in dist/');

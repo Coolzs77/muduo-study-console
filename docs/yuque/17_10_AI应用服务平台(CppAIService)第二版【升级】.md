@@ -24,7 +24,7 @@ lake
 
 ## 与第一版的区别：
 
-![](https://cdn.nlark.com/yuque/0/2025/png/23026425/1763717232973-4e52a2c1-1e2a-4662-beea-4aba6d5548cd.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_48%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_01.png)
 
 # AIApps目录结构与文件说明:
 
@@ -145,7 +145,7 @@ AIApps/
 
 相对第一版，第二版做了不少的重构和新增内容，但是总体的技术架构图是基本不变的
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1760261844131-ba49b974-2cf3-4659-97d3-85efed668d3b.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_30%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_02.png)
 
 架构图展示了 **自研 C++ HTTP 服务框架** 如何将 AI 模型调用、图像识别、消息队列、数据库存储与多厂商模型 API 进行解耦，实现了**高性能、可扩展、可私有化部署**的 AI 应用平台。
 
@@ -280,7 +280,7 @@ CREATE TABLE users (
 
 ​
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1760432836170-8c4ee34a-8352-4fc4-b274-2263a68aff7c.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_23%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_03.png)
 
 上图展示了整个系统从 **客户端请求 → ChatServer 业务调度 → 多模型调用 → 异步消息入库** 的全链路流程：
 
@@ -370,7 +370,7 @@ POST /chat/send
 
 这里的只讲基本的调用链，方便大家理清是怎么一个处理流程。重点的调用链查看第三点（右侧目录找第三点）
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1760436273692-7110baf3-ded0-49de-a072-a9f40178a88e.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_10%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_04.png)
 
 ### 初始化阶段：
 
@@ -759,11 +759,11 @@ ASR 系统会识别并输出文字：
 
 需要点击密钥管理这个按钮进入到第二张图片这里
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1757930784240-24863cab-b2fa-4c83-bde9-58e7f5c17cd3.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_38%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10%2Fformat%2Cwebp%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_38%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_05.png)
 
 创建完之后记住它方便后续创建docker使用
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1757930770468-c34aba4f-425d-485e-a43c-fbb2020d9be5.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_37%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10%2Fformat%2Cwebp%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_37%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_06.png)
 
 ## 2.2: 获取字节火山引擎中豆包大模型的api-key
 
@@ -771,19 +771,19 @@ ASR 系统会识别并输出文字：
 
 搜索豆包大模型
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759905878764-ff692721-b416-4d0d-a870-3b2eae78605b.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_54%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_07.png)
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759905921793-6afe646c-a1dd-4ded-9120-342cadb7d2b0.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_54%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_08.png)
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759905936850-0826bd9b-9ea5-4f03-82c7-6e15cf6f5917.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_52%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_09.png)
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759905961950-562fe0a3-aaed-4e0a-beb3-816c8a5af9ad.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_54%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_10.png)
 
 创建对应API-Key，记住他方便后续创建docker使用，
 
 **注意：这边创建API KEY完后，进入step 2阶段，会出现开通模型的内容，选择开启所有服务(这边开启250715的服务也行，但是一键开启所有服务就不用专门去找250715服务了。如果没有开通，即便有api-key，后续访问大模型的时候会返回空数据，调用不成功!!!）**
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759905978452-ce6e3368-9008-486c-b7fa-6a04e43f71c8.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_11%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_11.png)
 
 ​
 
@@ -793,49 +793,49 @@ ASR 系统会识别并输出文字：
 
 登录进入百度智能云，搜索语音合成
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759906250431-eca4c691-e496-4c41-86ca-24518ef5e4b9.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_54%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_12.png)
 
 点击立即使用（注意：中途可能会让你注册服务什么的，直接开通服务即可）
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759906313185-09a56b29-7f34-49b6-a89c-cbc00bfbabaa.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_50%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_13.png)
 
 点击下面的API在线调试
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759906350470-823109c1-88e4-40c8-b5cb-75360c0e1551.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_39%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_14.png)
 
 从这里可以查看对应client_id还有client_secret
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759906459321-8185cf4d-5e28-4c8e-8c4c-e24b4521f68a.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_42%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_15.png)
 
 ## 2.4：构造阿里知识库&&获取知识库ID
 
 进入该地点，点击右侧的创建知识库：[https://bailian.console.aliyun.com/?tab=app#/knowledge-base](https://bailian.console.aliyun.com/?tab=app#/knowledge-base)
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907040438-21bf7c73-b86f-4344-8eb9-08518d89f00e.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_11%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_16.png)
 
 知识库一般从pdf，word文档中读入，按照我这么选择即可，点击下一步
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907061662-868eee60-eba5-4b24-96e6-4906a833851f.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_47%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_17.png)
 
 这边我将一份简历放入进去，后续搭建好了之后，AI会知道我当前知识库的信息，后续基于知识库中的内容做出相应回答。点击下一步
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907144619-1ce1887f-cb71-4417-8d69-8648ea225f4e.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_48%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_18.png)
 
 直接点导入完成即可，不需要弄太复杂的操作
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907222846-f6acfc1a-224f-46d0-89b0-af761e96969f.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_48%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_19.png)
 
 创建完成
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907256993-c35c1547-9be3-4559-a930-59865474f4ea.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_48%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_20.png)
 
 再进入此，创建一个新应用 [https://bailian.console.aliyun.com/?tab=app#/app-center](https://bailian.console.aliyun.com/?tab=app#/app-center)
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907320776-7d37420f-8c5d-405c-be5a-3838a78690a6.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_49%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_21.png)
 
 创建智能体应用，输入应用名称，点击立即创建
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907350767-b157b4d3-d526-4f46-bc6e-dce430d821d8.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_25%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_22.png)
 
 ​
 
@@ -847,27 +847,27 @@ ASR 系统会识别并输出文字：
 
 ​
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759906959412-d011ecc1-8c9e-47ec-a5a3-4cd5801f844e.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_54%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_23.png)
 
 点击知识，将刚刚创建的知识库导入进来
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907547521-535be6f2-2289-4c35-857d-56c41ef4c323.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_42%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_24.png)
 
 选择刚刚创建的知识库
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907512915-24c8d7f4-6890-4704-bbae-83e45bed34ee.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_54%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_25.png)
 
 点击发布
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907614343-4d6a65dd-89ba-4926-b5b3-4ef8cf650087.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_54%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_26.png)
 
 进入发布渠道
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907737920-8ca11810-796a-4517-ac02-503ae3f40c43.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_17%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_27.png)
 
 获取知识库ID，这边可以进行复制
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759907723215-54ac25d5-2d05-4bc2-b7b7-5e5ec0e79e1d.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_50%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_28.png)
 
 ## 2.5：下载Docker
 
@@ -972,7 +972,7 @@ docker run -dit \
 
 先docker ps查看是否有这个容器
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1757942644336-05a9d39d-de4e-4be1-9c86-5a533233c2f3.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_42%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10%2Fformat%2Cwebp%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_42%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_29.png)
 
 通过docker exec -it 724c8e6e5111 bash进入容器，**724c8e6e5111为你的CONTAINER ID ，看上面的截图，每个人的不一样**
 
@@ -1001,13 +1001,13 @@ rabbitmqctl status
 
 访问成功！（若用wsl登录，请在浏览器上输入127.0.0.1)
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759911193856-ad254d92-d55e-4544-ba45-ed48827d50c8.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_46%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_30.png)
 
 ## 2.8：关于访问mysql的注意点：
 
 这边容器的mysql的密码是123456，如果想要访问mysql的话记住这个密码即可
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1757931699617-d484b2aa-2d17-4809-83cf-f6e6ab225e84.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_20%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_20%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_31.png)
 
 ## 2.9：对于项目启动的补充：
 
@@ -1402,7 +1402,7 @@ static StrategyRegister<AliyunMcpStrategy> regAliyunMcp("4");
 
 具体AISpeechProcessor封装是根据文档这边2.4图中对应链接的示例进行curl封装的
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1759926786641-65b30588-c43a-4e6a-8590-4f6f1a1166ef.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_31%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_32.png)
 
 ​
 
@@ -2381,9 +2381,9 @@ FROM chat_message ORDER BY ts ASC, id ASC;
 
 下面摘取该文章的两个截图
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1760173285698-5bec3b83-bbb8-411b-85be-35d5e8b69de3.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_26%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_33.png)
 
-![](https://cdn.nlark.com/yuque/0/2025/png/60235355/1760173293343-08bbb4c7-6aa1-415c-83c1-280aa5acb1c6.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_29%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_17_34.png)
 
 ### 答法：
 

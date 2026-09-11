@@ -27,15 +27,18 @@
             box-shadow: 0 3px 6px rgba(35, 29, 22, 0.06), 0 14px 28px -6px rgba(35, 29, 22, 0.08);
         }
 
-        /* 代码高亮区域纸质质感 */
-        pre code.hljs {
+        /* 代码高亮区域纸质质感 (与 28 天实验代码块完全对齐) */
+        pre code.hljs,
+        .yuque-code-block pre code {
             background: #ffffff !important;
             border-radius: 0.5rem;
             border: 1px solid #e2e8f0;
+            border-left: 3px solid #cbd5e1 !important;
             padding: 0.85rem 1rem !important;
-            font-family: "Courier Prime", monospace !important;
+            font-family: "Courier Prime", "JetBrains Mono", Consolas, Courier, monospace !important;
             font-size: 0.82rem !important;
-            line-height: 1.6 !important;
+            line-height: 1.65 !important;
+            color: #24292e !important;
         }
 
         /* 拓扑流光动态连线 */

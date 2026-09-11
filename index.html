@@ -52,7 +52,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="css/style.css?v=5.4.1">
+    <meta name="referrer" content="no-referrer">
+    <link rel="stylesheet" href="css/style.css?v=6.0.0">
 </head>
 <body class="min-h-screen antialiased selection:bg-amber-100 selection:text-amber-900 pb-16 flex flex-col justify-between">
 
@@ -1363,10 +1364,28 @@ add_executable(my_server ${SOURCES})</pre>
     </div>
 </div>
 
-
-
-
-
+<!-- ==================== 语雀专栏高清架构大图灯箱预览 Modal ==================== -->
+<div id="yuque-image-modal" class="fixed inset-0 z-50 bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-6" onclick="closeYuqueImageModal()" role="dialog" aria-modal="true" aria-label="架构大图预览">
+    <div class="relative bg-white rounded-2xl max-w-5xl w-full p-4 sm:p-6 shadow-2xl border border-stone-300 max-h-[95vh] flex flex-col justify-between" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-200 mb-3">
+            <h4 class="font-bold text-stone-900 text-sm font-serifHeading flex items-center gap-2">
+                <i class="fa-solid fa-image text-blue-600"></i>
+                <span id="yuque-modal-title">架构与技术全景图</span>
+            </h4>
+            <div class="flex items-center gap-2">
+                <a id="yuque-modal-open-tab" href="#" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-serifMono transition flex items-center gap-1">
+                    <span>新窗口打开</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </a>
+                <button onclick="closeYuqueImageModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭预览">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="overflow-auto max-h-[78vh] flex items-center justify-center p-3 bg-stone-50 rounded-xl border border-stone-200">
+            <img id="yuque-modal-img" src="" alt="预览" class="max-w-full h-auto object-contain rounded shadow-xs" />
+        </div>
+    </div>
+</div>
 
     <!-- 模块化外部脚本加载（无打包依赖，原生静态秒开） -->
     <script src="js/dataset-28days.js?v=5.4.1"></script>

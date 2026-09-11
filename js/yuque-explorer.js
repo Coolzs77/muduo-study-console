@@ -75,11 +75,19 @@ function renderMarkdownSafe(mdText) {
     // 分割线
     text = text.replace(/^---$/gm, '<hr class="my-6 border-stone-200">');
 
-    // 图片渲染
+    // 图片渲染 (支持本地离线嵌入、图文居中、放大模态框预览)
     text = text.replace(/!\[(.*?)\]\((.*?)\)/g, function(m, alt, src) {
-        return `<div class="my-4 p-2 bg-stone-50 border border-stone-200 rounded-xl text-center">
-            <img src="${src}" alt="${alt}" class="max-h-96 mx-auto rounded-lg shadow-xs hover:scale-[1.01] transition" loading="lazy" />
-            ${alt ? `<p class="text-[11px] text-stone-500 mt-1.5 font-serifMono">${alt}</p>` : ''}
+        const cleanAlt = safeEscape(alt || '架构与技术全景图');
+        return `<div class="my-5 p-3 bg-white border border-stone-200 rounded-2xl text-center shadow-xs">
+            <div class="overflow-hidden rounded-xl bg-stone-50/60 p-2 border border-stone-100 flex items-center justify-center">
+                <img src="${src}" alt="${cleanAlt}" class="max-w-full max-h-[580px] object-contain mx-auto rounded-lg shadow-xs hover:scale-[1.01] transition cursor-zoom-in" loading="lazy" onclick="openYuqueImageModal(this.src, '${cleanAlt}')" onerror="handleImageLoadError(this)" />
+            </div>
+            <div class="flex items-center justify-center gap-2 mt-2 text-[11.5px] text-stone-500 font-serifMono">
+                <i class="fa-regular fa-image text-amber-600 text-xs"></i>
+                <span class="font-medium text-stone-600">${cleanAlt}</span>
+                <span class="text-stone-300">|</span>
+                <button onclick="openYuqueImageModal('${src}', '${cleanAlt}')" class="text-sky-700 hover:text-sky-900 font-semibold cursor-pointer transition hover:underline">点击放大查看</button>
+            </div>
         </div>`;
     });
 
@@ -154,13 +162,14 @@ function renderMarkdownSafe(mdText) {
         text = text.replace(`__INLINE_CODE_${idx}__`, `<code class="bg-stone-100 text-amber-900 border border-stone-200 px-1.5 py-0.5 rounded text-[11px] font-mono">${safeEscape(code)}</code>`);
     });
 
-    // 还原代码块并执行高亮
+    // 还原代码块并执行高亮 (完全对齐 28 天任务实验代码块纸质白底高亮风格)
     codeBlocks.forEach((block, idx) => {
+        const lang = (block.lang || "cpp").toLowerCase();
         let highlightedCode = safeEscape(block.code);
         if (typeof hljs !== 'undefined') {
             try {
-                if (block.lang && hljs.getLanguage(block.lang)) {
-                    highlightedCode = hljs.highlight(block.code, { language: block.lang }).value;
+                if (hljs.getLanguage(lang)) {
+                    highlightedCode = hljs.highlight(block.code, { language: lang }).value;
                 } else {
                     highlightedCode = hljs.highlightAuto(block.code).value;
                 }
@@ -170,16 +179,18 @@ function renderMarkdownSafe(mdText) {
         }
 
         const codeId = `code-block-${idx}-${Date.now()}`;
-        const copyButtonHtml = `<button onclick="copyCodeBlock('${codeId}')" class="px-2 py-0.5 rounded bg-stone-700 hover:bg-stone-600 text-stone-200 text-[10px] font-serifMono transition flex items-center gap-1 cursor-pointer" title="复制代码">
-            <i class="fa-solid fa-copy"></i> <span>复制</span>
+        const copyButtonHtml = `<button onclick="copyCodeBlock('${codeId}')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 text-stone-600 hover:text-stone-900 border border-stone-200 text-[11px] font-serifMono transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="复制代码">
+            <i class="fa-regular fa-copy text-stone-500"></i> <span>复制代码</span>
         </button>`;
 
-        const renderedBlock = `<div class="relative my-4 rounded-xl overflow-hidden border border-stone-800 shadow-md font-serifMono">
-            <div class="bg-stone-900 text-stone-400 px-3.5 py-1.5 text-[11px] flex items-center justify-between border-b border-stone-800">
-                <span class="font-bold text-amber-400"><i class="fa-solid fa-code text-xs mr-1"></i> ${safeEscape(block.lang.toUpperCase())}</span>
+        const renderedBlock = `<div class="yuque-code-block relative my-4 rounded-xl border border-stone-200/90 bg-white shadow-xs font-serifMono overflow-hidden">
+            <div class="bg-stone-50/90 px-3.5 py-1.5 text-[11px] flex items-center justify-between border-b border-stone-200/80 text-stone-600">
+                <span class="font-bold text-stone-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-code text-sky-700 text-xs"></i> <span>${safeEscape(lang)}</span>
+                </span>
                 ${copyButtonHtml}
             </div>
-            <pre class="p-4 bg-stone-950 text-stone-100 text-xs overflow-x-auto leading-relaxed"><code id="${codeId}" class="language-${block.lang}">${highlightedCode}</code></pre>
+            <pre class="m-0 p-0 overflow-x-auto bg-white"><code id="${codeId}" class="hljs language-${lang} font-mono-code text-xs leading-relaxed block p-4 bg-white text-stone-900" style="background:#ffffff!important;">${highlightedCode}</code></pre>
         </div>`;
 
         text = text.replace(`__CODE_BLOCK_${idx}__`, renderedBlock);
@@ -621,10 +632,39 @@ function loadYuqueState() {
     }
 }
 
+// 语雀高清架构大图灯箱预览
+window.openYuqueImageModal = function(src, title) {
+    const modal = document.getElementById('yuque-image-modal');
+    const modalImg = document.getElementById('yuque-modal-img');
+    const modalTitle = document.getElementById('yuque-modal-title');
+    const openTab = document.getElementById('yuque-modal-open-tab');
+    if (!modal || !modalImg) return;
+    modalImg.src = src;
+    if (modalTitle) modalTitle.innerText = title || "架构与技术全景图";
+    if (openTab) openTab.href = src;
+    modal.classList.remove('hidden');
+};
+
+window.closeYuqueImageModal = function() {
+    document.getElementById('yuque-image-modal')?.classList.add('hidden');
+};
+
+window.handleImageLoadError = function(img) {
+    const src = img.getAttribute('src') || '';
+    if (!src) return;
+    const basename = src.split('/').pop().split('?')[0];
+    if (basename && !src.endsWith('/' + basename)) {
+        img.src = 'images/yuque/' + basename;
+    }
+};
+
 // 自执行加载
 if (typeof window !== 'undefined') {
     window.renderYuqueExplorer = renderYuqueExplorer;
     window.loadYuqueState = loadYuqueState;
     window.selectYuqueArticle = selectYuqueArticle;
+    window.openYuqueImageModal = openYuqueImageModal;
+    window.closeYuqueImageModal = closeYuqueImageModal;
+    window.handleImageLoadError = handleImageLoadError;
     loadYuqueState();
 }

@@ -2180,6 +2180,7 @@ document.addEventListener('keydown', (e) => {
         closeReviewModal();
         closeModal();
         closeNewPitfallModal();
+        if (typeof closeYuqueImageModal === 'function') closeYuqueImageModal();
         return;
     }
 

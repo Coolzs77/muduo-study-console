@@ -56,7 +56,7 @@ HTTPS和HTTP的区别主要如下：
 
 我们都知道 HTTPS 能够加密信息，以免敏感信息被第三方获取，所以很多银行网站或电子邮箱等等安全级别较高的服务都会采用 HTTPS 协议。
 
-![](https://cdn.nlark.com/yuque/0/2025/png/39027506/1736943427786-f9eacb9f-612d-4567-b2a2-e007349df634.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_23%2Ctext_5Luj56CB6ZqP5oOz5b2V55-l6K-G5pif55CD%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10)
+![](images/img_11_01.png)
 
 **1、客户端发起 HTTPS 请求**
 
