@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>muduo C++ 个人训练系统 V5</title>
+    <title>CppAIService Engineering OS | 个人工程训练中枢与求职系统</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome 图标 -->
@@ -52,7 +52,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="css/style.css?v=5.4.1">
+    <link rel="stylesheet" href="css/style.css?v=6.0.0">
 </head>
 <body class="min-h-screen antialiased selection:bg-amber-100 selection:text-amber-900 pb-16 flex flex-col justify-between">
 
@@ -62,135 +62,78 @@
     <span id="toast-msg">记录已保存</span>
 </div>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-7 w-full">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 w-full">
     
-    <!-- 头部学术看板与统计总览 (优化布局：顶栏标题与操作指引，下栏 7 维全宽指标卡片) -->
-    <header class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card mb-6 sm:mb-8 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-amber-50 to-transparent pointer-events-none rounded-tr-2xl"></div>
+    <!-- 头部工程看板与专注计时控制台 -->
+    <header class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card mb-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-amber-50 via-sky-50/40 to-transparent pointer-events-none rounded-tr-2xl"></div>
         
-        <!-- 第一行：系统标题与右侧环境指引 -->
+        <!-- 第一行：系统标题与项目定位 -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
             <div>
-                <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-serifMono mb-2.5">
-                    <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-                    <span>INDUSTRIAL REACTOR ENGINE</span>
-                    <span class="text-amber-400">•</span>
-                    <span class="font-bold">面向 muduo 源码攻坚 • V5.0 个人训练系统</span>
+                <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-stone-900 text-amber-300 text-xs font-serifMono mb-2.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="font-bold">CPPAISERVICE ENGINEERING OS</span>
+                    <span class="text-stone-500">•</span>
+                    <span>V6.0 个人工程训练中枢</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-serif-heading">
-                    muduo C++ 个人训练系统 V5
+                    CppAIService Engineering OS
                 </h1>
-                <p class="text-stone-600 text-xs sm:text-sm mt-1.5 max-w-3xl leading-relaxed">
-                    以《C++ Primer Plus 第6版（中文版）》实体排版为精准基准，构建从<strong>学习 ➔ 实验 ➔ 自测 ➔ 掌握 ➔ 复习 ➔ 源码 ➔ 实战</strong>的完整工业级闭环。直击生命周期、RAII、智能指针、STL 容器、Lambda 闭包与 bind 回调，穿透 Reactor 架构！
+                <p class="text-stone-600 text-xs sm:text-sm mt-1.5 max-w-3xl leading-relaxed font-serifHeading">
+                    以 <strong>youngyangyang04/CppAIService</strong> 真实工业源码与程序员 Carl 语雀<strong>《HTTP服务框架》</strong>为绝对主线，构建从<strong>项目问题 ➔ 源码研读 ➔ 代码修改 ➔ 测试排错 ➔ Git Commit ➔ 工程证据 ➔ 简历提炼</strong>的实战闭环。
                 </p>
             </div>
 
-            <!-- 右侧快捷指引按钮 -->
-            <div class="flex items-center gap-2.5 shrink-0 self-start md:self-auto font-serifMono">
-                <button onclick="openEnvGuideModal()" class="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold transition flex items-center gap-2 shadow-xs group cursor-pointer" aria-label="开发环境与企业实战工作流指引">
-                    <i class="fa-solid fa-server text-sky-700 group-hover:scale-110 transition"></i>
-                    <span>企业级开发环境指引</span>
+            <!-- 右侧操作与环境指引 -->
+            <div class="flex flex-wrap items-center gap-2.5 shrink-0 self-start md:self-auto font-serifMono">
+                <a href="https://github.com/youngyangyang04/CppAIService" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-brands fa-github"></i> <span>源码仓库</span>
+                </a>
+                <button onclick="openEnvGuideModal()" class="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-server text-sky-700"></i> <span>实战开发指引</span>
                 </button>
             </div>
         </div>
 
-        <!-- 第二行：统计指标卡片 (全宽独立行，7 项维度舒展对齐，永不挤压折行) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3 mt-6 pt-5 border-t border-stone-100 font-serifMono">
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-sky-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-compass text-sky-700 text-xs"></i> 学习进度
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-sky-800 my-1" id="stat-progress-val">0%</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate" id="stat-progress-count">0 / 28 天</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-emerald-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-award text-emerald-600 text-xs"></i> 知识掌握
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-emerald-700 my-1" id="stat-mastery-val">0%</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate" id="stat-mastery-sub">L0 ~ L5 评级</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-indigo-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-flask text-indigo-600 text-xs"></i> Demo 跑通
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-indigo-700 my-1" id="stat-demo-val">0 / 28</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">实验工作台</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-teal-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-code-branch text-teal-700 text-xs"></i> 源码研读
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-teal-800 my-1" id="stat-source-val">0 / 8</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">核心流水线</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-amber-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-clock text-amber-600 text-xs"></i> 今日学习
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-amber-700 my-1" id="stat-today-time">0 min</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">专注会话</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-rose-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-repeat text-rose-600 text-xs"></i> 间隔复习
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-rose-600 my-1" id="stat-reviews-val">0 项</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">到期待巩固</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-amber-400 transition col-span-2 sm:col-span-2 lg:col-span-1">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-fire text-amber-700 text-xs"></i> 连续攻坚
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-amber-800 my-1" id="stat-streak">0 天</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">真实日期</div>
-            </div>
-        </div>
-
-        <!-- 第三行：专注学习计时与快捷记时栏 -->
-        <div class="mt-4 pt-4 border-t border-stone-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs font-serifMono bg-stone-50/60 p-3 rounded-xl border border-stone-200/80">
+        <!-- 第二行：工业级专注计时控制栏 -->
+        <div class="mt-5 pt-4 border-t border-stone-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs font-serifMono bg-stone-50/70 p-3.5 rounded-xl border border-stone-200">
             <div class="flex items-center gap-3 flex-wrap">
                 <span class="font-bold text-stone-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-stopwatch text-amber-600"></i> 专注会话：
+                    <i class="fa-solid fa-stopwatch text-amber-600"></i> 专注工坊：
                 </span>
-                <span id="timer-display" class="font-bold text-sky-900 bg-white px-2.5 py-1 rounded-lg border border-stone-200 text-sm tracking-widest">
+                <span id="timer-display" class="font-bold text-sky-900 bg-white px-3 py-1 rounded-lg border border-stone-300 text-sm sm:text-base tracking-widest shadow-xs">
                     00:00
                 </span>
-                <button id="btn-timer-toggle" onclick="toggleStudyTimer()" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-xs cursor-pointer flex items-center gap-1.5">
+                <button id="btn-timer-toggle" onclick="toggleStudyTimer()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-xs cursor-pointer flex items-center gap-1.5">
                     <i id="btn-timer-icon" class="fa-solid fa-play"></i>
                     <span id="btn-timer-text">开始专注</span>
                 </button>
-                <button onclick="resetStudyTimer()" class="px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-700 transition cursor-pointer flex items-center gap-1">
+                <button onclick="resetStudyTimer()" class="px-2.5 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-700 transition cursor-pointer flex items-center gap-1">
                     <i class="fa-solid fa-rotate-left"></i> <span>重置</span>
                 </button>
-                <button onclick="saveActiveSession()" class="px-2.5 py-1 rounded-lg bg-sky-700 hover:bg-sky-800 text-white font-bold transition cursor-pointer flex items-center gap-1">
+                <button onclick="saveActiveSession()" class="px-3 py-1.5 rounded-lg bg-sky-800 hover:bg-sky-900 text-white font-bold transition cursor-pointer flex items-center gap-1 shadow-xs">
                     <i class="fa-solid fa-check"></i> <span>归档会话</span>
                 </button>
-                <select id="timer-day" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="关联攻坚Day">
-                </select>
-                <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="攻坚类型">
-                    <option value="coding">代码攻坚</option>
-                    <option value="reading">书目研读</option>
-                    <option value="debug">排错调试</option>
+                <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2.5 py-1 text-xs text-stone-700 font-serifMono" title="攻坚类型">
+                    <option value="coding">CppAIService 源码实战</option>
+                    <option value="debug">排错调试与压测</option>
+                    <option value="reading">语雀/教材精读</option>
                 </select>
             </div>
             <div class="flex items-center gap-2 text-stone-500 text-[11px]">
-                <i class="fa-solid fa-shield text-amber-600"></i>
-                <span>工业沉浸模式 · 支持番茄钟与会话归档</span>
+                <i class="fa-solid fa-fire text-amber-600"></i>
+                <span>连续攻坚: <strong id="stat-streak" class="text-amber-800">0 天</strong></span>
+                <span class="text-stone-300">•</span>
+                <span>今日专注: <strong id="stat-today-time" class="text-sky-800">0 min</strong></span>
             </div>
         </div>
 
-        <!-- 进度条 -->
-        <div class="mt-4 pt-4 border-t border-stone-100">
+        <!-- 第三行：主线进度条 -->
+        <div class="mt-4 pt-3 border-t border-stone-100">
             <div class="flex items-center justify-between text-xs text-stone-500 font-serifMono mb-1.5">
-                <span id="progress-bar-text">准备踏入 muduo 源码大门</span>
-                <span class="text-amber-700 font-semibold">28 Days Mastery Pipeline</span>
+                <span id="progress-bar-text">Week 1 · CppAIService 深度攻坚推进中</span>
+                <span id="stat-progress-count" class="text-amber-700 font-bold">0 / 8 主线任务</span>
             </div>
             <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden border border-stone-200/80">
                 <div id="progress-fill" class="h-full bg-gradient-to-r from-sky-600 via-indigo-600 to-amber-600 transition-all duration-500 rounded-full" style="width: 0%;"></div>
@@ -198,1053 +141,558 @@
         </div>
     </header>
 
-    <!-- 顶部主视图切换导航 (6大核心模块) -->
-    <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-3 mb-6 font-serifHeading text-xs sm:text-sm" id="view-tabs" role="tablist" aria-label="主视图导航">
-        <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="攻坚大盘与架构拓扑">
-            <i class="fa-solid fa-chart-pie text-sky-700"></i> 攻坚大盘与架构拓扑
+    <!-- 顶部 8 维工程架构导航 (标准一级导航) -->
+    <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-3 mb-6 font-serifHeading text-xs sm:text-sm" id="view-tabs" role="tablist" aria-label="工程架构导航">
+        <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true">
+            <i class="fa-solid fa-compass text-amber-600"></i> 01 今日使命名盘
         </button>
-        <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
-            <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
+        <button onclick="switchView('project')" id="nav-project" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false">
+            <i class="fa-solid fa-network-wired text-sky-700"></i> 02 CppAIService 核心工坊
         </button>
-        <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="语法 ➔ muduo 映射矩阵">
-            <i class="fa-solid fa-sitemap text-emerald-600"></i> 语法 ➔ muduo 映射矩阵
+        <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false">
+            <i class="fa-solid fa-book-bookmark text-emerald-700"></i> 03 语雀目录与映射
         </button>
-        <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="每日自测中心">
-            <i class="fa-solid fa-clipboard-question text-purple-600"></i> 每日自测中心
+        <button onclick="switchView('learning')" id="nav-learning" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false">
+            <i class="fa-solid fa-code text-purple-700"></i> 04 算法手撕与八股题库
         </button>
-        <button onclick="switchView('source')" id="nav-source" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="muduo 源码路线">
-            <i class="fa-solid fa-code-branch text-teal-600"></i> muduo 源码路线
+        <button onclick="switchView('tasks')" id="nav-tasks" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false">
+            <i class="fa-solid fa-list-check text-rose-700"></i> 05 全景工程任务
         </button>
-        <button onclick="switchView('pitfalls')" id="nav-pitfalls" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="C++ 踩坑档案">
-            <i class="fa-solid fa-bug text-rose-600"></i> C++ 踩坑档案
+        <button onclick="switchView('evidence')" id="nav-evidence" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false">
+            <i class="fa-solid fa-bug text-red-600"></i> 06 踩坑档案与工程证据
+        </button>
+        <button onclick="switchView('career')" id="nav-career" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false">
+            <i class="fa-solid fa-file-invoice text-indigo-700"></i> 07 简历提炼与面试通关
+        </button>
+        <button onclick="switchView('settings')" id="nav-settings" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false">
+            <i class="fa-solid fa-gear text-stone-500"></i> 08 系统设置与安全备份
         </button>
     </nav>
 
-    <!-- ==================== VIEW 1: 仪表盘与架构拓扑 ==================== -->
+    <!-- ==================== VIEW 1: 今日使命与全局大盘 (DASHBOARD) ==================== -->
     <section id="view-dashboard" class="space-y-6">
         
-        <!-- 今日最高优先级任务卡 (Today's Mission) -->
-        <div id="today-mission-card" class="bg-gradient-to-r from-amber-50 via-white to-sky-50 rounded-2xl p-5 sm:p-6 border border-amber-200/80 academic-card">
-            <!-- 由 JS 动态计算填充 -->
+        <!-- 今日最高优先级主线 (Today's Mission) 核心 Hero 卡片 -->
+        <div id="today-mission-card" class="bg-gradient-to-r from-amber-50 via-white to-sky-50 rounded-2xl p-5 sm:p-7 border border-amber-300/80 academic-card">
+            <!-- 由 JS 动态渲染 -->
         </div>
 
-        <!-- 28 天日历热力打卡矩阵 -->
-        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-                <div>
-                    <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-calendar-days text-amber-700"></i> 28 天定向攻坚打卡索引网格
-                    </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">单元格颜色映射 0~5 阶掌握度等级，点击直接跳转定位任务卡片。</p>
-                </div>
-                <!-- 图例说明 -->
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-serifMono text-stone-600">
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-stone-200 inline-block"></span> 未开始 (0)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> 已阅读 (1)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> 已理解 (2)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Demo跑通 (3)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span> 独立实现 (4)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-800 inline-block"></span> 源码贯通 (5)</span>
-                </div>
-            </div>
-
-            <!-- 28 天自适应网格 -->
-            <div class="grid grid-cols-4 sm:grid-cols-7 gap-2 sm:gap-2.5" id="calendar-grid">
-                <!-- 由 JavaScript 动态生成 -->
-            </div>
-        </div>
-
-        <!-- 学习时间统计与间隔复习待办双栏 -->
+        <!-- 左右双栏：左侧项目工程状态，右侧今日分级计划 (S/A/B/C) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- 左栏：学习时间统计卡片与纯轻量 SVG 柱状图 -->
-            <div class="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                            <i class="fa-solid fa-chart-simple text-sky-800"></i> 近 7 天专注投入分布
+            <!-- 左栏：当前阶段与能力阶梯 -->
+            <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex items-center justify-between border-b border-stone-100 pb-3 mb-3">
+                        <h3 class="font-bold text-stone-900 text-sm sm:text-base font-serif-heading flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-sky-800"></i> 当前项目状态与能力阶梯
                         </h3>
-                        <p class="text-[11px] text-stone-500 mt-0.5">轻量原生矢量可视化，记录真实专注学习曲线。</p>
+                        <span class="text-xs font-serifMono px-2 py-0.5 rounded bg-sky-100 text-sky-900 font-bold">Week 1 攻坚</span>
                     </div>
-                    <span class="text-xs font-serifMono text-stone-500 bg-stone-100 px-2.5 py-1 rounded-lg">
-                        累计 <span id="stat-total-hours" class="font-bold text-stone-900">0.0</span> 小时
-                    </span>
-                </div>
 
-                <div class="grid grid-cols-4 gap-2 mb-4 text-center font-serifMono">
-                    <div class="bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                        <div class="text-[10px] text-stone-400">今日时间</div>
-                        <div class="text-xs sm:text-sm font-bold text-amber-800" id="stat-card-today">0m</div>
-                    </div>
-                    <div class="bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                        <div class="text-[10px] text-stone-400">本周时间</div>
-                        <div class="text-xs sm:text-sm font-bold text-sky-800" id="stat-card-week">0m</div>
-                    </div>
-                    <div class="bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                        <div class="text-[10px] text-stone-400">日均时间</div>
-                        <div class="text-xs sm:text-sm font-bold text-emerald-800" id="stat-card-avg">0m</div>
-                    </div>
-                    <div class="bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                        <div class="text-[10px] text-stone-400">记录会话</div>
-                        <div class="text-xs sm:text-sm font-bold text-stone-800" id="stat-card-sessions">0次</div>
+                    <div class="space-y-2.5 text-xs font-serifHeading text-stone-700">
+                        <div class="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
+                            <div class="text-[11px] font-bold text-stone-400 font-serifMono uppercase">当前攻坚模块</div>
+                            <div class="font-bold text-stone-900 text-sm">HttpServer 核心服务框架 (muduo Reactor)</div>
+                            <p class="text-stone-500 text-[11px]">搞透主从 Reactor 线程模型、事件循环与非阻塞 Socket 分发机制。</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
+                            <div class="text-[11px] font-bold text-stone-400 font-serifMono uppercase">能力等级目标 (L0 ~ L6)</div>
+                            <div class="flex items-center justify-between font-serifMono">
+                                <span class="font-bold text-amber-800">当前等级: L3 (能运行调试)</span>
+                                <span class="text-emerald-700 font-bold">目标: L6 (能讲透面试)</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden mt-1">
+                                <div class="h-full bg-amber-600 rounded-full" style="width: 50%;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 纯 SVG 7天柱状图 -->
-                <div class="w-full h-36 bg-stone-50/50 rounded-xl border border-stone-200 p-2" id="study-chart-container">
-                    <!-- 由 JS 动态绘制 -->
+                <div class="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-serifMono">
+                    <span class="text-stone-400">已沉淀工程贡献: <strong id="stat-demo-val" class="text-stone-800">1 项</strong></span>
+                    <button onclick="switchView('evidence')" class="text-sky-700 hover:text-sky-900 font-bold flex items-center gap-1">
+                        <span>查看工程证据库</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- 右栏：艾宾浩斯间隔复习今日清单 -->
-            <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card flex flex-col justify-between">
+            <!-- 右栏：今日任务分级队列 (Today's Plan) -->
+            <div class="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                            <i class="fa-solid fa-repeat text-rose-600"></i> 今日待复习清单
+                    <div class="flex items-center justify-between border-b border-stone-100 pb-3 mb-3">
+                        <h3 class="font-bold text-stone-900 text-sm sm:text-base font-serif-heading flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-rose-700"></i> 今日分级任务队列 (S/A/B/C)
                         </h3>
-                        <span id="badge-due-count" class="text-xs font-serifMono font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
-                            0 项到期
-                        </span>
+                        <span class="text-xs font-serifMono text-stone-400">项目永远优先</span>
                     </div>
-                    <p class="text-[11px] text-stone-500 mb-3 leading-relaxed">
-                        基于 [1d ➔ 3d ➔ 7d ➔ 14d ➔ 30d] 记忆衰减阶梯，对已完成自测的内容定期巩固。
-                    </p>
 
-                    <div id="review-due-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        <!-- JS 填充到期复习项 -->
+                    <div id="today-plan-container">
+                        <!-- JS 填充 -->
                     </div>
                 </div>
 
-                <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
-                    <span class="text-[11px] text-stone-400 font-serifMono">按 R 键随时打开复习闪卡</span>
-                    <button onclick="openReviewModal()" class="px-3.5 py-1.5 rounded-xl bg-stone-900 text-stone-100 hover:bg-stone-800 text-xs font-serifMono font-bold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-play"></i> 开启今日复习
+                <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-serifMono">
+                    <span class="text-[11px] text-stone-400">时间不足时优先砍 C 级，确保 S 级主线交付</span>
+                    <button onclick="switchView('tasks')" class="text-stone-700 hover:text-stone-900 font-bold flex items-center gap-1">
+                        <span>管理全部任务</span> <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- 知识推导路线与 muduo 架构拓扑 (可点击交互式工程蓝图) -->
+        <!-- CppAIService 交互式全景拓扑预览 -->
         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card overflow-hidden">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
                 <div>
                     <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-sky-50 border border-sky-200 text-sky-800 text-[11px] font-serifMono uppercase tracking-wider mb-1">
-                        Interactive Topology & Reactor Architecture
+                        CppAIService Full Architecture Topology
                     </div>
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        现代 C++ 递进路线 ➔ muduo 架构拓扑映射
+                        服务全链路架构拓扑图 (点击节点透视源码与面试深挖)
                     </h2>
                     <p class="text-xs text-stone-500 mt-0.5">
-                        💡 <strong>节点可点击交互：</strong>点击 EventLoop、Channel、Poller、Buffer 等任意组件查看职责、成员、核心函数与关联学习日。
+                        基于真实源码映射：客户端请求 ➔ HttpServer ➔ Router ➔ ChatServer ➔ AIStrategy / MCP ➔ RabbitMQ ➔ MySQL
                     </p>
                 </div>
                 <div class="flex items-center gap-3 text-xs font-serifMono text-stone-600">
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-50 border border-amber-300 inline-block"></span> C++ 核心机制</span>
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-50 border border-sky-300 inline-block"></span> 事件驱动调度</span>
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-50 border border-emerald-300 inline-block"></span> 业务连接实体</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-100 border border-sky-300 inline-block"></span> 基础通信层</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-100 border border-amber-300 inline-block"></span> 业务与AI层</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-100 border border-emerald-300 inline-block"></span> 异步持久化</span>
                 </div>
             </div>
-            
-            <!-- 浅色工程蓝图风格 SVG 拓扑图 (带点击事件) -->
+
+            <!-- 可交互 SVG 拓扑蓝图 -->
             <div class="w-full overflow-x-auto border border-stone-200 rounded-xl p-3 bg-stone-50/50">
-                <svg viewBox="0 0 1120 480" class="min-w-[980px] w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 1120 400" class="min-w-[960px] w-full h-auto" xmlns="http://www.w3.org/2000/svg">
                     <defs>
-                        <pattern id="academic-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#ede7dd" stroke-width="0.8"/>
+                        <pattern id="grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ede7dd" stroke-width="0.8"/>
                         </pattern>
-                        <marker id="arrow-stone" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#78716c"/>
-                        </marker>
                         <marker id="arrow-sky" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#0284c7"/>
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#0369a1"/>
+                        </marker>
+                        <marker id="arrow-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#b45309"/>
                         </marker>
                         <marker id="arrow-emerald" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#059669"/>
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#047857"/>
                         </marker>
                     </defs>
 
-                    <rect width="1120" height="480" fill="url(#academic-grid)" rx="8"/>
+                    <rect width="1120" height="400" fill="url(#grid-pattern)" rx="8"/>
 
-                    <!-- === 第一列：C++ 8 阶演进阶梯 (左翼基础) === -->
-                    <g transform="translate(25, 20)">
-                        <rect width="250" height="440" rx="8" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
-                        <text x="125" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13.5" fill="#292524">现代 C++ 8 阶演进阶梯</text>
-                        <line x1="20" y1="38" x2="230" y2="38" stroke="#f5f5f4" stroke-width="1.5"/>
+                    <!-- 列 1: 客户端与通信接入层 (0~330) -->
+                    <g transform="translate(30, 25)">
+                        <rect width="300" height="350" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <text x="150" y="26" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#0f172a">网络传输与 HTTP 框架 (HttpServer)</text>
+                        <line x1="20" y1="36" x2="280" y2="36" stroke="#f1f5f9" stroke-width="1.5"/>
 
-                        <g transform="translate(15, 50)" class="topo-node" onclick="openTopologyDrawer('step_1')">
-                            <rect width="220" height="42" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
-                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#92400e">① const & 引用传参</text>
-                            <text x="10" y="32" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">const T& 零拷贝只读入参规范</text>
+                        <g transform="translate(15, 48)" class="topo-node" onclick="openTopologyDrawer('mod_http_core')">
+                            <rect width="270" height="68" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">HttpServer (muduo 主从 Reactor)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• One Loop Per Thread 4工作线程池</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• 包装 TcpServer 与 EventLoop 事件分发</text>
                         </g>
 
-                        <g transform="translate(15, 98)" class="topo-node" onclick="openTopologyDrawer('step_2')">
-                            <rect width="220" height="42" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
-                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#92400e">② 类 / 析构自动化 / RAII</text>
-                            <text x="10" y="32" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">锁与文件描述符生命期绑定</text>
+                        <g transform="translate(15, 126)" class="topo-node" onclick="openTopologyDrawer('mod_http_codec')">
+                            <rect width="270" height="54" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                            <text x="12" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#334155">HttpContext (有限状态机编解码)</text>
+                            <text x="12" y="38" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">解析请求行、请求头、空行与报文体</text>
                         </g>
 
-                        <g transform="translate(15, 146)" class="topo-node" onclick="openTopologyDrawer('step_3')">
-                            <rect width="220" height="42" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
-                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#92400e">③ 移动语义 / =delete</text>
-                            <text x="10" y="32" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">右值窃取所有权，禁拷贝基类</text>
+                        <g transform="translate(15, 190)" class="topo-node" onclick="openTopologyDrawer('mod_router')">
+                            <rect width="270" height="68" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#15803d">Router (动态路由分发引擎)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="10" fill="#166534">• 精确路由哈希匹配 O(1)</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="10" fill="#166534">• std::regex 正则路径参数捕获 (/user/:id)</text>
                         </g>
 
-                        <g transform="translate(15, 194)" class="topo-node" onclick="openTopologyDrawer('step_4')">
-                            <rect width="220" height="52" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
-                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#92400e">④ 智能指针体系</text>
-                            <text x="10" y="32" font-family="'Courier Prime', monospace" font-size="9.5" fill="#b45309">unique 独占 / shared 共享</text>
-                            <text x="10" y="44" font-family="'Courier Prime', monospace" font-size="9.5" fill="#b45309">weak_ptr 观察者解耦防死锁</text>
-                        </g>
-
-                        <g transform="translate(15, 252)" class="topo-node" onclick="openTopologyDrawer('step_5')">
-                            <rect width="220" height="42" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
-                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#92400e">⑤ STL 连续与关联容器</text>
-                            <text x="10" y="32" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">vector 缓冲 / map 维护连接</text>
-                        </g>
-
-                        <g transform="translate(15, 300)" class="topo-node" onclick="openTopologyDrawer('step_6')">
-                            <rect width="220" height="42" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
-                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#92400e">⑥ std::function & Lambda</text>
-                            <text x="10" y="32" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">类型擦除通用可调用包装器</text>
-                        </g>
-
-                        <g transform="translate(15, 348)" class="topo-node" onclick="openTopologyDrawer('step_7')">
-                            <rect width="220" height="42" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
-                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#92400e">⑦ std::bind 绑定成员函数</text>
-                            <text x="10" y="32" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">消除 this 依赖，跨类回调胶水</text>
-                        </g>
-
-                        <g transform="translate(15, 396)" class="topo-node" onclick="openTopologyDrawer('step_8')">
-                            <rect width="220" height="34" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
-                            <text x="10" y="16" font-family="'Courier Prime', monospace" font-weight="700" font-size="11" fill="#92400e">⑧ 模板基础 / 虚析构</text>
-                            <text x="10" y="28" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">Poller 虚析构防泄漏 / 泛型</text>
+                        <g transform="translate(15, 268)" class="topo-node" onclick="openTopologyDrawer('mod_middleware')">
+                            <rect width="270" height="58" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                            <text x="12" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#334155">MiddlewareChain & CORS</text>
+                            <text x="12" y="38" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">洋葱模型责任链，OPTIONS 预检与安全头注入</text>
                         </g>
                     </g>
 
-                    <!-- 连接跨越：C++ 机制 -> Reactor 调度引擎 -->
-                    <path d="M 275 120 L 340 120" stroke="#78716c" stroke-dasharray="3,3" stroke-width="1.2" marker-end="url(#arrow-stone)"/>
-                    <path d="M 275 220 C 305 220, 310 270, 340 270" stroke="#78716c" stroke-dasharray="3,3" stroke-width="1.2" marker-end="url(#arrow-stone)"/>
-                    <path d="M 275 320 C 310 320, 310 300, 340 300" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
-                    <path d="M 275 370 C 310 370, 310 360, 520 360" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
-                    <path d="M 275 270 C 330 270, 480 270, 740 375" stroke="#059669" stroke-width="1.4" marker-end="url(#arrow-emerald)"/>
+                    <path d="M 330 190 L 390 190" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-sky)"/>
 
-                    <!-- === 第二列：Reactor 反应堆驱动调度 (中间层) === -->
-                    <g transform="translate(345, 20)">
-                        <rect width="365" height="440" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
-                        <text x="182" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13.5" fill="#0f172a">muduo 事件分发驱动 (Reactor 引擎)</text>
-                        <line x1="20" y1="38" x2="345" y2="38" stroke="#f1f5f9" stroke-width="1.5"/>
+                    <!-- 列 2: AI 业务中枢层 (390~730) -->
+                    <g transform="translate(390, 25)">
+                        <rect width="330" height="350" rx="8" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+                        <text x="165" y="26" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#9a3412">AI 业务总管与多模型策略 (ChatServer)</text>
+                        <line x1="20" y1="36" x2="310" y2="36" stroke="#fff7ed" stroke-width="1.5"/>
 
-                        <g transform="translate(18, 50)" class="topo-node" onclick="openTopologyDrawer('mutexlockguard')">
-                            <rect width="329" height="44" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-                            <text x="12" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#334155">MutexLockGuard (RAII 自动互斥锁)</text>
-                            <text x="12" y="34" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">构造加锁，离开作用域析构自动解锁，杜绝死锁</text>
+                        <g transform="translate(15, 48)" class="topo-node" onclick="openTopologyDrawer('mod_chat_server')">
+                            <rect width="300" height="74" rx="6" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#92400e">ChatServer (全业务调度总管)</text>
+                            <text x="12" y="42" font-family="'Courier Prime', monospace" font-size="9.5" fill="#78350f">unordered_map&lt;userId, map&lt;sessionId, AIHelper&gt;&gt;</text>
+                            <text x="12" y="60" font-family="'Noto Serif SC', serif" font-size="10" fill="#78350f">多用户多会话安全上下文隔离</text>
                         </g>
 
-                        <g transform="translate(18, 104)" class="topo-node" onclick="openTopologyDrawer('eventloop')">
-                            <rect width="329" height="100" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.5"/>
-                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#0369a1">EventLoop (One Loop Per Thread)</text>
-                            <text x="12" y="46" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• loop() 驱动循环；eventfd 跨线程安全唤醒</text>
-                            <text x="12" y="66" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• queueInLoop(Functor) 异步安全任务队列</text>
-                            <text x="12" y="86" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• 独占 unique_ptr&lt;Poller&gt; 负责 I/O 监听</text>
+                        <g transform="translate(15, 132)" class="topo-node" onclick="openTopologyDrawer('mod_ai_strategy')">
+                            <rect width="300" height="84" rx="6" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#92400e">StrategyFactory (注册式多模型工厂)</text>
+                            <text x="12" y="42" font-family="'Courier Prime', monospace" font-size="9.5" fill="#78350f">• Aliyun / DouBao / AliyunRAG / AliyunMcp</text>
+                            <text x="12" y="60" font-family="'Noto Serif SC', serif" font-size="10" fill="#78350f">• 模板自注册 StrategyRegister&lt;T&gt; 零侵入扩展</text>
                         </g>
 
-                        <g transform="translate(18, 214)" class="topo-node" onclick="openTopologyDrawer('poller')">
-                            <rect width="155" height="85" rx="5" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
-                            <text x="10" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#1e293b">Poller / epoll</text>
-                            <text x="10" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#475569">虚基类抽象接口</text>
-                            <text x="10" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#475569">epoll_wait() 阻塞</text>
-                            <text x="10" y="74" font-family="'Courier Prime', monospace" font-size="9" fill="#0284c7">map&lt;int, Channel*&gt;</text>
+                        <g transform="translate(15, 226)" class="topo-node" onclick="openTopologyDrawer('mod_mcp_registry')">
+                            <rect width="300" height="66" rx="6" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#6b21a8">AIToolRegistry (轻量级 MCP 落地)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="10" fill="#581c87">• 工具注册: getWeather / getTime</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="10" fill="#581c87">• 模型意图识别 ➔ 本地工具调用 ➔ 二段式推理</text>
                         </g>
 
-                        <g transform="translate(190, 214)" class="topo-node" onclick="openTopologyDrawer('channel')">
-                            <rect width="157" height="85" rx="5" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.5"/>
-                            <text x="10" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">Channel (通道适配)</text>
-                            <text x="10" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#075985">独占单一 Socket fd</text>
-                            <text x="10" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#075985">注册读写事件与回调</text>
-                            <text x="10" y="74" font-family="'Courier Prime', monospace" font-size="9" fill="#b45309">weak_ptr&lt;void&gt; tie_</text>
+                        <g transform="translate(15, 300)" class="topo-node" onclick="openTopologyDrawer('mod_multimodal')">
+                            <rect width="300" height="38" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                            <text x="10" y="16" font-family="'Courier Prime', monospace" font-weight="700" font-size="10.5" fill="#334155">多模态: 百度 ASR/TTS + ONNX OpenCV</text>
+                            <text x="10" y="30" font-family="'Noto Serif SC', serif" font-size="9" fill="#64748b">语音识别合成 + 本地深度学习图像分类</text>
                         </g>
-
-                        <g transform="translate(18, 310)" class="topo-node" onclick="openTopologyDrawer('handleeventwithguard')">
-                            <rect width="329" height="114" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="11" fill="#334155">Channel::handleEventWithGuard()</text>
-                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">1. tie_.lock() 安全提升为 shared_ptr 保证连接存活</text>
-                            <text x="12" y="62" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">2. EPOLLIN  ➜ 触发 readCallback_(receiveTime)</text>
-                            <text x="12" y="82" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">3. EPOLLOUT ➜ 触发 writeCallback_()</text>
-                            <text x="12" y="102" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">4. EPOLLERR ➜ 触发 errorCallback_()</text>
-                        </g>
-
-                        <path d="M 95 204 L 95 212" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
-                        <path d="M 173 256 L 188 256" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
-                        <path d="M 268 300 L 268 308" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
                     </g>
 
-                    <path d="M 710 160 L 755 160" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-sky)"/>
-                    <path d="M 710 270 L 755 270" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
+                    <path d="M 720 190 L 780 190" stroke="#b45309" stroke-width="2" marker-end="url(#arrow-amber)"/>
 
-                    <!-- === 第三列：业务层与网络连接实体 (右翼结果) === -->
-                    <g transform="translate(760, 20)">
-                        <rect width="335" height="440" rx="8" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
-                        <text x="167" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13.5" fill="#065f46">网络连接与数据实体 (Tcp 服务)</text>
-                        <line x1="20" y1="38" x2="315" y2="38" stroke="#f0fdf4" stroke-width="1.5"/>
+                    <!-- 列 3: 异步持久化与数据库层 (780~1080) -->
+                    <g transform="translate(780, 25)">
+                        <rect width="310" height="350" rx="8" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
+                        <text x="155" y="26" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#065f46">异步消息削峰与持久化 (RabbitMQ & DB)</text>
+                        <line x1="20" y1="36" x2="290" y2="36" stroke="#f0fdf4" stroke-width="1.5"/>
 
-                        <g transform="translate(16, 50)" class="topo-node" onclick="openTopologyDrawer('tcpserver')">
-                            <rect width="303" height="116" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
-                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#047857">TcpServer (高层服务器大总管)</text>
-                            <text x="12" y="48" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• map&lt;string, TcpConnectionPtr&gt; conns_</text>
-                            <text x="12" y="68" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 管理全服所有活跃客户端连接生命周期</text>
-                            <text x="12" y="88" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• std::bind 绑定 newConnection 回调挂入 Acceptor</text>
-                            <text x="12" y="106" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• noncopyable 阻止非法的对象复制</text>
+                        <g transform="translate(15, 48)" class="topo-node" onclick="openTopologyDrawer('mod_rabbitmq_async')">
+                            <rect width="280" height="74" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#047857">MQManager (RabbitMQ 连接池)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 前台同步写内存，秒级响应用户</text>
+                            <text x="12" y="60" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 异步投递 SQL 至队列 (sql_queue) 削峰</text>
                         </g>
 
-                        <g transform="translate(16, 180)" class="topo-node" onclick="openTopologyDrawer('tcpconnection')">
-                            <rect width="303" height="120" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
-                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#047857">TcpConnection (客户端长连接核心)</text>
-                            <text x="12" y="48" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• shared_ptr&lt;TcpConnection&gt; 共享生存期</text>
-                            <text x="12" y="68" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• enable_shared_from_this 跨线程自保</text>
-                            <text x="12" y="88" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 拥有独立 inputBuffer_ 与 outputBuffer_</text>
-                            <text x="12" y="106" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• std::bind 组装 onMessage / onClose 回调</text>
+                        <g transform="translate(15, 132)" class="topo-node" onclick="openTopologyDrawer('mod_rabbitmq_async')">
+                            <rect width="280" height="66" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#047857">RabbitMQThreadPool (消费者)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 2 个工作线程并发安全消费</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 彻底消除主线程磁盘 I/O 阻塞</text>
                         </g>
 
-                        <g transform="translate(16, 314)" class="topo-node" onclick="openTopologyDrawer('buffer')">
-                            <rect width="303" height="106" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
-                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#334155">Buffer (自适应非阻塞缓冲器)</text>
-                            <text x="12" y="44" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">• 底层为连续内存 std::vector&lt;char&gt;</text>
-                            <text x="12" y="62" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">• 采用 prepends / readable / writable 游标</text>
-                            <text x="12" y="80" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">• readv 分散读结合栈临时空间实现零碎片扩容</text>
-                            <text x="12" y="98" font-family="'Courier Prime', monospace" font-size="9" fill="#0284c7">size_t readableBytes() const;</text>
+                        <g transform="translate(15, 210)" class="topo-node" onclick="openTopologyDrawer('mod_db_pool')">
+                            <rect width="280" height="120" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#1e293b">DbConnectionPool & MySQL</text>
+                            <text x="12" y="44" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#475569">• RAII 锁 + 条件变量管理有限 MySQL 连接</text>
+                            <text x="12" y="64" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#475569">• 历史消息落地 chat_message 数据表</text>
+                            <text x="12" y="84" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#475569">• ChatServer 启动时执行预热恢复</text>
+                            <text x="12" y="104" font-family="'Courier Prime', monospace" font-size="9" fill="#0284c7">SELECT * FROM chat_message ORDER BY ts ASC</text>
                         </g>
-
-                        <path d="M 167 166 L 167 178" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
-                        <path d="M 167 300 L 167 312" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
                     </g>
                 </svg>
             </div>
-
-            <!-- 拓扑关键结论批注 -->
-            <div class="mt-4 p-4 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs leading-relaxed text-amber-950 font-serifHeading">
-                <span class="font-bold font-serifMono text-amber-900">📌 拓扑关键结论：</span>
-                muduo 源码之所以在现代 C++ 网络工程中极为精悍，是因为它<strong>彻底抛弃了层层深继承的传统 OOP 虚函数包袱</strong>，转而采用以 <code>std::function / std::bind</code> 为核心的“基于对象（Object-based）”回调模式。配合 <code>shared_ptr/weak_ptr</code>，极为优雅地解决了多线程异步网络编程中“对象正在析构但回调恰好到来”的并发竞态问题。
-            </div>
-        </div>
-
-        <!-- 知识分级与战略剪裁卡片 (A/B/C 三级) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-rose-200 academic-card flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-serifMono font-black px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800">A 级 · 绝对核心</span>
-                        <i class="fa-solid fa-fire text-rose-500"></i>
-                    </div>
-                    <h3 class="font-bold text-stone-900 text-sm font-serif-heading">必须精读、动手写 Demo 验证</h3>
-                    <p class="text-xs text-stone-500 mt-1">muduo 类的骨架机制，遇到任何一处卡壳就完全无法继续通读。</p>
-                    <div class="flex flex-wrap gap-1.5 mt-3 text-[11px] font-serifMono">
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">引用 & const</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">RAII 构造析构</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">深拷贝与自赋值</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">移动语义(move)</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">=delete / =default</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">unique_ptr</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">shared_ptr/weak_ptr</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">vector / map / set</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">Lambda & function</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">std::bind 成员绑定</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">类模板基础 / 虚析构</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">运算符重载 (&lt;&lt; / &lt;)</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-rose-100 text-[11px] text-rose-700 font-serifMono">
-                    共 25 个不可跳过的硬核核心任务
-                </div>
-            </div>
-
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-amber-200 academic-card flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-serifMono font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">B 级 · 概念理解</span>
-                        <i class="fa-solid fa-lightbulb text-amber-500"></i>
-                    </div>
-                    <h3 class="font-bold text-stone-900 text-sm font-serif-heading">理解即可，不必陷入语法深渊</h3>
-                    <p class="text-xs text-stone-500 mt-1">知道为什么有此特性，能看懂源码意图即可，不要死扣复杂八股。</p>
-                    <div class="flex flex-wrap gap-1.5 mt-3 text-[11px] font-serifMono">
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">单继承 & 纯虚函数</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">override / final</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">std::list 双向链表</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">deque (仅作选型对比)</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">static 静态成员</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">namespace 命名空间</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">static_cast 显式转换</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-amber-100 text-[11px] text-amber-700 font-serifMono">
-                    只掌握核心意图，节省实操时间
-                </div>
-            </div>
-
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 academic-card flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-serifMono font-black px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-600">C 级 · 坚决跳过</span>
-                        <i class="fa-solid fa-ban text-stone-400"></i>
-                    </div>
-                    <h3 class="font-bold text-stone-900 text-sm font-serif-heading">4周内绝对不碰，节省精力</h3>
-                    <p class="text-xs text-stone-500 mt-1">工业网络库极力避免的过度设计或已被现代 C++ 淘汰的技术。</p>
-                    <div class="flex flex-wrap gap-1.5 mt-3 text-[11px] font-serifMono">
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">多重继承 / 菱形继承</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">RTTI 与 typeid 底层</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">auto_ptr (已废弃)</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">复杂模板元编程 (SFINAE)</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">valarray 数值数组</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">老旧 C++98 宏黑魔法</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-stone-200 text-[11px] text-stone-500 font-serifMono">
-                    杜绝偏题，保持最强执行力
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- ==================== VIEW 2: 28天任务与实验 ==================== -->
-    <section id="view-daily" class="hidden space-y-6">
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200 academic-card flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div class="flex bg-stone-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
-                <button onclick="setWeekFilter(0)" class="week-tab px-3 py-1.5 text-xs font-bold rounded-lg transition text-stone-900 bg-white shadow-xs font-serifMono whitespace-nowrap" data-week="0">全部 (28天)</button>
-                <button onclick="setWeekFilter(1)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="1">W1: 生命周期与RAII</button>
-                <button onclick="setWeekFilter(2)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="2">W2: 智能指针与STL</button>
-                <button onclick="setWeekFilter(3)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="3">W3: 回调与bind系统</button>
-                <button onclick="setWeekFilter(4)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="4">W4: 泛型与源码通读</button>
-            </div>
-
-            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                <div class="relative w-full sm:w-64">
-                    <input type="text" id="search-input" oninput="applyDailyFilters()" placeholder="搜索 (如: weak_ptr, bind, RAII)..." class="w-full bg-stone-50 border border-stone-200 text-xs sm:text-sm rounded-xl px-3 py-1.5 pl-8 focus:outline-none focus:ring-2 focus:ring-sky-600/30 focus:border-sky-700 font-serifMono transition" aria-label="搜索学习卡片">
-                    <span class="absolute left-2.5 top-2 text-stone-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
-                </div>
-                <select id="filter-status-select" onchange="changeFilterStatus(this.value)" class="px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-serifMono font-bold text-stone-700 hover:bg-stone-100 transition whitespace-nowrap focus:outline-none" aria-label="状态筛选">
-                    <option value="all">显示全部</option>
-                    <option value="pending">仅看待学项</option>
-                    <option value="mastered">仅看已攻克</option>
-                    <option value="due_review">仅看今日待复习</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- 每日任务卡片列表 -->
-        <div class="space-y-6" id="cards-container">
-            <!-- 由 JS 动态渲染全部 28 天核心卡片 -->
-        </div>
-    </section>
-
-    <!-- ==================== VIEW 3: 语法与源码映射矩阵 ==================== -->
-    <section id="view-mapping" class="hidden space-y-6">
-        <div class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
-            <div class="p-5 sm:p-6 bg-stone-50/80 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+    <!-- ==================== VIEW 2: CppAIService 核心工坊 (PROJECT) ==================== -->
+    <section id="view-project" class="hidden space-y-6">
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 border-b border-stone-100 pb-4">
                 <div>
-                    <h3 class="font-bold text-stone-900 text-base flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-table-list text-sky-800"></i> C++ 核心机制 ➔ muduo 源码设计映射全景图
-                    </h3>
-                    <p class="text-xs text-stone-500 mt-1">
-                        清晰对应每个 C++ 关键语法在 muduo 工业源码中的所在文件、工程设计思想与代表性代码片段。
-                    </p>
+                    <span class="text-xs font-serifMono text-sky-800 font-bold uppercase tracking-wider">CODEBASE EXPLORER</span>
+                    <h2 class="text-lg sm:text-xl font-bold text-stone-900 font-serif-heading mt-0.5">CppAIService 真实源码模块地图</h2>
+                    <p class="text-xs text-stone-500 mt-1">深度审计 GitHub 仓库各模块源码职责、类设计、线程模型与调用关系。</p>
                 </div>
-                <span class="text-xs font-serifMono text-stone-400 bg-white px-3 py-1 rounded-lg border border-stone-200 w-fit">
-                    共 15 项基石映射
+                <span class="text-xs font-serifMono bg-stone-100 text-stone-700 px-3 py-1.5 rounded-xl border border-stone-200" id="stat-source-val">
+                    共 13 个核心工程模块
                 </span>
             </div>
 
-            <!-- 响应式表格 -->
+            <!-- 模块卡片瀑布流 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="project-modules-container">
+                <!-- 由 JS 填充 -->
+            </div>
+        </div>
+
+        <!-- 行级源码索引表 -->
+        <div class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
+            <div class="p-5 bg-stone-50/80 border-b border-stone-200">
+                <h3 class="font-bold text-stone-900 text-base font-serif-heading flex items-center gap-2">
+                    <i class="fa-solid fa-code-branch text-sky-800"></i> CppAIService 行级代码索引与逐行导读
+                </h3>
+                <p class="text-xs text-stone-500 mt-1">每个关键模块的真实实现文件、核心类与架构职责。</p>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="bg-stone-100 text-stone-700 font-bold border-b border-stone-200 font-serifMono">
-                            <th class="p-3.5 w-36 sm:w-44">C++ 语法特性</th>
-                            <th class="p-3.5 w-48 sm:w-60">muduo 源码典型位置</th>
-                            <th class="p-3.5 min-w-[260px]">设计思想与“为什么这么写”</th>
-                            <th class="p-3.5 w-64 sm:w-72">代表性代码片段</th>
-                            <th class="p-3.5 w-24 text-center">对应任务</th>
+                            <th class="p-3.5 w-48">模块名称</th>
+                            <th class="p-3.5 w-60">源码相对路径</th>
+                            <th class="p-3.5">架构职责</th>
+                            <th class="p-3.5 w-56">核心类</th>
+                            <th class="p-3.5 w-24 text-center">透视</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100 font-normal text-stone-600 font-serifHeading" id="source-map-table-body">
+                        <!-- JS 填充 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 我的真实项目贡献记录 (Engineering Contributions) -->
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card space-y-4">
+            <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+                <div>
+                    <h3 class="font-bold text-stone-900 text-base font-serif-heading flex items-center gap-2">
+                        <i class="fa-solid fa-medal text-amber-600"></i> My CppAIService Engineering Contributions (项目真实贡献)
+                    </h3>
+                    <p class="text-xs text-stone-500 mt-0.5">记录你在项目中攻克的真实缺陷、重构与测试成果，作为简历与面试的不可辩驳证据。</p>
+                </div>
+            </div>
+            <div class="space-y-3" id="contributions-container">
+                <!-- JS 填充 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== VIEW 3: 语雀目录与映射全景 (KNOWLEDGE) ==================== -->
+    <section id="view-knowledge" class="hidden space-y-6">
+        
+        <!-- 全站统一即时检索 (Unified Search) -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 academic-card">
+            <div class="relative w-full">
+                <input type="text" id="unified-search-input" oninput="executeUnifiedSearch(this.value)" placeholder="输入关键词全站穿透检索 (如: shared_ptr, Router, EventLoop, RabbitMQ, MCP)..." class="w-full bg-stone-50 border border-stone-300 text-xs sm:text-sm rounded-xl px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-sky-600/30 font-serifMono">
+                <span class="absolute left-3.5 top-3 text-stone-400 text-sm"><i class="fa-solid fa-magnifying-glass"></i></span>
+            </div>
+            <div id="unified-search-results" class="hidden mt-4 rounded-xl border border-stone-200 bg-stone-50/50">
+                <!-- JS 填充搜索结果 -->
+            </div>
+        </div>
+
+        <!-- 程序员 Carl 语雀知识库《HTTP服务框架》目录全景 -->
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-stone-100 pb-3">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-serifMono font-bold">
+                        YUQUE OFFICIAL TUTORIAL
+                    </div>
+                    <h2 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading mt-1">
+                        程序员 Carl 语雀《HTTP服务框架》17 篇知识库索引
+                    </h2>
+                    <p class="text-xs text-stone-500 mt-0.5">从基础 HTTP 框架到五子棋，再到 CppAIService 第一版与第二版升级全貌。</p>
+                </div>
+                <div class="flex items-center gap-2 font-serifMono text-xs text-stone-500">
+                    <span>17 篇文档</span>
+                    <span>•</span>
+                    <span>68,091 字</span>
+                </div>
+            </div>
+
+            <!-- 语雀文档卡片瀑布流 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="yuque-list-container">
+                <!-- JS 填充 -->
+            </div>
+        </div>
+
+        <!-- 语法 ➔ 源码 映射矩阵表格 -->
+        <div class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
+            <div class="p-5 bg-stone-50/80 border-b border-stone-200">
+                <h3 class="font-bold text-stone-900 text-base font-serif-heading flex items-center gap-2">
+                    <i class="fa-solid fa-table-list text-emerald-800"></i> C++ 核心机制 ➔ CppAIService 架构映射全景图
+                </h3>
+                <p class="text-xs text-stone-500 mt-1">清晰对应现代 C++ 机制在工业代码中的设计意图与工程铁律。</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-stone-100 text-stone-700 font-bold border-b border-stone-200 font-serifMono">
+                            <th class="p-3.5 w-40">C++ 语法特性</th>
+                            <th class="p-3.5 w-60">典型所在源码位置</th>
+                            <th class="p-3.5">设计思想与“为什么这么写”</th>
+                            <th class="p-3.5 w-64">代表性代码片段</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-100 font-normal text-stone-600 font-serifHeading" id="mapping-table-body">
-                        <!-- 由 JS 动态填充表格 -->
+                        <!-- JS 填充 -->
                     </tbody>
                 </table>
             </div>
         </div>
     </section>
 
-    <!-- ==================== VIEW 4: 实验沙盒与备忘录 ==================== -->
-
-    <!-- ==================== VIEW 5: 每日自测中心 ==================== -->
-    <section id="view-quiz" class="hidden space-y-6">
-        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-stone-100">
+    <!-- ==================== VIEW 4: 算法手撕与八股题库 (LEARNING) ==================== -->
+    <section id="view-learning" class="hidden space-y-6">
+        
+        <!-- 算法手撕板块 (每日 3 题) -->
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-stone-100 pb-3">
                 <div>
-                    <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-clipboard-question text-purple-700"></i> 每日深度自测中心
+                    <h2 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading flex items-center gap-2">
+                        <i class="fa-solid fa-code text-purple-700"></i> C++ 算法手撕 Lab (每日 3 道高频题)
                     </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">选择任意 Day 开启 5 维硬核自测；通过自测（得分 ≥ 80%）方可解锁该 Day 的更高掌握度。</p>
-                </div>
-                <div class="flex items-center gap-2 font-serifMono">
-                    <span class="text-xs text-stone-600">切换自测日:</span>
-                    <select id="quiz-day-selector" onchange="loadQuizForDay(parseInt(this.value))" class="bg-stone-50 border border-stone-200 text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-600/30 text-stone-800" aria-label="选择自测日期">
-                        <!-- 由 JS 填充 28 天选项 -->
-                    </select>
+                    <p class="text-xs text-stone-500 mt-0.5">记录题目思路、第一次踩坑错因、时间复杂度与面试口述技巧，强化二刷复习。</p>
                 </div>
             </div>
+            <div class="space-y-4" id="algorithm-logs-container">
+                <!-- JS 填充 -->
+            </div>
+        </div>
 
-            <!-- 自测卡片展示区 -->
-            <div id="quiz-runner-container" class="mt-6 space-y-6">
-                <!-- 由 JS 动态渲染当前选择 Day 的完整自测题 -->
+        <!-- CppAIService 项目高频面试真题库 -->
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-stone-100 pb-3">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-sky-800"></i> CppAIService 深度高频面试题库 (直接抗住大厂深挖)
+                    </h2>
+                    <p class="text-xs text-stone-500 mt-0.5">覆盖 Reactor 线程模型、enable_shared_from_this 陷阱、RabbitMQ 异步写库一致性与 MCP 协议两段式推理。</p>
+                </div>
+            </div>
+            <div class="space-y-4" id="interview-bank-container">
+                <!-- JS 填充 -->
             </div>
         </div>
     </section>
 
-    <!-- ==================== VIEW 6: muduo 源码路线 ==================== -->
-    <section id="view-source" class="hidden space-y-6">
-        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <!-- ==================== VIEW 5: 全景工程任务 (TASKS) ==================== -->
+    <section id="view-tasks" class="hidden space-y-6">
+        <!-- 8 周路线图里程碑展示 -->
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card space-y-4">
+            <div class="flex items-center justify-between border-b border-stone-100 pb-3">
                 <div>
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-teal-50 border border-teal-200 text-teal-800 text-[11px] font-serifMono uppercase tracking-wider mb-1">
-                        Sequential Source Code Exploration
-                    </div>
-                    <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        muduo 8 阶核心源码演进路线图
+                    <h2 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading flex items-center gap-2">
+                        <i class="fa-solid fa-flag-checkered text-amber-600"></i> 8 周工业级攻坚路线里程碑
                     </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">
-                        按照底层网络调度到高层连接实体的精确执行时序：从 Channel ➔ Poller ➔ EventLoop ➔ Acceptor ➔ TcpConnection ➔ TcpServer ➔ Buffer ➔ TimerQueue 步步进阶。
-                    </p>
-                </div>
-                <div class="text-xs font-serifMono text-stone-500 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200">
-                    精读进度: <span id="source-read-progress" class="font-bold text-teal-700">0 / 8</span> 已攻克
+                    <p class="text-xs text-stone-500 mt-0.5">从环境搭建 ➔ 现代 C++ ➔ 网络路由 ➔ 并发异步 ➔ AI 策略 ➔ MCP Agent ➔ 压测交付 ➔ 求职简历。</p>
                 </div>
             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="roadmap-weeks-container">
+                <!-- JS 填充 -->
+            </div>
+        </div>
 
-            <!-- 8 大组件卡片瀑布流 -->
-            <div class="space-y-6" id="source-roadmap-container">
-                <!-- 由 JS 动态渲染 8 大核心节点 -->
+        <!-- 任务列表 (S/A/B/C) -->
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card space-y-4">
+            <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+                <h3 class="font-bold text-stone-900 text-base font-serif-heading flex items-center gap-2">
+                    <i class="fa-solid fa-list-ul text-rose-700"></i> 全部工程任务清单
+                </h3>
+            </div>
+            <div class="space-y-5" id="all-tasks-container">
+                <!-- JS 填充 -->
             </div>
         </div>
     </section>
 
-    <!-- ==================== VIEW 7: C++ 踩坑档案 ==================== -->
-    <section id="view-pitfalls" class="hidden space-y-6">
-        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+    <!-- ==================== VIEW 6: 踩坑档案与工程证据 (EVIDENCE) ==================== -->
+    <section id="view-evidence" class="hidden space-y-6">
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-stone-100 pb-3">
                 <div>
-                    <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-bug text-rose-600"></i> C++ 工业级踩坑事故档案库
+                    <h2 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading flex items-center gap-2">
+                        <i class="fa-solid fa-bug text-rose-600"></i> C++ 踩坑事故档案库 (原备忘录升级)
                     </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">深入排查内存越界、Double Free、循环引用、悬挂闭包与迭代器失效等 12 大典型灾难。</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="openNewPitfallModal()" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-serifMono font-bold rounded-xl shadow-xs transition flex items-center gap-1.5" aria-label="新建踩坑记录">
-                        <i class="fa-solid fa-plus"></i> 新增踩坑记录
-                    </button>
+                    <p class="text-xs text-stone-500 mt-0.5">记录内存越界、Double Free、shared_from_this 析构死锁、多线程竞态等工业级真实灾难复盘。</p>
                 </div>
             </div>
-
-            <!-- 搜索与标签过滤栏 -->
-            <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs font-serifMono mb-6">
-                <div class="relative w-full md:w-80">
-                    <input type="text" id="pitfall-search-input" oninput="applyPitfallFilters()" placeholder="搜索踩坑标题、现象或错误原因..." class="w-full bg-white border border-stone-200 text-xs rounded-lg px-3 py-1.5 pl-8 focus:outline-none focus:ring-2 focus:ring-rose-500/30" aria-label="搜索踩坑记录">
-                    <span class="absolute left-2.5 top-2 text-stone-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
-                </div>
-                <div class="flex items-center gap-2 overflow-x-auto pb-1" id="pitfall-tag-filters">
-                    <!-- JS 填充标签过滤器 -->
-                </div>
-            </div>
-
-            <!-- 踩坑卡片列表 -->
-            <div class="space-y-6" id="pitfalls-container">
-                <!-- 由 JS 渲染踩坑卡片 -->
+            <div class="space-y-4" id="incidents-container">
+                <!-- JS 填充 -->
             </div>
         </div>
     </section>
 
-    <!-- 底部持久化与备份状态栏 -->
+    <!-- ==================== VIEW 7: 简历提炼与面试通关 (CAREER) ==================== -->
+    <section id="view-career" class="hidden space-y-6">
+        <div id="career-resume-container">
+            <!-- JS 填充 STAR 简历生成器 -->
+        </div>
+    </section>
+
+    <!-- ==================== VIEW 8: 系统设置与安全备份 (SETTINGS) ==================== -->
+    <section id="view-settings" class="hidden space-y-6">
+        <div id="settings-status-container">
+            <!-- JS 填充存储大小与 Schema 状态 -->
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-stone-200 academic-card space-y-4 font-serifHeading text-xs">
+            <h3 class="font-bold text-stone-900 text-base">数据备份与灾备恢复</h3>
+            <div class="flex flex-wrap gap-3 font-serifMono">
+                <button onclick="exportDataBackup()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-stone-100 font-bold rounded-xl transition flex items-center gap-2 cursor-pointer shadow-xs">
+                    <i class="fa-solid fa-download"></i> 导出完整 JSON 备份
+                </button>
+                <label class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold rounded-xl border border-stone-300 transition cursor-pointer flex items-center gap-2">
+                    <i class="fa-solid fa-upload"></i> 导入并恢复 JSON
+                    <input type="file" accept=".json" class="hidden" onchange="handleJsonImport(event)">
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部状态栏 -->
     <footer class="mt-8 bg-white border border-stone-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500 font-serifMono">
         <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span class="font-bold text-stone-700">持久化状态：</span>
-            打卡进度、自测、手记与踩坑档案实时保存在浏览器本地。
+            <span class="font-bold text-stone-700">CppAIService Engineering OS:</span>
+            <span>Project First • Knowledge Driven • Evidence Based</span>
         </div>
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-            <button onclick="exportMarkdownReport()" class="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold rounded-xl border border-sky-200 transition flex items-center gap-1" aria-label="导出学习档案Markdown">
-                <i class="fa-solid fa-file-arrow-down"></i> 导出学习档案.md
-            </button>
-            <button onclick="exportDataBackup()" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold rounded-xl border border-stone-300 transition flex items-center gap-1" aria-label="导出JSON备份">
-                <i class="fa-solid fa-download"></i> 导出 JSON
-            </button>
-            <label class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold rounded-xl border border-stone-300 transition cursor-pointer flex items-center gap-1" aria-label="导入JSON备份">
-                <i class="fa-solid fa-upload"></i> 导入 JSON
-                <input type="file" id="json-import-input" accept=".json" class="hidden" onchange="handleJsonImport(event)">
-            </label>
-            <button onclick="openResetModal()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-xl border border-rose-200 transition flex items-center gap-1" aria-label="重置进度">
-                <i class="fa-solid fa-rotate-left"></i> 重置系统
-            </button>
+        <div class="text-[11px] text-stone-400">
+            按 1~8 数字键极速切换对应工程视图
         </div>
     </footer>
 </div>
 
-<!-- ==================== 抽屉与模态框组件 ==================== -->
-
-<!-- ==================== 1. 企业级 C++ 开发环境与阿里云实战全流程 Modal ==================== -->
-<div id="env-guide-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" role="dialog" aria-modal="true" aria-label="企业级开发环境指引">
-    <div class="bg-white rounded-2xl max-w-4xl w-full p-4 sm:p-7 shadow-2xl border border-stone-200 font-serifHeading max-h-[92vh] overflow-y-auto flex flex-col justify-between space-y-4">
-        
-        <!-- 弹窗顶栏 -->
-        <div class="flex items-center justify-between border-b border-stone-200 pb-3.5 shrink-0">
-            <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center text-lg shadow-xs">
-                    <i class="fa-solid fa-server"></i>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h3 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading">阿里云 Linux 服务器 + VS Code 工业级开发全流程实操手册</h3>
-                        <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-serifMono text-[10px] font-bold">保姆级图解</span>
-                    </div>
-                    <p class="text-[11px] text-stone-500 font-serifMono mt-0.5">彻底解密“在 Windows 写代码，如何直接在阿里云 Linux 内核编译、断点调试与内存检测”的工业真相</p>
-                </div>
-            </div>
-            <button onclick="closeEnvGuideModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭指引">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- 选项卡导航 (5 大核心模块) -->
-        <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 border-b border-stone-100 text-xs font-serifMono shrink-0">
-            <button id="env-tab-btn-concept" onclick="switchEnvModalTab('concept')" class="px-3 py-1.5 rounded-lg bg-sky-800 text-white font-bold text-xs shadow-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-brain mr-1"></i> 1. 核心认知：代码到底保存在哪？
-            </button>
-            <button id="env-tab-btn-steps" onclick="switchEnvModalTab('steps')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-list-check mr-1"></i> 2. 阿里云实战：从零到一 8 步闭环
-            </button>
-            <button id="env-tab-btn-matrix" onclick="switchEnvModalTab('matrix')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-table-columns mr-1"></i> 3. 运作对照：Windows vs 阿里云底层
-            </button>
-            <button id="env-tab-btn-debug" onclick="switchEnvModalTab('debug')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-bug mr-1"></i> 4. 调试与排错：GDB断点 / ASan内存探针
-            </button>
-            <button id="env-tab-btn-cmake" onclick="switchEnvModalTab('cmake')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-cubes mr-1"></i> 5. 工程骨架 CMake 与 WSL2 平替
-            </button>
-        </div>
-
-        <!-- 选项卡 1: 核心认知破局 -->
-        <div id="env-pane-concept" class="space-y-4 text-stone-700 text-xs leading-relaxed">
-            <div class="bg-amber-50/80 border border-amber-300/80 rounded-xl p-4">
-                <div class="font-bold text-amber-950 font-serifMono text-sm mb-1.5 flex items-center gap-1.5">
-                    <i class="fa-solid fa-lightbulb text-amber-700"></i> 打破初学者的最大误区：“我在 Windows 写的代码，怎么‘发’给阿里云 Linux？”
-                </div>
-                <p class="text-stone-800 text-xs mb-2 leading-relaxed">
-                    初学者最容易产生的一个心智障碍是：以为要在 Windows 的 D 盘写好 <code>main.cpp</code> ➔ 像发微信附件或者用网盘一样把文件“复制/传输”到阿里云 ➔ 再去阿里云敲命令编译。<strong>大错特错！现代大厂绝不这么干！</strong>
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 font-serifMono text-[11px]">
-                    <div class="p-3 rounded-lg bg-rose-50 border border-rose-200">
-                        <span class="text-rose-700 font-bold block mb-1">❌ 错误认知（千万别这么想）：</span>
-                        以为代码存在 Windows 硬盘，每改一行都要手动 scp / FTP 上传到 Linux。繁琐易错、断点调试失灵、文件冲突不断。
-                    </div>
-                    <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-300">
-                        <span class="text-emerald-800 font-bold block mb-1">✅ 工业界真相（VS Code 客户端/服务端架构）：</span>
-                        <strong>代码从始至终就只保存在阿里云服务器的磁盘上！</strong> 你的 Windows 电脑上的 VS Code，本质上只是一个<strong>超高清投屏显示器与键盘鼠标输入端</strong>！
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-stone-50 border border-stone-200 rounded-xl p-4 space-y-3 font-serifMono">
-                <h4 class="font-bold text-stone-900 text-xs font-serifHeading flex items-center gap-1.5">
-                    <i class="fa-solid fa-network-wired text-sky-700"></i> VS Code Remote - SSH 底层是怎么无缝协作的？
-                </h4>
-                <div class="bg-white p-3 rounded-lg border border-stone-200 text-[11px] leading-relaxed space-y-2.5 text-stone-600">
-                    <div class="flex items-start gap-2">
-                        <span class="w-5 h-5 rounded-full bg-sky-100 text-sky-800 flex items-center justify-center shrink-0 font-bold">1</span>
-                        <div><strong>你在 Windows 上敲字：</strong> 比如敲入 <code>int epfd = epoll_create1(0);</code>，VS Code 只是通过极速加密 SSH 通道把你的按键指令实时发往阿里云。</div>
-                    </div>
-                    <div class="flex items-start gap-2">
-                        <span class="w-5 h-5 rounded-full bg-sky-100 text-sky-800 flex items-center justify-center shrink-0 font-bold">2</span>
-                        <div><strong>按 Ctrl + S 保存：</strong> 文件直接落盘在阿里云的 Linux 文件系统（例如 <code>/root/muduo_project/main.cpp</code>），你的 Windows 硬盘里根本不需要存这个文件！</div>
-                    </div>
-                    <div class="flex items-start gap-2">
-                        <span class="w-5 h-5 rounded-full bg-sky-100 text-sky-800 flex items-center justify-center shrink-0 font-bold">3</span>
-                        <div><strong>按 Ctrl + ` 打开的终端：</strong> 弹出的黑底终端是<strong>阿里云服务器的真实 Ubuntu Bash 终端</strong>！不是 Windows cmd。你在终端敲 <code>g++ main.cpp</code>，调用的是 Linux 的编译器，直接读取 Linux 的 <code>&lt;sys/epoll.h&gt;</code> 原生头文件！</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 选项卡 2: 阿里云 8 步实操指南 -->
-        <div id="env-pane-steps" class="space-y-3 text-stone-700 text-xs leading-relaxed hidden">
-            <div class="space-y-2.5 font-serifMono">
-                <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
-                    <div class="flex items-center gap-2 font-bold text-stone-900 text-xs">
-                        <span class="w-5 h-5 rounded-full bg-sky-700 text-white flex items-center justify-center text-[11px]">1</span>
-                        <span>第一步：在 Windows VS Code 安装 Remote - SSH 插件</span>
-                    </div>
-                    <p class="text-[11.5px] text-stone-600 mt-1 font-serifHeading">
-                        打开 VS Code 左侧扩展市场（快捷键 <code>Ctrl+Shift+X</code>），搜索并安装微软官方的 <code>Remote - SSH</code> 插件。
-                    </p>
-                </div>
-
-                <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
-                    <div class="flex items-center gap-2 font-bold text-stone-900 text-xs">
-                        <span class="w-5 h-5 rounded-full bg-sky-700 text-white flex items-center justify-center text-[11px]">2</span>
-                        <span>第二步：配置阿里云服务器连接信息</span>
-                    </div>
-                    <p class="text-[11.5px] text-stone-600 mt-1 font-serifHeading">
-                        按 <code>F1</code> 输入 <code>Remote-SSH: Open SSH Configuration File...</code>，打开默认配置文件，写入你的公网 IP 与用户：
-                    </p>
-                    <pre class="bg-stone-900 text-emerald-400 p-2.5 rounded-lg text-[11px] mt-1.5">Host AliCloud
-    HostName 123.56.78.90    # 替换为你阿里云服务器的公网 IP (安全组放行 22 端口)
-    User root                 # 或者 ubuntu，取决于你的云主机默认登录名
-    Port 22</pre>
-                </div>
-
-                <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
-                    <div class="flex items-center gap-2 font-bold text-stone-900 text-xs">
-                        <span class="w-5 h-5 rounded-full bg-sky-700 text-white flex items-center justify-center text-[11px]">3</span>
-                        <span>第三步：点击连接，进入云端 Linux 世界</span>
-                    </div>
-                    <p class="text-[11.5px] text-stone-600 mt-1 font-serifHeading">
-                        点击 VS Code 最左下角绿/蓝色的 <code>&gt;&lt;</code> 按钮，选择 <code>Connect to Host...</code> ➔ 选择 <code>AliCloud</code> ➔ 输入密码。
-                        连接成功后，<strong>左下角会显示 [SSH: AliCloud]</strong>！
-                    </p>
-                </div>
-
-                <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
-                    <div class="flex items-center gap-2 font-bold text-stone-900 text-xs">
-                        <span class="w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center text-[11px]">4</span>
-                        <span>第四步：【最关键一步】在 VS Code 中直接打开阿里云上的文件夹！</span>
-                    </div>
-                    <p class="text-[11.5px] text-stone-600 mt-1 font-serifHeading">
-                        顶部菜单点击 <code>文件(File) ➔ 打开文件夹(Open Folder)</code>。注意：<strong>此时弹出的路径框是 Linux 路径！</strong>
-                        输入例如 <code>/root/muduo_project</code>，点击确定。此时左侧“资源管理器”显示的就是阿里云上的磁盘目录！
-                    </p>
-                </div>
-
-                <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
-                    <div class="flex items-center gap-2 font-bold text-stone-900 text-xs">
-                        <span class="w-5 h-5 rounded-full bg-sky-700 text-white flex items-center justify-center text-[11px]">5</span>
-                        <span>第五步：在内置终端一键装齐 Linux 编译全家桶</span>
-                    </div>
-                    <p class="text-[11.5px] text-stone-600 mt-1 font-serifHeading">
-                        按快捷键 <code>Ctrl + `</code>（Tab键上方）调出底部终端，看到类似 <code>root@aliyun:~/muduo_project#</code>，输入命令：
-                    </p>
-                    <pre class="bg-stone-900 text-emerald-400 p-2.5 rounded-lg text-[11px] mt-1.5">sudo apt update && sudo apt install -y build-essential g++ cmake gdb git libboost-all-dev valgrind clangd</pre>
-                </div>
-
-                <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
-                    <div class="flex items-center gap-2 font-bold text-stone-900 text-xs">
-                        <span class="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[11px]">6</span>
-                        <span>第六步：安装远端 C++ 智能补全插件</span>
-                    </div>
-                    <p class="text-[11.5px] text-stone-600 mt-1 font-serifHeading">
-                        在插件市场搜索 <code>clangd</code> 或 <code>C/C++</code>，点击 <strong>Install on SSH: AliCloud</strong>。它会在 Linux 远端直接索引 <code>/usr/include</code>，敲代码时享受系统调用级别的高精度跳转与成员补全！
-                    </p>
-                </div>
-
-                <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
-                    <div class="flex items-center gap-2 font-bold text-stone-900 text-xs">
-                        <span class="w-5 h-5 rounded-full bg-sky-700 text-white flex items-center justify-center text-[11px]">7</span>
-                        <span>第七步：编写代码并一键编译</span>
-                    </div>
-                    <p class="text-[11.5px] text-stone-600 mt-1 font-serifHeading">
-                        在左侧点击新建 <code>test_epoll.cpp</code>，贴入代码，按 Ctrl+S。直接在底部终端敲：
-                    </p>
-                    <pre class="bg-stone-900 text-emerald-400 p-2.5 rounded-lg text-[11px] mt-1.5">g++ -std=c++17 -Wall test_epoll.cpp -o test_epoll && ./test_epoll</pre>
-                    <p class="text-[11px] text-stone-500 font-serifHeading mt-1">代码直接在阿里云的内存和 CPU 中跑起来了！运行结果秒回屏幕！</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 选项卡 3: 操作对照表 -->
-        <div id="env-pane-matrix" class="space-y-3 text-stone-700 text-xs leading-relaxed hidden">
-            <p class="text-xs text-stone-600">
-                当你坐在电脑前操作时，Windows 本地与阿里云远端各自到底在干什么？对照表一目了然：
-            </p>
-            <div class="overflow-x-auto rounded-xl border border-stone-200">
-                <table class="w-full text-left font-serifMono text-[11px]">
-                    <thead class="bg-stone-100 text-stone-800 border-b border-stone-200">
-                        <tr>
-                            <th class="p-2.5">你的操作</th>
-                            <th class="p-2.5 text-sky-900">你的电脑 (Windows 11)</th>
-                            <th class="p-2.5 text-emerald-800">阿里云服务器 (Linux)</th>
-                            <th class="p-2.5 text-stone-600">网络 SSH 通道传输</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-stone-200 bg-white">
-                        <tr>
-                            <td class="p-2.5 font-bold">在左侧新建 <code>main.cpp</code></td>
-                            <td class="p-2.5 text-stone-600">在 UI 界面渲染一个新文件名输入框</td>
-                            <td class="p-2.5 text-emerald-700 font-semibold">执行系统调用 <code>creat()</code> 创建磁盘 inode</td>
-                            <td class="p-2.5 text-stone-500">发送新建文件 RPC 指令</td>
-                        </tr>
-                        <tr>
-                            <td class="p-2.5 font-bold">键盘打字敲入 C++ 代码</td>
-                            <td class="p-2.5 text-stone-600">本地渲染字符，零输入延迟</td>
-                            <td class="p-2.5 text-emerald-700 font-semibold">语言服务器 clangd 分析 Linux 头文件准备补全</td>
-                            <td class="p-2.5 text-stone-500">毫秒级增量文本流同步</td>
-                        </tr>
-                        <tr>
-                            <td class="p-2.5 font-bold">按 <code>Ctrl + S</code></td>
-                            <td class="p-2.5 text-stone-600">圆点消失，标记为已保存</td>
-                            <td class="p-2.5 text-emerald-700 font-semibold">将内容 <code>write()</code> 刷入阿里云磁盘</td>
-                            <td class="p-2.5 text-stone-500">传输几 KB 文本内容</td>
-                        </tr>
-                        <tr>
-                            <td class="p-2.5 font-bold">按 <code>Ctrl + `</code> 打开终端</td>
-                            <td class="p-2.5 text-stone-600">弹出一个终端窗口（xterm.js 前端渲染）</td>
-                            <td class="p-2.5 text-emerald-700 font-semibold">分配一个 pty 虚拟终端并启动 <code>/bin/bash</code></td>
-                            <td class="p-2.5 text-stone-500">打开 SSH 交互 Shell 会话</td>
-                        </tr>
-                        <tr>
-                            <td class="p-2.5 font-bold">在终端敲 <code>g++ ...</code> 编译</td>
-                            <td class="p-2.5 text-stone-600">无任何 CPU 消耗，仅显示输出文字</td>
-                            <td class="p-2.5 text-emerald-700 font-semibold">Linux CPU 启动编译器，链接 <code>glibc</code> 与 <code>epoll</code></td>
-                            <td class="p-2.5 text-stone-500">实时回传编译警告/错误日志</td>
-                        </tr>
-                        <tr>
-                            <td class="p-2.5 font-bold">运行 <code>./my_server</code></td>
-                            <td class="p-2.5 text-stone-600">无任何端口监听</td>
-                            <td class="p-2.5 text-emerald-700 font-semibold">绑定并监听物理网卡端口，处理 TCP 握手</td>
-                            <td class="p-2.5 text-stone-500">回传服务启动日志 stdout</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 选项卡 4: 调试与排错 -->
-        <div id="env-pane-debug" class="space-y-3 text-stone-700 text-xs leading-relaxed hidden">
-            <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-3.5 space-y-2 font-serifMono">
-                <div class="font-bold text-indigo-950 font-serifHeading text-xs flex items-center gap-1.5">
-                    <i class="fa-solid fa-crosshairs text-indigo-700"></i> 一、图形化断点调试（GDB 联动）
-                </div>
-                <p class="text-[11.5px] text-stone-700 font-serifHeading">
-                    编译时加上 <code>-g</code> 调试符号。直接在代码行号左侧单击鼠标打上红点。
-                    在 <code>.vscode/launch.json</code> 中配置：
-                </p>
-                <pre class="bg-stone-900 text-emerald-400 p-2.5 rounded-lg text-[11px]">{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Debug muduo demo",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/test_epoll",
-            "cwd": "${workspaceFolder}",
-            "MIMode": "gdb",
-            "setupCommands": [{ "text": "-enable-pretty-printing" }]
-        }
-    ]
-}</pre>
-                <p class="text-[11px] text-stone-600 font-serifHeading">
-                    按 <code>F5</code> 启动调试！代码将自动停在断点处，左侧可直观查看变量、智能指针指向、调用栈，按 <code>F10</code> 单步跳过。
-                </p>
-            </div>
-
-            <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 space-y-2 font-serifMono">
-                <div class="font-bold text-rose-950 font-serifHeading text-xs flex items-center gap-1.5">
-                    <i class="fa-solid fa-shield-halved text-rose-700"></i> 二、工业级内存泄漏与越界检测（AddressSanitizer）
-                </div>
-                <p class="text-[11.5px] text-stone-700 font-serifHeading">
-                    C++ 最怕悬空指针和野指针。在编译时加上 <code>-fsanitize=address -g</code> 即可激活 GCC 内置的 ASan 内存检测神探：
-                </p>
-                <pre class="bg-stone-900 text-rose-300 p-2 rounded-lg text-[11px]">g++ -std=c++17 -fsanitize=address -g main.cpp -o main_asan && ./main_asan</pre>
-                <p class="text-[11px] text-stone-600 font-serifHeading">
-                    一旦有内存泄漏、堆越界（heap-buffer-overflow）或 use-after-free，程序退出时 Linux 会在屏幕打印精确到具体代码行数的排查报告！
-                </p>
-            </div>
-        </div>
-
-        <!-- 选项卡 5: CMake 与 WSL2 备选 -->
-        <div id="env-pane-cmake" class="space-y-3 text-stone-700 text-xs leading-relaxed hidden">
-            <div class="bg-stone-50 border border-stone-200 rounded-xl p-3.5 space-y-2 font-serifMono">
-                <div class="font-bold text-stone-900 font-serifHeading text-xs flex items-center gap-1.5">
-                    <i class="fa-solid fa-folder-tree text-teal-700"></i> 一、多文件项目的标准 CMake 工程结构
-                </div>
-                <p class="text-[11.5px] text-stone-600 font-serifHeading">
-                    在学习 muduo 时，往往会有 Channel.cpp、Poller.cpp、EventLoop.cpp 多个源文件，推荐在阿里云上这样组织：
-                </p>
-                <pre class="bg-stone-900 text-teal-300 p-2.5 rounded-lg text-[11px]">my_muduo/
-├── CMakeLists.txt
-├── include/
-│   └── Channel.h
-├── src/
-│   ├── Channel.cpp
-│   └── main.cpp
-└── build/              # 编译中间文件目录</pre>
-                <p class="text-[11px] text-stone-600 font-serifHeading mt-1">在 <code>CMakeLists.txt</code> 中写入标准构建脚本：</p>
-                <pre class="bg-stone-900 text-emerald-400 p-2.5 rounded-lg text-[11px]">cmake_minimum_required(VERSION 3.10)
-project(TinyMuduo CXX)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pthread -g")
-
-include_directories(include)
-file(GLOB SOURCES "src/*.cpp")
-add_executable(my_server ${SOURCES})</pre>
-                <p class="text-[11px] text-stone-600 font-serifHeading mt-1">在终端执行两行命令即可极速完成编译：</p>
-                <pre class="bg-stone-900 text-amber-300 p-2 rounded-lg text-[11px]">mkdir -p build && cd build && cmake .. && make -j4</pre>
-            </div>
-
-            <div class="bg-stone-50 border border-stone-200 rounded-xl p-3.5 font-serifMono text-xs">
-                <div class="font-bold text-stone-900 font-serifHeading text-xs flex items-center gap-1.5 mb-1.5">
-                    <i class="fa-brands fa-windows text-sky-700"></i> 二、如果网络波动或没网？本地 WSL2 是完美的平替！
-                </div>
-                <p class="text-[11.5px] text-stone-600 font-serifHeading leading-relaxed">
-                    如果你出门在外没有稳定 WiFi，可以在 Windows 运行 <code>wsl --install -d Ubuntu-22.04</code>。它在本地跑着真实的微软优化版 Linux 内核。
-                    配置方式与阿里云一模一样（唯一区别是 VS Code 插件装 <strong>WSL</strong> 替代 Remote-SSH），零延迟且完全免费！
-                </p>
-            </div>
-        </div>
-
-        <!-- 弹窗底栏 -->
-        <div class="pt-3 border-t border-stone-100 flex items-center justify-between font-serifMono shrink-0">
-            <span class="text-[11px] text-stone-400">💡 提示：本指引永久内嵌于训练系统右上角，可随时打开查阅</span>
-            <button onclick="closeEnvGuideModal()" class="px-5 py-2 bg-stone-900 hover:bg-stone-800 text-stone-100 text-xs font-bold rounded-xl transition cursor-pointer">
-                明白，立即实操！
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- 1. 架构拓扑右侧滑动抽屉 (Topology Drawer) -->
+<!-- ==================== 架构拓扑抽屉 (Topology Drawer) ==================== -->
 <div id="topology-drawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl border-l border-stone-200 transform translate-x-full slide-drawer flex flex-col justify-between overflow-hidden" role="dialog" aria-modal="true" aria-label="组件架构详情">
     <div class="p-6 border-b border-stone-200 flex items-center justify-between bg-stone-50/80 font-serifHeading">
         <div>
             <span id="drawer-tag" class="text-[10px] font-serifMono uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">COMPONENT</span>
             <h3 id="drawer-title" class="text-lg font-bold text-stone-900 mt-1">EventLoop</h3>
         </div>
-        <button onclick="closeTopologyDrawer()" class="w-8 h-8 rounded-full bg-stone-200/80 hover:bg-stone-300 text-stone-700 flex items-center justify-center transition" aria-label="关闭抽屉">
+        <button onclick="closeTopologyDrawer()" class="w-8 h-8 rounded-full bg-stone-200/80 hover:bg-stone-300 text-stone-700 flex items-center justify-center transition cursor-pointer" aria-label="关闭抽屉">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
     <div class="p-6 space-y-5 overflow-y-auto font-serifHeading text-xs sm:text-sm text-stone-700 leading-relaxed" id="drawer-content">
-        <!-- 由 JS 填充职责、成员、函数与关联 Day -->
+        <!-- JS 填充 -->
     </div>
 
     <div class="p-4 border-t border-stone-200 bg-stone-50/50 flex justify-end font-serifMono">
-        <button onclick="closeTopologyDrawer()" class="px-4 py-1.5 bg-stone-200 text-stone-800 rounded-xl font-semibold hover:bg-stone-300 transition text-xs">关闭抽屉</button>
+        <button onclick="closeTopologyDrawer()" class="px-4 py-1.5 bg-stone-200 text-stone-800 rounded-xl font-semibold hover:bg-stone-300 transition text-xs cursor-pointer">关闭抽屉</button>
     </div>
 </div>
-
-<!-- 遮罩层 -->
 <div id="drawer-overlay" onclick="closeTopologyDrawer()" class="fixed inset-0 z-40 bg-stone-900/40 backdrop-blur-xs hidden transition-opacity"></div>
 
-<!-- 2. 复习闪卡模态框 (Spaced Review Modal) -->
-<div id="review-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="间隔复习卡片">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-stone-200 font-serifHeading">
-        <div class="flex items-center justify-between mb-3 border-b border-stone-100 pb-3">
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block animate-pulse"></span>
-                <h4 class="font-bold text-stone-900 text-base" id="review-modal-title">间隔复习闪卡</h4>
-            </div>
-            <button onclick="closeReviewModal()" class="text-stone-400 hover:text-stone-600 text-sm" aria-label="关闭复习模态框"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <div id="review-card-content" class="py-3 space-y-3 text-xs leading-relaxed text-stone-700">
-            <!-- JS 填充卡片正面与解答 -->
-        </div>
-
-        <div class="mt-5 pt-3 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-2 font-serifMono">
-            <button onclick="revealReviewAnswer()" id="btn-reveal-review" class="w-full sm:w-auto px-4 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl transition">
-                <i class="fa-solid fa-eye mr-1"></i> 查看核心要点解答
-            </button>
-            <div id="review-action-buttons" class="hidden flex items-center gap-2 w-full sm:w-auto justify-end">
-                <button onclick="recordReviewResult('forgot')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200 transition" aria-label="忘记了，重置复习时间">
-                    忘记了 (1d)
-                </button>
-                <button onclick="recordReviewResult('fuzzy')" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-semibold rounded-xl border border-amber-200 transition" aria-label="有点模糊，保持当前间隔">
-                    有点模糊
-                </button>
-                <button onclick="recordReviewResult('mastered')" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl transition shadow-xs" aria-label="牢固掌握，进入下一间隔">
-                    牢固掌握
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 3. 自定义通用 Modal (确认/提示/导入选择) -->
-<div id="custom-modal" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="操作确认">
+<!-- 通用确认模态框 -->
+<div id="custom-modal" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-stone-200 font-serifHeading">
-        <div class="flex items-center gap-3 text-amber-600 mb-3" id="modal-icon-header">
-            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-lg" id="modal-icon-box">
-                <i class="fa-solid fa-triangle-exclamation" id="modal-icon"></i>
-            </div>
-            <h4 class="font-bold text-stone-900 text-base" id="modal-title">操作确认</h4>
-        </div>
-        <p class="text-xs text-stone-600 leading-relaxed mb-6" id="modal-message">确认要执行此操作吗？</p>
+        <h4 class="font-bold text-stone-900 text-base mb-2" id="modal-title">操作确认</h4>
+        <p class="text-xs text-stone-600 leading-relaxed mb-5" id="modal-message">确认要执行此操作吗？</p>
         <div class="flex justify-end gap-2.5 font-serifMono" id="modal-buttons-container">
-            <button onclick="closeModal()" class="px-4 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl hover:bg-stone-200 transition" aria-label="取消">取消</button>
-            <button id="modal-confirm-btn" class="px-4 py-1.5 bg-rose-600 text-white text-xs font-semibold rounded-xl hover:bg-rose-700 transition shadow-xs" aria-label="确认">确认执行</button>
+            <button onclick="closeModal()" class="px-4 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl hover:bg-stone-200 transition">取消</button>
+            <button id="modal-confirm-btn" class="px-4 py-1.5 bg-rose-600 text-white text-xs font-semibold rounded-xl hover:bg-rose-700 transition shadow-xs">确认执行</button>
         </div>
     </div>
 </div>
 
-<!-- 4. 新增踩坑记录模态框 (New Pitfall Modal) -->
-<div id="new-pitfall-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="新建踩坑记录">
-    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-stone-200 font-serifHeading max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-4 border-b border-stone-100 pb-3">
-            <h4 class="font-bold text-stone-900 text-base flex items-center gap-2">
-                <i class="fa-solid fa-bug text-rose-600"></i> 新建 C++ 踩坑档案记录
-            </h4>
-            <button onclick="closeNewPitfallModal()" class="text-stone-400 hover:text-stone-600 text-sm" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+<!-- 实操手册弹窗 -->
+<div id="env-guide-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl border border-stone-200 font-serifHeading max-h-[90vh] overflow-y-auto space-y-4">
+        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+            <h3 class="font-bold text-stone-900 text-base">CppAIService Linux + CMake 企业级开发指引</h3>
+            <button onclick="closeEnvGuideModal()" class="text-stone-400 hover:text-stone-600"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
-        <div class="space-y-3 font-serifMono text-xs">
-            <div>
-                <label class="block text-stone-600 font-bold mb-1">事故标题</label>
-                <input type="text" id="np-title" placeholder="如: vector 遍历中调用 push_back 导致迭代器失效" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:outline-none focus:border-rose-500">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-stone-600 font-bold mb-1">对应 Day (1~28)</label>
-                    <input type="number" id="np-day" min="1" max="28" value="1" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:outline-none focus:border-rose-500">
-                </div>
-                <div>
-                    <label class="block text-stone-600 font-bold mb-1">关键词标签 (英文逗号隔开)</label>
-                    <input type="text" id="np-keywords" placeholder="iterator, vector, 扩容" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:outline-none focus:border-rose-500">
-                </div>
-            </div>
-            <div>
-                <label class="block text-stone-600 font-bold mb-1">错误代码片段</label>
-                <textarea id="np-error-code" rows="3" placeholder="// 导致崩溃或异常的错误代码" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 font-mono-code"></textarea>
-            </div>
-            <div>
-                <label class="block text-stone-600 font-bold mb-1">错误现象与报错信息</label>
-                <input type="text" id="np-symptom" placeholder="如: 段错误崩溃 (SIGSEGV) 或数据混乱" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
-            </div>
-            <div>
-                <label class="block text-stone-600 font-bold mb-1">根因剖析</label>
-                <textarea id="np-cause" rows="2" placeholder="分析为何发生此错误，底层机制原因..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2"></textarea>
-            </div>
-            <div>
-                <label class="block text-stone-600 font-bold mb-1">正确修复代码</label>
-                <textarea id="np-correct-code" rows="3" placeholder="// 规范工业级写法" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 font-mono-code"></textarea>
-            </div>
-            <div>
-                <label class="block text-stone-600 font-bold mb-1">工程结论与铁律</label>
-                <input type="text" id="np-conclusion" placeholder="如: 【工程铁律】遍历连续容器时严禁直接修改容量" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
-            </div>
+        <div class="text-xs leading-relaxed text-stone-700 space-y-3 font-serifHeading">
+            <p>1. <strong>代码位于本地仓库：</strong> <code>e:/workspace/CppAIService</code>。</p>
+            <p>2. <strong>依赖安装：</strong> 包含 <code>muduo</code>, <code>OpenSSL</code>, <code>CURL</code>, <code>MySQL Client</code>, <code>RabbitMQ</code>, <code>OpenCV</code> 与 <code>ONNX Runtime</code>。</p>
+            <p>3. <strong>编译命令：</strong> <code>mkdir -p build && cd build && cmake .. && make -j4</code>。</p>
+            <p>4. <strong>服务启动：</strong> <code>./http_server -p 80</code>，在浏览器访问 <code>http://localhost/entry</code>。</p>
         </div>
-
-        <div class="mt-5 pt-3 border-t border-stone-100 flex justify-end gap-2 font-serifMono">
-            <button onclick="closeNewPitfallModal()" class="px-4 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl hover:bg-stone-200 transition">取消</button>
-            <button onclick="submitNewPitfall()" class="px-4 py-1.5 bg-rose-600 text-white text-xs font-semibold rounded-xl hover:bg-rose-700 transition shadow-xs">保存入库</button>
+        <div class="pt-3 border-t border-stone-100 flex justify-end font-serifMono">
+            <button onclick="closeEnvGuideModal()" class="px-4 py-1.5 bg-stone-900 text-stone-100 text-xs rounded-xl font-bold">关闭指引</button>
         </div>
     </div>
 </div>
 
-
-
-
-
-
-    <!-- 模块化外部脚本加载（无打包依赖，原生静态秒开） -->
-    <script src="js/dataset-28days.js?v=5.4.1"></script>
-    <script src="js/dataset-mappings.js?v=5.4.1"></script>
-    <script src="js/timer.js?v=5.4.1"></script>
-    <script src="js/app.js?v=5.4.1"></script>
+<!-- 脚本加载 -->
+<script src="js/dataset-cppai.js?v=6.0.0"></script>
+<script src="js/dataset-28days.js?v=6.0.0"></script>
+<script src="js/dataset-mappings.js?v=6.0.0"></script>
+<script src="js/timer.js?v=6.0.0"></script>
+<script src="js/app.js?v=6.0.0"></script>
 </body>
 </html>
