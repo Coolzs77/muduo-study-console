@@ -18,33 +18,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
 
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        serifMono: ['"Courier Prime"', '"Noto Serif SC"', '"Songti SC"', '"STSong"', 'SimSun', 'serif', 'monospace'],
-                        serifHeading: ['"Noto Serif SC"', '"Songti SC"', 'STSong', 'Georgia', 'serif']
-                    },
-                    colors: {
-                        parchment: {
-                            50: '#faf9f6',
-                            100: '#f4efe6',
-                            200: '#e8ded0',
-                            800: '#3d342a',
-                            900: '#231d16'
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            serifMono: ['"Courier Prime"', '"Noto Serif SC"', '"Songti SC"', '"STSong"', 'SimSun', 'serif', 'monospace'],
+                            serifHeading: ['"Noto Serif SC"', '"Songti SC"', 'STSong', 'Georgia', 'serif']
                         },
-                        oxford: {
-                            50: '#f0f4f8',
-                            100: '#d9e2ec',
-                            500: '#1e40af',
-                            600: '#0369a1',
-                            700: '#075985',
-                            800: '#0c4a6e',
-                            900: '#082f49'
+                        colors: {
+                            parchment: {
+                                50: '#faf9f6',
+                                100: '#f4efe6',
+                                200: '#e8ded0',
+                                800: '#3d342a',
+                                900: '#231d16'
+                            },
+                            oxford: {
+                                50: '#f0f4f8',
+                                100: '#d9e2ec',
+                                500: '#1e40af',
+                                600: '#0369a1',
+                                700: '#075985',
+                                800: '#0c4a6e',
+                                900: '#082f49'
+                            }
                         }
                     }
                 }
-            }
+            };
         }
     </script>
     <style>
@@ -120,7 +122,8 @@
         .mastery-star:hover {
             transform: scale(1.15);
         }
-    </style>
+
+</style>
 </head>
 <body class="min-h-screen antialiased selection:bg-amber-100 selection:text-amber-900 pb-16 flex flex-col justify-between">
 
@@ -273,6 +276,10 @@
         </button>
         <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
             <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
+        </button>
+        <button onclick="switchView('reading')" id="nav-reading" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="书卷伴读(Readest)">
+            <i class="fa-solid fa-book-open text-sky-700"></i> 书卷伴读 (Readest)
+            <span class="text-[10px] bg-rose-100 text-rose-800 px-1.5 py-0.2 rounded font-bold">直跳页码</span>
         </button>
         <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="语法 ➔ muduo 映射矩阵">
             <i class="fa-solid fa-sitemap text-emerald-600"></i> 语法 ➔ muduo 映射矩阵
@@ -670,6 +677,11 @@
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- ==================== VIEW 7: 双权威书目与 Readest 伴读流 (NEW) ==================== -->
+    <section id="view-reading" class="hidden space-y-6">
+        <div id="view-reading-container"></div>
     </section>
 
     <!-- ==================== VIEW 2: 28天任务与实验 ==================== -->
@@ -1305,12 +1317,16 @@ add_executable(my_server ${SOURCES})</pre>
 </div>
 
 
-// Now append datasets into script tag
 
-<script>
-const APP_VERSION = "5.0.0";
 
-const DAYS_DATASET = [
+
+    <!-- 单文件离线模式内联脚本 -->
+    <script>
+// ==========================================================================
+// muduo C++ 工业实战 28 天全周期攻坚数据集 (DAYS_DATASET)
+// ==========================================================================
+
+var DAYS_DATASET = [
   {
     "day": 1,
     "week": 1,
@@ -4616,7 +4632,15 @@ const DAYS_DATASET = [
 ];
 
 
-const MAPPING_MATRIX = [
+
+window.DAYS_DATASET = DAYS_DATASET;
+
+
+// ==========================================================================
+// 知识图谱映射、源码大纲与避坑库 (MAPPING_MATRIX, SOURCE_ROADMAP, PITFALLS_DATASET)
+// ==========================================================================
+
+var MAPPING_MATRIX = [
   {
     "feature": "RAII",
     "muduoLocation": "MutexLockGuard / Socket",
@@ -4710,7 +4734,7 @@ const MAPPING_MATRIX = [
 ];
 
 
-const SOURCE_ROADMAP = [
+var SOURCE_ROADMAP = [
   {
     "id": "channel",
     "name": "Channel",
@@ -5018,7 +5042,7 @@ const SOURCE_ROADMAP = [
 ];
 
 
-const PITFALLS_DATASET = [
+var PITFALLS_DATASET = [
   {
     "id": "p1",
     "title": "Double Free：裸指针未重写拷贝构造引发堆内存双重释放",
@@ -5228,7 +5252,488 @@ const PITFALLS_DATASET = [
 
 // ==================== muduo V5 CLIENT RUNTIME ====================
 
-let appState = {
+
+window.MAPPING_MATRIX = MAPPING_MATRIX;
+window.SOURCE_ROADMAP = SOURCE_ROADMAP;
+window.PITFALLS_DATASET = PITFALLS_DATASET;
+
+
+// ==========================================================================
+// muduo C++ 工业实战个人控制台 - 权威参考书目与 Readest 伴读流集成
+// 深度绑定 E:\workspace\C++_learning\ 书目
+// ==========================================================================
+
+const BOOKS_CONFIG = {
+    chenShuo: {
+        id: 'chenShuo',
+        title: 'Linux 多线程服务端编程：使用 muduo C++ 网络库',
+        shortTitle: '陈硕《Linux多线程服务端编程》',
+        author: '陈硕',
+        localPath: 'file:///E:/workspace/C++_learning/Linux多线程服务端编程使用muduo%20C++网络库%20(陈硕)%20(Z-Library).pdf',
+        totalPages: 607,
+        pageOffset: 23, // 印刷 P.1 对应 PDF 物理 P.24 (23页前言与目录)
+        chapters: [
+            { id: 1, title: '第 1 章：线程安全的对象生命周期管理', bookRange: 'P.1 ~ 38', startPage: 1, coreTopic: 'shared_ptr / weak_ptr 解决析构竞态' },
+            { id: 2, title: '第 2 章：线程同步精要：互斥器与条件变量', bookRange: 'P.39 ~ 64', startPage: 39, coreTopic: 'RAII 互斥锁、避免死锁原则' },
+            { id: 3, title: '第 3 章：多线程服务端的进程与线程模型', bookRange: 'P.65 ~ 92', startPage: 65, coreTopic: 'One Loop Per Thread + 线程池' },
+            { id: 4, title: '第 4 章：C++ 多线程系统编程实践与避坑', bookRange: 'P.93 ~ 138', startPage: 93, coreTopic: '编译警告、线程私有数据与安全日志' },
+            { id: 6, title: '第 6 章：muduo 网络库设计动机与总体架构', bookRange: 'P.161 ~ 220', startPage: 161, coreTopic: 'Reactor 反应堆核心演进与事件驱动' },
+            { id: 7, title: '第 7 章：muduo 编程实战与示例剖析', bookRange: 'P.221 ~ 254', startPage: 221, coreTopic: 'Echo, Chargen, Time 等网络协议实战' },
+            { id: 8, title: '第 8 章：muduo 网络库核心源码深度剖析', bookRange: 'P.255 ~ 336', startPage: 255, coreTopic: 'Channel, EventLoop, Poller, TcpServer 全源码' },
+            { id: 9, title: '第 9 章：muduo 核心网络组件与设计细节', bookRange: 'P.337 ~ 398', startPage: 337, coreTopic: 'Buffer 环形缓冲、定时器队列、Connector' }
+        ]
+    },
+    primerPlus: {
+        id: 'primerPlus',
+        title: 'C++ Primer Plus (第6版) 中文版',
+        shortTitle: '《C++ Primer Plus (第6版)》',
+        author: 'Stephen Prata',
+        localPath: 'file:///E:/workspace/C++_learning/C++PrimerPlus中文版第6版.pdf',
+        totalPages: 1400,
+        pageOffset: 30, // 印刷 P.1 对应 PDF 物理 P.31 (30页前言与目录)
+        chapters: [
+            { id: 7, title: '第 7 章：函数 —— C++ 的编程模块', bookRange: 'P.200 ~ 254', startPage: 200, coreTopic: '函数指针、引用传参' },
+            { id: 8, title: '第 8 章：函数探幽', bookRange: 'P.255 ~ 308', startPage: 255, coreTopic: '内联函数、引用变量与默认参数' },
+            { id: 9, title: '第 9 章：内存模型和名称空间', bookRange: 'P.309 ~ 348', startPage: 309, coreTopic: '静态存储持续性、生存期、namespace' },
+            { id: 10, title: '第 10 章：对象和类', bookRange: 'P.349 ~ 392', startPage: 349, coreTopic: '过程抽象、封装与构造析构' },
+            { id: 12, title: '第 12 章：类和动态内存分配', bookRange: 'P.433 ~ 488', startPage: 433, coreTopic: '深浅拷贝、移动构造与赋值运算符' },
+            { id: 13, title: '第 13 章：类继承', bookRange: 'P.489 ~ 550', startPage: 489, coreTopic: '虚函数、虚析构与动态多态' },
+            { id: 16, title: '第 16 章：string 类和标准模板库 (STL)', bookRange: 'P.671 ~ 794', startPage: 671, coreTopic: 'vector, map, 迭代器与智能指针' },
+            { id: 18, title: '第 18 章：探讨 C++ 新标准 (C++11)', bookRange: 'P.829 ~ 878', startPage: 829, coreTopic: '右值引用、std::move、Lambda 表达式' }
+        ]
+    }
+};
+
+function getBookPhysicalPage(bookKey, bookPage) {
+    const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
+    const pageNum = parseInt(bookPage) || 1;
+    return pageNum + cfg.pageOffset;
+}
+
+function openPdfAtPage(bookKey, bookPage) {
+    const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
+    const pPage = getBookPhysicalPage(bookKey, bookPage);
+    const targetUrl = `${cfg.localPath}#page=${pPage}`;
+    window.open(targetUrl, '_blank');
+    if (typeof showToast === 'function') {
+        showToast(`已在浏览器新标签页打开《${cfg.shortTitle}》第 ${pPage} 页 (正文 P.${bookPage})`);
+    }
+}
+
+function openInReadest(bookKey, bookPage, chapterTitle = '') {
+    const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
+    const pPage = getBookPhysicalPage(bookKey, bookPage);
+    const clipText = `【Readest 研读定位】\n书目：${cfg.title}\n章节：${chapterTitle}\n正文印刷页：P.${bookPage}\nPDF 物理页：第 ${pPage} 页`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(clipText).finally(() => {
+            triggerReadestProtocol(cfg.shortTitle, bookPage, pPage);
+        });
+    } else {
+        triggerReadestProtocol(cfg.shortTitle, bookPage, pPage);
+    }
+}
+
+function triggerReadestProtocol(bookTitle, bookPage, physicalPage) {
+    try {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = 'readest://';
+        document.body.appendChild(iframe);
+        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1000);
+    } catch (e) {}
+
+    if (typeof showToast === 'function') {
+        showToast(`已将《${bookTitle}》P.${bookPage} (物理第 ${physicalPage} 页) 复制到剪贴板，已尝试呼起 Readest！`);
+    }
+}
+
+function extractBookPageFromDay(dayItem) {
+    if (!dayItem || !dayItem.bookRange) return 255;
+    const m = dayItem.bookRange.match(/P\.(\d+)/i);
+    return m ? parseInt(m[1]) : 255;
+}
+
+function quickJumpByDay(dayNum) {
+    const dayItem = (typeof DAYS_DATASET !== 'undefined' ? DAYS_DATASET : []).find(d => d.day === dayNum);
+    const page = extractBookPageFromDay(dayItem);
+    openPdfAtPage('chenShuo', page);
+}
+
+function quickReadestByDay(dayNum) {
+    const dayItem = (typeof DAYS_DATASET !== 'undefined' ? DAYS_DATASET : []).find(d => d.day === dayNum);
+    const page = extractBookPageFromDay(dayItem);
+    const title = dayItem ? dayItem.title : `Day ${dayNum}`;
+    openInReadest('chenShuo', page, title);
+}
+
+function renderBookReadingView() {
+    const container = document.getElementById('view-reading-container');
+    if (!container) return;
+
+    container.innerHTML = `
+    <div class="space-y-6">
+        <!-- 头部卡片 -->
+        <div class="bg-gradient-to-r from-stone-900 via-sky-950 to-stone-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-stone-800">
+            <div class="relative z-10 max-w-3xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs font-mono font-bold mb-3 border border-sky-400/30">
+                    <i class="fa-solid fa-book-open"></i> 双权威书目深度伴读系统
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold font-serifHeading mb-3 tracking-tight">
+                    陈硕《Linux 多线程服务端编程》 + 《C++ Primer Plus》伴读引擎
+                </h2>
+                <p class="text-xs sm:text-sm text-stone-300 font-serifMono leading-relaxed mb-6">
+                    面向 muduo 核心源码攻坚，无缝衔接本地 <span class="text-sky-300 font-bold">Readest</span> 桌面阅读器与浏览器内置 PDF 阅读引擎。内置物理印刷页码偏移补正算法（陈硕 +23 页，Primer Plus +30 页），点击即可直接定位到指定页码！
+                </p>
+
+                <!-- 自定义页码极速直跳栏 -->
+                <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-stone-300 whitespace-nowrap">书目选择：</span>
+                        <select id="jump-book-select" class="bg-stone-800 border border-stone-700 text-white rounded-xl px-3 py-2 text-xs font-serifMono focus:outline-none focus:border-sky-400">
+                            <option value="chenShuo">陈硕《Linux 多线程服务端编程》(P.1~607)</option>
+                            <option value="primerPlus">《C++ Primer Plus (第6版)》(P.1~1400)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2 flex-1">
+                        <input id="jump-page-input" type="number" min="1" max="1400" placeholder="输入印刷正文页码 (如 255)" class="bg-stone-800 border border-stone-700 text-white rounded-xl px-3 py-2 text-xs font-serifMono w-full focus:outline-none focus:border-sky-400">
+                        <button onclick="handleCustomPageJump()" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-stone-950 font-bold text-xs transition shrink-0 flex items-center gap-1.5 cursor-pointer shadow-md">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span>浏览器直跳</span>
+                        </button>
+                        <button onclick="handleCustomReadestJump()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition shrink-0 flex items-center gap-1.5 cursor-pointer shadow-md">
+                            <i class="fa-solid fa-book-bookmark"></i>
+                            <span>呼起 Readest</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 双书目大纲对照 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- 陈硕 -->
+            <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-xl bg-sky-100 text-sky-900 flex items-center justify-center font-bold text-sm font-serifHeading">硕</span>
+                        <div>
+                            <h3 class="text-base font-bold text-stone-900 font-serifHeading">《Linux 多线程服务端编程》</h3>
+                            <p class="text-xs text-stone-500 font-serifMono">陈硕 著 · 607 页 · 工业 Reactor 圣经</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 rounded bg-sky-50 text-sky-800 border border-sky-200">偏移 +23 页</span>
+                </div>
+
+                <div class="space-y-2.5">
+                    ${BOOKS_CONFIG.chenShuo.chapters.map(c => `
+                        <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 hover:border-sky-300 transition flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="space-y-0.5">
+                                <div class="text-xs font-bold text-stone-800 font-serifHeading">
+                                    ${c.title}
+                                </div>
+                                <div class="text-[11px] text-stone-500 font-serifMono">
+                                    核心：${c.coreTopic}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white text-stone-700 border border-stone-200">${c.bookRange}</span>
+                                <button onclick="openPdfAtPage('chenShuo', ${c.startPage})" class="px-2.5 py-1 rounded-lg bg-sky-900 hover:bg-sky-950 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1">
+                                    <i class="fa-solid fa-up-right-from-square text-[10px]"></i> 直跳
+                                </button>
+                                <button onclick="openInReadest('chenShuo', ${c.startPage}, '${c.title}')" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer flex items-center gap-1">
+                                    Readest
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- C++ Primer Plus -->
+            <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-sm font-serifHeading">普</span>
+                        <div>
+                            <h3 class="text-base font-bold text-stone-900 font-serifHeading">《C++ Primer Plus (第6版)》</h3>
+                            <p class="text-xs text-stone-500 font-serifMono">Stephen Prata 著 · 现代 C++ 底座根基</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 rounded bg-amber-50 text-amber-800 border border-amber-200">偏移 +30 页</span>
+                </div>
+
+                <div class="space-y-2.5">
+                    ${BOOKS_CONFIG.primerPlus.chapters.map(c => `
+                        <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 hover:border-amber-300 transition flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="space-y-0.5">
+                                <div class="text-xs font-bold text-stone-800 font-serifHeading">
+                                    ${c.title}
+                                </div>
+                                <div class="text-[11px] text-stone-500 font-serifMono">
+                                    核心：${c.coreTopic}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white text-stone-700 border border-stone-200">${c.bookRange}</span>
+                                <button onclick="openPdfAtPage('primerPlus', ${c.startPage})" class="px-2.5 py-1 rounded-lg bg-amber-800 hover:bg-amber-900 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1">
+                                    <i class="fa-solid fa-up-right-from-square text-[10px]"></i> 直跳
+                                </button>
+                                <button onclick="openInReadest('primerPlus', ${c.startPage}, '${c.title}')" class="px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs font-semibold transition cursor-pointer flex items-center gap-1">
+                                    Readest
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function handleCustomPageJump() {
+    const bookKey = document.getElementById('jump-book-select')?.value || 'chenShuo';
+    const pageVal = document.getElementById('jump-page-input')?.value;
+    if (!pageVal) {
+        if (typeof showToast === 'function') showToast('请输入有效的印刷正文页码', false);
+        return;
+    }
+    openPdfAtPage(bookKey, parseInt(pageVal));
+}
+
+function handleCustomReadestJump() {
+    const bookKey = document.getElementById('jump-book-select')?.value || 'chenShuo';
+    const pageVal = document.getElementById('jump-page-input')?.value;
+    if (!pageVal) {
+        if (typeof showToast === 'function') showToast('请输入有效的印刷正文页码', false);
+        return;
+    }
+    const cfg = BOOKS_CONFIG[bookKey];
+    openInReadest(bookKey, parseInt(pageVal), `自定义精读 P.${pageVal}`);
+}
+
+
+// ==========================================================================
+// muduo C++ 工业实战个人控制台 - 专注计时器高可靠模块 (Timer Engine)
+// 彻底修复不走字、后台标签页节流时间漂移、脏数据死锁等缺陷
+// ==========================================================================
+
+let _timerIntervalHandle = null;
+let _timerStartTimestamp = 0;
+
+/**
+ * 计时器初始化自愈（杜绝 localStorage 脏数据导致已处于 running 假象）
+ */
+function initStudyTimer() {
+    if (!window.appState) window.appState = {};
+    if (!window.appState.activeTimer || typeof window.appState.activeTimer !== 'object') {
+        window.appState.activeTimer = {
+            running: false,
+            timerId: null,
+            seconds: 0,
+            day: 1,
+            type: 'coding'
+        };
+    }
+    // 强制清理运行态残留句柄
+    window.appState.activeTimer.running = false;
+    window.appState.activeTimer.timerId = null;
+    if (_timerIntervalHandle) {
+        clearInterval(_timerIntervalHandle);
+        _timerIntervalHandle = null;
+    }
+    updateTimerDisplay();
+}
+
+/**
+ * 启动 / 暂停专注计时
+ */
+function toggleStudyTimer() {
+    if (!window.appState || !window.appState.activeTimer) initStudyTimer();
+
+    const btn = document.getElementById('btn-timer-toggle');
+    const icon = document.getElementById('btn-timer-icon');
+    const text = document.getElementById('btn-timer-text');
+    const timer = window.appState.activeTimer;
+
+    if (!timer.running) {
+        // 启动走字
+        timer.running = true;
+        _timerStartTimestamp = Date.now() - (timer.seconds * 1000);
+
+        if (btn) btn.className = "px-3 py-1 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
+        if (icon) icon.className = "fa-solid fa-pause";
+        if (text) text.innerText = "暂停专注";
+
+        if (_timerIntervalHandle) clearInterval(_timerIntervalHandle);
+        _timerIntervalHandle = setInterval(() => {
+            // 使用时间戳差值计算，彻底消除系统休眠或标签页后台时的秒数漂移
+            timer.seconds = Math.floor((Date.now() - _timerStartTimestamp) / 1000);
+            updateTimerDisplay();
+        }, 1000);
+
+        if (typeof showToast === 'function') showToast("专注计时已启动，保持工业级专注！");
+    } else {
+        // 暂停计时
+        timer.running = false;
+        if (_timerIntervalHandle) {
+            clearInterval(_timerIntervalHandle);
+            _timerIntervalHandle = null;
+        }
+
+        if (btn) btn.className = "px-3 py-1 rounded-lg bg-sky-800 hover:bg-sky-900 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
+        if (icon) icon.className = "fa-solid fa-play";
+        if (text) text.innerText = "继续专注";
+
+        if (typeof showToast === 'function') showToast("专注计时已暂停", false);
+    }
+}
+
+/**
+ * 重置专注计时器
+ */
+function resetStudyTimer() {
+    if (!window.appState || !window.appState.activeTimer) initStudyTimer();
+
+    const timer = window.appState.activeTimer;
+    timer.running = false;
+    timer.seconds = 0;
+    _timerStartTimestamp = 0;
+
+    if (_timerIntervalHandle) {
+        clearInterval(_timerIntervalHandle);
+        _timerIntervalHandle = null;
+    }
+
+    updateTimerDisplay();
+
+    const btn = document.getElementById('btn-timer-toggle');
+    const icon = document.getElementById('btn-timer-icon');
+    const text = document.getElementById('btn-timer-text');
+    if (btn) btn.className = "px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
+    if (icon) icon.className = "fa-solid fa-play";
+    if (text) text.innerText = "开始专注";
+
+    if (typeof showToast === 'function') showToast("专注计时已重置", false);
+}
+
+/**
+ * 实时刷新界面时间显示
+ */
+function updateTimerDisplay() {
+    const timer = window.appState?.activeTimer || { seconds: 0 };
+    const totalSecs = timer.seconds || 0;
+    const hours = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+
+    let timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    if (hours > 0) {
+        timeStr = `${String(hours).padStart(2, '0')}:${timeStr}`;
+    }
+
+    const el = document.getElementById('timer-display');
+    if (el) el.innerText = timeStr;
+}
+
+/**
+ * 归档当前会话到学习大盘
+ */
+function saveActiveSession() {
+    const timer = window.appState?.activeTimer;
+    if (!timer) return;
+
+    const mins = Math.round(timer.seconds / 60);
+    if (mins < 1 && timer.seconds >= 10) {
+        // 不足 1 分钟但多于 10 秒按 1 分钟记
+        logStudyMinutes(1);
+    } else if (mins >= 1) {
+        logStudyMinutes(mins);
+    } else {
+        if (typeof showToast === 'function') showToast("计时不足 10 秒，未记入会话", false);
+        return;
+    }
+
+    // 播放归档完成轻音效
+    playChimeSound();
+
+    // 归档后自动清零
+    resetStudyTimer();
+}
+
+/**
+ * 快捷记时 (+15m, +30m, +45m)
+ */
+function quickAddMinutes(mins) {
+    logStudyMinutes(mins);
+    playChimeSound();
+    if (typeof showToast === 'function') showToast(`成功记入 ${mins} 分钟专注会话！`);
+}
+
+/**
+ * 核心入库与大盘指标刷新
+ */
+function logStudyMinutes(mins) {
+    if (!window.appState) return;
+    if (!Array.isArray(window.appState.studySessions)) {
+        window.appState.studySessions = [];
+    }
+
+    const type = document.getElementById('timer-type')?.value || 'coding';
+    const day = parseInt(document.getElementById('timer-day')?.value || '1');
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const typeNames = {
+        coding: '代码攻坚',
+        reading: '书卷伴读(Readest)',
+        debug: '排错调试'
+    };
+
+    window.appState.studySessions.push({
+        id: Date.now(),
+        date: typeof getTodayDateStr === 'function' ? getTodayDateStr() : now.toISOString().slice(0, 10),
+        time: timeStr,
+        day: day,
+        duration: mins,
+        type: type,
+        note: `专注攻坚 Day ${day} (${typeNames[type] || type})`
+    });
+
+    if (typeof persistState === 'function') persistState();
+    if (typeof updateDashboardMetrics === 'function') updateDashboardMetrics();
+    if (typeof showToast === 'function') showToast(`专注会话已归档：+${mins} 分钟！`);
+}
+
+/**
+ * Web Audio API 柔和完成提示音
+ */
+function playChimeSound() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3); // A5
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.6);
+    } catch (e) {
+        // 忽略音频限制
+    }
+}
+
+
+var appState = {
+    // 全局根状态对象
+
     version: "5.0.0",
     completedDays: [],
     mastery: {},         // { [day]: { level: 0..5, read: false, quizPassed: false, demo: false, independentImpl: false, sourceUnderstood: false, completedAt: null, score: 0, quizScores: null } }
@@ -5251,6 +5756,8 @@ let appState = {
         type: 'coding'
     }
 };
+window.appState = appState;
+
 
 // 工具函数：日期
 function getTodayDateStr() {
@@ -5318,6 +5825,13 @@ function loadAndMigrateState() {
             const parsed = JSON.parse(v5Saved);
             if (parsed && typeof parsed === 'object') {
                 appState = Object.assign(appState, parsed);
+                if (!appState.activeTimer) {
+                    appState.activeTimer = { running: false, timerId: null, seconds: 0, day: 1, type: 'coding' };
+                } else {
+                    appState.activeTimer.running = false;
+                    appState.activeTimer.timerId = null;
+                }
+                window.appState = appState;
                 if (!appState.mastery) appState.mastery = {};
                 if (!appState.reviews) appState.reviews = {};
                 if (!appState.sourceStatus) appState.sourceStatus = {};
@@ -5467,7 +5981,7 @@ function calculateRealStreak() {
 // 视图切换
 function switchView(viewName) {
     appState.currentView = viewName;
-    const views = ['dashboard', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
+    const views = ['dashboard', 'daily', 'reading', 'mapping', 'quiz', 'source', 'pitfalls'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -5496,6 +6010,10 @@ function switchView(viewName) {
         renderSourceRoadmap();
     } else if (viewName === 'pitfalls') {
         renderPitfallsList();
+    } else if (viewName === 'reading') {
+        if (typeof renderBookReadingView === 'function') {
+            renderBookReadingView();
+        }
     }
 }
 
@@ -5842,102 +6360,7 @@ function renderDueReviewList() {
     });
 }
 
-// 专注计时器功能
-function toggleStudyTimer() {
-    const btn = document.getElementById('btn-timer-toggle');
-    const icon = document.getElementById('btn-timer-icon');
-    const text = document.getElementById('btn-timer-text');
-
-    if (!appState.activeTimer.running) {
-        appState.activeTimer.running = true;
-        if (btn) btn.className = "px-3 py-1 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
-        if (icon) icon.className = "fa-solid fa-pause";
-        if (text) text.innerText = "暂停专注";
-
-        appState.activeTimer.timerId = setInterval(() => {
-            appState.activeTimer.seconds++;
-            updateTimerDisplay();
-        }, 1000);
-        showToast("专注计时已启动");
-    } else {
-        appState.activeTimer.running = false;
-        clearInterval(appState.activeTimer.timerId);
-        if (btn) btn.className = "px-3 py-1 rounded-lg bg-sky-800 hover:bg-sky-900 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
-        if (icon) icon.className = "fa-solid fa-play";
-        if (text) text.innerText = "继续专注";
-        showToast("专注计时已暂停", false);
-    }
-}
-
-function resetStudyTimer() {
-    if (appState.activeTimer.running) {
-        clearInterval(appState.activeTimer.timerId);
-        appState.activeTimer.running = false;
-    }
-    appState.activeTimer.seconds = 0;
-    updateTimerDisplay();
-
-    const btn = document.getElementById('btn-timer-toggle');
-    const icon = document.getElementById('btn-timer-icon');
-    const text = document.getElementById('btn-timer-text');
-    if (btn) btn.className = "px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer";
-    if (icon) icon.className = "fa-solid fa-play";
-    if (text) text.innerText = "开始专注";
-    showToast("专注计时已重置", false);
-}
-
-function updateTimerDisplay() {
-    const mins = Math.floor(appState.activeTimer.seconds / 60);
-    const secs = appState.activeTimer.seconds % 60;
-    const str = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    const el = document.getElementById('timer-display');
-    if (el) el.innerText = str;
-}
-
-function saveActiveSession() {
-    const mins = Math.round(appState.activeTimer.seconds / 60);
-    if (mins < 1 && appState.activeTimer.seconds > 10) {
-        // 不足 1 分钟但多于 10 秒按 1 分钟记
-        logStudyMinutes(1);
-    } else if (mins >= 1) {
-        logStudyMinutes(mins);
-    } else {
-        showToast("计时不足，未记入会话", false);
-        return;
-    }
-
-    // 重置计时器
-    if (appState.activeTimer.running) {
-        toggleStudyTimer();
-    }
-    appState.activeTimer.seconds = 0;
-    updateTimerDisplay();
-}
-
-function quickAddMinutes(mins) {
-    logStudyMinutes(mins);
-    showToast(`成功记入 ${mins} 分钟专注会话！`);
-}
-
-function logStudyMinutes(mins) {
-    const type = document.getElementById('timer-type')?.value || 'coding';
-    const day = parseInt(document.getElementById('timer-day')?.value || '1');
-    const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    appState.studySessions.push({
-        id: Date.now(),
-        date: getTodayDateStr(),
-        time: timeStr,
-        day: day,
-        duration: mins,
-        type: type,
-        note: `专注攻坚 Day ${day}`
-    });
-
-    persistState();
-    updateDashboardMetrics();
-}
+// 专注计时器功能已由 js/timer.js 独立承载并增强修复
 
 // 每日任务卡片渲染 (View 2)
 function renderDailyCards() {
@@ -6046,9 +6469,17 @@ function renderDailyCards() {
 
                 <!-- 标题与教材定位 -->
                 <h3 class="text-base sm:text-lg font-bold text-stone-900 mb-1.5 font-serif-heading">${escapeHtml(item.title)}</h3>
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-100 border border-stone-200/80 text-stone-700 text-xs font-serifMono mb-3.5">
-                    <i class="fa-solid fa-book-bookmark text-amber-700"></i>
-                    <span>${escapeHtml(item.bookRange)}</span>
+                <div class="flex flex-wrap items-center gap-2 mb-3.5">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-100 border border-stone-200/80 text-stone-700 text-xs font-serifMono">
+                        <i class="fa-solid fa-book-bookmark text-amber-700"></i>
+                        <span>${escapeHtml(item.bookRange)}</span>
+                    </div>
+                    <button onclick="quickJumpByDay(${item.day})" class="px-2.5 py-1 rounded-lg bg-sky-900 hover:bg-sky-950 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1 shadow-2xs">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> <span>直跳原书</span>
+                    </button>
+                    <button onclick="quickReadestByDay(${item.day})" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer flex items-center gap-1 border border-amber-300">
+                        <i class="fa-solid fa-book-open text-[10px]"></i> <span>Readest</span>
+                    </button>
                 </div>
 
                 <div class="flex flex-wrap gap-1.5 mb-4">${tagsHtml}</div>
@@ -6187,7 +6618,7 @@ function renderDailyCards() {
 
     // 触发代码高亮
     document.querySelectorAll('pre code').forEach((el) => {
-        hljs.highlightElement(el);
+        if (typeof hljs !== "undefined") hljs.highlightElement(el);
     });
 }
 
@@ -7439,10 +7870,11 @@ document.addEventListener('keydown', (e) => {
 
     if (e.key === '1') switchView('dashboard');
     else if (e.key === '2') switchView('daily');
-    else if (e.key === '3') switchView('mapping');
-    else if (e.key === '4') switchView('quiz');
-    else if (e.key === '5') switchView('source');
-    else if (e.key === '6') switchView('pitfalls');
+    else if (e.key === '3') switchView('reading');
+    else if (e.key === '4') switchView('mapping');
+    else if (e.key === '5') switchView('quiz');
+    else if (e.key === '6') switchView('source');
+    else if (e.key === '7') switchView('pitfalls');
     else if (e.key === '/') {
         e.preventDefault();
         switchView('daily');
@@ -7464,6 +7896,7 @@ document.addEventListener('keydown', (e) => {
 // 页面加载入口
 window.addEventListener('DOMContentLoaded', () => {
     loadAndMigrateState();
+    if (typeof initStudyTimer === 'function') initStudyTimer();
     initQuizDaySelector();
     updateDashboardMetrics();
     renderDailyCards();
@@ -7512,6 +7945,7 @@ function switchEnvModalTab(tabId) {
 }
 
 
-</script>
+
+    </script>
 </body>
 </html>

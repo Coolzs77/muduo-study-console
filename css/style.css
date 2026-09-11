@@ -1,0 +1,72 @@
+        body {
+            font-family: "Courier Prime", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif, monospace;
+            background-color: #faf9f6;
+            color: #1f2937;
+            -webkit-tap-highlight-color: transparent;
+        }
+        h1, h2, h3, h4, .font-serif-heading {
+            font-family: "Noto Serif SC", "Songti SC", STSong, serif;
+            letter-spacing: -0.015em;
+        }
+        code, pre, .font-mono-code {
+            font-family: "Courier Prime", "JetBrains Mono", Consolas, Courier, monospace !important;
+        }
+
+        /* 细致典雅书卷滚动条 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f4efe6; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* 典雅书卷纸质微阴影 */
+        .academic-card {
+            box-shadow: 0 1px 3px rgba(35, 29, 22, 0.05), 0 8px 24px -4px rgba(35, 29, 22, 0.04);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+        }
+        .academic-card:hover {
+            box-shadow: 0 3px 6px rgba(35, 29, 22, 0.06), 0 14px 28px -6px rgba(35, 29, 22, 0.08);
+        }
+
+        /* 代码高亮区域纸质质感 */
+        pre code.hljs {
+            background: #ffffff !important;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.85rem 1rem !important;
+            font-family: "Courier Prime", monospace !important;
+            font-size: 0.82rem !important;
+            line-height: 1.6 !important;
+        }
+
+        /* 拓扑流光动态连线 */
+        .flow-line {
+            stroke-dasharray: 6 6;
+            animation: flowDash 24s linear infinite;
+        }
+        @keyframes flowDash {
+            to { stroke-dashoffset: -240; }
+        }
+
+        /* 可点击拓扑图节点 */
+        .topo-node {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .topo-node:hover rect {
+            stroke: #0284c7 !important;
+            stroke-width: 2 !important;
+            filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.25));
+        }
+
+        /* 侧边滑动抽屉 */
+        .slide-drawer {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* 掌握度阶梯指示 */
+        .mastery-star {
+            transition: color 0.15s ease, transform 0.15s ease;
+        }
+        .mastery-star:hover {
+            transform: scale(1.15);
+        }

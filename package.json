@@ -4,9 +4,9 @@
   "version": "5.2.0",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/restore_dev_html.js && vite",
-    "build": "node scripts/restore_dev_html.js && tsc && vite build && node scripts/copy_dist.js",
-    "preview": "vite preview"
+    "dev": "npx serve . -p 3000",
+    "build": "node scripts/build_static.cjs",
+    "preview": "npx serve dist -p 4173"
   },
   "dependencies": {
     "clsx": "^2.1.1",
