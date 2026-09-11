@@ -1,3 +1,29 @@
+
+// ==================== 安全数据集读取防弹函数 (防异步加载竞态/网络丢包) ====================
+function getDaysDataset() {
+    if (typeof DAYS_DATASET !== 'undefined' && Array.isArray(DAYS_DATASET)) return DAYS_DATASET;
+    if (typeof window !== 'undefined' && window.DAYS_DATASET && Array.isArray(window.DAYS_DATASET)) return window.DAYS_DATASET;
+    return [];
+}
+
+function getMappingMatrix() {
+    if (typeof MAPPING_MATRIX !== 'undefined' && Array.isArray(MAPPING_MATRIX)) return MAPPING_MATRIX;
+    if (typeof window !== 'undefined' && window.MAPPING_MATRIX && Array.isArray(window.MAPPING_MATRIX)) return window.MAPPING_MATRIX;
+    return [];
+}
+
+function getSourceRoadmap() {
+    if (typeof SOURCE_ROADMAP !== 'undefined' && Array.isArray(SOURCE_ROADMAP)) return SOURCE_ROADMAP;
+    if (typeof window !== 'undefined' && window.SOURCE_ROADMAP && Array.isArray(window.SOURCE_ROADMAP)) return window.SOURCE_ROADMAP;
+    return [];
+}
+
+function getPitfallsDataset() {
+    if (typeof PITFALLS_DATASET !== 'undefined' && Array.isArray(PITFALLS_DATASET)) return PITFALLS_DATASET;
+    if (typeof window !== 'undefined' && window.PITFALLS_DATASET && Array.isArray(window.PITFALLS_DATASET)) return window.PITFALLS_DATASET;
+    return [];
+}
+
 var appState = {
     // 全局根状态对象
 
@@ -102,7 +128,7 @@ function loadAndMigrateState() {
                 if (!appState.mastery) appState.mastery = {};
                 if (!appState.reviews) appState.reviews = {};
                 if (!appState.sourceStatus) appState.sourceStatus = {};
-                if (!appState.pitfalls || appState.pitfalls.length === 0) appState.pitfalls = [...PITFALLS_DATASET];
+                if (!appState.pitfalls || appState.pitfalls.length === 0) appState.pitfalls = [...getPitfallsDataset()];
                 if (!appState.studySessions) appState.studySessions = [];
                 if (!appState.dayNotes) appState.dayNotes = {};
                 if (!appState.experimentNotes) appState.experimentNotes = {};
@@ -153,12 +179,12 @@ function loadAndMigrateState() {
             appState.globalNotes = legacyGlobalNotes;
         }
 
-        appState.pitfalls = [...PITFALLS_DATASET];
+        appState.pitfalls = [...getPitfallsDataset()];
         persistState();
     } catch(e) {
         console.warn("Storage restricted or parse error:", e);
         if (!appState.pitfalls || appState.pitfalls.length === 0) {
-            appState.pitfalls = [...PITFALLS_DATASET];
+            appState.pitfalls = [...getPitfallsDataset()];
         }
     }
 }
@@ -1048,7 +1074,7 @@ function renderMappingTable() {
         "虚析构函数": 26
     };
 
-    MAPPING_MATRIX.forEach(row => {
+    getMappingMatrix().forEach(row => {
         const targetDay = featureToDayMap[row.feature] || 1;
         const tr = document.createElement('tr');
         tr.className = "hover:bg-stone-50/80 transition";
@@ -1403,7 +1429,7 @@ function renderSourceRoadmap() {
     const readCount = Object.values(appState.sourceStatus).filter(s => s && s.status === '已精读').length;
     if (progEl) progEl.innerText = `${readCount} / 8`;
 
-    SOURCE_ROADMAP.forEach((node, idx) => {
+    getSourceRoadmap().forEach((node, idx) => {
         const curStatus = appState.sourceStatus[node.id]?.status || '未读';
         const savedNotes = appState.sourceStatus[node.id]?.notes || '';
 
@@ -1903,7 +1929,7 @@ function openResetModal() {
         appState.mastery = {};
         appState.reviews = {};
         appState.sourceStatus = {};
-        appState.pitfalls = [...PITFALLS_DATASET];
+        appState.pitfalls = [...getPitfallsDataset()];
         appState.studySessions = [];
         appState.dayNotes = {};
         appState.experimentNotes = {};
@@ -2037,7 +2063,7 @@ function executeImportOverwrite(imported) {
     appState.mastery = imported.mastery || {};
     appState.reviews = imported.reviews || {};
     appState.sourceStatus = imported.sourceStatus || {};
-    appState.pitfalls = imported.pitfalls || [...PITFALLS_DATASET];
+    appState.pitfalls = imported.pitfalls || [...getPitfallsDataset()];
     appState.studySessions = imported.studySessions || [];
     appState.dayNotes = imported.dayNotes || {};
     appState.experimentNotes = imported.experimentNotes || {};
@@ -2092,7 +2118,7 @@ function exportMarkdownReport() {
     if (!hasNotes) md += `*暂未记录每日手记*\n\n`;
 
     md += `## 四、muduo 8 阶核心源码研读进展\n\n`;
-    SOURCE_ROADMAP.forEach(node => {
+    getSourceRoadmap().forEach(node => {
         const s = appState.sourceStatus[node.id] || { status: '未读', notes: '' };
         md += `### ${node.name} (${node.layer})\n`;
         md += `- **研读状态**: ${s.status}\n`;
@@ -2162,22 +2188,26 @@ document.addEventListener('keydown', (e) => {
 
 // 页面加载入口
 window.addEventListener('DOMContentLoaded', () => {
-    loadAndMigrateState();
-    if (typeof initStudyTimer === 'function') initStudyTimer();
-    initQuizDaySelector();
-    updateDashboardMetrics();
-    renderDailyCards();
-    renderMappingTable();
+    try { loadAndMigrateState(); } catch(e) { console.error('loadAndMigrateState error:', e); }
+    try { if (typeof initStudyTimer === 'function') initStudyTimer(); } catch(e) { console.error('initStudyTimer error:', e); }
+    try { initQuizDaySelector(); } catch(e) { console.error('initQuizDaySelector error:', e); }
+    try { updateDashboardMetrics(); } catch(e) { console.error('updateDashboardMetrics error:', e); }
+    try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
+    try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
 
     // 绑定笔记本自动存盘
-    const notebookEl = document.getElementById('notebook-textarea');
-    if (notebookEl) {
-        if (appState.globalNotes) notebookEl.value = appState.globalNotes;
-        notebookEl.addEventListener('input', debouncedSaveGlobalNotes);
-        notebookEl.addEventListener('blur', () => {
-            appState.globalNotes = notebookEl.value;
-            persistState();
-        });
+    try {
+        const notebookEl = document.getElementById('notebook-textarea');
+        if (notebookEl) {
+            if (appState.globalNotes) notebookEl.value = appState.globalNotes;
+            notebookEl.addEventListener('input', debouncedSaveGlobalNotes);
+            notebookEl.addEventListener('blur', () => {
+                appState.globalNotes = notebookEl.value;
+                persistState();
+            });
+        }
+    } catch(e) {
+        console.error('notebook init error:', e);
     }
 });
 
