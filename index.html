@@ -173,7 +173,7 @@
                 </select>
                 <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="攻坚类型">
                     <option value="coding">代码攻坚</option>
-                    <option value="reading">书目研读(Readest)</option>
+                    <option value="reading">书目研读</option>
                     <option value="debug">排错调试</option>
                 </select>
             </div>
@@ -195,17 +195,13 @@
         </div>
     </header>
 
-    <!-- 顶部主视图切换导航 (7大核心模块) -->
+    <!-- 顶部主视图切换导航 (6大核心模块) -->
     <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-3 mb-6 font-serifHeading text-xs sm:text-sm" id="view-tabs" role="tablist" aria-label="主视图导航">
         <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="攻坚大盘与架构拓扑">
             <i class="fa-solid fa-chart-pie text-sky-700"></i> 攻坚大盘与架构拓扑
         </button>
         <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
             <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
-        </button>
-        <button onclick="switchView('reading')" id="nav-reading" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="书卷伴读(Readest)">
-            <i class="fa-solid fa-book-open text-sky-700"></i> 书卷伴读 (Readest)
-            <span class="text-[10px] bg-rose-100 text-rose-800 px-1.5 py-0.2 rounded font-bold">直跳页码</span>
         </button>
         <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="语法 ➔ muduo 映射矩阵">
             <i class="fa-solid fa-sitemap text-emerald-600"></i> 语法 ➔ muduo 映射矩阵
@@ -603,11 +599,6 @@
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- ==================== VIEW 7: 双权威书目与 Readest 伴读流 (NEW) ==================== -->
-    <section id="view-reading" class="hidden space-y-6">
-        <div id="view-reading-container"></div>
     </section>
 
     <!-- ==================== VIEW 2: 28天任务与实验 ==================== -->
@@ -1247,89 +1238,9 @@ add_executable(my_server ${SOURCES})</pre>
 
 
 
-<!-- 5. 本地阅读助手模态框 (Local Reader Modal - 用于公网 HTTPS 环境安全导流) -->
-<div id="local-reader-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-label="本地阅读助手">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-stone-200 font-serifHeading space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-stone-100">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center text-base">
-                    <i class="fa-solid fa-book-bookmark"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-stone-900 text-base" id="lrm-book-title">参考书目研读直达</h4>
-                    <p class="text-[11px] text-sky-800 font-serifMono font-semibold" id="lrm-page-info">正文印刷页 P.255 ➔ 物理第 278 页</p>
-                </div>
-            </div>
-            <button onclick="closeLocalReaderModal()" class="text-stone-400 hover:text-stone-600 text-sm" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1.5 leading-relaxed">
-            <div class="font-bold flex items-center gap-1.5">
-                <i class="fa-solid fa-shield-halved text-amber-700"></i> 浏览器安全沙箱限制说明
-            </div>
-            <p class="text-[11.5px] text-amber-800 font-serifMono">
-                您当前正通过公网 <strong>HTTPS</strong> 访问控制台。现代浏览器出于隐私安全，<strong>严禁公网网页直接打开本地磁盘文件 (file:///)</strong>。系统已为您备妥以下秒级直达方案：
-            </p>
-        </div>
-
-        <div class="space-y-3 font-serifMono text-xs">
-            <!-- 方案一：呼起 Readest -->
-            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between gap-3">
-                <div class="space-y-0.5">
-                    <div class="font-bold text-stone-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-bolt text-amber-500"></i> 方案 A：一键唤起 Readest 桌面端
-                    </div>
-                    <p class="text-[11px] text-stone-500 font-serifHeading">系统已自动将页码信息复制到剪贴板，按 Ctrl+G 秒达</p>
-                </div>
-                <button id="lrm-btn-readest" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold rounded-lg transition shadow-xs shrink-0 cursor-pointer">
-                    呼起 Readest
-                </button>
-            </div>
-
-            <!-- 方案二：复制 Edge 打开命令 -->
-            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
-                <div class="flex items-center justify-between">
-                    <div class="font-bold text-stone-900 flex items-center gap-1.5">
-                        <i class="fa-brands fa-edge text-sky-700"></i> 方案 B：复制 Edge 秒开命令
-                    </div>
-                    <button onclick="copyLocalReaderCmd()" class="px-2.5 py-1 bg-sky-700 hover:bg-sky-800 text-white font-semibold rounded-lg transition cursor-pointer text-[11px] flex items-center gap-1">
-                        <i class="fa-solid fa-copy"></i> 复制命令
-                    </button>
-                </div>
-                <input type="text" id="lrm-cmd-input" readonly class="w-full bg-white border border-stone-200 rounded-lg p-2 text-[11px] text-stone-600 font-mono-code select-all">
-                <p class="text-[11px] text-stone-500 font-serifHeading">按 <kbd class="px-1 py-0.5 bg-stone-200 rounded text-[10px]">Win + R</kbd> 呼出运行窗口，粘贴并回车，Edge 将直接翻到对应页！</p>
-            </div>
-
-            <!-- 方案三：本地运行提示 -->
-            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 space-y-1.5">
-                <div class="font-bold text-stone-900 flex items-center gap-1.5">
-                    <i class="fa-solid fa-laptop-code text-emerald-700"></i> 方案 C：使用本地控制台（最爽体验）
-                </div>
-                <p class="text-[11px] text-stone-600 font-serifHeading leading-relaxed">
-                    在您的电脑直接双击打开 <code class="text-sky-900 bg-white px-1.5 py-0.5 rounded border border-stone-200">e:\workspace\muduo-study-console\index.html</code>，即可彻底解除浏览器安全限制，享受<strong>一键点击直接在新标签页翻开 PDF</strong> 的原生快感！
-                </p>
-                <div class="flex items-center gap-2 pt-1">
-                    <input type="text" id="lrm-path-input" readonly class="w-full bg-white border border-stone-200 rounded-lg p-1.5 text-[11px] text-stone-600 font-mono-code select-all">
-                    <button onclick="copyLocalReaderPath()" class="px-2 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-semibold rounded-lg transition shrink-0 text-[11px]">
-                        复制路径
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="pt-2 border-t border-stone-100 flex justify-end font-serifMono">
-            <button onclick="closeLocalReaderModal()" class="px-4 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl transition">
-                关闭
-            </button>
-        </div>
-    </div>
-</div>
-
-
     <!-- 模块化外部脚本加载（无打包依赖，原生静态秒开） -->
     <script src="js/dataset-28days.js"></script>
     <script src="js/dataset-mappings.js"></script>
-    <script src="js/books-integration.js"></script>
     <script src="js/timer.js"></script>
     <script src="js/app.js"></script>
 </body>

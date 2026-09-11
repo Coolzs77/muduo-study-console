@@ -274,7 +274,7 @@ function calculateRealStreak() {
 // 视图切换
 function switchView(viewName) {
     appState.currentView = viewName;
-    const views = ['dashboard', 'daily', 'reading', 'mapping', 'quiz', 'source', 'pitfalls'];
+    const views = ['dashboard', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -303,10 +303,6 @@ function switchView(viewName) {
         renderSourceRoadmap();
     } else if (viewName === 'pitfalls') {
         renderPitfallsList();
-    } else if (viewName === 'reading') {
-        if (typeof renderBookReadingView === 'function') {
-            renderBookReadingView();
-        }
     }
 }
 
@@ -767,12 +763,6 @@ function renderDailyCards() {
                         <i class="fa-solid fa-book-bookmark text-amber-700"></i>
                         <span>${escapeHtml(item.bookRange)}</span>
                     </div>
-                    <button onclick="quickJumpByDay(${item.day})" class="px-2.5 py-1 rounded-lg bg-sky-900 hover:bg-sky-950 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1 shadow-2xs">
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> <span>直跳原书</span>
-                    </button>
-                    <button onclick="quickReadestByDay(${item.day})" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer flex items-center gap-1 border border-amber-300">
-                        <i class="fa-solid fa-book-open text-[10px]"></i> <span>Readest</span>
-                    </button>
                 </div>
 
                 <div class="flex flex-wrap gap-1.5 mb-4">${tagsHtml}</div>
@@ -2163,11 +2153,10 @@ document.addEventListener('keydown', (e) => {
 
     if (e.key === '1') switchView('dashboard');
     else if (e.key === '2') switchView('daily');
-    else if (e.key === '3') switchView('reading');
-    else if (e.key === '4') switchView('mapping');
-    else if (e.key === '5') switchView('quiz');
-    else if (e.key === '6') switchView('source');
-    else if (e.key === '7') switchView('pitfalls');
+    else if (e.key === '3') switchView('mapping');
+    else if (e.key === '4') switchView('quiz');
+    else if (e.key === '5') switchView('source');
+    else if (e.key === '6') switchView('pitfalls');
     else if (e.key === '/') {
         e.preventDefault();
         switchView('daily');

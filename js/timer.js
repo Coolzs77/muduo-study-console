@@ -171,7 +171,7 @@ function logStudyMinutes(mins) {
 
     const typeNames = {
         coding: '代码攻坚',
-        reading: '书卷伴读(Readest)',
+        reading: '书目研读',
         debug: '排错调试'
     };
 

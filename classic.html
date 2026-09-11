@@ -247,7 +247,7 @@
                 </select>
                 <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="攻坚类型">
                     <option value="coding">代码攻坚</option>
-                    <option value="reading">书目研读(Readest)</option>
+                    <option value="reading">书目研读</option>
                     <option value="debug">排错调试</option>
                 </select>
             </div>
@@ -269,17 +269,13 @@
         </div>
     </header>
 
-    <!-- 顶部主视图切换导航 (7大核心模块) -->
+    <!-- 顶部主视图切换导航 (6大核心模块) -->
     <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-3 mb-6 font-serifHeading text-xs sm:text-sm" id="view-tabs" role="tablist" aria-label="主视图导航">
         <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="攻坚大盘与架构拓扑">
             <i class="fa-solid fa-chart-pie text-sky-700"></i> 攻坚大盘与架构拓扑
         </button>
         <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
             <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
-        </button>
-        <button onclick="switchView('reading')" id="nav-reading" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="书卷伴读(Readest)">
-            <i class="fa-solid fa-book-open text-sky-700"></i> 书卷伴读 (Readest)
-            <span class="text-[10px] bg-rose-100 text-rose-800 px-1.5 py-0.2 rounded font-bold">直跳页码</span>
         </button>
         <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="语法 ➔ muduo 映射矩阵">
             <i class="fa-solid fa-sitemap text-emerald-600"></i> 语法 ➔ muduo 映射矩阵
@@ -677,11 +673,6 @@
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- ==================== VIEW 7: 双权威书目与 Readest 伴读流 (NEW) ==================== -->
-    <section id="view-reading" class="hidden space-y-6">
-        <div id="view-reading-container"></div>
     </section>
 
     <!-- ==================== VIEW 2: 28天任务与实验 ==================== -->
@@ -1315,6 +1306,7 @@ add_executable(my_server ${SOURCES})</pre>
         </div>
     </div>
 </div>
+
 
 
 
@@ -5259,363 +5251,6 @@ window.PITFALLS_DATASET = PITFALLS_DATASET;
 
 
 // ==========================================================================
-// muduo C++ 工业实战个人控制台 - 权威参考书目与 Readest 伴读流集成
-// 深度绑定 E:\workspace\C++_learning\ 书目
-// ==========================================================================
-
-// ==========================================================================
-// muduo C++ 工业实战个人控制台 - 权威参考书目与 Readest 伴读流集成
-// 深度绑定 E:\workspace\C++_learning\ 书目与 E:\soft\Readest 桌面客户端
-// ==========================================================================
-
-const BOOKS_CONFIG = {
-    chenShuo: {
-        id: 'chenShuo',
-        title: 'Linux 多线程服务端编程：使用 muduo C++ 网络库',
-        shortTitle: '陈硕《Linux多线程服务端编程》',
-        author: '陈硕',
-        fileName: 'Linux 多线程服务端编程 使用muduo C++网络库 (陈硕) (z-library.sk, 1lib.sk, z-lib.sk).pdf',
-        systemPath: 'E:\\workspace\\C++_learning\\Linux 多线程服务端编程 使用muduo C++网络库 (陈硕) (z-library.sk, 1lib.sk, z-lib.sk).pdf',
-        fileUri: 'file:///E:/workspace/C++_learning/' + encodeURIComponent('Linux 多线程服务端编程 使用muduo C++网络库 (陈硕) (z-library.sk, 1lib.sk, z-lib.sk).pdf'),
-        totalPages: 607,
-        pageOffset: 23, // 印刷 P.1 对应 PDF 物理 P.24 (23页前言与目录)
-        chapters: [
-            { id: 1, title: '第 1 章：线程安全的对象生命周期管理', bookRange: 'P.1 ~ 38', startPage: 1, coreTopic: 'shared_ptr / weak_ptr 解决析构竞态' },
-            { id: 2, title: '第 2 章：线程同步精要：互斥器与条件变量', bookRange: 'P.39 ~ 64', startPage: 39, coreTopic: 'RAII 互斥锁、避免死锁原则' },
-            { id: 3, title: '第 3 章：多线程服务端的进程与线程模型', bookRange: 'P.65 ~ 92', startPage: 65, coreTopic: 'One Loop Per Thread + 线程池' },
-            { id: 4, title: '第 4 章：C++ 多线程系统编程实践与避坑', bookRange: 'P.93 ~ 138', startPage: 93, coreTopic: '编译警告、线程私有数据与安全日志' },
-            { id: 6, title: '第 6 章：muduo 网络库设计动机与总体架构', bookRange: 'P.161 ~ 220', startPage: 161, coreTopic: 'Reactor 反应堆核心演进与事件驱动' },
-            { id: 7, title: '第 7 章：muduo 编程实战与示例剖析', bookRange: 'P.221 ~ 254', startPage: 221, coreTopic: 'Echo, Chargen, Time 等网络协议实战' },
-            { id: 8, title: '第 8 章：muduo 网络库核心源码深度剖析', bookRange: 'P.255 ~ 336', startPage: 255, coreTopic: 'Channel, EventLoop, Poller, TcpServer 全源码' },
-            { id: 9, title: '第 9 章：muduo 核心网络组件与设计细节', bookRange: 'P.337 ~ 398', startPage: 337, coreTopic: 'Buffer 环形缓冲、定时器队列、Connector' }
-        ]
-    },
-    primerPlus: {
-        id: 'primerPlus',
-        title: 'C++ Primer Plus (第6版) 中文版',
-        shortTitle: '《C++ Primer Plus (第6版)》',
-        author: 'Stephen Prata',
-        fileName: 'C++ Primer Plus：中文版（第六版） (Stephen Prata) (z-library.sk, 1lib.sk, z-lib.sk).pdf',
-        systemPath: 'E:\\workspace\\C++_learning\\C++ Primer Plus：中文版（第六版） (Stephen Prata) (z-library.sk, 1lib.sk, z-lib.sk).pdf',
-        fileUri: 'file:///E:/workspace/C++_learning/' + encodeURIComponent('C++ Primer Plus：中文版（第六版） (Stephen Prata) (z-library.sk, 1lib.sk, z-lib.sk).pdf'),
-        totalPages: 1400,
-        pageOffset: 30, // 印刷 P.1 对应 PDF 物理 P.31 (30页前言与目录)
-        chapters: [
-            { id: 7, title: '第 7 章：函数 —— C++ 的编程模块', bookRange: 'P.200 ~ 254', startPage: 200, coreTopic: '函数指针、引用传参' },
-            { id: 8, title: '第 8 章：函数探幽', bookRange: 'P.255 ~ 308', startPage: 255, coreTopic: '内联函数、引用变量与默认参数' },
-            { id: 9, title: '第 9 章：内存模型和名称空间', bookRange: 'P.309 ~ 348', startPage: 309, coreTopic: '静态存储持续性、生存期、namespace' },
-            { id: 10, title: '第 10 章：对象和类', bookRange: 'P.349 ~ 392', startPage: 349, coreTopic: '过程抽象、封装与构造析构' },
-            { id: 12, title: '第 12 章：类和动态内存分配', bookRange: 'P.433 ~ 488', startPage: 433, coreTopic: '深浅拷贝、移动构造与赋值运算符' },
-            { id: 13, title: '第 13 章：类继承', bookRange: 'P.489 ~ 550', startPage: 489, coreTopic: '虚函数、虚析构与动态多态' },
-            { id: 16, title: '第 16 章：string 类和标准模板库 (STL)', bookRange: 'P.671 ~ 794', startPage: 671, coreTopic: 'vector, map, 迭代器与智能指针' },
-            { id: 18, title: '第 18 章：探讨 C++ 新标准 (C++11)', bookRange: 'P.829 ~ 878', startPage: 829, coreTopic: '右值引用、std::move、Lambda 表达式' }
-        ]
-    }
-};
-
-function getBookPhysicalPage(bookKey, bookPage) {
-    const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
-    const pageNum = parseInt(bookPage) || 1;
-    return pageNum + cfg.pageOffset;
-}
-
-// 核心 PDF 直跳：智能区分本地协议与公网 HTTPS 安全沙箱
-function openPdfAtPage(bookKey, bookPage) {
-    const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
-    const pPage = getBookPhysicalPage(bookKey, bookPage);
-    const targetUrl = `${cfg.fileUri}#page=${pPage}`;
-    const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-    if (isLocal) {
-        // 1. 本地环境下：动态创建真实 <a> 标签模拟点击，唤起 Edge 内置 PDF 阅读器并直达指定页码
-        try {
-            const a = document.createElement('a');
-            a.href = targetUrl;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            if (typeof showToast === 'function') {
-                showToast(`已在 Edge 新标签页翻开《${cfg.shortTitle}》第 ${pPage} 页 (正文 P.${bookPage})`);
-            }
-        } catch(e) {
-            window.open(targetUrl, '_blank');
-        }
-    } else {
-        // 2. 公网 HTTPS 环境下：由于浏览器安全沙箱限制，打开本地阅读助手弹窗
-        openLocalReaderModal(bookKey, bookPage, pPage);
-    }
-}
-
-// 核心 Readest 桌面应用唤起：同步触发 readest:// 协议与剪贴板注入
-function openInReadest(bookKey, bookPage, chapterTitle = '') {
-    const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
-    const pPage = getBookPhysicalPage(bookKey, bookPage);
-    const clipText = `【Readest 研读定位】\n书目：${cfg.title}\n章节：${chapterTitle || '核心章节'}\n正文印刷页：P.${bookPage}\nPDF 物理页：第 ${pPage} 页\n本地路径：${cfg.systemPath}`;
-
-    // 1. 核心关键：必须在用户点击事件的同步主调用栈中执行唤起，保持浏览器用户激活态 (User Activation)
-    try {
-        const a = document.createElement('a');
-        a.href = 'readest://';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    } catch(e) {
-        try {
-            window.location.href = 'readest://';
-        } catch(err) {}
-    }
-
-    // 2. 并行将研读信息写入剪贴板 (异步，不阻碍协议呼起)
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(clipText).catch(() => {});
-    }
-
-    // 3. 弹出 Toast 提示
-    if (typeof showToast === 'function') {
-        showToast(`已唤起 Readest！已复制《${cfg.shortTitle}》P.${bookPage} (物理第 ${pPage} 页) 到剪贴板，按 Ctrl+G 即可秒达`);
-    }
-}
-
-// 打开公网 HTTPS 下的「本地阅读助手」模态框
-function openLocalReaderModal(bookKey, bookPage, pPage) {
-    const cfg = BOOKS_CONFIG[bookKey] || BOOKS_CONFIG.chenShuo;
-    const modal = document.getElementById('local-reader-modal');
-    if (!modal) {
-        // 兜底降级处理
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(cfg.systemPath);
-        }
-        alert(`【浏览器安全拦截提示】\n出于隐私安全，现代浏览器严禁公网 HTTPS 网页直接读取本地磁盘文件 (file:///)。\n\n已将本地路径复制到您的剪贴板：\n${cfg.systemPath}\n\n推荐解决方案：\n1. 点击【呼起 Readest】使用桌面客户端阅读\n2. 在本地双击运行 index.html 享受无限制极速直跳！`);
-        return;
-    }
-
-    document.getElementById('lrm-book-title').innerText = cfg.title;
-    document.getElementById('lrm-page-info').innerText = `正文印刷页 P.${bookPage} ➔ 绝对物理第 ${pPage} 页 (加权偏移 +${cfg.pageOffset})`;
-    document.getElementById('lrm-path-input').value = cfg.systemPath;
-    document.getElementById('lrm-cmd-input').value = `start msedge "${cfg.systemPath}#page=${pPage}"`;
-
-    // 自动复制打开命令
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(`start msedge "${cfg.systemPath}#page=${pPage}"`).catch(() => {});
-    }
-
-    // 绑定唤起 Readest 按钮
-    const btnReadest = document.getElementById('lrm-btn-readest');
-    if (btnReadest) {
-        btnReadest.onclick = () => {
-            openInReadest(bookKey, bookPage, `正文 P.${bookPage}`);
-            closeLocalReaderModal();
-        };
-    }
-
-    modal.classList.remove('hidden');
-}
-
-function closeLocalReaderModal() {
-    document.getElementById('local-reader-modal')?.classList.add('hidden');
-}
-
-function copyLocalReaderCmd() {
-    const cmd = document.getElementById('lrm-cmd-input')?.value;
-    if (cmd && navigator.clipboard) {
-        navigator.clipboard.writeText(cmd).then(() => {
-            if (typeof showToast === 'function') showToast('已复制 Edge 打开命令！在 Win+R 运行窗口粘贴回车即可秒开！');
-        });
-    }
-}
-
-function copyLocalReaderPath() {
-    const p = document.getElementById('lrm-path-input')?.value;
-    if (p && navigator.clipboard) {
-        navigator.clipboard.writeText(p).then(() => {
-            if (typeof showToast === 'function') showToast('已复制本地文件完整路径！');
-        });
-    }
-}
-
-function extractBookPageFromDay(dayItem) {
-    if (!dayItem || !dayItem.bookRange) return 255;
-    const m = dayItem.bookRange.match(/P\.([0-9]+)/i);
-    return m ? parseInt(m[1]) : 255;
-}
-
-function quickJumpByDay(dayNum) {
-    const days = (typeof getDaysDataset === 'function' ? getDaysDataset() : (window.DAYS_DATASET || []));
-    const dayItem = days.find(d => d.day === dayNum);
-    const page = extractBookPageFromDay(dayItem);
-    openPdfAtPage('chenShuo', page);
-}
-
-function quickReadestByDay(dayNum) {
-    const days = (typeof getDaysDataset === 'function' ? getDaysDataset() : (window.DAYS_DATASET || []));
-    const dayItem = days.find(d => d.day === dayNum);
-    const page = extractBookPageFromDay(dayItem);
-    const title = dayItem ? dayItem.title : `Day ${dayNum}`;
-    openInReadest('chenShuo', page, title);
-}
-
-function renderBookReadingView() {
-    const container = document.getElementById('view-reading-container');
-    if (!container) return;
-
-    container.innerHTML = `
-    <div class="space-y-6">
-        <!-- 头部卡片 -->
-        <div class="bg-gradient-to-r from-stone-900 via-sky-950 to-stone-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-stone-800">
-            <div class="relative z-10 max-w-3xl">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs font-mono font-bold mb-3 border border-sky-400/30">
-                    <i class="fa-solid fa-book-open"></i> 双权威书目深度伴读系统
-                </div>
-                <h2 class="text-2xl sm:text-3xl font-bold font-serifHeading mb-3 tracking-tight">
-                    陈硕《Linux 多线程服务端编程》 + 《C++ Primer Plus》伴读引擎
-                </h2>
-                <p class="text-xs sm:text-sm text-stone-300 font-serifMono leading-relaxed mb-6">
-                    面向 muduo 核心源码攻坚，无缝衔接本地 <span class="text-sky-300 font-bold">Readest</span> 桌面阅读器与浏览器内置 PDF 阅读引擎。内置物理印刷页码偏移补正算法（陈硕 +23 页，Primer Plus +30 页），点击即可直接定位到指定页码！
-                </p>
-
-                <!-- 自定义页码极速直跳栏 -->
-                <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-stone-300 whitespace-nowrap">书目选择：</span>
-                        <select id="jump-book-select" class="bg-stone-800 border border-stone-700 text-white rounded-xl px-3 py-2 text-xs font-serifMono focus:outline-none focus:border-sky-400">
-                            <option value="chenShuo">陈硕《Linux 多线程服务端编程》(P.1~607)</option>
-                            <option value="primerPlus">《C++ Primer Plus (第6版)》(P.1~1400)</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2 flex-1">
-                        <input id="jump-page-input" type="number" min="1" max="1400" placeholder="输入印刷正文页码 (如 255)" class="bg-stone-800 border border-stone-700 text-white rounded-xl px-3 py-2 text-xs font-serifMono w-full focus:outline-none focus:border-sky-400">
-                        <button onclick="handleCustomPageJump()" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-stone-950 font-bold text-xs transition shrink-0 flex items-center gap-1.5 cursor-pointer shadow-md">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            <span>浏览器直跳</span>
-                        </button>
-                        <button onclick="handleCustomReadestJump()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition shrink-0 flex items-center gap-1.5 cursor-pointer shadow-md">
-                            <i class="fa-solid fa-book-bookmark"></i>
-                            <span>呼起 Readest</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 双书目大纲对照 -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- 陈硕 -->
-            <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-stone-100">
-                    <div class="flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-xl bg-sky-100 text-sky-900 flex items-center justify-center font-bold text-sm font-serifHeading">硕</span>
-                        <div>
-                            <h3 class="text-base font-bold text-stone-900 font-serifHeading">《Linux 多线程服务端编程》</h3>
-                            <p class="text-xs text-stone-500 font-serifMono">陈硕 著 · 607 页 · 工业 Reactor 圣经</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-mono px-2 py-1 rounded bg-sky-50 text-sky-800 border border-sky-200">偏移 +23 页</span>
-                </div>
-
-                <div class="space-y-2.5">
-                    ${BOOKS_CONFIG.chenShuo.chapters.map(c => `
-                        <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 hover:border-sky-300 transition flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div class="space-y-0.5">
-                                <div class="text-xs font-bold text-stone-800 font-serifHeading">
-                                    ${c.title}
-                                </div>
-                                <div class="text-[11px] text-stone-500 font-serifMono">
-                                    核心：${c.coreTopic}
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white text-stone-700 border border-stone-200">${c.bookRange}</span>
-                                <button onclick="openPdfAtPage('chenShuo', ${c.startPage})" class="px-2.5 py-1 rounded-lg bg-sky-900 hover:bg-sky-950 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1">
-                                    <i class="fa-solid fa-up-right-from-square text-[10px]"></i> 直跳
-                                </button>
-                                <button onclick="openInReadest('chenShuo', ${c.startPage}, '${c.title}')" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer flex items-center gap-1">
-                                    Readest
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-
-            <!-- C++ Primer Plus -->
-            <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-stone-100">
-                    <div class="flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-sm font-serifHeading">普</span>
-                        <div>
-                            <h3 class="text-base font-bold text-stone-900 font-serifHeading">《C++ Primer Plus (第6版)》</h3>
-                            <p class="text-xs text-stone-500 font-serifMono">Stephen Prata 著 · 现代 C++ 底座根基</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-mono px-2 py-1 rounded bg-amber-50 text-amber-800 border border-amber-200">偏移 +30 页</span>
-                </div>
-
-                <div class="space-y-2.5">
-                    ${BOOKS_CONFIG.primerPlus.chapters.map(c => `
-                        <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 hover:border-amber-300 transition flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div class="space-y-0.5">
-                                <div class="text-xs font-bold text-stone-800 font-serifHeading">
-                                    ${c.title}
-                                </div>
-                                <div class="text-[11px] text-stone-500 font-serifMono">
-                                    核心：${c.coreTopic}
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white text-stone-700 border border-stone-200">${c.bookRange}</span>
-                                <button onclick="openPdfAtPage('primerPlus', ${c.startPage})" class="px-2.5 py-1 rounded-lg bg-amber-800 hover:bg-amber-900 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1">
-                                    <i class="fa-solid fa-up-right-from-square text-[10px]"></i> 直跳
-                                </button>
-                                <button onclick="openInReadest('primerPlus', ${c.startPage}, '${c.title}')" class="px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs font-semibold transition cursor-pointer flex items-center gap-1">
-                                    Readest
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    </div>
-    `;
-}
-
-function handleCustomPageJump() {
-    const bookKey = document.getElementById('jump-book-select')?.value || 'chenShuo';
-    const pageVal = document.getElementById('jump-page-input')?.value;
-    if (!pageVal) {
-        if (typeof showToast === 'function') showToast('请输入有效的印刷正文页码', false);
-        return;
-    }
-    openPdfAtPage(bookKey, parseInt(pageVal));
-}
-
-function handleCustomReadestJump() {
-    const bookKey = document.getElementById('jump-book-select')?.value || 'chenShuo';
-    const pageVal = document.getElementById('jump-page-input')?.value;
-    if (!pageVal) {
-        if (typeof showToast === 'function') showToast('请输入有效的印刷正文页码', false);
-        return;
-    }
-    openInReadest(bookKey, parseInt(pageVal), `自定义精读 P.${pageVal}`);
-}
-
-window.BOOKS_CONFIG = BOOKS_CONFIG;
-window.openPdfAtPage = openPdfAtPage;
-window.openInReadest = openInReadest;
-window.openLocalReaderModal = openLocalReaderModal;
-window.closeLocalReaderModal = closeLocalReaderModal;
-window.copyLocalReaderCmd = copyLocalReaderCmd;
-window.copyLocalReaderPath = copyLocalReaderPath;
-window.quickJumpByDay = quickJumpByDay;
-window.quickReadestByDay = quickReadestByDay;
-window.renderBookReadingView = renderBookReadingView;
-window.handleCustomPageJump = handleCustomPageJump;
-window.handleCustomReadestJump = handleCustomReadestJump;
-
-
-// ==========================================================================
 // muduo C++ 工业实战个人控制台 - 专注计时器高可靠模块 (Timer Engine)
 // 彻底修复不走字、后台标签页节流时间漂移、脏数据死锁等缺陷
 // ==========================================================================
@@ -5788,7 +5423,7 @@ function logStudyMinutes(mins) {
 
     const typeNames = {
         coding: '代码攻坚',
-        reading: '书卷伴读(Readest)',
+        reading: '书目研读',
         debug: '排错调试'
     };
 
@@ -5831,6 +5466,32 @@ function playChimeSound() {
     }
 }
 
+
+
+// ==================== 安全数据集读取防弹函数 (防异步加载竞态/网络丢包) ====================
+function getDaysDataset() {
+    if (typeof DAYS_DATASET !== 'undefined' && Array.isArray(DAYS_DATASET)) return DAYS_DATASET;
+    if (typeof window !== 'undefined' && window.DAYS_DATASET && Array.isArray(window.DAYS_DATASET)) return window.DAYS_DATASET;
+    return [];
+}
+
+function getMappingMatrix() {
+    if (typeof MAPPING_MATRIX !== 'undefined' && Array.isArray(MAPPING_MATRIX)) return MAPPING_MATRIX;
+    if (typeof window !== 'undefined' && window.MAPPING_MATRIX && Array.isArray(window.MAPPING_MATRIX)) return window.MAPPING_MATRIX;
+    return [];
+}
+
+function getSourceRoadmap() {
+    if (typeof SOURCE_ROADMAP !== 'undefined' && Array.isArray(SOURCE_ROADMAP)) return SOURCE_ROADMAP;
+    if (typeof window !== 'undefined' && window.SOURCE_ROADMAP && Array.isArray(window.SOURCE_ROADMAP)) return window.SOURCE_ROADMAP;
+    return [];
+}
+
+function getPitfallsDataset() {
+    if (typeof PITFALLS_DATASET !== 'undefined' && Array.isArray(PITFALLS_DATASET)) return PITFALLS_DATASET;
+    if (typeof window !== 'undefined' && window.PITFALLS_DATASET && Array.isArray(window.PITFALLS_DATASET)) return window.PITFALLS_DATASET;
+    return [];
+}
 
 var appState = {
     // 全局根状态对象
@@ -5936,7 +5597,7 @@ function loadAndMigrateState() {
                 if (!appState.mastery) appState.mastery = {};
                 if (!appState.reviews) appState.reviews = {};
                 if (!appState.sourceStatus) appState.sourceStatus = {};
-                if (!appState.pitfalls || appState.pitfalls.length === 0) appState.pitfalls = [...PITFALLS_DATASET];
+                if (!appState.pitfalls || appState.pitfalls.length === 0) appState.pitfalls = [...getPitfallsDataset()];
                 if (!appState.studySessions) appState.studySessions = [];
                 if (!appState.dayNotes) appState.dayNotes = {};
                 if (!appState.experimentNotes) appState.experimentNotes = {};
@@ -5987,12 +5648,12 @@ function loadAndMigrateState() {
             appState.globalNotes = legacyGlobalNotes;
         }
 
-        appState.pitfalls = [...PITFALLS_DATASET];
+        appState.pitfalls = [...getPitfallsDataset()];
         persistState();
     } catch(e) {
         console.warn("Storage restricted or parse error:", e);
         if (!appState.pitfalls || appState.pitfalls.length === 0) {
-            appState.pitfalls = [...PITFALLS_DATASET];
+            appState.pitfalls = [...getPitfallsDataset()];
         }
     }
 }
@@ -6082,7 +5743,7 @@ function calculateRealStreak() {
 // 视图切换
 function switchView(viewName) {
     appState.currentView = viewName;
-    const views = ['dashboard', 'daily', 'reading', 'mapping', 'quiz', 'source', 'pitfalls'];
+    const views = ['dashboard', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -6111,10 +5772,6 @@ function switchView(viewName) {
         renderSourceRoadmap();
     } else if (viewName === 'pitfalls') {
         renderPitfallsList();
-    } else if (viewName === 'reading') {
-        if (typeof renderBookReadingView === 'function') {
-            renderBookReadingView();
-        }
     }
 }
 
@@ -6575,12 +6232,6 @@ function renderDailyCards() {
                         <i class="fa-solid fa-book-bookmark text-amber-700"></i>
                         <span>${escapeHtml(item.bookRange)}</span>
                     </div>
-                    <button onclick="quickJumpByDay(${item.day})" class="px-2.5 py-1 rounded-lg bg-sky-900 hover:bg-sky-950 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1 shadow-2xs">
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> <span>直跳原书</span>
-                    </button>
-                    <button onclick="quickReadestByDay(${item.day})" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer flex items-center gap-1 border border-amber-300">
-                        <i class="fa-solid fa-book-open text-[10px]"></i> <span>Readest</span>
-                    </button>
                 </div>
 
                 <div class="flex flex-wrap gap-1.5 mb-4">${tagsHtml}</div>
@@ -6882,7 +6533,7 @@ function renderMappingTable() {
         "虚析构函数": 26
     };
 
-    MAPPING_MATRIX.forEach(row => {
+    getMappingMatrix().forEach(row => {
         const targetDay = featureToDayMap[row.feature] || 1;
         const tr = document.createElement('tr');
         tr.className = "hover:bg-stone-50/80 transition";
@@ -7237,7 +6888,7 @@ function renderSourceRoadmap() {
     const readCount = Object.values(appState.sourceStatus).filter(s => s && s.status === '已精读').length;
     if (progEl) progEl.innerText = `${readCount} / 8`;
 
-    SOURCE_ROADMAP.forEach((node, idx) => {
+    getSourceRoadmap().forEach((node, idx) => {
         const curStatus = appState.sourceStatus[node.id]?.status || '未读';
         const savedNotes = appState.sourceStatus[node.id]?.notes || '';
 
@@ -7737,7 +7388,7 @@ function openResetModal() {
         appState.mastery = {};
         appState.reviews = {};
         appState.sourceStatus = {};
-        appState.pitfalls = [...PITFALLS_DATASET];
+        appState.pitfalls = [...getPitfallsDataset()];
         appState.studySessions = [];
         appState.dayNotes = {};
         appState.experimentNotes = {};
@@ -7871,7 +7522,7 @@ function executeImportOverwrite(imported) {
     appState.mastery = imported.mastery || {};
     appState.reviews = imported.reviews || {};
     appState.sourceStatus = imported.sourceStatus || {};
-    appState.pitfalls = imported.pitfalls || [...PITFALLS_DATASET];
+    appState.pitfalls = imported.pitfalls || [...getPitfallsDataset()];
     appState.studySessions = imported.studySessions || [];
     appState.dayNotes = imported.dayNotes || {};
     appState.experimentNotes = imported.experimentNotes || {};
@@ -7926,7 +7577,7 @@ function exportMarkdownReport() {
     if (!hasNotes) md += `*暂未记录每日手记*\n\n`;
 
     md += `## 四、muduo 8 阶核心源码研读进展\n\n`;
-    SOURCE_ROADMAP.forEach(node => {
+    getSourceRoadmap().forEach(node => {
         const s = appState.sourceStatus[node.id] || { status: '未读', notes: '' };
         md += `### ${node.name} (${node.layer})\n`;
         md += `- **研读状态**: ${s.status}\n`;
@@ -7971,11 +7622,10 @@ document.addEventListener('keydown', (e) => {
 
     if (e.key === '1') switchView('dashboard');
     else if (e.key === '2') switchView('daily');
-    else if (e.key === '3') switchView('reading');
-    else if (e.key === '4') switchView('mapping');
-    else if (e.key === '5') switchView('quiz');
-    else if (e.key === '6') switchView('source');
-    else if (e.key === '7') switchView('pitfalls');
+    else if (e.key === '3') switchView('mapping');
+    else if (e.key === '4') switchView('quiz');
+    else if (e.key === '5') switchView('source');
+    else if (e.key === '6') switchView('pitfalls');
     else if (e.key === '/') {
         e.preventDefault();
         switchView('daily');
@@ -7996,22 +7646,26 @@ document.addEventListener('keydown', (e) => {
 
 // 页面加载入口
 window.addEventListener('DOMContentLoaded', () => {
-    loadAndMigrateState();
-    if (typeof initStudyTimer === 'function') initStudyTimer();
-    initQuizDaySelector();
-    updateDashboardMetrics();
-    renderDailyCards();
-    renderMappingTable();
+    try { loadAndMigrateState(); } catch(e) { console.error('loadAndMigrateState error:', e); }
+    try { if (typeof initStudyTimer === 'function') initStudyTimer(); } catch(e) { console.error('initStudyTimer error:', e); }
+    try { initQuizDaySelector(); } catch(e) { console.error('initQuizDaySelector error:', e); }
+    try { updateDashboardMetrics(); } catch(e) { console.error('updateDashboardMetrics error:', e); }
+    try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
+    try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
 
     // 绑定笔记本自动存盘
-    const notebookEl = document.getElementById('notebook-textarea');
-    if (notebookEl) {
-        if (appState.globalNotes) notebookEl.value = appState.globalNotes;
-        notebookEl.addEventListener('input', debouncedSaveGlobalNotes);
-        notebookEl.addEventListener('blur', () => {
-            appState.globalNotes = notebookEl.value;
-            persistState();
-        });
+    try {
+        const notebookEl = document.getElementById('notebook-textarea');
+        if (notebookEl) {
+            if (appState.globalNotes) notebookEl.value = appState.globalNotes;
+            notebookEl.addEventListener('input', debouncedSaveGlobalNotes);
+            notebookEl.addEventListener('blur', () => {
+                appState.globalNotes = notebookEl.value;
+                persistState();
+            });
+        }
+    } catch(e) {
+        console.error('notebook init error:', e);
     }
 });
 
@@ -8048,84 +7702,5 @@ function switchEnvModalTab(tabId) {
 
 
     </script>
-
-<!-- 5. 本地阅读助手模态框 (Local Reader Modal - 用于公网 HTTPS 环境安全导流) -->
-<div id="local-reader-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-label="本地阅读助手">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-stone-200 font-serifHeading space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-stone-100">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center text-base">
-                    <i class="fa-solid fa-book-bookmark"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-stone-900 text-base" id="lrm-book-title">参考书目研读直达</h4>
-                    <p class="text-[11px] text-sky-800 font-serifMono font-semibold" id="lrm-page-info">正文印刷页 P.255 ➔ 物理第 278 页</p>
-                </div>
-            </div>
-            <button onclick="closeLocalReaderModal()" class="text-stone-400 hover:text-stone-600 text-sm" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1.5 leading-relaxed">
-            <div class="font-bold flex items-center gap-1.5">
-                <i class="fa-solid fa-shield-halved text-amber-700"></i> 浏览器安全沙箱限制说明
-            </div>
-            <p class="text-[11.5px] text-amber-800 font-serifMono">
-                您当前正通过公网 <strong>HTTPS</strong> 访问控制台。现代浏览器出于隐私安全，<strong>严禁公网网页直接打开本地磁盘文件 (file:///)</strong>。系统已为您备妥以下秒级直达方案：
-            </p>
-        </div>
-
-        <div class="space-y-3 font-serifMono text-xs">
-            <!-- 方案一：呼起 Readest -->
-            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between gap-3">
-                <div class="space-y-0.5">
-                    <div class="font-bold text-stone-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-bolt text-amber-500"></i> 方案 A：一键唤起 Readest 桌面端
-                    </div>
-                    <p class="text-[11px] text-stone-500 font-serifHeading">系统已自动将页码信息复制到剪贴板，按 Ctrl+G 秒达</p>
-                </div>
-                <button id="lrm-btn-readest" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold rounded-lg transition shadow-xs shrink-0 cursor-pointer">
-                    呼起 Readest
-                </button>
-            </div>
-
-            <!-- 方案二：复制 Edge 打开命令 -->
-            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
-                <div class="flex items-center justify-between">
-                    <div class="font-bold text-stone-900 flex items-center gap-1.5">
-                        <i class="fa-brands fa-edge text-sky-700"></i> 方案 B：复制 Edge 秒开命令
-                    </div>
-                    <button onclick="copyLocalReaderCmd()" class="px-2.5 py-1 bg-sky-700 hover:bg-sky-800 text-white font-semibold rounded-lg transition cursor-pointer text-[11px] flex items-center gap-1">
-                        <i class="fa-solid fa-copy"></i> 复制命令
-                    </button>
-                </div>
-                <input type="text" id="lrm-cmd-input" readonly class="w-full bg-white border border-stone-200 rounded-lg p-2 text-[11px] text-stone-600 font-mono-code select-all">
-                <p class="text-[11px] text-stone-500 font-serifHeading">按 <kbd class="px-1 py-0.5 bg-stone-200 rounded text-[10px]">Win + R</kbd> 呼出运行窗口，粘贴并回车，Edge 将直接翻到对应页！</p>
-            </div>
-
-            <!-- 方案三：本地运行提示 -->
-            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 space-y-1.5">
-                <div class="font-bold text-stone-900 flex items-center gap-1.5">
-                    <i class="fa-solid fa-laptop-code text-emerald-700"></i> 方案 C：使用本地控制台（最爽体验）
-                </div>
-                <p class="text-[11px] text-stone-600 font-serifHeading leading-relaxed">
-                    在您的电脑直接双击打开 <code class="text-sky-900 bg-white px-1.5 py-0.5 rounded border border-stone-200">e:\\workspace\\muduo-study-console\\index.html</code>，即可彻底解除浏览器安全限制，享受<strong>一键点击直接在新标签页翻开 PDF</strong> 的原生快感！
-                </p>
-                <div class="flex items-center gap-2 pt-1">
-                    <input type="text" id="lrm-path-input" readonly class="w-full bg-white border border-stone-200 rounded-lg p-1.5 text-[11px] text-stone-600 font-mono-code select-all">
-                    <button onclick="copyLocalReaderPath()" class="px-2 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-semibold rounded-lg transition shrink-0 text-[11px]">
-                        复制路径
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="pt-2 border-t border-stone-100 flex justify-end font-serifMono">
-            <button onclick="closeLocalReaderModal()" class="px-4 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl transition">
-                关闭
-            </button>
-        </div>
-    </div>
-</div>
-
 </body>
 </html>
