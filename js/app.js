@@ -3985,7 +3985,7 @@ function generateAndExportDailyReview() {
 
     switchSchedulerTab('review', true);
     if (typeof showToast === 'function') {
-        showToast('已生成今日复盘报表（已打通 Phase 6 真实凭证）！');
+        showToast('已生成今日工程复盘报表（已自动打通求职真实工程凭证）！');
     }
 }
 

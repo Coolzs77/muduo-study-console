@@ -239,7 +239,7 @@
                 <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
             </button>
             <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="统一学习体系与六维穿透">
-                <i class="fa-solid fa-graduation-cap text-emerald-600"></i> 统一学习体系 (P5)
+                <i class="fa-solid fa-graduation-cap text-emerald-600"></i> 统一学习体系
             </button>
             <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="每日自测中心">
                 <i class="fa-solid fa-clipboard-question text-purple-600"></i> 每日自测中心
@@ -251,10 +251,10 @@
                 <i class="fa-solid fa-bug text-rose-600"></i> C++ 踩坑档案
             </button>
             <button onclick="switchView('career')" id="nav-career" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="求职能力与工程凭证">
-                <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力与凭证 (P6)
+                <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力与凭证
             </button>
             <button onclick="switchView('scheduler')" id="nav-scheduler" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="智能任务调度与日历同步">
-                <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 智能排程与日历 (P7)
+                <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 智能排程与日历
             </button>
         </nav>
 
@@ -1571,7 +1571,10 @@
                     <!-- 动态生成 h2 / h3 链接 -->
                 </div>
             </div>
-    <!-- ==================== VIEW: 求职能力与工程凭证体系 (Phase 6) ==================== -->
+        </div>
+    </section>
+
+    <!-- ==================== VIEW: 求职能力与工程凭证体系 ==================== -->
     <section id="view-career" class="hidden space-y-6">
         <!-- 头部导航与体系介绍 -->
         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
@@ -1584,7 +1587,7 @@
                         <span>真实凭证 ➔ 闭环晋级 ➔ 拿捏面试</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
-                        <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力矩阵与真实工程凭证中心 (P6)
+                        <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力矩阵与真实工程凭证中心
                     </h2>
                     <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
                         把“我学过”转化成“我能够证明我会”。严禁虚构经历，能力等级由真实代码改动、Bug 修复、性能压测等
@@ -1690,12 +1693,12 @@
                         <span>真实日历 ➔ 赤字压缩 ➔ 根因诊断 ➔ 复盘联动</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
-                        <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 智能任务调度与日历同步引擎 (P7)
+                        <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 智能任务调度与日历同步引擎
                     </h2>
                     <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
                         深度整合原生 RFC 5545 iCal/ICS 解析器与 Google Tasks，真实计算事件冲突与连续专注块。
                         实施 <span class="font-semibold text-stone-700 font-serifMono">S(3h)➔A(1h)➔A(1h)➔B(0.5h)➔C</span> 严格优先级流水线。
-                        在时间赤字时自动压缩次要通识并誓死保卫核心主干；未完成强制归因诊断，复盘直接打通 Phase 6 工程凭据。
+                        在时间赤字时自动压缩次要通识并誓死保卫核心主干；未完成强制归因诊断，复盘直接打通求职工程实证记录。
                     </p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 font-serifMono shrink-0">
@@ -1834,14 +1837,14 @@
             </div>
         </div>
 
-        <!-- 子面板 4: 每日工程复盘与成长报表 (Review - 打通 P6) -->
+        <!-- 子面板 4: 每日工程复盘与成长报表 (Review) -->
         <div id="scheduler-pane-review" class="space-y-6 hidden">
             <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 mb-4 border-b border-stone-100">
                     <div>
                         <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
                             <i class="fa-solid fa-file-contract text-emerald-600"></i>
-                            <span>今日工程复盘报表 (已自动打通 Phase 6 真实凭据)</span>
+                            <span>今日工程复盘报表 (自动联动求职真实工程实证)</span>
                         </h3>
                         <p class="text-xs text-stone-500 mt-0.5">工时统计、未完成归因、今日产出 Evidence 与能力雷达增量全景报表。</p>
                     </div>

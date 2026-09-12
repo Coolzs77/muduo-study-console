@@ -912,8 +912,8 @@
         mdLines.push('');
       }
 
-      // Phase 6 真实凭据产出
-      mdLines.push(`## 三、今日沉淀真实工程凭据 (Phase 6 联动: ${todayEvidences.length} 项)`);
+      // 真实凭据产出
+      mdLines.push(`## 三、今日沉淀真实工程凭据 (求职实证联动: ${todayEvidences.length} 项)`);
       if (todayEvidences.length > 0) {
         todayEvidences.forEach(ev => {
           mdLines.push(`- **[${ev.type}] ${ev.title}**`);
@@ -922,7 +922,7 @@
           if (ev.details) mdLines.push(`  - 验证记录：${ev.details}`);
         });
       } else {
-        mdLines.push(`*今日暂未产生显式工程凭证（已完成任务可前往 P6 凭证库录入代码修改或测试断言）。*`);
+        mdLines.push(`*今日暂未产生显式工程凭证（已完成任务可前往工程凭证库录入代码修改或测试断言）。*`);
       }
       mdLines.push('');
 
@@ -933,7 +933,7 @@
       if (incompleteTasks.length > 0) {
         mdLines.push(`3. **[重排队列] 优先消化今日遗留任务**：根据诊断建议执行拆分与前置补齐。`);
       }
-      mdLines.push(`\n---\n*由 CppAIService & muduo Dual-Core Engineering OS Phase 7 智能调度引擎自动生成*`);
+      mdLines.push(`\n---\n*由 CppAIService & muduo 双核工程学习操作系统智能排程调度引擎自动生成*`);
 
       const markdownReport = mdLines.join('\n');
 
