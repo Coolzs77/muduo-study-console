@@ -1,9 +1,9 @@
 // ==========================================================================
 // CppAIService & muduo Dual-Core Engineering OS
 // Phase 5: 统一学习系统核心数据集 (dataset-learning.js)
-// 破除五大孤岛：C++ 语法、Linux 底层、专业书目、算法手撕、技术八股、通识阅读
+// 统一学习体系：C++ 核心语法、Linux 系统原理、经典专业书目、算法手撕、技术八股与通识阅读
 // 闭环体系：Learn → Apply → Build → Explain → Review
-// 六维穿透：Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview
+// 多维工程关联：理论知识 ➔ 工程模块 ➔ 源码实现 ➔ 日程任务 ➔ 实证结果 ➔ 面试考点
 // ==========================================================================
 
 // 1. C++ 核心知识体系 (严格对齐语雀《C++学习路线 (2026)》全路线与专业书目页码)
@@ -12,7 +12,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_01",
     "chapterId": "cpp_sec_01",
-    "chapterTitle": "一、C++ 语言核心与高级特性 (语法/函数/指针/OOP/内存)",
+    "chapterTitle": "一、C++ 语言核心特性 (语法/函数/指针/OOP/内存)",
     "dimension": "Basic Syntax",
     "title": "基础语法与标准 I/O (变量/运算符/控制流/cin-cout)",
     "yuqueSection": "C++学习 > 1.基础语法",
@@ -24,7 +24,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "循环语句（for, while, do-while 及范围 for 展开）",
       "输入输出（cin, cout 与 tie/sync_with_stdio 流缓冲机制）"
     ],
-    "coreConcept": "对应语雀路线第一部分基础语法。熟练掌握 C++ 基本数据类型在 64 位体系中的字节大小与对齐填充，理解分支跳转表与循环结构栈退栈行为，避免有符号/无符号隐式类型转换 bug。",
+    "coreConcept": "掌握 64 位体系下基础数据类型的字节大小与内存对齐规则，理解 switch-case 跳转表原理与分支预测开销，规范有符号与无符号数值转换，使用 static_cast 规避类型转换未定义行为。",
     "cppaiModule": "mod_http_common",
     "moduleName": "Common / 基础类型定义与工具类",
     "sourceFile": "HttpServer/HttpTypes.h",
@@ -42,7 +42,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_02",
     "chapterId": "cpp_sec_01",
-    "chapterTitle": "一、C++ 语言核心与高级特性 (语法/函数/指针/OOP/内存)",
+    "chapterTitle": "一、C++ 语言核心特性 (语法/函数/指针/OOP/内存)",
     "dimension": "Functions",
     "title": "函数机制、参数传递与重载解析",
     "yuqueSection": "C++学习 > 函数",
@@ -53,7 +53,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "函数的重载（Name Mangling 符号修饰与重载决议匹配优先级）",
       "默认参数与内联函数（inline 关键字、编译期展开与 ODR 原则）"
     ],
-    "coreConcept": "对应语雀路线函数核心。掌握 C++ 函数调用过程中的栈帧分配与寄存器传参语义，理解 const 引用在零拷贝传参中的核心地位，掌握内联展开与重载决议机制。",
+    "coreConcept": "掌握函数调用约定、栈帧布局与寄存器传参语义，使用 const 引用避免对象拷贝开销，理解编译器名字修饰 (Name Mangling) 与内联函数的编译期展开条件及 ODR 原则。",
     "cppaiModule": "mod_http_router",
     "moduleName": "HttpServer / 路由匹配与回调函数包装",
     "sourceFile": "HttpServer/Router.cpp",
@@ -71,7 +71,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_03",
     "chapterId": "cpp_sec_01",
-    "chapterTitle": "一、C++ 语言核心与高级特性 (语法/函数/指针/OOP/内存)",
+    "chapterTitle": "一、C++ 语言核心特性 (语法/函数/指针/OOP/内存)",
     "dimension": "Pointers & Arrays",
     "title": "数组与指针：算术运算、数组衰减与指针安全",
     "yuqueSection": "C++学习 > 数组与指针",
@@ -82,7 +82,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "指针与数组的关系（数组名衰减为首元素指针的边界条件）",
       "空指针与野指针（nullptr vs NULL，悬垂指针与内存越界防范）"
     ],
-    "coreConcept": "对应语雀路线数组与指针。透彻理解指针本质是持有虚拟内存地址的无符号整数，掌握指针偏移与步长计算，严格使用 nullptr 初始化，杜绝悬挂指针与越界访问。",
+    "coreConcept": "掌握指针本质与指针算术步长计算，分析数组名向首元素指针退化的边界条件与多维数组寻址公式，使用 nullptr 初始化指针，避免野指针与越界访问。",
     "cppaiModule": "mod_buffer",
     "moduleName": "Common / 连续内存缓冲区切片",
     "sourceFile": "Common/Buffer.cpp",
@@ -100,7 +100,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_04",
     "chapterId": "cpp_sec_01",
-    "chapterTitle": "一、C++ 语言核心与高级特性 (语法/函数/指针/OOP/内存)",
+    "chapterTitle": "一、C++ 语言核心特性 (语法/函数/指针/OOP/内存)",
     "dimension": "OOP Principles",
     "title": "面向对象 OOP：类与对象、封装、继承与多态",
     "yuqueSection": "C++学习 > 2.C++核心特性 > 面向对象编程(OOP)",
@@ -112,7 +112,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "继承与多态（虚函数表 vtable 与虚表指针 vptr、重载与覆盖 override、纯虚函数与接口）",
       "访问权限控制（public, protected, private）与运算符重载（=, +, << 等）"
     ],
-    "coreConcept": "对应语雀路线核心 OOP 特性。深入理解构造初始化列表遵循声明顺序，掌握虚函数表指针在对象头部的存放与动态绑定机制，遵循基类虚析构原则防范内存泄漏。",
+    "coreConcept": "掌握类成员变量布局与字节对齐，遵循构造初始化列表的声明顺序，分析虚函数表 (vtable) 与虚表指针 (vptr) 的动态绑定机制，在基类中声明虚析构函数保证多态析构安全。",
     "cppaiModule": "mod_channel",
     "moduleName": "HttpServer / Channel 抽象与多态事件分发",
     "sourceFile": "HttpServer/Channel.h",
@@ -130,7 +130,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_05",
     "chapterId": "cpp_sec_01",
-    "chapterTitle": "一、C++ 语言核心与高级特性 (语法/函数/指针/OOP/内存)",
+    "chapterTitle": "一、C++ 语言核心特性 (语法/函数/指针/OOP/内存)",
     "dimension": "Memory Management",
     "title": "内存管理：堆栈差异、动态分配与智能指针体系",
     "yuqueSection": "C++学习 > 2.C++核心特性 > 内存管理",
@@ -141,7 +141,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "智能指针核心（std::shared_ptr 引用计数控制块、std::unique_ptr 独占所有权）",
       "弱引用 std::weak_ptr（打破 shared_ptr 循环引用与对象存活探测 lock）"
     ],
-    "coreConcept": "对应语雀路线内存管理与陈硕服务端编程第 1 章。严格掌握线程安全的对象生命周期管理，使用 unique_ptr 表达独占所有权，使用 shared_ptr/weak_ptr 避免悬空指针与析构竞态。",
+    "coreConcept": "掌握栈内存与堆内存分配特性，理解 new/delete 底层对 malloc/free 与构造析构的调用。使用 unique_ptr 表达独占所有权，使用 shared_ptr 与 weak_ptr 管理共享资源并规避循环引用导致的内存泄露。",
     "cppaiModule": "mod_connection",
     "moduleName": "HttpServer / TcpConnection 连接生命周期管理",
     "sourceFile": "HttpServer/TcpConnection.h",
@@ -159,7 +159,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_06",
     "chapterId": "cpp_sec_01",
-    "chapterTitle": "一、C++ 语言核心与高级特性 (语法/函数/指针/OOP/内存)",
+    "chapterTitle": "一、C++ 语言核心特性 (语法/函数/指针/OOP/内存)",
     "dimension": "Modern Features",
     "title": "C++高级特性：右值引用、移动语义与完美转发",
     "yuqueSection": "C++学习笔记 > C++高级特性",
@@ -171,7 +171,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "通用引用 (Universal Reference) 与引用折叠规则",
       "std::forward 保持原始值类别的完美转发机制"
     ],
-    "coreConcept": "对应语雀学习笔记高级特性。掌握 C++11 引入的移动语义，消除深拷贝开销，熟练使用 std::forward 实现参数包完美转发，确保移动构造声明 noexcept 以被标准库容器采纳。",
+    "coreConcept": "掌握左值、纯右值与将亡值的语义边界，通过移动构造与移动赋值转移内部堆指针，确保移动操作标记 noexcept，理解通用引用与引用折叠规则，使用 std::forward 实现参数完美转发。",
     "cppaiModule": "mod_http_parser",
     "moduleName": "HttpServer / 请求对象移动语义传递",
     "sourceFile": "HttpServer/HttpRequest.h",
@@ -189,7 +189,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_07",
     "chapterId": "cpp_sec_01",
-    "chapterTitle": "一、C++ 语言核心与高级特性 (语法/函数/指针/OOP/内存)",
+    "chapterTitle": "一、C++ 语言核心特性 (语法/函数/指针/OOP/内存)",
     "dimension": "Concurrency",
     "title": "并发编程：多线程基础、互斥同步与条件变量",
     "yuqueSection": "C++学习笔记 > C++并发编程",
@@ -200,7 +200,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "条件变量 std::condition_variable 与防止虚假唤醒 (Spurious Wakeup)",
       "原子操作 std::atomic 与内存屏障 / 内存顺序 (Memory Order) 简介"
     ],
-    "coreConcept": "对应语雀学习笔记并发编程。掌握现代 C++ 多线程编程规范，在临界区使用 RAII lock_guard，条件变量 wait 必须使用 while 循环检查谓词，遵循互斥锁保护共享可变状态准则。",
+    "coreConcept": "掌握 std::thread 线程管理与 std::mutex 同步机制，使用 std::lock_guard 保证 RAII 锁释放，条件变量 wait 必须配合 while 循环检验谓词以应对虚假唤醒，遵循固定加锁顺序防范死锁。",
     "cppaiModule": "mod_threadpool",
     "moduleName": "HttpServer / EventLoopThreadPool 线程池",
     "sourceFile": "HttpServer/EventLoopThreadPool.cpp",
@@ -218,7 +218,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_08",
     "chapterId": "cpp_sec_01",
-    "chapterTitle": "一、C++ 语言核心与高级特性 (语法/函数/指针/OOP/内存)",
+    "chapterTitle": "一、C++ 语言核心特性 (语法/函数/指针/OOP/内存)",
     "dimension": "Build & Link",
     "title": "C++编译与链接机制：预处理、汇编、动态库与跨平台",
     "yuqueSection": "C++学习笔记 > C++编译和链接 & C++跨平台开发",
@@ -229,7 +229,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "头文件重复包含防护 (#pragma once vs include guard) 与 ODR 单一定义规则",
       "C++ 跨平台开发与 CMake 自动化构建系统集成"
     ],
-    "coreConcept": "对应语雀学习笔记编译和链接与跨平台开发。深入理解编译器从源代码到机器码的全流程，掌握静态链接与动态重定位过程，编写跨平台的 CMakeLists.txt 构建脚本。",
+    "coreConcept": "掌握预处理、编译、汇编、链接四阶段的产物与符号表结构，分析静态库 (.a) 与动态库 (.so) 的重定位差异，配置 CMake 脚本规范多模块依赖构建与跨平台编译选项。",
     "cppaiModule": "mod_cmake_build",
     "moduleName": "Build / CMake 工程化配置与库链接",
     "sourceFile": "CMakeLists.txt",
@@ -247,7 +247,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_09",
     "chapterId": "cpp_sec_02",
-    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/源码剖析)",
+    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/空间配置器)",
     "dimension": "Sequence Containers",
     "title": "线性容器：vector 扩容、deque 分段缓冲与 list 双向链表",
     "yuqueSection": "C++STL笔记 > 线性容器",
@@ -258,7 +258,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "std::list 双向环状链表与节点动态内存分配开销",
       "线性容器内存局部性 (Locality) 与 CPU Cache 命中率对比"
     ],
-    "coreConcept": "对应语雀路线线性容器篇。vector 拥有绝佳的 CPU 缓存亲和性与随机访问能力，deque 适合两端频繁进出，list 适合频繁任意位置插入且不发生迭代器失效。",
+    "coreConcept": "掌握 std::vector 连续内存管理与倍数扩容重新分配逻辑，理解 deque 分段连续缓冲区与中央控制器的索引映射，对比 list 链表节点内存碎片与指针开销，根据内存局部性与访问频次选择容器。",
     "cppaiModule": "mod_buffer_vec",
     "moduleName": "Common / std::vector 底层缓冲区实现",
     "sourceFile": "Common/Buffer.h",
@@ -276,7 +276,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_10",
     "chapterId": "cpp_sec_02",
-    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/源码剖析)",
+    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/空间配置器)",
     "dimension": "Associative Containers",
     "title": "关联式容器：map/set 红黑树 vs unordered 哈希表",
     "yuqueSection": "C++STL笔记 > 关联式容器",
@@ -287,7 +287,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "哈希碰撞、负载因子 load_factor 与 rehash 扩容开销",
       "自定义 Key 类型的哈希函数 hash 与相等比较 operator=="
     ],
-    "coreConcept": "对应语雀路线关联式容器。严格区分红黑树有序容器与哈希表无序容器，高频点查选择 unordered_map 并注意预留 bucket_count，范围遍历选择有序 map。",
+    "coreConcept": "对比基于红黑树的有序容器 (O(log n)) 与基于哈希桶的无序容器 (平均 O(1))，掌握哈希冲突开链法、负载因子阈值与 rehash 扩容过程，为自定义结构体实现 std::hash 与 operator==。",
     "cppaiModule": "mod_http_headers",
     "moduleName": "HttpServer / HTTP 头部映射存储",
     "sourceFile": "HttpServer/HttpRequest.h",
@@ -305,7 +305,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_11",
     "chapterId": "cpp_sec_02",
-    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/源码剖析)",
+    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/空间配置器)",
     "dimension": "STL Algorithms",
     "title": "STL 算法体系、仿函数与 Lambda 谓词表达式",
     "yuqueSection": "C++STL笔记 > 算法",
@@ -316,7 +316,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "变序与拷贝算法（std::transform, std::copy, std::remove_if）",
       "函数对象 (Functor)、std::function/std::bind 与 C++11 Lambda 捕获机制"
     ],
-    "coreConcept": "对应语雀路线算法篇。掌握 STL 算法基于迭代器解耦容器与操作的设计精髓，熟练使用 std::sort 与二分算法，结合 Lambda 表达式编写高效紧凑的比较谓词。",
+    "coreConcept": "掌握 STL 算法基于迭代器的抽象模式，分析 std::sort 内省排序在快速排序、堆排序与插入排序之间的切换策略，掌握二分查找与范围比较算法，使用 Lambda 表达式编写无状态比较谓词。",
     "cppaiModule": "mod_router_sort",
     "moduleName": "HttpServer / 路由规则排序与前缀匹配",
     "sourceFile": "HttpServer/Router.cpp",
@@ -334,7 +334,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_12",
     "chapterId": "cpp_sec_02",
-    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/源码剖析)",
+    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/空间配置器)",
     "dimension": "Iterators",
     "title": "迭代器体系、分类与迭代器失效排错规范",
     "yuqueSection": "C++STL笔记 > 迭代器 & 选择合适的STL容器",
@@ -345,7 +345,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "vector 插入/删除导致内存重新分配引发的迭代器全失效",
       "list / map 节点式容器在删除节点时的局部迭代器失效与 it = c.erase(it) 规范"
     ],
-    "coreConcept": "对应语雀路线迭代器与选型。深入掌握迭代器失效的根源：连续容器的内存搬迁与节点容器的指针释放，掌握在循环遍历中安全删除元素的标准写法。",
+    "coreConcept": "掌握 5 类迭代器的能力特征与 iterator_traits 萃取机制，分析连续存储容器在扩容与插入删除时的迭代器失效边界，规范使用 it = c.erase(it) 处理遍历中的节点安全删除。",
     "cppaiModule": "mod_connection_mgr",
     "moduleName": "HttpServer / 连接管理器迭代器安全清理",
     "sourceFile": "HttpServer/ConnectionManager.cpp",
@@ -363,7 +363,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_13",
     "chapterId": "cpp_sec_02",
-    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/源码剖析)",
+    "chapterTitle": "二、C++ STL 标准模板库 (容器/算法/迭代器/空间配置器)",
     "dimension": "STL Internals",
     "title": "手写 STL 核心与空间配置器 Allocator 内存池原理",
     "yuqueSection": "C++STL > 书籍推荐(侯捷《STL源码剖析》与卡码手写STL)",
@@ -374,7 +374,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "内存碎片 (Internal/External Fragmentation) 与针对小于 128 字节的小内存优化",
       "卡码网手写简易 vector / string 容器核心实践"
     ],
-    "coreConcept": "对应语雀路线推荐的侯捷《STL源码剖析》与手写STL。理解 STL 空间配置器分离内存分配与对象构造的思想，掌握基于固定大小链表池避免小对象高频向操作系统申请内存的优化策略。",
+    "coreConcept": "掌握 STL 空间配置器 allocate 与 deallocate 的内存管理机制，分析基于自由链表维护不同尺寸内存块的池化思想，减少频繁调用系统 malloc 产生的堆内存碎片与系统调用开销。",
     "cppaiModule": "mod_buffer_alloc",
     "moduleName": "Common / 网络缓冲区内存池与定长块管理",
     "sourceFile": "Common/Buffer.cpp",
@@ -392,7 +392,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_14",
     "chapterId": "cpp_sec_03",
-    "chapterTitle": "三、计算机基础：计算机网络 (体系结构/HTTP/TCP/IP/抓包)",
+    "chapterTitle": "三、计算机网络 (体系结构/HTTP/TCP/IP/抓包诊断)",
     "dimension": "Network Architecture",
     "title": "计算机网络体系结构与分层模型 (OSI 7层 vs TCP/IP 4层)",
     "yuqueSection": "计算机网络 > 计网笔记 > 网络体系结构",
@@ -403,7 +403,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "以太网帧头、IP 头、TCP/UDP 头与应用层载荷在物理链路上的传输",
       "经典问题：在浏览器输入 URL 到页面展示，网络全链路发生了什么？"
     ],
-    "coreConcept": "对应语雀路线计网网络体系结构。掌握各层协议头部的逐层封装与拆包解析，深入剖析从 DNS 查询、TCP 握手、HTTP 发送到页面渲染的全链路物理与逻辑流转。",
+    "coreConcept": "掌握 OSI 7 层与 TCP/IP 4 层体系结构，理解报文从应用层到物理链路的逐层封装与拆解过程，梳理 DNS 递归迭代解析、TCP 握手与 HTTP 请求响应在网络各层的物理流向。",
     "cppaiModule": "mod_http_packet",
     "moduleName": "HttpServer / 协议栈报文解析与边界划分",
     "sourceFile": "HttpServer/HttpRequestParser.cpp",
@@ -421,7 +421,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_15",
     "chapterId": "cpp_sec_03",
-    "chapterTitle": "三、计算机基础：计算机网络 (体系结构/HTTP/TCP/IP/抓包)",
+    "chapterTitle": "三、计算机网络 (体系结构/HTTP/TCP/IP/抓包诊断)",
     "dimension": "Application Layer",
     "title": "应用层协议深入：HTTP 报文规范、版本演进与 HTTPS TLS 握手",
     "yuqueSection": "计算机网络 > 计网笔记 > 应用层",
@@ -433,7 +433,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "HTTP/1.1 vs HTTP/2 (多路复用二进制分帧) vs HTTP/3 (基于 UDP 的 QUIC)",
       "HTTPS 安全通信：对称加密、非对称加密、数字证书 CA 与 TLS 1.3 握手流程"
     ],
-    "coreConcept": "对应语雀路线应用层核心。掌握 HTTP 报文状态机解析，理解 HTTP 各版本在解决并发与队头阻塞上的演进，透彻掌握 HTTPS 基于数字证书与非对称加密协商会话密钥的握手过程。",
+    "coreConcept": "掌握 HTTP/1.1 请求与响应报文规范，分析状态机逐行解析过程与 Keep-Alive 连接复用，对比 HTTP/2 二进制分帧多路复用与 HTTP/3 QUIC 机制，掌握 TLS 基于证书与非对称加密协商对称密钥的过程。",
     "cppaiModule": "mod_http_fsm",
     "moduleName": "HttpServer / HTTP 报文解析状态机",
     "sourceFile": "HttpServer/HttpRequestParser.cpp",
@@ -451,7 +451,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_16",
     "chapterId": "cpp_sec_03",
-    "chapterTitle": "三、计算机基础：计算机网络 (体系结构/HTTP/TCP/IP/抓包)",
+    "chapterTitle": "三、计算机网络 (体系结构/HTTP/TCP/IP/抓包诊断)",
     "dimension": "Transport Layer",
     "title": "传输层核心：TCP 三次握手四次挥手、可靠传输与 TCP/UDP 差异",
     "yuqueSection": "计算机网络 > 计网笔记 > 传输层",
@@ -463,7 +463,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "TCP 可靠传输机制：校验和、序列号确认应答、超时重传 (RTO)、滑动窗口与流量控制",
       "拥塞控制算法四大阶段：慢启动、拥塞避免、快重传与快恢复"
     ],
-    "coreConcept": "对应语雀路线传输层核心。深入理解 TCP 状态机转换，重点掌握服务器端 TIME_WAIT 状态回收套接字保证报文消逝，以及排查服务端业务处理卡死导致的 CLOSE_WAIT 堆积。",
+    "coreConcept": "掌握 TCP 报文头结构与面向连接可靠传输机制，分析三次握手、四次挥手状态迁移，理解 2MSL 的 TIME_WAIT 状态对连接回收的必要性，掌握滑动窗口流量控制与拥塞控制算法。",
     "cppaiModule": "mod_tcp_connection",
     "moduleName": "HttpServer / TcpConnection 连接状态迁移",
     "sourceFile": "HttpServer/TcpConnection.cpp",
@@ -481,7 +481,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_17",
     "chapterId": "cpp_sec_03",
-    "chapterTitle": "三、计算机基础：计算机网络 (体系结构/HTTP/TCP/IP/抓包)",
+    "chapterTitle": "三、计算机网络 (体系结构/HTTP/TCP/IP/抓包诊断)",
     "dimension": "Network & Link Layer",
     "title": "网络层与链路层：IP 协议、子网路由与 ARP 抓包排错",
     "yuqueSection": "计算机网络 > 计网笔记 > 网络层/链路层 & 抓包",
@@ -492,7 +492,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "数据链路层 ARP 协议：MAC 地址解析、ARP 缓存表与 ARP 欺骗防范",
       "网络抓包与诊断工具实操：Wireshark 过滤语法、Linux tcpdump 抓包、curl 命令排障"
     ],
-    "coreConcept": "对应语雀路线网络层/数据链路层及抓包技能。掌握路由器根据路由表转发数据包的机制，掌握 ARP 在局域网内解析物理 MAC 地址的流程，熟练使用 tcpdump 分析网络问题。",
+    "coreConcept": "掌握 IPv4/IPv6 头部格式、子网掩码与 CIDR 路由前缀匹配，分析数据链路层 ARP 协议通过广播解析 MAC 地址的流程，掌握利用 tcpdump 和 Wireshark 进行抓包与报文分析的方法。",
     "cppaiModule": "mod_network_diag",
     "moduleName": "Network / 抓包排障与网络连通性诊断",
     "sourceFile": "scripts/diag_network.sh",
@@ -510,7 +510,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_18",
     "chapterId": "cpp_sec_04",
-    "chapterTitle": "四、计算机基础：操作系统底层机制 (进程/线程/内存/文件IO)",
+    "chapterTitle": "四、操作系统原理 (进程/线程/内存管理/文件IO)",
     "dimension": "OS Fundamentals",
     "title": "操作系统基本概念：用户态与内核态、系统调用与中断处理",
     "yuqueSection": "操作系统 > 操作系统笔记 > 基本概念",
@@ -521,7 +521,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "系统调用的执行流程（int 0x80 / sysenter / syscall 指令、寄存器传参与栈切换）",
       "上下文切换开销（寄存器保存恢复、页表刷新、TLB 失效与 CPU Cache 污染）"
     ],
-    "coreConcept": "对应语雀路线操作系统基本概念。深刻理解用户态到内核态切换带来的上下文开销，避免在高频 I/O 循环中产生不必要的系统调用，利用批量系统调用优化性能。",
+    "coreConcept": "掌握 CPU 特权级（内核态与用户态）与中断向量处理，分析系统调用通过寄存器传参与软中断切换上下文的软硬件开销，通过减少或批量合并系统调用降低性能损耗。",
     "cppaiModule": "mod_syscall_opt",
     "moduleName": "HttpServer / 系统调用优化与批量读写",
     "sourceFile": "Common/Buffer.cpp",
@@ -539,9 +539,9 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_19",
     "chapterId": "cpp_sec_04",
-    "chapterTitle": "四、计算机基础：操作系统底层机制 (进程/线程/内存/文件IO)",
+    "chapterTitle": "四、操作系统原理 (进程/线程/内存管理/文件IO)",
     "dimension": "Process & Thread",
-    "title": "进程、线程与协程深度剖析：PCB、LWP 与多任务并发",
+    "title": "进程、线程与协程分析：PCB、LWP 与多任务并发",
     "yuqueSection": "操作系统 > 操作系统笔记 > 进程管理",
     "bookReference": "《Linux多线程服务端编程》第 2 章 P.37-72（多线程与进程模型对比）",
     "keyPoints": [
@@ -550,7 +550,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "Linux 进程地址空间布局（代码段、数据段、BSS、堆、内存映射区 mmap、栈）",
       "协程 (Coroutine) 概念：用户态协作式调度、极轻量栈空间与上下文切换优势"
     ],
-    "coreConcept": "对应语雀路线进程管理核心。掌握 Linux 内核下 clone 系统调用统一创建进程与线程的原理，理解多线程共享地址空间而拥有独立线程栈的内存拓扑，对比协程与线程适用场景。",
+    "coreConcept": "分析 Linux 内核中 task_struct 与轻量级进程 (LWP) 的实现，理解进程虚拟内存空间布局与线程共享资源的边界，分析 fork 写时复制 (COW) 原理与用户态协程的轻量调度特征。",
     "cppaiModule": "mod_thread_model",
     "moduleName": "HttpServer / 线程模型与多核亲和性",
     "sourceFile": "HttpServer/EventLoopThread.cpp",
@@ -568,7 +568,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_20",
     "chapterId": "cpp_sec_04",
-    "chapterTitle": "四、计算机基础：操作系统底层机制 (进程/线程/内存/文件IO)",
+    "chapterTitle": "四、操作系统原理 (进程/线程/内存管理/文件IO)",
     "dimension": "IPC & Synchronization",
     "title": "进程间通信 (IPC)、线程同步机制与死锁防范",
     "yuqueSection": "操作系统 > 操作系统笔记 > 进程间通信 & 线程同步 & 死锁",
@@ -579,7 +579,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "线程同步机制：互斥锁、自旋锁、读写锁、屏障 barrier 的性能抉择",
       "死锁四大必要条件（互斥、持有并等待、不可剥夺、环路等待）与按序加锁破除死锁"
     ],
-    "coreConcept": "对应语雀路线 IPC、同步与死锁。共享内存结合信号量是性能最高的本地 IPC，互斥锁与读写锁的使用必须遵守全局锁排序协议 (Lock Ordering Protocol)，从根本上消除循环等待。",
+    "coreConcept": "掌握管道、消息队列、共享内存、信号量等 IPC 机制，理解共享内存免拷贝的原理，分析互斥锁、自旋锁与读写锁的适用场景，遵循严格的全局加锁顺序消除环路等待死锁。",
     "cppaiModule": "mod_ipc_shm",
     "moduleName": "Common / 跨进程共享内存与信号量同步",
     "sourceFile": "Common/SharedMemory.h",
@@ -597,7 +597,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_21",
     "chapterId": "cpp_sec_04",
-    "chapterTitle": "四、计算机基础：操作系统底层机制 (进程/线程/内存/文件IO)",
+    "chapterTitle": "四、操作系统原理 (进程/线程/内存管理/文件IO)",
     "dimension": "Virtual Memory & File IO",
     "title": "内存管理与文件 I/O：虚拟内存、页面置换与 VFS 虚拟文件系统",
     "yuqueSection": "操作系统 > 操作系统笔记 > 内存管理 & 文件系统 & I/O管理",
@@ -609,7 +609,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "Linux 虚拟文件系统 VFS、inode 索引节点与 dentry 目录项缓存",
       "I/O 管理模型：阻塞、非阻塞、I/O 复用、信号驱动与异步 I/O (AIO)"
     ],
-    "coreConcept": "对应语雀路线内存管理与文件I/O。透彻理解 MMU 地址翻译与 TLB 命中，掌握通过 LRU 算法进行页面淘汰的思想，理解 VFS 对不同硬件文件系统的统一抽象。",
+    "coreConcept": "掌握分页存储管理、多级页表与 TLB 快表翻译机制，分析缺页异常中断与 LRU 页面置换算法，理解 Linux 虚拟文件系统 (VFS) 通过 inode 与 dentry 对各类底层文件系统的抽象屏蔽。",
     "cppaiModule": "mod_mmap_cache",
     "moduleName": "HttpServer / 静态资源内存映射与缓存",
     "sourceFile": "HttpServer/StaticFileHandler.cpp",
@@ -621,15 +621,15 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "apply": "在 StaticFileHandler 中使用 mmap 将静态文件直接映射到进程地址空间。",
       "build": "手写并单测 LRU 缓存淘汰算法，验证 O(1) 插入、查找与过期淘汰逻辑。",
       "explain": "口述：多级页表是如何在节省物理内存空间的同时实现快速地址翻译的？",
-      "review": "分析系统 sar -B 监控数据，检查系统是否存在缺页中断过高引发的性能颠簸。"
+      "review": "分析系统 sar -B 监控数据，检查系统是否存在缺页中断过高引发的性能抖动。"
     }
   },
   {
     "id": "cpp_item_22",
     "chapterId": "cpp_sec_05",
-    "chapterTitle": "五、计算机基础：数据库核心 (MySQL 架构/索引/事务 & Redis 数据结构/持久化)",
+    "chapterTitle": "五、数据库系统 (MySQL 索引/事务 & Redis 数据结构/持久化)",
     "dimension": "MySQL Architecture & Indexes",
-    "title": "MySQL 核心架构与 InnoDB B+树索引深度剖析",
+    "title": "MySQL 核心架构与 InnoDB B+树索引分析",
     "yuqueSection": "数据库 > MySQL 笔记 > 架构 & 索引",
     "bookReference": "《Linux多线程服务端编程》第 8 章 P.281-315（服务端数据持久化与数据库交互）",
     "keyPoints": [
@@ -638,7 +638,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "聚簇索引 (Clustered Index) 与二级索引 (Secondary Index)、回表与覆盖索引",
       "最左前缀匹配原则、索引下推 (ICP) 优化与慢查询 Explain 执行计划分析"
     ],
-    "coreConcept": "对应语雀路线 MySQL 架构与索引。掌握 B+ 树高扇出与叶子节点双向链表带来的范围查询优势，设计覆盖索引避免回表二次寻道，熟练使用 explain 分析索引生效情况。",
+    "coreConcept": "掌握 MySQL Server 层与存储引擎层的分工，分析 InnoDB B+ 树索引结构（高扇出、叶子节点双向链表），区分聚簇索引与二级索引，理解最左前缀匹配与覆盖索引消除回表开销。",
     "cppaiModule": "mod_db_mysql",
     "moduleName": "Database / MySQL 客户端连接池与索引优化",
     "sourceFile": "Database/MySQLConnectionPool.cpp",
@@ -656,7 +656,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_23",
     "chapterId": "cpp_sec_05",
-    "chapterTitle": "五、计算机基础：数据库核心 (MySQL 架构/索引/事务 & Redis 数据结构/持久化)",
+    "chapterTitle": "五、数据库系统 (MySQL 索引/事务 & Redis 数据结构/持久化)",
     "dimension": "MySQL Transactions & Logs",
     "title": "MySQL 事务 ACID、MVCC 多版本并发控制与锁/日志体系",
     "yuqueSection": "数据库 > MySQL 笔记 > 事务 & 锁 & 日志",
@@ -668,7 +668,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "锁机制（共享锁/排他锁、意向锁、行级 Record Lock、间隙锁 Gap Lock、临键锁 Next-Key Lock）",
       "日志系统：Redo Log（WAL 机制保持久性）、Undo Log（保原子性）、Binlog（归档与主从）"
     ],
-    "coreConcept": "对应语雀路线 MySQL 事务、锁与日志。深入理解 InnoDB 在 RR 级别利用 MVCC 快照读与 Next-Key Lock 当前读解决幻读，掌握 Redo Log 与 Binlog 两阶段提交保证数据一致性。",
+    "coreConcept": "掌握事务 ACID 特性与并发隔离级别，分析 InnoDB 在可重复读 (RR) 下利用 MVCC 快照读与 Next-Key Lock 当前读解决幻读的原理，理解 Redo Log 崩溃恢复与 Binlog 两阶段提交。",
     "cppaiModule": "mod_db_transaction",
     "moduleName": "Database / 事务封装与并发一致性控制",
     "sourceFile": "Database/TransactionManager.cpp",
@@ -676,7 +676,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
     "taskDay": 23,
     "interviewPoint": "MySQL 事务的 ACID 分别由哪些日志或机制保证？MVCC 的底层原理是什么？ReadView 是如何判断版本可见性的？Redo Log 和 Binlog 的两阶段提交流程？",
     "learnLoop": {
-      "learn": "研读丁奇《MySQL45讲》事务与锁篇章，透彻理解 MVCC ReadView 生成时机。",
+      "learn": "研读丁奇《MySQL45讲》事务与锁篇章，理解 MVCC ReadView 生成时机。",
       "apply": "在业务代码中利用事务包装多步原子操作，并设置合理的超时隔离级别。",
       "build": "并发两个事务模拟死锁产生，查看 SHOW ENGINE INNODB STATUS 死锁日志。",
       "explain": "口述：InnoDB 的 Redo Log 两阶段提交（prepare/commit）如何防止奔溃恢复数据不一致？",
@@ -686,7 +686,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_24",
     "chapterId": "cpp_sec_05",
-    "chapterTitle": "五、计算机基础：数据库核心 (MySQL 架构/索引/事务 & Redis 数据结构/持久化)",
+    "chapterTitle": "五、数据库系统 (MySQL 索引/事务 & Redis 数据结构/持久化)",
     "dimension": "Redis Data Structures",
     "title": "Redis 5 大核心数据结构、底层编码与高性能架构",
     "yuqueSection": "数据库 > Redis 笔记 > 基本概念 & 数据结构 & 架构",
@@ -698,7 +698,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "ZSet 跳表 (SkipList) 与字典双索引设计（时间复杂度 O(log n)）",
       "单线程反应堆模型为什么速度极快（全内存操作、I/O 多路复用、无线程上下文切换）"
     ],
-    "coreConcept": "对应语雀路线 Redis 数据结构与架构。深入理解 Redis 基于全内存与 I/O 多路复用的高效设计，掌握 String 底层 SDS 的优化，掌握 ZSet 利用跳表实现高效范围查询。",
+    "coreConcept": "掌握 Redis 基于全内存与单线程事件循环的架构设计，分析 String (SDS)、List (quicklist)、Hash、Set 与 ZSet (跳表+哈希表) 的底层编码选择与渐进式 rehash 机制。",
     "cppaiModule": "mod_cache_redis",
     "moduleName": "Cache / Redis 客户端连接池封装",
     "sourceFile": "Cache/RedisClient.cpp",
@@ -716,25 +716,25 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_25",
     "chapterId": "cpp_sec_05",
-    "chapterTitle": "五、计算机基础：数据库核心 (MySQL 架构/索引/事务 & Redis 数据结构/持久化)",
+    "chapterTitle": "五、数据库系统 (MySQL 索引/事务 & Redis 数据结构/持久化)",
     "dimension": "Redis Persistence & Caching",
-    "title": "Redis 持久化机制 (RDB/AOF) 与缓存穿透/击穿/雪崩实战",
+    "title": "Redis 持久化机制 (RDB/AOF) 与缓存关联/击穿/雪崩实战",
     "yuqueSection": "数据库 > Redis 笔记 > 持久化 & 缓存",
     "bookReference": "《Linux多线程服务端编程》第 8 章 P.361-380（持久化可靠性与缓存设计模式）",
     "keyPoints": [
       "RDB 快照持久化原理：bgsave 后台 fork 子进程与写时复制 COW",
       "AOF 日志持久化：写后日志、刷盘策略 (always/everysec/no) 与 AOF 后台重写",
       "混合持久化机制 (RDB + 增量 AOF 日志)",
-      "缓存三剑客防御：缓存穿透（布隆过滤器）、缓存雪崩（随机 TTL/多级缓存）、缓存击穿（互斥锁/逻辑过期）",
+      "缓存三剑客防御：缓存关联（布隆过滤器）、缓存雪崩（随机 TTL/多级缓存）、缓存击穿（互斥锁/逻辑过期）",
       "Cache-Aside 旁路缓存模式与保证 MySQL 和 Redis 双写一致性（延迟双删）"
     ],
-    "coreConcept": "对应语雀路线 Redis 持久化与缓存实战。掌握 RDB 与 AOF 在容灾恢复上的权衡，严格在服务端架构中落实缓存穿透、雪崩、击穿的防御措施，理解延迟双删在读写并发下的原理。",
+    "coreConcept": "分析 Redis RDB 快照 (bgsave COW) 与 AOF 写后追加及后台重写机制，掌握缓存穿透、缓存击穿与缓存雪崩的成因及布隆过滤器/互斥锁/随机 TTL 防御方案，理解双写一致性策略。",
     "cppaiModule": "mod_cache_strategy",
     "moduleName": "Cache / 缓存防护层与双写一致性策略",
     "sourceFile": "Cache/CacheAsideManager.cpp",
     "sourceLine": "L20-L80",
     "taskDay": 25,
-    "interviewPoint": "RDB 和 AOF 持久化的区别及优缺点？什么是缓存穿透、缓存击穿、缓存雪崩？分别怎么解决？如何保证 Redis 和 MySQL 的数据一致性？",
+    "interviewPoint": "RDB 和 AOF 持久化的区别及优缺点？什么是缓存关联、缓存击穿、缓存雪崩？分别怎么解决？如何保证 Redis 和 MySQL 的数据一致性？",
     "learnLoop": {
       "learn": "研读语雀 Redis 缓存笔记，掌握布隆过滤器与双写一致性方案。",
       "apply": "在 CacheAsideManager 中实现互斥锁防击穿与随机过期时间防雪崩。",
@@ -746,7 +746,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_26",
     "chapterId": "cpp_sec_06",
-    "chapterTitle": "六、计算机基础：计算机组成原理 (数据表示/CPU指令/存储层次)",
+    "chapterTitle": "六、计算机组成原理 (数据表示/CPU指令/Cache层次)",
     "dimension": "Computer Organization",
     "title": "计算机组成：数据机器级表示、CPU 指令流水线与 Cache 层次",
     "yuqueSection": "计算机组成原理 > 计组笔记 (数据表示/CPU/存储系统)",
@@ -758,7 +758,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "存储系统层次体系：寄存器、L1/L2/L3 CPU Cache、主存、磁盘与局部性原理 (Locality)",
       "多核 CPU 缓存一致性协议 MESI 与伪共享 (False Sharing) 的字节填充对齐防范"
     ],
-    "coreConcept": "对应语雀路线计算机组成原理。掌握主机字节序与网络大端字节序的转换，深入理解 CPU 缓存行（通常 64 字节）对多线程程序性能的影响，通过内存对齐消除伪共享带来的总线锁竞争。",
+    "coreConcept": "掌握整数原码补码表示与 IEEE 754 浮点数规范，掌握网络大端字节序与主机小端字节序的转换，分析 CPU 缓存行 (Cache Line) 与 MESI 一致性协议，利用内存对齐消除多线程伪共享。",
     "cppaiModule": "mod_cpu_cache",
     "moduleName": "Common / CPU 缓存行对齐与无伪共享环形队列",
     "sourceFile": "Common/AtomicRingBuffer.h",
@@ -776,7 +776,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_27",
     "chapterId": "cpp_sec_07",
-    "chapterTitle": "七、Linux 高性能网络编程 (Socket/epoll/粘包拆包/零拷贝)",
+    "chapterTitle": "七、Linux 网络编程 (Socket/epoll/粘包拆包/零拷贝)",
     "dimension": "Socket Programming",
     "title": "Socket API 核心机制与非阻塞 I/O 编程规范",
     "yuqueSection": "网络编程 > 网络编程笔记 > SOCKET方面 & 网络编程基础",
@@ -787,7 +787,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "套接字常用配置项：SO_REUSEADDR (解决 TIME_WAIT 端口占用)、TCP_NODELAY (禁用 Nagle 算法)",
       "read/write 错误码排错：EAGAIN / EWOULDBLOCK (数据未就绪) 与 EINTR (被信号中断)"
     ],
-    "coreConcept": "对应语雀路线网络编程 Socket 方面。掌握高性能服务中套接字必须设置为非阻塞的核心法则，开启 TCP_NODELAY 降低即时交互延迟，开启 SO_REUSEADDR 允许服务快速重启重连。",
+    "coreConcept": "掌握 Socket 核心 API（socket, bind, listen, accept, connect）与 TCP 状态机的对应关系，配置非阻塞套接字，设置 SO_REUSEADDR 与 TCP_NODELAY，正确处理 EAGAIN 与 EINTR 错误码。",
     "cppaiModule": "mod_socket_ops",
     "moduleName": "HttpServer / Socket 套接字底层封装",
     "sourceFile": "HttpServer/Socket.cpp",
@@ -805,7 +805,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_28",
     "chapterId": "cpp_sec_07",
-    "chapterTitle": "七、Linux 高性能网络编程 (Socket/epoll/粘包拆包/零拷贝)",
+    "chapterTitle": "七、Linux 网络编程 (Socket/epoll/粘包拆包/零拷贝)",
     "dimension": "IO Multiplexing",
     "title": "I/O 多路复用深入：select, poll 与 epoll 原理对比 (LT vs ET)",
     "yuqueSection": "网络编程 > 网络编程笔记 > 网络编程基础",
@@ -816,7 +816,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "epoll 为什么高效：红黑树快速检索、内核事件回调唤醒、mmap 共享结果、只遍历就绪队列 O(1)",
       "水平触发 (Level Triggered, LT) 与边缘触发 (Edge Triggered, ET) 的本质区别与循环读写"
     ],
-    "coreConcept": "对应语雀路线网络编程基础。掌握 epoll 基于红黑树管理数万并发连接的机制，深入理解 ET 模式下必须搭配非阻塞 I/O 且循环 read 直到返回 EAGAIN，否则会导致数据丢失。",
+    "coreConcept": "对比 select, poll 与 epoll 的内核数据结构与时间复杂度，掌握 epoll 基于红黑树与就绪链表的高效机制，区分水平触发 (LT) 与边缘触发 (ET)，理解 ET 模式下非阻塞循环读写的必要性。",
     "cppaiModule": "mod_epoll_poller",
     "moduleName": "HttpServer / EpollPoller 事件分发驱动器",
     "sourceFile": "HttpServer/EpollPoller.cpp",
@@ -824,7 +824,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
     "taskDay": 28,
     "interviewPoint": "select, poll, epoll 的底层区别与性能瓶颈对比？epoll 的 LT（水平触发）和 ET（边缘触发）有什么区别？为什么 ET 模式必须搭配非阻塞 Socket？",
     "learnLoop": {
-      "learn": "精读《Linux高性能服务器编程》第 9 章与陈硕第 6 章，透彻掌握 epoll 源码实现。",
+      "learn": "精读《Linux高性能服务器编程》第 9 章与陈硕第 6 章，掌握 epoll 源码实现。",
       "apply": "在 EpollPoller 中封装 epoll_ctl 监听与 epoll_wait 事件轮询主循环。",
       "build": "使用 Webbench / wrk 对 LT 模式与 ET 模式进行十万级并发连接性能压测。",
       "explain": "口述：epoll 内核中红黑树与双向就绪链表各自承担的数据结构职责。",
@@ -834,7 +834,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_29",
     "chapterId": "cpp_sec_07",
-    "chapterTitle": "七、Linux 高性能网络编程 (Socket/epoll/粘包拆包/零拷贝)",
+    "chapterTitle": "七、Linux 网络编程 (Socket/epoll/粘包拆包/零拷贝)",
     "dimension": "Packet Processing & Zero-Copy",
     "title": "TCP 粘包拆包解决方案与零拷贝技术 (mmap, sendfile)",
     "yuqueSection": "网络编程 > 网络编程笔记 > TCP和UDP & 零拷贝",
@@ -845,7 +845,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "传统 I/O 四次数据拷贝与四次上下文切换的性能瓶颈",
       "零拷贝技术：mmap 内存映射（减少一次 CPU 拷贝）、sendfile（数据直接在内核空间直通传输）"
     ],
-    "coreConcept": "对应语雀路线 TCP/UDP 粘包与零拷贝。深入理解字节流协议的应用层拆包机制，掌握在 CppAIService 中设计定长包头+变长 Body，掌握使用 sendfile 实现静态文件无拷贝高速外发。",
+    "coreConcept": "分析 TCP 字节流传输中粘包拆包的成因，设计固定长度或长度字段头 (Length-Field) 的应用层分包协议，理解零拷贝技术通过 mmap 或 sendfile 减少 CPU 数据拷贝与上下文切换的原理。",
     "cppaiModule": "mod_zero_copy",
     "moduleName": "HttpServer / 长度字段拆包与 sendfile 高速传输",
     "sourceFile": "HttpServer/HttpServer.cpp",
@@ -863,7 +863,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_30",
     "chapterId": "cpp_sec_08",
-    "chapterTitle": "八、数据结构与算法 (代码随想录 12 大专题/Hot100/ACM模式)",
+    "chapterTitle": "八、数据结构与算法 (分类题单/复杂度分析/ACM模式)",
     "dimension": "Algorithm Methodology",
     "title": "代码随想录 12 大分类刷题体系与 ACM 模式工程化实战",
     "yuqueSection": "数据结构与算法 > 视频 & 推荐路线 & 思维导图",
@@ -874,7 +874,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "核心解题模式：双指针快慢指针、滑动窗口、递归回溯模板、动态规划五步法",
       "时空复杂度严格把控（推导大 O 表示法、递归栈空间与辅助数组开销）"
     ],
-    "coreConcept": "对应语雀路线数据结构与算法篇。坚持成体系刷题，先理解算法模式再编码，熟练掌握卡码网 ACM 模式的多行输入与 EOF 处理，将算法中的双指针与前缀和映射到服务端缓冲处理。",
+    "coreConcept": "掌握代码随想录 12 大专题算法体系，分析双指针、滑动窗口、二分搜索、回溯剪枝与动态规划的状态转移方程推导，掌握 ACM 模式下的标准输入输出处理与严格时空复杂度分析。",
     "cppaiModule": "mod_algo_lab",
     "moduleName": "Algorithm / 手撕算法 Lab 与 179 题分类索引",
     "sourceFile": "js/dataset-learning.js",
@@ -892,7 +892,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_31",
     "chapterId": "cpp_sec_09",
-    "chapterTitle": "九、后端必备技术栈 (消息队列 RabbitMQ/ES 搜索/Docker/K8S)",
+    "chapterTitle": "九、后端技术栈 (消息队列 RabbitMQ/ES 检索/Docker/K8S)",
     "dimension": "Middlewares",
     "title": "消息队列中间件 (RabbitMQ) 与分布式搜索引擎 (Elasticsearch)",
     "yuqueSection": "后端必备技术栈 > 中间件",
@@ -903,7 +903,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "消息可靠性保障：生产端 Confirm 确认、消费端手动 ACK、死信队列 (DLX) 与防重复消费",
       "Elasticsearch 核心：倒排索引 (Inverted Index) 底层原理、分词器、DSL 查询与数据聚合"
     ],
-    "coreConcept": "对应语雀路线后端中间件篇。掌握微服务架构中基于消息队列解耦耗时任务（如 AI 推理异步排队），理解 Elasticsearch 倒排索引相比关系型数据库在全文检索上的压倒性优势。",
+    "coreConcept": "掌握消息队列在分布式系统中的异步解耦与削峰填谷作用，分析 RabbitMQ 的 Exchange、Queue 与手动 ACK 确认机制，掌握 Elasticsearch 倒排索引原理与 DSL 检索聚合语法。",
     "cppaiModule": "mod_async_mq",
     "moduleName": "Middlewares / 异步消息队列与事件广播解耦",
     "sourceFile": "Middlewares/TaskQueue.cpp",
@@ -921,7 +921,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_32",
     "chapterId": "cpp_sec_09",
-    "chapterTitle": "九、后端必备技术栈 (消息队列 RabbitMQ/ES 搜索/Docker/K8S)",
+    "chapterTitle": "九、后端技术栈 (消息队列 RabbitMQ/ES 检索/Docker/K8S)",
     "dimension": "DevOps & Containers",
     "title": "工程工具与容器化：Git 版本控制、Docker 隔离与 Kubernetes 编排",
     "yuqueSection": "后端必备技术栈 > 工具与容器",
@@ -932,7 +932,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "Dockerfile 多阶段构建 (Multi-stage Build) 最小化 C++ 生产镜像体积",
       "Kubernetes (K8s) 基础概念：Pod, Deployment, Service, ConfigMap 与容器自动化扩缩容"
     ],
-    "coreConcept": "对应语雀路线工具与容器篇。熟练运用 Git 规范化提交与分支管理，深入理解 Docker 容器与虚拟机的底层区别，掌握将 C++ 服务打包为轻量 Alpine/Ubuntu 容器部署到云端。",
+    "coreConcept": "掌握 Git 提交规范、分支合并与变基 (rebase)，理解 Linux Namespaces 隔离与 Cgroups 资源限制在 Docker 容器中的实现，配置多阶段 Dockerfile 构建轻量级服务镜像。",
     "cppaiModule": "mod_docker_k8s",
     "moduleName": "DevOps / Dockerfile 多阶段构建与编排",
     "sourceFile": "Dockerfile",
@@ -950,7 +950,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_33",
     "chapterId": "cpp_sec_10",
-    "chapterTitle": "十、C++ 常用设计模式 (单例/工厂/观察者/重构实战)",
+    "chapterTitle": "十、C++ 设计模式 (单例/工厂/观察者/重构原则)",
     "dimension": "Design Patterns",
     "title": "单例模式、工厂模式体系与观察者模式实战",
     "yuqueSection": "C++设计模式 > 笔记 (单例/工厂/观察者/重构)",
@@ -961,7 +961,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "观察者模式 (Observer)：发布-订阅模型解耦，现代 C++ 使用 std::function 回调机制替代繁重基类",
       "设计模式在工程代码重构中的作用：开闭原则 (OCP)、依赖倒置原则 (DIP) 与防范过度设计"
     ],
-    "coreConcept": "对应语雀路线 C++ 设计模式篇。掌握应届生面试与服务端开发最核心的三大模式（单例、工厂、观察者），理解陈硕在 muduo 中推崇的使用 std::function/std::bind 代替传统虚函数观察者的工程思想。",
+    "coreConcept": "掌握 Meyers' Singleton 局部静态变量线程安全单例实现，掌握工厂模式在对象创建与业务逻辑间的解耦，使用现代 C++ std::function 回调机制实现轻量级观察者模式。",
     "cppaiModule": "mod_singleton_pattern",
     "moduleName": "Pattern / 线程安全全局配置单例与工厂模式",
     "sourceFile": "Common/Singleton.h",
@@ -979,7 +979,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_34",
     "chapterId": "cpp_sec_11",
-    "chapterTitle": "十一、工业级硬核项目实战 (仿 muduo 高并发网络库 & Raft 分布式系统)",
+    "chapterTitle": "十一、综合项目实战 (muduo 网络库 & Raft 分布式系统)",
     "dimension": "High-Concurrency Reactor",
     "title": "手写仿 muduo 多线程高并发 Reactor 网络库全流程剖析",
     "yuqueSection": "项目篇 > 仿muduo手写Reactor高并发服务器",
@@ -991,7 +991,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "EventLoop：事件循环、驱动 IO 事件、跨线程任务队列 runInLoop 与 eventfd 唤醒",
       "TcpServer 与 EventLoopThreadPool：主线程 Acceptor 监听连接，轮询轮转派发给 SubLoop 工作线程"
     ],
-    "coreConcept": "对应语雀路线项目篇首推的仿 muduo Reactor 高并发网络库。透彻掌握主从 Reactor 模型：MainReactor 负责连接建立，SubReactor 线程池负责连接读写与业务处理，通过 eventfd 实现无锁跨线程唤醒。",
+    "coreConcept": "分析 muduo 采用的 one loop per thread 主从 Reactor 架构，剖析 EventLoop、Channel、Poller 与 TcpServer 的协同关系，分析通过 eventfd 实现无锁跨线程唤醒与任务分发的过程。",
     "cppaiModule": "mod_eventloop_core",
     "moduleName": "HttpServer / EventLoop 与主从 Reactor 核心",
     "sourceFile": "HttpServer/EventLoop.cpp",
@@ -1009,7 +1009,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_35",
     "chapterId": "cpp_sec_11",
-    "chapterTitle": "十一、工业级硬核项目实战 (仿 muduo 高并发网络库 & Raft 分布式系统)",
+    "chapterTitle": "十一、综合项目实战 (muduo 网络库 & Raft 分布式系统)",
     "dimension": "Distributed Raft",
     "title": "基于 Raft 共识算法的分布式一致性系统实战 (RPC/协程/跳表)",
     "yuqueSection": "项目篇 > 基于共识算法的Raft项目 (RPC/协程/跳表)",
@@ -1020,7 +1020,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "高性能存储引擎底层：基于跳表 (SkipList) 的高并发持久化键值存储",
       "用户态协程库结合：利用协程挂起与恢复消除异步回调地狱 (Callback Hell)"
     ],
-    "coreConcept": "对应语雀路线项目篇重点推荐的基于共识算法的 Raft 项目。融会贯通 C++ RPC、跳表存储引擎与协程库，相当于掌握近万行分布式底层工程代码，技术复用度极高。",
+    "coreConcept": "掌握 Raft 分布式共识算法的 Leader 选举、心跳超时与日志复制大多数原则，结合跳表持久化键值存储与 Protobuf RPC 协议构建分布式节点，分析脑裂防范机制。",
     "cppaiModule": "mod_raft_consensus",
     "moduleName": "Distributed / Raft 共识与 RPC 远程调用",
     "sourceFile": "Distributed/RaftNode.cpp",
@@ -1038,9 +1038,9 @@ var CPP_KNOWLEDGE_SYSTEM = [
   {
     "id": "cpp_item_36",
     "chapterId": "cpp_sec_11",
-    "chapterTitle": "十一、工业级硬核项目实战 (仿 muduo 高并发网络库 & Raft 分布式系统)",
+    "chapterTitle": "十一、综合项目实战 (muduo 网络库 & Raft 分布式系统)",
     "dimension": "Production AI Service",
-    "title": "工业级 CppAIService 落地：状态机、异步推理与全链路监控",
+    "title": "生产级 CppAIService 落地：状态机、异步推理与全链路监控",
     "yuqueSection": "项目篇 > CppAIService 工业级服务端落地",
     "bookReference": "《Linux多线程服务端编程》第 11 章 P.365-395（网络服务系统架构与性能优化）",
     "keyPoints": [
@@ -1049,7 +1049,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "心跳保活、连接超时剔除与资源主动回收机制",
       "全链路观测体系：请求吞吐 QPS、P99 延迟分布与系统错误率监控"
     ],
-    "coreConcept": "对应语雀路线项目篇结合 CppAIService 实战。将 C++ 基础、STL、操作系统、网络编程与多线程融为一体，构建高可用、高并发、支持流式 SSE 推理的工业级现代服务端体系。",
+    "coreConcept": "基于非阻塞 I/O 与 Reactor 事件驱动架构构建 HTTP 服务端，利用独立的计算线程池承载长耗时计算与 AI 推理任务，通过 SSE 分块流式传输返回数据，结合全链路日志与指标监控维护服务可用性。",
     "cppaiModule": "mod_ai_service_core",
     "moduleName": "HttpServer / CppAIService 综合架构落地",
     "sourceFile": "HttpServer/HttpServer.cpp",
@@ -1061,7 +1061,7 @@ var CPP_KNOWLEDGE_SYSTEM = [
       "apply": "编写 SSE 推理推送模块，利用分块传输编码 (Chunked) 实时推送生成结果。",
       "build": "使用 wrk 进行端到端压力测试，测定不同工作线程数下的最优吞吐吞吐极限。",
       "explain": "口述：CppAIService 如何通过主从 Reactor + 独立计算线程池实现计算与 I/O 解耦。",
-      "review": "审查生产配置参数，确保 ulimit -n 与套接字缓冲区参数达到最优工业级状态。"
+      "review": "审查生产配置参数，确保 ulimit -n 与套接字缓冲区参数达到最优生产级状态。"
     }
   }
 ];
@@ -1078,7 +1078,7 @@ var LINUX_SYSTEM_KNOWLEDGE = [
     "syscallOrCmd": "ls / cd / pwd / date / cal / clear / history / Tab / Ctrl+c / Ctrl+d",
     "keyPoints": [
       "命令行提示符结构与指令标准语法：command [-options] parameter1 parameter2",
-      "极其高效的核心快捷键：Tab 键命令/文件名自动补全、Ctrl+c 强行中断、Ctrl+d 键盘输入结束",
+      "核心快捷键：Tab 键命令/文件名自动补全、Ctrl+c 强行中断、Ctrl+d 键盘输入结束",
       "重要系统信息与时间指令：date, cal, bc 简易计算器",
       "man 与 info 联机帮助系统查询技巧"
     ],
@@ -1214,7 +1214,7 @@ var LINUX_SYSTEM_KNOWLEDGE = [
     "syscallOrCmd": "tar -zcvf / tar -zxvf / tar -ztvf / tar -jcvf / gzip / gunzip",
     "keyPoints": [
       "常用压缩工具格式对比：gzip (.gz 速度快通用), bzip2 (.bz2 压缩比高)",
-      "tar 打包归档核心参数记忆口诀：-c (建立), -x (解开), -t (查看清单), -v (显示过程), -f (指定文件名)",
+      "tar 打包归档核心参数核心参数：-c (建立), -x (解开), -t (查看清单), -v (显示过程), -f (指定文件名)",
       "-z 配合 gzip 格式 (.tar.gz), -j 配合 bzip2 格式 (.tar.bz2)",
       "解包至指定目录：tar -zxvf archive.tar.gz -C /target/path"
     ],
@@ -1269,7 +1269,7 @@ var LINUX_SYSTEM_KNOWLEDGE = [
       "扩展正则表达式 (ERE) 特性：+ (1 到多次), ? (0 或 1 次), | (或逻辑), () (分组捕获)",
       "通配符 (Wildcard) 与正则表达式在语法与使用环境上的本质区别"
     ],
-    "projectScene": "编写正则是日志分析与文本过滤的底层功力，精确匹配 IP 地址、HTTP 状态码或指定错误日志堆栈。",
+    "projectScene": "编写正则是日志分析与文本过滤的技术要点，精确匹配 IP 地址、HTTP 状态码或指定错误日志堆栈。",
     "interviewPoint": "正则表达式中的 * 和通配符中的 * 有什么不同？grep 开启扩展正则表达式的参数是什么？"
   },
   {
@@ -1577,7 +1577,7 @@ var LINUX_SYSTEM_KNOWLEDGE = [
       "ss 相比传统 netstat 的巨大优势 (直接读取内核 netlink 机制，海量并发连接下查询迅速不卡顿)",
       "核心参数记忆组合：-t (TCP), -u (UDP), -l (Listening 监听), -n (数字 IP/端口显示), -p (显示进程名与 PID)",
       "lsof -i :port 快速反查占用该端口的具体进程与进程号",
-      "常用端口连通性探测 nc -zv host port，网络抓包神技 tcpdump -i eth0 tcp port 80 -w packet.pcap"
+      "常用端口连通性探测 nc -zv host port，网络抓包方法 tcpdump -i eth0 tcp port 80 -w packet.pcap"
     ],
     "projectScene": "服务端启动报 Address already in use 时，使用 ss -tulnp | grep :8080 或 lsof -i :8080 快速定位占用端口的旧进程并 kill 释放。",
     "interviewPoint": "为什么 ss 命令比 netstat 快很多？在客户端和服务端建立连接过程中，如何用 ss 过滤出所有处于 TIME_WAIT 状态的连接？"
@@ -1618,7 +1618,6 @@ var LINUX_SYSTEM_KNOWLEDGE = [
   }
 ];
 
-// 3. 两大硬核专业书目伴读伴学体系
 var BOOKS_COMPANION_DATA = {
   linuxServerBook: {
     key: "linuxServer",
