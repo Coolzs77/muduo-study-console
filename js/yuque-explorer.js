@@ -8,6 +8,8 @@
 function getYuqueDataset() {
     if (typeof YUQUE_DATASET !== 'undefined' && Array.isArray(YUQUE_DATASET)) return YUQUE_DATASET;
     if (typeof window !== 'undefined' && window.YUQUE_DATASET && Array.isArray(window.YUQUE_DATASET)) return window.YUQUE_DATASET;
+    if (typeof YUQUE_ARTICLES_DATASET !== 'undefined' && Array.isArray(YUQUE_ARTICLES_DATASET)) return YUQUE_ARTICLES_DATASET;
+    if (typeof window !== 'undefined' && window.YUQUE_ARTICLES_DATASET && Array.isArray(window.YUQUE_ARTICLES_DATASET)) return window.YUQUE_ARTICLES_DATASET;
     return [];
 }
 

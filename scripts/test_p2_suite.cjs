@@ -18,7 +18,7 @@ assert.ok(projectIds.has('proj_muduo'), 'Must contain proj_muduo');
 assert.ok(projectIds.has('proj_cppai'), 'Must contain proj_cppai');
 
 assert.ok(Array.isArray(globalThis.DOMAIN_MODULES), 'DOMAIN_MODULES should be an array');
-assert.strictEqual(globalThis.DOMAIN_MODULES.length, 19, 'Should have 19 domain modules (8 muduo + 11 CppAI)');
+assert.strictEqual(globalThis.DOMAIN_MODULES.length, 23, 'Should have 23 domain modules (10 muduo + 13 CppAI)');
 
 // 验证每个模块的项目引用完整性
 globalThis.DOMAIN_MODULES.forEach(mod => {

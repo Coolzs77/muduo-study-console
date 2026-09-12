@@ -43,6 +43,8 @@ function getDomainPitfallsDataset() {
 }
 
 function getYuqueDataset() {
+    if (typeof YUQUE_DATASET !== 'undefined' && Array.isArray(YUQUE_DATASET)) return YUQUE_DATASET;
+    if (typeof window !== 'undefined' && window.YUQUE_DATASET && Array.isArray(window.YUQUE_DATASET)) return window.YUQUE_DATASET;
     if (typeof YUQUE_ARTICLES_DATASET !== 'undefined' && Array.isArray(YUQUE_ARTICLES_DATASET)) return YUQUE_ARTICLES_DATASET;
     if (typeof window !== 'undefined' && window.YUQUE_ARTICLES_DATASET && Array.isArray(window.YUQUE_ARTICLES_DATASET)) return window.YUQUE_ARTICLES_DATASET;
     return [];
@@ -518,8 +520,9 @@ function updateDashboardMetrics() {
     const elDemoVal = document.getElementById('stat-demo-val');
     if (elDemoVal) elDemoVal.innerText = `${demoCount} / ${total}`;
 
+    const totalModules = (getDomainModulesDataset && getDomainModulesDataset().length) || (typeof DOMAIN_MODULES !== 'undefined' ? DOMAIN_MODULES.length : 23);
     const elSourceVal = document.getElementById('stat-source-val');
-    if (elSourceVal) elSourceVal.innerText = sourceReadCount > 0 ? `${sourceReadCount} / 19 研读` : '19 模块';
+    if (elSourceVal) elSourceVal.innerText = sourceReadCount > 0 ? `${sourceReadCount} / ${totalModules} 研读` : `${totalModules} 模块`;
 
     const elTodayTime = document.getElementById('stat-today-time');
     if (elTodayTime) elTodayTime.innerText = `${todayMinutes} min`;
@@ -1997,7 +2000,11 @@ const TOPOLOGY_DRAWER_DATA = {
     handleeventwithguard: { title: "Channel::handleEventWithGuard", tag: "多线程安全自保", role: "事件到来的核心分发防线。先通过 tie_.lock() 原子提权为 shared_ptr；若提权成功保证宿主存活才执行用户回调，从根源消除多线程异步回调中的 Use-After-Free 崩溃。", members: ["std::shared_ptr<void> guard = tie_.lock()", "ReadEventCallback readCallback_", "EventCallback writeCallback_"], functions: ["if (guard) { readCallback_(receiveTime); }"], relatedDays: [10, 18] },
     tcpserver: { title: "TcpServer", tag: "服务器大总管", role: "统领全服所有长连接生命周期。使用 map<string, TcpConnectionPtr> conns_ 存储长连接，使用 std::bind 将 newConnection 回调挂入 Acceptor。", members: ["unique_ptr<Acceptor> acceptor_: 监听新建连接", "map<string, TcpConnectionPtr> connections_: 存活长连接映射表", "EventLoopThreadPool threadPool_: 反应堆工作线程池"], functions: ["void setThreadNum(int)", "void start()", "void newConnection(int sockfd, const InetAddress&)", "void removeConnection(const TcpConnectionPtr&)"], relatedDays: [9, 13, 14, 19] },
     tcpconnection: { title: "TcpConnection", tag: "客户端连接实体", role: "代表已建立的 TCP 连接。继承 enable_shared_from_this 跨线程自保；独占 Channel 与 Socket；拥有 inputBuffer_ 与 outputBuffer_ 解决非阻塞网络发包粘包。", members: ["shared_ptr<TcpConnection>", "unique_ptr<Socket> socket_", "unique_ptr<Channel> channel_", "Buffer inputBuffer_, outputBuffer_"], functions: ["void send(const string&)", "void shutdown()", "void handleRead()", "void handleWrite()"], relatedDays: [9, 10, 14, 18, 19] },
-    buffer: { title: "Buffer", tag: "应用层自适应缓冲", role: "连续内存非阻塞应用层缓冲。利用 vector<char> 保证高 CPU Cache 命中；以 prepends / readable / writable 游标消除内存搬移；以 readv 分散读实现零碎片扩容。", members: ["vector<char> buffer_", "size_t readerIndex_, writerIndex_", "static const size_t kCheapPrepend = 8"], functions: ["size_t readableBytes() const", "void retrieve(size_t)", "void append(const char*, size_t)", "ssize_t readFd(int fd, int* savedErrno)"], relatedDays: [2, 6, 11, 23] }
+    buffer: { title: "Buffer", tag: "应用层自适应缓冲", role: "连续内存非阻塞应用层缓冲。利用 vector<char> 保证高 CPU Cache 命中；以 prepends / readable / writable 游标消除内存搬移；以 readv 分散读实现零碎片扩容。", members: ["vector<char> buffer_", "size_t readerIndex_, writerIndex_", "static const size_t kCheapPrepend = 8"], functions: ["size_t readableBytes() const", "void retrieve(size_t)", "void append(const char*, size_t)", "ssize_t readFd(int fd, int* savedErrno)"], relatedDays: [2, 6, 11, 23] },
+    client: { title: "Client 外部并发客户端", tag: "接入终端", role: "发起并发长连接与 HTTP 请求，接收 SSE 流式事件与大模型生成结果。", members: ["TcpClient / HttpClient 客户端连接句柄"], functions: ["void connect()", "void send(req)", "void onMessage(resp)"], relatedDays: [1, 5, 9] },
+    linux_epoll: { title: "Linux 内核 epoll", tag: "内核 I/O 复用", role: "操作系统底层红黑树维护海量关注文件描述符，双向就绪链表实现 O(1) 事件通知。", members: ["epoll_event 内核事件结构体", "eventpoll 内核数据结构"], functions: ["epoll_create1(EPOLL_CLOEXEC)", "epoll_ctl(epfd, op, fd, event)", "epoll_wait(epfd, events, maxevents, timeout)"], relatedDays: [8, 13, 26] },
+    chatserver: { title: "ChatServer 业务总控中心", tag: "AI 调度中枢", role: "承接 HTTP 网关分发，管理单用户多会话隔离映射树，调度多模型策略与 RabbitMQ 异步写库。", members: ["chatInformation[userId][sessionId]", "sessionsIdsMap[userId]", "MQManager rabbitmq_"], functions: ["void initialize()", "void initChatMessage()", "void packageResp()"], relatedDays: [14, 19, 28] },
+    rag: { title: "RAG 检索增强引擎", tag: "知识库检索", role: "企业知识库切片向量召回，在模型推理前置注入业务文档上下文，彻底杜绝大模型事实性幻觉。", members: ["AliyunRAGStrategy ragStrategy_", "Knowledge_Base_ID 知识库凭据"], functions: ["json buildRequest(messages)", "string parseResponse(json)"], relatedDays: [27, 28] }
 };
 
 function openTopologyDrawer(nodeId) {
@@ -2011,7 +2018,13 @@ function openTopologyDrawer(nodeId) {
         'buffer': 'mod_net_buffer',
         'tcpserver': 'mod_net_tcpserver',
         'tcpconnection': 'mod_net_tcpconnection',
-        'handleeventwithguard': 'mod_net_channel'
+        'handleeventwithguard': 'mod_net_channel',
+        'client': 'mod_net_client',
+        'mod_client': 'mod_net_client',
+        'linux_epoll': 'mod_kernel_epoll',
+        'epoll': 'mod_kernel_epoll',
+        'chatserver': 'mod_ai_chatserver',
+        'rag': 'mod_ai_rag'
     };
     const effectiveId = ALIAS_MAP[nodeId] || nodeId;
 
@@ -2255,8 +2268,20 @@ function openTopologyDrawer(nodeId) {
             </div>
         `;
     } else {
-        console.warn(`[openTopologyDrawer] Unknown node ID: ${nodeId}`);
-        return;
+        console.warn(`[openTopologyDrawer] Fallback for node ID: ${nodeId}`);
+        if (drawerTag) {
+            drawerTag.innerText = "双核架构组件";
+            drawerTag.className = "text-[10px] font-serifMono uppercase px-2 py-0.5 rounded bg-stone-100 text-stone-800 font-bold";
+        }
+        if (drawerTitle) {
+            drawerTitle.innerText = nodeId.replace(/^mod_/, '').toUpperCase();
+        }
+        content.innerHTML = `
+            <div class="bg-stone-50 p-3 rounded-xl border border-stone-200">
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1">系统核心拓扑组件:</div>
+                <p class="text-stone-800 text-xs leading-relaxed">该组件深度集成于双核架构中，协同驱动高性能高并发网络与智能业务流。</p>
+            </div>
+        `;
     }
 
     document.getElementById('topology-drawer')?.classList.remove('translate-x-full');
@@ -2651,13 +2676,14 @@ function exportMarkdownReport() {
     md += `| 专栏编号 | 篇章课题 | 掌握评级 | 收藏状态 | 关联模块 |\n`;
     md += `|:---:|:---|:---:|:---:|:---|\n`;
 
-    if (typeof YUQUE_ARTICLES_DATASET !== 'undefined' && Array.isArray(YUQUE_ARTICLES_DATASET)) {
+    const yuqueArticles = getYuqueDataset();
+    if (yuqueArticles && yuqueArticles.length > 0) {
         const favSet = new Set(appState.knowledgeFavorites || []);
-        YUQUE_ARTICLES_DATASET.forEach(art => {
+        yuqueArticles.forEach(art => {
             const lvl = yqMastery[art.slug] || yqMastery[art.id] || 0;
             const isFav = favSet.has(art.slug) || favSet.has(art.id);
             const stars = "★".repeat(lvl) + "☆".repeat(5 - lvl);
-            md += `| ${art.number} | ${art.title} | L${lvl} (${stars}) | ${isFav ? '⭐ 已收藏' : '-'} | ${art.linkedModule || '核心微服务'} |\n`;
+            md += `| ${art.number || art.index || art.id} | ${art.title} | L${lvl} (${stars}) | ${isFav ? '⭐ 已收藏' : '-'} | ${art.linkedModule || '核心微服务'} |\n`;
         });
     } else {
         md += `| - | *专栏数据未加载* | - | - | - |\n`;

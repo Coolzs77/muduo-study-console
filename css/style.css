@@ -53,7 +53,13 @@
         /* 可点击拓扑图节点 */
         .topo-node {
             cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
             transition: all 0.2s ease;
+        }
+        .topo-node * {
+            cursor: pointer;
+            pointer-events: all;
         }
         .topo-node:hover rect {
             stroke: #0284c7 !important;

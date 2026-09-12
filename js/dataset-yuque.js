@@ -701,4 +701,9 @@ var YUQUE_DATASET = [
 
 if (typeof window !== 'undefined') {
     window.YUQUE_DATASET = YUQUE_DATASET;
+    window.YUQUE_ARTICLES_DATASET = YUQUE_DATASET;
+}
+if (typeof globalThis !== 'undefined') {
+    globalThis.YUQUE_DATASET = YUQUE_DATASET;
+    globalThis.YUQUE_ARTICLES_DATASET = YUQUE_DATASET;
 }

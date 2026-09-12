@@ -15,7 +15,7 @@ var DOMAIN_PROJECTS = [
     localStudyRepo: "https://github.com/Coolzs77/muduo-study-console",
     role: "L0~L2 通信底座：负责 epoll 边缘/水平触发、多线程 EventLoop 反应堆模型、非阻塞 I/O 与应用层零拷贝 Buffer 封装",
     techStack: ["C++11", "Linux", "epoll", "Reactor", "pthread", "POSIX Socket", "RAII"],
-    modulesCount: 8,
+    modulesCount: 10,
     tasksCount: 28,
     status: "active",
     badgeClass: "bg-sky-50 text-sky-800 border-sky-300"
@@ -29,7 +29,7 @@ var DOMAIN_PROJECTS = [
     yuqueUrl: "https://www.yuque.com/chengxuyuancarl/imh9xc/hzpib1xpx85xbg3n",
     role: "L3~L5 分布式智能业务平台：负责两段式推理 MCP 工具协议化、多厂商策略工厂 (GPT/通义/豆包)、RabbitMQ 异步写库解耦、ONNX Runtime 图像识别、TTS 语音合成与单用户多会话管理",
     techStack: ["C++17", "muduo", "RabbitMQ", "MySQL ConnectionPool", "ONNX Runtime", "OpenCV", "MCP Protocol", "RAG", "Baidu TTS/ASR"],
-    modulesCount: 11,
+    modulesCount: 13,
     articlesCount: 17,
     status: "active",
     badgeClass: "bg-amber-50 text-amber-800 border-amber-300"
@@ -287,6 +287,58 @@ var DOMAIN_MODULES = [
     desc: "前后台异步解耦架构核心。前台 HTTP 线程同步将大模型回复渲染给用户，同时向 RabbitMQ 推入落库任务；后台工作线程池异步刷盘 MySQL，极大提升服务器吞吐量。",
     threadModel: "独立消费者线程池执行，网络线程零 I/O 阻塞",
     keyConcepts: ["发布-订阅解耦", "削峰填谷", "最终一致性保证"]
+  },
+  {
+    id: "mod_net_client",
+    projectId: "proj_muduo",
+    name: "Client 外部并发请求与长连接",
+    category: "Network",
+    layer: "Client Ingress",
+    sourceFiles: ["examples/chat/client.cc", "HttpServer/resource/AI.html"],
+    classes: ["TcpClient", "HttpClient"],
+    functions: ["connect()", "send()", "onMessage()", "disconnect()"],
+    desc: "外部并发接入终端。维持浏览器、移动端与服务器之间的全双工通信管道，向服务器发起 RESTful 请求与 SSE 流式交互。",
+    threadModel: "客户端独立进程，服务端通过 Socket fd 与非阻塞 I/O 并发承载",
+    keyConcepts: ["非阻塞 Socket", "Keep-Alive 长连接复用", "SSE 流式接收"]
+  },
+  {
+    id: "mod_kernel_epoll",
+    projectId: "proj_muduo",
+    name: "Linux 内核 epoll 事件多路复用",
+    category: "Network",
+    layer: "Linux Kernel I/O",
+    sourceFiles: ["muduo/net/poller/EPollPoller.cc", "<sys/epoll.h>"],
+    classes: ["EPollPoller", "struct epoll_event"],
+    functions: ["epoll_create1()", "epoll_ctl()", "epoll_wait()"],
+    desc: "Linux 操作系统底层最高性能的 I/O 多路复用内核机制。基于红黑树维护海量监听 socket，基于就绪双向链表通过 epoll_wait 实现 O(1) 复杂度的事件通知。",
+    threadModel: "内核系统调用，由 Poller 线程阻塞监听并唤醒",
+    keyConcepts: ["LT 水平触发与 ET 边缘触发", "epoll 红黑树与双向就绪链表", "mmap 与零拷贝设计思想"]
+  },
+  {
+    id: "mod_ai_chatserver",
+    projectId: "proj_cppai",
+    name: "ChatServer 业务主控与多会话调度",
+    category: "AI",
+    layer: "Business Orchestration",
+    sourceFiles: ["AIApps/ChatServer/src/ChatServer.cpp", "AIApps/ChatServer/include/ChatServer.h"],
+    classes: ["ChatServer", "ChatSendHandler", "ChatSessionsHandler"],
+    functions: ["initialize()", "initChatMessage()", "readDataFromMySQL()", "packageResp()"],
+    desc: "CppAIService 业务调度中枢。统一承接自研 HTTP 微服务网关路由分发，维护「单用户多会话」隔离树 (chatInformation[userId][sessionId])，协调大模型多策略调用、本地工具 MCP 执行与 RabbitMQ 异步入库。",
+    threadModel: "多线程并发处理业务请求，按 session_id 隔离 AIHelper 实例",
+    keyConcepts: ["单用户多会话隔离 (chatInformation)", "业务分发与 Handler 路由", "前后端数据解耦"]
+  },
+  {
+    id: "mod_ai_rag",
+    projectId: "proj_cppai",
+    name: "RAG 检索增强生成与知识库引擎",
+    category: "AI",
+    layer: "Knowledge Retrieval",
+    sourceFiles: ["AIApps/ChatServer/src/AIUtil/AIStrategy.cpp", "AIApps/ChatServer/include/AIUtil/AIStrategy.h"],
+    classes: ["AliyunRAGStrategy", "AIStrategy"],
+    functions: ["buildRequest()", "parseResponse()", "retrieveKnowledge()"],
+    desc: "Retrieval-Augmented Generation 检索增强生成引擎。将私有知识库 (PDF/Word/Markdown) 向量化切片召回，在模型推理前置注入关联上下文，彻底杜绝大语言模型事实性幻觉。",
+    threadModel: "无状态检索策略，多线程共享",
+    keyConcepts: ["向量语义检索 (Embedding)", "上下文提示词动态增强", "知识库 ID 鉴权隔离"]
   }
 ];
 
@@ -371,6 +423,46 @@ var DOMAIN_KNOWLEDGE_NODES = [
     yuqueDocIds: ["yq_16", "yq_17"],
     summary: "前端将图片 Base64 编码上传，后端解码并调用 OpenCV 进行尺寸归一化，灌入本地 ONNX Runtime 执行前向传播。",
     interviewTrap: "图像预处理在 C++ 中如何避免深拷贝？ONNX 的 Session 是线程安全的吗？"
+  },
+  {
+    id: "know_client_ingress",
+    title: "高并发长连接客户端与全双工协议接入",
+    category: "Network",
+    moduleId: "mod_net_client",
+    muduoDays: [1, 5, 9],
+    yuqueDocIds: ["yq_01", "yq_03"],
+    summary: "客户端发起非阻塞 TCP 握手并维持长连接，承载高频 HTTP 请求与 SSE 实时数据流推送。",
+    interviewTrap: "长连接心跳保活与 TCP KeepAlive 有何本质区别？为什么现代 Web 通常推荐应用层心跳？"
+  },
+  {
+    id: "know_kernel_epoll_arch",
+    title: "Linux epoll 水平触发 vs 边缘触发与内核数据结构",
+    category: "Network",
+    moduleId: "mod_kernel_epoll",
+    muduoDays: [8, 13, 26],
+    yuqueDocIds: ["yq_01", "yq_04"],
+    summary: "Linux epoll 基于红黑树高效管理海量注册 fd，基于双向就绪链表实现 O(1) 事件唤醒通知。",
+    interviewTrap: "epoll 的 LT 与 ET 模式有什么区别？为什么在 ET 模式下读写套接字必须循环读取直至 EAGAIN？"
+  },
+  {
+    id: "know_chatserver_multisession",
+    title: "单用户多会话隔离与业务智能路由调度",
+    category: "AI",
+    moduleId: "mod_ai_chatserver",
+    muduoDays: [14, 19, 28],
+    yuqueDocIds: ["yq_10", "yq_16", "yq_17"],
+    summary: "从单用户单会话重构为多会话树 (chatInformation[userId][sessionId])，保证上下文隔离与历史并发回溯。",
+    interviewTrap: "在多线程 HTTP 服务中，如何设计单用户多会话的并发互斥？锁粒度如何控制以保证高吞吐？"
+  },
+  {
+    id: "know_rag_vector_retrieval",
+    title: "RAG 私有知识库向量化召回与防幻觉注入",
+    category: "AI",
+    moduleId: "mod_ai_rag",
+    muduoDays: [27, 28],
+    yuqueDocIds: ["yq_10", "yq_17"],
+    summary: "构建私有知识库切片，利用向量数据库进行相似度检索，并将命中片段前置组装入 Prompt 提示词上下文。",
+    interviewTrap: "RAG 与模型微调 (Fine-Tuning) 的核心差异是什么？在时效性与准确性场景下如何做技术选型？"
   }
 ];
 

@@ -100,7 +100,7 @@ console.log('✓ Test 2 Passed!\n');
 // 3. 验证领域数据字典
 console.log('[Test 3] 验证领域模型与模块完整度...');
 assert.strictEqual(context.DOMAIN_PROJECTS.length, 2, 'DOMAIN_PROJECTS should have 2 projects');
-assert.strictEqual(context.DOMAIN_MODULES.length, 19, 'DOMAIN_MODULES should have 19 modules');
+assert.strictEqual(context.DOMAIN_MODULES.length, 23, 'DOMAIN_MODULES should have 23 modules');
 console.log(`  - 核心项目: ${context.DOMAIN_PROJECTS.map(p => p.id).join(', ')}`);
 console.log(`  - 领域模块总数: ${context.DOMAIN_MODULES.length}`);
 console.log('✓ Test 3 Passed!\n');
@@ -156,8 +156,26 @@ console.log(`  - 双核核心模块数: ${statSourceVal}`);
 
 assert.ok(statProgVal.includes('%'), 'stat-progress-val must contain %');
 assert.ok(statMasteryVal.includes('17'), 'stat-mastery-val must contain 17');
-assert.ok(statSourceVal.includes('19'), 'stat-source-val must contain 19');
+assert.ok(statSourceVal.includes('23'), 'stat-source-val must contain 23');
 console.log('✓ Test 7 Passed!\n');
+
+// 8. 验证 CppAIService 语雀知识库全量加载与渲染 (renderYuqueExplorer)
+console.log('[Test 8] 验证 CppAIService 语雀知识库加载与渲染...');
+const yqData = context.getYuqueDataset();
+assert.ok(Array.isArray(yqData), 'getYuqueDataset() must return an array');
+assert.strictEqual(yqData.length, 17, 'getYuqueDataset() must return exactly 17 articles');
+console.log(`  - 成功获取语雀专栏: ${yqData.length} 篇文档, 第一篇: 《${yqData[0].title}》`);
+
+context.switchView('knowledge');
+const dirListEl = domStore['yq-directory-list'];
+const readerTitleEl = domStore['yq-reader-title'];
+const readerBodyEl = domStore['yq-reader-body'];
+
+assert.ok(dirListEl && dirListEl.innerHTML.length > 100, 'yq-directory-list should be rendered with articles');
+assert.ok(readerTitleEl && readerTitleEl.innerText.length > 0, 'yq-reader-title should have active article title');
+assert.ok(readerBodyEl && readerBodyEl.innerHTML.length > 100, 'yq-reader-body should have rendered markdown content');
+console.log(`  - 专栏目录树与阅读器正文渲染正常 (标题: ${readerTitleEl?.innerText}, 正文字符: ${readerBodyEl?.innerHTML?.length})`);
+console.log('✓ Test 8 Passed!\n');
 
 console.log('===============================================================');
 console.log('🎉 PHASE 3 全部自动化测试验收通过！双核拓扑与全景交互就绪！');
