@@ -253,6 +253,9 @@
             <button onclick="switchView('career')" id="nav-career" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="求职能力与工程凭证">
                 <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力与凭证 (P6)
             </button>
+            <button onclick="switchView('scheduler')" id="nav-scheduler" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="智能任务调度与日历同步">
+                <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 智能排程与日历 (P7)
+            </button>
         </nav>
 
         <!-- 任务边栏常驻快捷开关按钮 -->
@@ -1673,6 +1676,192 @@
             </div>
         </div>
     </section>
+
+    <!-- ==================== VIEW: 智能任务调度与日历同步体系 (Phase 7) ==================== -->
+    <section id="view-scheduler" class="hidden space-y-6">
+        <!-- 头部导航与核心指引 -->
+        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-stone-100">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-xs font-serifMono mb-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+                        <span class="font-bold">PERSONAL SCHEDULER & RFC 5545 CALENDAR SYNC</span>
+                        <span class="text-stone-300">•</span>
+                        <span>真实日历 ➔ 赤字压缩 ➔ 根因诊断 ➔ 复盘联动</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
+                        <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 智能任务调度与日历同步引擎 (P7)
+                    </h2>
+                    <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
+                        深度整合原生 RFC 5545 iCal/ICS 解析器与 Google Tasks，真实计算事件冲突与连续专注块。
+                        实施 <span class="font-semibold text-stone-700 font-serifMono">S(3h)➔A(1h)➔A(1h)➔B(0.5h)➔C</span> 严格优先级流水线。
+                        在时间赤字时自动压缩次要通识并誓死保卫核心主干；未完成强制归因诊断，复盘直接打通 Phase 6 工程凭据。
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 font-serifMono shrink-0">
+                    <button onclick="openCalendarImportModal()" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" id="btn-open-calendar-import">
+                        <i class="fa-solid fa-file-import"></i> 导入日历/待办
+                    </button>
+                    <button onclick="runSmartScheduleCalculation()" class="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" id="btn-recalculate-schedule">
+                        <i class="fa-solid fa-calculator"></i> 重新计算排程
+                    </button>
+                    <button onclick="generateAndExportDailyReview()" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" id="btn-generate-daily-review">
+                        <i class="fa-solid fa-clipboard-check"></i> 生成今日复盘
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 大子体系切换标签导航 -->
+            <div class="flex items-center gap-2 overflow-x-auto pt-4 pb-1 font-serifMono text-xs" id="scheduler-subtabs-nav">
+                <button onclick="switchSchedulerTab('planner')" id="scheduler-tab-btn-planner" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-timeline text-cyan-400"></i> 1. 今日智能时间轴与心流块
+                </button>
+                <button onclick="switchSchedulerTab('calendar')" id="scheduler-tab-btn-calendar" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-calendar-days text-sky-600"></i> 2. 外部日历冲突与空闲矩阵
+                </button>
+                <button onclick="switchSchedulerTab('diagnostics')" id="scheduler-tab-btn-diagnostics" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-stethoscope text-amber-600"></i> 3. 任务未完成工程根因诊断
+                </button>
+                <button onclick="switchSchedulerTab('review')" id="scheduler-tab-btn-review" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-file-contract text-emerald-600"></i> 4. 每日工程复盘与成长报表
+                </button>
+            </div>
+        </div>
+
+        <!-- 子面板 1: 今日智能时间轴与心流块 (Planner) -->
+        <div id="scheduler-pane-planner" class="space-y-6">
+            <!-- 核心指标摘要网格 -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="scheduler-stats-container">
+                <!-- 由 JS 填充：需求工时、实际可用工时、赤字压缩状态、编排心流块数 -->
+            </div>
+
+            <!-- 时间赤字警示与逐级压缩明细条 -->
+            <div id="scheduler-deficit-alert-container"></div>
+
+            <!-- 时间轴日程卡片流水线 -->
+            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+                <div class="flex items-center justify-between pb-4 mb-4 border-b border-stone-100">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
+                            <i class="fa-solid fa-bars-staggered text-cyan-600"></i>
+                            <span>今日心流编排队列 (上下文切换最小化)</span>
+                        </h3>
+                        <p class="text-xs text-stone-500 mt-0.5">深层连续工作块优先，任务间嵌入 10m 认知缓冲，杜绝任务碎片化交织。</p>
+                    </div>
+                    <span class="text-xs font-serifMono text-stone-400" id="scheduler-current-date-label"></span>
+                </div>
+                <div class="space-y-3" id="scheduler-timeline-grid">
+                    <!-- 动态填充时间轴卡片 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 子面板 2: 外部日历冲突与空闲矩阵 (Calendar & Tasks) -->
+        <div id="scheduler-pane-calendar" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 mb-4 border-b border-stone-100">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-sky-600"></i>
+                            <span>已同步外部日历源与事件状态</span>
+                        </h3>
+                        <p class="text-xs text-stone-500 mt-0.5">真实解析 RFC 5545 VEVENT，包含全天、时区与重复规则。</p>
+                    </div>
+                    <div id="calendar-source-badge" class="font-serifMono text-xs"></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <!-- 左列：外部事件冲突与占用区间 -->
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold text-stone-700 font-serifHeading flex items-center gap-1.5">
+                            <i class="fa-solid fa-user-clock text-rose-500"></i> 外部繁忙日程区间 (Busy Intervals)
+                        </h4>
+                        <div class="space-y-2 max-h-96 overflow-y-auto pr-1" id="calendar-busy-list">
+                            <!-- 动态填充 -->
+                        </div>
+                    </div>
+                    <!-- 右列：计算所得空闲专注块 -->
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold text-stone-700 font-serifHeading flex items-center gap-1.5">
+                            <i class="fa-solid fa-bolt text-emerald-600"></i> 可用连续空闲专注块 (Free Focus Windows)
+                        </h4>
+                        <div class="space-y-2 max-h-96 overflow-y-auto pr-1" id="calendar-free-slots-list">
+                            <!-- 动态填充 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google Tasks 同步状态卡 -->
+            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-stone-100">
+                    <h3 class="text-sm font-bold text-stone-900 font-serifHeading flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i> Google Tasks / 外部待办导入清单
+                    </h3>
+                    <span class="text-xs font-serifMono text-stone-400" id="google-tasks-count-badge">共 0 条</span>
+                </div>
+                <div class="space-y-2" id="google-tasks-container">
+                    <!-- 动态填充任务 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 子面板 3: 任务未完成工程根因诊断 (Diagnostics) -->
+        <div id="scheduler-pane-diagnostics" class="space-y-6 hidden">
+            <!-- 未完成任务诊断工作台 -->
+            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+                <div class="pb-4 mb-4 border-b border-stone-100">
+                    <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
+                        <i class="fa-solid fa-stethoscope text-amber-600"></i>
+                        <span>今日未完成任务技术归因 (严禁盲目顺延，必须追查根因)</span>
+                    </h3>
+                    <p class="text-xs text-stone-500 mt-0.5">
+                        按 5 大工程归因标准进行定性分析。根据深层卡点或工时低估，自适应输出拆分、前置学习补齐或延后对策。
+                    </p>
+                </div>
+                <div class="space-y-3" id="scheduler-incomplete-tasks-list">
+                    <!-- 动态填充今日未完成任务与诊断按钮 -->
+                </div>
+            </div>
+
+            <!-- 历史诊断与调优记录 -->
+            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+                <h3 class="text-sm font-bold text-stone-900 font-serifHeading mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-book-medical text-stone-700"></i> 历史工程根因诊断与对策档案
+                </h3>
+                <div class="space-y-3" id="scheduler-diagnostics-history-container">
+                    <!-- 动态填充诊断历史记录卡片 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 子面板 4: 每日工程复盘与成长报表 (Review - 打通 P6) -->
+        <div id="scheduler-pane-review" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 mb-4 border-b border-stone-100">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
+                            <i class="fa-solid fa-file-contract text-emerald-600"></i>
+                            <span>今日工程复盘报表 (已自动打通 Phase 6 真实凭据)</span>
+                        </h3>
+                        <p class="text-xs text-stone-500 mt-0.5">工时统计、未完成归因、今日产出 Evidence 与能力雷达增量全景报表。</p>
+                    </div>
+                    <div class="flex items-center gap-2 font-serifMono text-xs">
+                        <button onclick="copyReviewMarkdownToClipboard()" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold transition flex items-center gap-1 cursor-pointer" id="btn-copy-review-md">
+                            <i class="fa-solid fa-copy"></i> 复制 Markdown
+                        </button>
+                        <button onclick="downloadReviewMarkdown()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition flex items-center gap-1 shadow-xs cursor-pointer" id="btn-download-review-md">
+                            <i class="fa-solid fa-download"></i> 导出 .md
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 报表预览容器 -->
+                <div class="p-4 sm:p-6 bg-stone-50 rounded-xl border border-stone-200/80 font-serifMono text-xs text-stone-800 leading-relaxed whitespace-pre-wrap select-text" id="scheduler-review-content">
+                    <!-- 由 JS 填充每日复盘 Markdown -->
+                </div>
+            </div>
+        </div>
+    </section>
         </main>
 
         <!-- 移动端遮罩层 (在小于 xl 屏幕抽屉打开时显示) -->
@@ -2614,6 +2803,115 @@ add_executable(my_server ${SOURCES})</pre>
     </div>
 </div>
 
+<!-- ==================== Phase 7: 外部日历与待办导入模态框 ==================== -->
+<div id="calendar-import-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-label="外部日历与待办导入">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl border border-stone-200 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+            <h4 class="font-bold text-stone-900 text-base font-serifHeading flex items-center gap-2">
+                <i class="fa-solid fa-calendar-plus text-cyan-600"></i>
+                <span>真实导入 Google Calendar / Tasks (.ics & JSON)</span>
+            </h4>
+            <button onclick="closeCalendarImportModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="space-y-4 font-serifMono text-xs">
+            <!-- 导入源选项 -->
+            <div class="flex items-center gap-2 border-b border-stone-200 pb-2">
+                <button type="button" onclick="setCalendarImportTab('file')" id="cal-import-tab-file" class="px-3 py-1.5 rounded-lg bg-stone-900 text-white font-bold cursor-pointer">
+                    <i class="fa-solid fa-file-arrow-up mr-1"></i> 1. 上传 .ics 文件
+                </button>
+                <button type="button" onclick="setCalendarImportTab('text')" id="cal-import-tab-text" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold cursor-pointer">
+                    <i class="fa-solid fa-paste mr-1"></i> 2. 粘贴 ICS 文本
+                </button>
+                <button type="button" onclick="setCalendarImportTab('tasks')" id="cal-import-tab-tasks" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold cursor-pointer">
+                    <i class="fa-solid fa-list-check mr-1"></i> 3. Google Tasks 导入
+                </button>
+            </div>
+
+            <!-- 子表单 1: 文件上传 -->
+            <div id="cal-import-pane-file" class="space-y-3">
+                <p class="text-stone-600">选择您从 Google Calendar 或 Outlook 导出的标准 RFC 5545 <code>.ics</code> 文件：</p>
+                <input type="file" id="ics-file-input" accept=".ics,text/calendar" class="w-full bg-stone-50 border border-stone-300 rounded-xl p-3 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer" />
+                <p class="text-[11px] text-stone-400">💡 原生客户端解析，无需任何外部服务器中转，零数据泄露风险。</p>
+            </div>
+
+            <!-- 子表单 2: 文本粘贴 -->
+            <div id="cal-import-pane-text" class="space-y-3 hidden">
+                <label class="block text-stone-700 font-bold">直接粘贴 iCalendar (RFC 5545) 格式内容：</label>
+                <textarea id="ics-paste-input" rows="6" placeholder="BEGIN:VCALENDAR&#10;VERSION:2.0&#10;BEGIN:VEVENT&#10;SUMMARY:团队周会&#10;DTSTART:20260912T140000&#10;DTEND:20260912T153000&#10;END:VEVENT&#10;END:VCALENDAR" class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-cyan-500 font-mono-code text-[11px]"></textarea>
+            </div>
+
+            <!-- 子表单 3: Google Tasks 导入 -->
+            <div id="cal-import-pane-tasks" class="space-y-3 hidden">
+                <label class="block text-stone-700 font-bold">粘贴 Google Tasks 导出 JSON 或 Markdown 待办：</label>
+                <textarea id="tasks-paste-input" rows="6" placeholder='[&#10;  { "title": "完善 CppAIService HTTP 状态机解析", "due": "2026-09-12" },&#10;  { "title": "刷 3 道高频链表手撕题", "due": "2026-09-12" }&#10;]' class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-cyan-500 font-mono-code text-[11px]"></textarea>
+            </div>
+
+            <!-- 目标日期选择 -->
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">匹配目标日期 (默认今日)</label>
+                <input type="date" id="calendar-target-date" class="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800" />
+            </div>
+
+            <div class="pt-3 border-t border-stone-200 flex items-center justify-end gap-2">
+                <button type="button" onclick="closeCalendarImportModal()" class="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold transition cursor-pointer">取消</button>
+                <button type="button" onclick="submitCalendarImport()" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold transition cursor-pointer shadow-xs">
+                    解析并载入排程
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Phase 7: 任务未完成工程根因诊断模态框 ==================== -->
+<div id="task-diagnostic-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-label="任务工程根因诊断">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-5 sm:p-7 shadow-2xl border border-stone-200 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+            <h4 class="font-bold text-stone-900 text-base font-serifHeading flex items-center gap-2">
+                <i class="fa-solid fa-stethoscope text-amber-600"></i>
+                <span>任务未完成工程根因归因诊断</span>
+            </h4>
+            <button onclick="closeTaskDiagnosticModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form id="task-diagnostic-form" onsubmit="submitTaskDiagnostic(event)" class="space-y-4 font-serifMono text-xs">
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">未完成目标任务 *</label>
+                <select id="diag-task-select" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 font-serifHeading font-bold focus:outline-none focus:border-amber-500" required>
+                    <!-- 动态填充未完成任务 -->
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">技术归因类别 (5 大工程标准) *</label>
+                <select id="diag-reason-select" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-amber-500" required>
+                    <option value="underestimated_time">工时预估过紧：模块复杂度超预期，需自适应提高估时乘数</option>
+                    <option value="high_complexity">深层技术卡点：竞态死锁、内存越界，需专属调试排错探针</option>
+                    <option value="missing_prerequisites">前置知识欠缺：底层机理不清晰，需排入前置支撑学习通道</option>
+                    <option value="time_squeezed">外部事务挤占：日历临时会议/突发事务打断，顺延至明日空闲槽</option>
+                    <option value="energy_depletion">认知负荷与精力透支：高强度攻坚后脑力衰竭，强制降级放空</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">现场分析手记与技术卡点细节 *</label>
+                <textarea id="diag-notes" rows="4" required placeholder="记录为什么超时或卡住：例如遇上了 epoll ET 模式下循环 read 返回 EAGAIN 时的缓冲区残余，还是 gdb 单步跟踪耗费大量时间..." class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-amber-500 font-sans"></textarea>
+            </div>
+
+            <div class="pt-3 border-t border-stone-200 flex items-center justify-end gap-2">
+                <button type="button" onclick="closeTaskDiagnosticModal()" class="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold transition cursor-pointer">取消</button>
+                <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold transition cursor-pointer shadow-xs">
+                    录入诊断并生成自适应建议
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
     <!-- 模块化外部脚本加载（无打包依赖，原生静态秒开） -->
     <script src="js/dataset-28days.js?v=5.4.1"></script>
     <script src="js/dataset-mappings.js?v=5.4.1"></script>
@@ -2622,6 +2920,7 @@ add_executable(my_server ${SOURCES})</pre>
     <script src="js/dataset-tasks.js?v=6.0.0"></script>
     <script src="js/dataset-learning.js?v=6.0.0"></script>
     <script src="js/dataset-career.js?v=6.0.0"></script>
+    <script src="js/dataset-scheduler.js?v=7.0.0"></script>
     <script src="js/state-manager.js?v=6.0.0"></script>
     <script src="js/timer.js?v=6.0.0"></script>
     <script src="js/yuque-explorer.js?v=6.0.0"></script>

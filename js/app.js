@@ -82,6 +82,25 @@ var appState = {
         seconds: 0,
         day: 1,
         type: 'coding'
+    },
+    learningSystem: {
+        activeTab: 'cpp',
+        bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+        algoReviewQueue: {},
+        qaMastery: {}
+    },
+    careerSystem: {
+        activeCareerTab: 'evidence',
+        customEvidences: [],
+        mockInterviewLogs: []
+    },
+    schedulerSystem: {
+        activeSchedulerTab: 'planner',
+        calendarSource: { type: 'none', fileName: '', lastSyncTime: null, events: [] },
+        googleTasks: [],
+        dailySchedule: { date: '', availableMinutes: 840, freeSlots: [], scheduledBlocks: [], deficitMinutes: 0, compressionApplied: false, compressionLogs: [] },
+        incompleteDiagnostics: {},
+        dailyReviews: {}
     }
 };
 window.appState = appState;
@@ -381,7 +400,7 @@ function switchView(viewName) {
     }
 
     appState.currentView = viewName;
-    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls', 'career'];
+    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls', 'career', 'scheduler'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -414,6 +433,8 @@ function switchView(viewName) {
         renderPitfallsList();
     } else if (viewName === 'career') {
         renderCareerSystem();
+    } else if (viewName === 'scheduler') {
+        renderSchedulerSystem();
     }
 }
 
@@ -2137,6 +2158,11 @@ function closeCrossLinkModal() {
 function toggleAlgoReview(problemNum) {
     if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleAlgoReview === 'function') {
         const res = stateManager.toggleAlgoReview(problemNum);
+        if (typeof appState !== 'undefined' && appState) {
+            if (!appState.learningSystem) appState.learningSystem = {};
+            if (!appState.learningSystem.algoReviewQueue) appState.learningSystem.algoReviewQueue = {};
+            appState.learningSystem.algoReviewQueue[problemNum] = res;
+        }
         renderLearningAlgoTab();
         if (typeof showToast === 'function') {
             showToast(res === 'mastered' ? `算法 #${problemNum} 已标记二刷掌握` : `算法 #${problemNum} 已设为待复习`);
@@ -2159,6 +2185,11 @@ function toggleAlgoReview(problemNum) {
 function adjustBookDailyGoal(bookKey, delta) {
     if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.adjustBookDailyGoal === 'function') {
         const res = stateManager.adjustBookDailyGoal(bookKey, delta);
+        if (typeof appState !== 'undefined' && appState) {
+            if (!appState.learningSystem) appState.learningSystem = {};
+            if (!appState.learningSystem.bookDynamicGoals) appState.learningSystem.bookDynamicGoals = { linuxServer: 10, birdLinux: 10 };
+            appState.learningSystem.bookDynamicGoals[bookKey] = res;
+        }
         renderLearningBooksTab();
         if (typeof showToast === 'function') {
             showToast(`书目目标调整为: ${res} 页/天`);
@@ -2181,6 +2212,11 @@ function adjustBookDailyGoal(bookKey, delta) {
 function toggleQAMastery(qaId) {
     if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleQAMastery === 'function') {
         const res = stateManager.toggleQAMastery(qaId);
+        if (typeof appState !== 'undefined' && appState) {
+            if (!appState.learningSystem) appState.learningSystem = {};
+            if (!appState.learningSystem.qaMastery) appState.learningSystem.qaMastery = {};
+            appState.learningSystem.qaMastery[qaId] = res;
+        }
         renderLearningQATab();
         if (typeof showToast === 'function') {
             showToast(res ? `八股考点已标记掌握` : `八股考点设为待巩固`);
@@ -3237,6 +3273,745 @@ function fallbackCopyText(text, successMsg) {
     } catch (e) {
         console.warn('Copy failed:', e);
     }
+}
+
+// ==========================================================================
+// Phase 7: 智能任务调度与日历同步引擎 (App Implementation)
+// ==========================================================================
+
+function getSchedulerSystemState() {
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getState === 'function') {
+        const s = stateManager.getState();
+        if (s && s.schedulerSystem) return s.schedulerSystem;
+    }
+    if (!appState.schedulerSystem) {
+        appState.schedulerSystem = {
+            calendarSource: { type: 'none', fileName: '', lastSyncTime: null, events: [] },
+            googleTasks: [],
+            dailySchedule: {
+                date: (typeof RFC5545Parser !== 'undefined' && RFC5545Parser.getTodayDateStr) ? RFC5545Parser.getTodayDateStr() : new Date().toISOString().slice(0, 10),
+                availableMinutes: 840,
+                freeSlots: [],
+                scheduledBlocks: [],
+                deficitMinutes: 0,
+                compressionApplied: false,
+                compressionLogs: []
+            },
+            incompleteDiagnostics: {},
+            dailyReviews: {},
+            activeSchedulerTab: 'planner'
+        };
+    }
+    return appState.schedulerSystem;
+}
+
+function switchSchedulerTab(tabKey, updateState = true) {
+    const tabs = ['planner', 'calendar', 'diagnostics', 'review'];
+    tabs.forEach(k => {
+        const btn = document.getElementById(`scheduler-tab-btn-${k}`);
+        const pane = document.getElementById(`scheduler-pane-${k}`);
+        if (btn) {
+            btn.className = (k === tabKey)
+                ? 'px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer'
+                : 'px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer';
+        }
+        if (pane) {
+            if (k === tabKey) pane.classList.remove('hidden');
+            else pane.classList.add('hidden');
+        }
+    });
+
+    if (updateState && typeof stateManager !== 'undefined' && stateManager && typeof stateManager.setSchedulerTab === 'function') {
+        stateManager.setSchedulerTab(tabKey);
+    }
+
+    if (tabKey === 'planner') {
+        renderSchedulerPlanner();
+    } else if (tabKey === 'calendar') {
+        renderSchedulerCalendar();
+    } else if (tabKey === 'diagnostics') {
+        renderSchedulerDiagnostics();
+    } else if (tabKey === 'review') {
+        renderSchedulerReview();
+    }
+}
+
+function renderSchedulerSystem() {
+    const ss = getSchedulerSystemState();
+    const activeTab = ss.activeSchedulerTab || 'planner';
+    switchSchedulerTab(activeTab, false);
+}
+
+// 1. 子面板 1: 今日智能时间轴与心流块
+function renderSchedulerPlanner() {
+    const ss = getSchedulerSystemState();
+    const dateLabel = document.getElementById('scheduler-current-date-label');
+    const statsContainer = document.getElementById('scheduler-stats-container');
+    const deficitContainer = document.getElementById('scheduler-deficit-alert-container');
+    const timelineGrid = document.getElementById('scheduler-timeline-grid');
+    if (!timelineGrid) return;
+
+    const todayStr = (typeof RFC5545Parser !== 'undefined' && RFC5545Parser.getTodayDateStr)
+        ? RFC5545Parser.getTodayDateStr()
+        : new Date().toISOString().slice(0, 10);
+
+    if (dateLabel) {
+        dateLabel.innerText = `排程基准日期：${todayStr}`;
+    }
+
+    let dailyPlan = ss.dailySchedule;
+    if (!dailyPlan || !dailyPlan.scheduledBlocks || dailyPlan.scheduledBlocks.length === 0) {
+        // 首次未计算排程时自动触发基准计算
+        runSmartScheduleCalculation(false);
+        dailyPlan = ss.dailySchedule;
+    }
+
+    const availableMin = dailyPlan ? (dailyPlan.availableMinutes || 0) : 840;
+    const deficitMin = dailyPlan ? (dailyPlan.deficitMinutes || 0) : 0;
+    const blocks = dailyPlan ? (dailyPlan.scheduledBlocks || []) : [];
+    const totalDemanded = 405; // 6.75h
+
+    // 渲染摘要卡片
+    if (statsContainer) {
+        statsContainer.innerHTML = `
+            <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                <span class="text-[11px] font-serifMono text-stone-400 font-bold block">标准全量需求工时</span>
+                <span class="text-xl font-bold font-serifMono text-stone-900">${(totalDemanded / 60).toFixed(1)}h</span>
+                <span class="text-[10px] text-stone-500 block mt-0.5">6级流水线标准负荷 (405m)</span>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                <span class="text-[11px] font-serifMono text-stone-400 font-bold block">外部日历可用工时</span>
+                <span class="text-xl font-bold font-serifMono ${availableMin < totalDemanded ? 'text-amber-700' : 'text-emerald-700'}">${(availableMin / 60).toFixed(1)}h</span>
+                <span class="text-[10px] text-stone-500 block mt-0.5">${availableMin} 分钟有效专注窗口</span>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                <span class="text-[11px] font-serifMono text-stone-400 font-bold block">时间赤字与模式</span>
+                <span class="text-xl font-bold font-serifMono ${deficitMin > 0 ? 'text-rose-700' : 'text-sky-700'}">
+                    ${deficitMin > 0 ? `-${deficitMin}m` : '无赤字'}
+                </span>
+                <span class="text-[10px] ${deficitMin > 0 ? 'text-rose-600' : 'text-emerald-700'} block mt-0.5">
+                    ${deficitMin > 0 ? '自适应逐级压缩中' : '充裕·保质执行'}
+                </span>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                <span class="text-[11px] font-serifMono text-stone-400 font-bold block">编排心流块数</span>
+                <span class="text-xl font-bold font-serifMono text-indigo-700">${blocks.length} 块</span>
+                <span class="text-[10px] text-stone-500 block mt-0.5">认知上下文切换最小化</span>
+            </div>
+        `;
+    }
+
+    // 渲染赤字警示与压缩明细
+    if (deficitContainer) {
+        if (dailyPlan && dailyPlan.compressionApplied && dailyPlan.compressionLogs && dailyPlan.compressionLogs.length > 0) {
+            const logsHtml = dailyPlan.compressionLogs.map(log => `<li class="flex items-start gap-1.5"><i class="fa-solid fa-angle-right text-amber-600 mt-1"></i><span>${log}</span></li>`).join('');
+            deficitContainer.innerHTML = `
+                <div class="p-4 rounded-2xl bg-amber-50/90 border border-amber-300 text-amber-950 font-serifMono text-xs space-y-2">
+                    <div class="flex items-center justify-between font-bold text-sm">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                            <span>触发自适应时间赤字压缩（今日可用工时不足，自动保护 S 级与 A 级主干）</span>
+                        </span>
+                        <span class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[11px]">赤字 ${deficitMin}m</span>
+                    </div>
+                    <ul class="space-y-1 text-[11.5px] text-stone-700 pl-1">
+                        ${logsHtml}
+                    </ul>
+                </div>
+            `;
+        } else {
+            deficitContainer.innerHTML = '';
+        }
+    }
+
+    // 渲染时间轴卡片
+    if (blocks.length === 0) {
+        timelineGrid.innerHTML = `
+            <div class="text-center py-10 text-stone-400 font-serifMono text-xs">
+                <i class="fa-solid fa-calendar-xmark text-3xl mb-2 text-stone-300"></i>
+                <p>当前无编排日程，请点击右上角「重新计算排程」或「导入日历」。</p>
+            </div>
+        `;
+        return;
+    }
+
+    timelineGrid.innerHTML = blocks.map((b, idx) => {
+        const tierBadge = b.tier === 'S'
+            ? 'bg-amber-100 text-amber-900 border-amber-300'
+            : (b.tier === 'A'
+                ? 'bg-sky-100 text-sky-900 border-sky-300'
+                : (b.tier === 'B'
+                    ? 'bg-purple-100 text-purple-900 border-purple-300'
+                    : 'bg-emerald-100 text-emerald-900 border-emerald-300'));
+
+        const isCompleted = b.status === 'completed';
+
+        return `
+            <div class="p-4 rounded-xl border ${isCompleted ? 'bg-stone-50/80 border-stone-200 opacity-70' : 'bg-white border-stone-200 hover:border-stone-400'} academic-card transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-start sm:items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-base text-stone-700 shrink-0 font-serifMono font-bold">
+                        ${idx + 1}
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <span class="px-2 py-0.5 rounded-md border font-serifMono font-bold text-[10px] ${tierBadge}">
+                                [${b.tier}级] ${b.tierKey || ''}
+                            </span>
+                            <span class="font-serifMono font-bold text-xs text-stone-900">
+                                ${b.startTimeStr} ~ ${b.endTimeStr}
+                            </span>
+                            <span class="text-[11px] font-serifMono text-stone-400">
+                                (${b.durationMinutes} min)
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-sm text-stone-900 font-serifHeading ${isCompleted ? 'line-through text-stone-400' : ''}">
+                            <i class="fa-solid ${b.icon || 'fa-cubes'} text-${b.color || 'stone'}-600 mr-1.5"></i>
+                            ${b.title}
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 font-serifMono text-xs shrink-0 self-end sm:self-auto">
+                    <button onclick="toggleScheduledBlockStatus('${b.id}')" class="px-3 py-1.5 rounded-xl border ${isCompleted ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200'} font-bold transition flex items-center gap-1 cursor-pointer">
+                        <i class="fa-solid ${isCompleted ? 'fa-circle-check text-emerald-600' : 'fa-circle text-stone-400'}"></i>
+                        <span>${isCompleted ? '已完成' : '打卡标记'}</span>
+                    </button>
+                    ${!isCompleted ? `
+                        <button onclick="openTaskDiagnosticModal('${b.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold transition flex items-center gap-1 cursor-pointer" title="遇到卡点/未完成时录入工程归因">
+                            <i class="fa-solid fa-stethoscope text-amber-600"></i>
+                            <span>诊断</span>
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function toggleScheduledBlockStatus(blockId) {
+    const ss = getSchedulerSystemState();
+    if (!ss.dailySchedule || !Array.isArray(ss.dailySchedule.scheduledBlocks)) return;
+    const blk = ss.dailySchedule.scheduledBlocks.find(b => b.id === blockId);
+    if (!blk) return;
+    blk.status = (blk.status === 'completed') ? 'scheduled' : 'completed';
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.updateDailySchedule === 'function') {
+        stateManager.updateDailySchedule(ss.dailySchedule);
+    }
+    renderSchedulerPlanner();
+    if (typeof showToast === 'function') {
+        showToast(blk.status === 'completed' ? `已完成: ${blk.title}` : `已恢复: ${blk.title}`);
+    }
+}
+
+// 2. 子面板 2: 外部日历冲突与空闲矩阵
+function renderSchedulerCalendar() {
+    const ss = getSchedulerSystemState();
+    const sourceBadge = document.getElementById('calendar-source-badge');
+    const busyList = document.getElementById('calendar-busy-list');
+    const freeList = document.getElementById('calendar-free-slots-list');
+    const tasksContainer = document.getElementById('google-tasks-container');
+    const tasksCountBadge = document.getElementById('google-tasks-count-badge');
+
+    const cal = ss.calendarSource || { type: 'none', events: [] };
+    const events = Array.isArray(cal.events) ? cal.events : [];
+    const tasks = Array.isArray(ss.googleTasks) ? ss.googleTasks : [];
+
+    if (sourceBadge) {
+        if (cal.type !== 'none' && events.length > 0) {
+            sourceBadge.innerHTML = `
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>已载入：${cal.fileName || '外部日历'} (${events.length} 个事件)</span>
+                </span>
+            `;
+        } else {
+            sourceBadge.innerHTML = `
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-100 text-stone-600 border border-stone-200">
+                    <span class="w-2 h-2 rounded-full bg-stone-400"></span>
+                    <span>未载入外部日历 (点击上方「导入日历」上传 .ics)</span>
+                </span>
+            `;
+        }
+    }
+
+    // 计算可用矩阵
+    const matrix = (typeof TimeConflictMatrix !== 'undefined')
+        ? TimeConflictMatrix.calculateAvailability(events)
+        : { mergedBusy: [], freeSlots: [] };
+
+    // 渲染 busy 区间
+    if (busyList) {
+        if (matrix.mergedBusy.length === 0) {
+            busyList.innerHTML = `
+                <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 text-stone-400 text-xs font-serifMono text-center">
+                    今日无外部冲突会议/课程占用，专注窗口充裕。
+                </div>
+            `;
+        } else {
+            busyList.innerHTML = matrix.mergedBusy.map(b => {
+                const sStr = (typeof TimeConflictMatrix !== 'undefined') ? TimeConflictMatrix._minToTimeStr(b.start) : `${b.start}m`;
+                const eStr = (typeof TimeConflictMatrix !== 'undefined') ? TimeConflictMatrix._minToTimeStr(b.end) : `${b.end}m`;
+                return `
+                    <div class="p-3 rounded-xl bg-rose-50/70 border border-rose-200 text-rose-950 font-serifMono text-xs flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-rose-900 block">${(b.titles || ['外部日程']).join(' / ')}</span>
+                            <span class="text-[11px] text-rose-700">${sStr} ~ ${eStr} (占用 ${b.end - b.start}m，含缓冲)</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-rose-200 text-rose-800 text-[10px] font-bold">BUSY</span>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // 渲染 free 区间
+    if (freeList) {
+        if (matrix.freeSlots.length === 0) {
+            freeList.innerHTML = `
+                <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-serifMono text-center">
+                    警告：外部日程已完全占满工作日，无连续空闲槽。
+                </div>
+            `;
+        } else {
+            freeList.innerHTML = matrix.freeSlots.map((s, idx) => `
+                <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-emerald-950 font-serifMono text-xs flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-emerald-900 block">连续专注时隙 #${idx + 1}</span>
+                        <span class="text-[11px] text-emerald-700">${s.startTimeStr} ~ ${s.endTimeStr} (${s.durationMinutes} 分钟可用)</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded bg-emerald-200 text-emerald-800 text-[10px] font-bold">FREE</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    // 渲染 Google Tasks
+    if (tasksCountBadge) tasksCountBadge.innerText = `共 ${tasks.length} 条`;
+    if (tasksContainer) {
+        if (tasks.length === 0) {
+            tasksContainer.innerHTML = `
+                <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 text-stone-400 text-xs font-serifMono text-center">
+                    暂未导入 Google Tasks 外部待办任务。可点击上方「导入日历/待办」批量导入。
+                </div>
+            `;
+        } else {
+            tasksContainer.innerHTML = tasks.map(t => `
+                <div class="p-3 rounded-xl bg-white border border-stone-200 font-serifMono text-xs flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-regular ${t.status === 'completed' ? 'fa-circle-check text-emerald-600' : 'fa-circle text-stone-400'}"></i>
+                        <span class="${t.status === 'completed' ? 'line-through text-stone-400' : 'text-stone-800 font-bold'}">${t.title}</span>
+                    </div>
+                    ${t.due ? `<span class="text-[10px] text-stone-400">截止: ${t.due}</span>` : ''}
+                </div>
+            `).join('');
+        }
+    }
+}
+
+// 3. 子面板 3: 任务未完成工程根因诊断
+function renderSchedulerDiagnostics() {
+    const ss = getSchedulerSystemState();
+    const incompleteContainer = document.getElementById('scheduler-incomplete-tasks-list');
+    const historyContainer = document.getElementById('scheduler-diagnostics-history-container');
+    if (!incompleteContainer) return;
+
+    // 获取今日任务待办
+    let routineTasks = [];
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getState === 'function') {
+        const s = stateManager.getState();
+        if (s && s.dailyRoutine && Array.isArray(s.dailyRoutine.tasks)) {
+            routineTasks = s.dailyRoutine.tasks;
+        }
+    }
+
+    const incomplete = routineTasks.filter(t => !t.completed);
+    const diags = ss.incompleteDiagnostics || {};
+
+    if (incomplete.length === 0) {
+        incompleteContainer.innerHTML = `
+            <div class="p-6 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-serifMono text-center">
+                <i class="fa-solid fa-circle-check text-2xl text-emerald-600 mb-2"></i>
+                <p class="font-bold">太棒了！今日常规待办任务已全部攻克完毕，无未完成项。</p>
+            </div>
+        `;
+    } else {
+        incompleteContainer.innerHTML = incomplete.map(t => {
+            const diag = diags[t.id];
+            return `
+                <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 academic-card font-serifMono text-xs space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-stone-900 font-serifHeading text-sm flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-bold font-serifMono">[${t.tier || 'A'}级]</span>
+                            <span>${t.title}</span>
+                        </span>
+                        <button onclick="openTaskDiagnosticModal('${t.id}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-stethoscope"></i>
+                            <span>${diag ? '重新归因诊断' : '录入根因归因'}</span>
+                        </button>
+                    </div>
+                    ${diag ? `
+                        <div class="p-3 rounded-lg bg-white border border-amber-200 text-stone-700 space-y-1">
+                            <div class="flex items-center gap-2 text-amber-900 font-bold">
+                                <i class="fa-solid fa-bug text-amber-600"></i>
+                                <span>定性归因：${diag.reasonName}</span>
+                                <span class="text-[10px] text-stone-400 font-normal">(${new Date(diag.timestamp).toLocaleTimeString()})</span>
+                            </div>
+                            <p class="text-[11.5px] text-stone-600">现场手记：${diag.note}</p>
+                            <p class="text-[11.5px] text-emerald-800 font-semibold">自适应对策：${diag.suggestedAction}</p>
+                        </div>
+                    ` : `
+                        <p class="text-[11px] text-stone-400">暂未分析该任务未能按时交付的深层工程原因。请点击诊断录入。</p>
+                    `}
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 渲染历史记录
+    if (historyContainer) {
+        const entries = Object.values(diags);
+        if (entries.length === 0) {
+            historyContainer.innerHTML = `
+                <div class="text-center py-6 text-stone-400 font-serifMono text-xs">
+                    暂无历史工程根因诊断档案。
+                </div>
+            `;
+        } else {
+            historyContainer.innerHTML = entries.map(d => `
+                <div class="p-3.5 rounded-xl border border-stone-200 bg-white academic-card font-serifMono text-xs space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-stone-900">${d.taskTitle}</span>
+                        <span class="px-2 py-0.5 rounded bg-stone-100 text-stone-700 text-[10px]">${d.reasonName}</span>
+                    </div>
+                    <p class="text-[11px] text-stone-600">${d.note}</p>
+                    <p class="text-[11px] text-indigo-700">建议动作：${d.suggestedAction}</p>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+// 4. 子面板 4: 每日工程复盘与成长报表
+function renderSchedulerReview() {
+    const reviewContent = document.getElementById('scheduler-review-content');
+    if (!reviewContent) return;
+
+    const ss = getSchedulerSystemState();
+    const todayStr = (typeof RFC5545Parser !== 'undefined' && RFC5545Parser.getTodayDateStr)
+        ? RFC5545Parser.getTodayDateStr()
+        : new Date().toISOString().slice(0, 10);
+
+    let reviewObj = ss.dailyReviews ? ss.dailyReviews[todayStr] : null;
+
+    if (!reviewObj || !reviewObj.markdownReport) {
+        // 自动构建今日复盘报表
+        let routineTasks = [];
+        let scheduledBlocks = [];
+        let careerEvidences = [];
+
+        if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getState === 'function') {
+            const s = stateManager.getState();
+            if (s.dailyRoutine && Array.isArray(s.dailyRoutine.tasks)) routineTasks = s.dailyRoutine.tasks;
+            if (s.schedulerSystem && s.schedulerSystem.dailySchedule && Array.isArray(s.schedulerSystem.dailySchedule.scheduledBlocks)) {
+                scheduledBlocks = s.schedulerSystem.dailySchedule.scheduledBlocks;
+            }
+            if (s.careerSystem) {
+                careerEvidences = [...(s.careerSystem.evidences || []), ...(s.careerSystem.customEvidences || [])];
+            }
+        }
+
+        if (typeof DailyReviewGenerator !== 'undefined') {
+            reviewObj = DailyReviewGenerator.generate({
+                date: todayStr,
+                routineTasks,
+                scheduledBlocks,
+                diagnostics: ss.incompleteDiagnostics || {},
+                careerEvidences
+            });
+        }
+    }
+
+    if (reviewObj && reviewObj.markdownReport) {
+        reviewContent.innerText = reviewObj.markdownReport;
+    } else {
+        reviewContent.innerText = '# 每日工程复盘报表生成中...';
+    }
+}
+
+// ==================== 模态框与操作交互 ====================
+
+let currentCalendarImportTab = 'file';
+
+function openCalendarImportModal() {
+    const modal = document.getElementById('calendar-import-modal');
+    if (!modal) return;
+    setCalendarImportTab('file');
+    const dateInput = document.getElementById('calendar-target-date');
+    if (dateInput && !dateInput.value) {
+        dateInput.value = (typeof RFC5545Parser !== 'undefined' && RFC5545Parser.getTodayDateStr)
+            ? RFC5545Parser.getTodayDateStr()
+            : new Date().toISOString().slice(0, 10);
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeCalendarImportModal() {
+    const modal = document.getElementById('calendar-import-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function setCalendarImportTab(tabKey) {
+    currentCalendarImportTab = tabKey;
+    const tabs = ['file', 'text', 'tasks'];
+    tabs.forEach(k => {
+        const btn = document.getElementById(`cal-import-tab-${k}`);
+        const pane = document.getElementById(`cal-import-pane-${k}`);
+        if (btn) {
+            btn.className = (k === tabKey)
+                ? 'px-3 py-1.5 rounded-lg bg-stone-900 text-white font-bold cursor-pointer'
+                : 'px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold cursor-pointer';
+        }
+        if (pane) {
+            if (k === tabKey) pane.classList.remove('hidden');
+            else pane.classList.add('hidden');
+        }
+    });
+}
+
+function submitCalendarImport() {
+    const dateInput = document.getElementById('calendar-target-date');
+    const targetDate = dateInput ? dateInput.value : '';
+
+    if (currentCalendarImportTab === 'file') {
+        const fileInput = document.getElementById('ics-file-input');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            alert('请先选择一个 .ics 日历导出文件！');
+            return;
+        }
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const raw = e.target.result;
+            processIcsContent(raw, file.name, targetDate);
+        };
+        reader.readAsText(file);
+    } else if (currentCalendarImportTab === 'text') {
+        const textInput = document.getElementById('ics-paste-input');
+        const raw = textInput ? textInput.value : '';
+        if (!raw || !raw.trim()) {
+            alert('请粘贴 iCalendar 格式内容！');
+            return;
+        }
+        processIcsContent(raw, 'pasted_calendar.ics', targetDate);
+    } else if (currentCalendarImportTab === 'tasks') {
+        const tasksInput = document.getElementById('tasks-paste-input');
+        const raw = tasksInput ? tasksInput.value : '';
+        if (!raw || !raw.trim()) {
+            alert('请粘贴 Google Tasks JSON 或待办列表！');
+            return;
+        }
+        const parsedTasks = (typeof GoogleTasksAdapter !== 'undefined') ? GoogleTasksAdapter.parse(raw) : [];
+        if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.importCalendarSource === 'function') {
+            stateManager.importCalendarSource({
+                type: 'tasks',
+                fileName: 'google_tasks.json',
+                googleTasks: parsedTasks
+            });
+        }
+        runSmartScheduleCalculation(true);
+        closeCalendarImportModal();
+        if (typeof showToast === 'function') showToast(`成功导入 ${parsedTasks.length} 条 Google Tasks 待办`);
+    }
+}
+
+function processIcsContent(rawContent, fileName, targetDate) {
+    const events = (typeof RFC5545Parser !== 'undefined')
+        ? RFC5545Parser.parse(rawContent, targetDate)
+        : [];
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.importCalendarSource === 'function') {
+        stateManager.importCalendarSource({
+            type: 'ics',
+            fileName: fileName || 'calendar.ics',
+            events: events
+        });
+    }
+
+    runSmartScheduleCalculation(true);
+    closeCalendarImportModal();
+    if (typeof showToast === 'function') {
+        showToast(`成功解析载入 ${events.length} 个外部日历事件！`);
+    }
+}
+
+function runSmartScheduleCalculation(showFeedback = true) {
+    const ss = getSchedulerSystemState();
+    const events = (ss.calendarSource && Array.isArray(ss.calendarSource.events)) ? ss.calendarSource.events : [];
+
+    const matrix = (typeof TimeConflictMatrix !== 'undefined')
+        ? TimeConflictMatrix.calculateAvailability(events)
+        : { freeSlots: [], totalFreeMinutes: 840 };
+
+    const freeMinutes = matrix.totalFreeMinutes;
+    const compression = (typeof TimeDeficitCompressor !== 'undefined')
+        ? TimeDeficitCompressor.compress(freeMinutes)
+        : { deficitMinutes: 0, compressionApplied: false, compressionLogs: [], allocated: {} };
+
+    const blocks = (typeof FlowBlockSequencer !== 'undefined')
+        ? FlowBlockSequencer.sequence(compression, matrix.freeSlots)
+        : [];
+
+    const newDailySchedule = {
+        date: (typeof RFC5545Parser !== 'undefined' && RFC5545Parser.getTodayDateStr) ? RFC5545Parser.getTodayDateStr() : new Date().toISOString().slice(0, 10),
+        availableMinutes: freeMinutes,
+        freeSlots: matrix.freeSlots,
+        scheduledBlocks: blocks,
+        deficitMinutes: compression.deficitMinutes,
+        compressionApplied: compression.compressionApplied,
+        compressionLogs: compression.compressionLogs
+    };
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.updateDailySchedule === 'function') {
+        stateManager.updateDailySchedule(newDailySchedule);
+    } else {
+        ss.dailySchedule = newDailySchedule;
+    }
+
+    renderSchedulerPlanner();
+    if (showFeedback && typeof showToast === 'function') {
+        showToast('智能排程自适应重算已完成！');
+    }
+}
+
+// 诊断模态框
+function openTaskDiagnosticModal(taskId) {
+    const modal = document.getElementById('task-diagnostic-modal');
+    const selectEl = document.getElementById('diag-task-select');
+    if (!modal) return;
+
+    let routineTasks = [];
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getState === 'function') {
+        const s = stateManager.getState();
+        if (s && s.dailyRoutine && Array.isArray(s.dailyRoutine.tasks)) {
+            routineTasks = s.dailyRoutine.tasks;
+        }
+    }
+
+    if (selectEl) {
+        selectEl.innerHTML = routineTasks.map(t => `
+            <option value="${t.id}" ${t.id === taskId ? 'selected' : ''}>[${t.tier || 'A'}级] ${t.title} (${t.completed ? '已打卡' : '未完成'})</option>
+        `).join('');
+        if (taskId) selectEl.value = taskId;
+    }
+
+    const noteEl = document.getElementById('diag-notes');
+    if (noteEl) noteEl.value = '';
+
+    modal.classList.remove('hidden');
+}
+
+function closeTaskDiagnosticModal() {
+    const modal = document.getElementById('task-diagnostic-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function submitTaskDiagnostic(event) {
+    if (event) event.preventDefault();
+    const taskSelect = document.getElementById('diag-task-select');
+    const reasonSelect = document.getElementById('diag-reason-select');
+    const notesEl = document.getElementById('diag-notes');
+
+    const taskId = taskSelect ? taskSelect.value : '';
+    const reasonKey = reasonSelect ? reasonSelect.value : 'underestimated_time';
+    const notes = notesEl ? notesEl.value : '';
+
+    let taskObj = null;
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getState === 'function') {
+        const s = stateManager.getState();
+        if (s && s.dailyRoutine && Array.isArray(s.dailyRoutine.tasks)) {
+            taskObj = s.dailyRoutine.tasks.find(t => t.id === taskId);
+        }
+    }
+
+    const diagResult = (typeof DiagnosticEngine !== 'undefined')
+        ? DiagnosticEngine.diagnose(reasonKey, notes, taskObj)
+        : { taskId, reasonKey, note: notes, timestamp: new Date().toISOString() };
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.recordTaskDiagnostic === 'function') {
+        stateManager.recordTaskDiagnostic(taskId, diagResult);
+    }
+
+    closeTaskDiagnosticModal();
+    renderSchedulerDiagnostics();
+    if (typeof showToast === 'function') {
+        showToast(`已录入「${diagResult.reasonName || reasonKey}」归因并生成自适应调整策略！`);
+    }
+}
+
+function generateAndExportDailyReview() {
+    const ss = getSchedulerSystemState();
+    const todayStr = (typeof RFC5545Parser !== 'undefined' && RFC5545Parser.getTodayDateStr)
+        ? RFC5545Parser.getTodayDateStr()
+        : new Date().toISOString().slice(0, 10);
+
+    let routineTasks = [];
+    let scheduledBlocks = [];
+    let careerEvidences = [];
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getState === 'function') {
+        const s = stateManager.getState();
+        if (s.dailyRoutine && Array.isArray(s.dailyRoutine.tasks)) routineTasks = s.dailyRoutine.tasks;
+        if (s.schedulerSystem && s.schedulerSystem.dailySchedule && Array.isArray(s.schedulerSystem.dailySchedule.scheduledBlocks)) {
+            scheduledBlocks = s.schedulerSystem.dailySchedule.scheduledBlocks;
+        }
+        if (s.careerSystem) {
+            careerEvidences = [...(s.careerSystem.evidences || []), ...(s.careerSystem.customEvidences || [])];
+        }
+    }
+
+    const review = (typeof DailyReviewGenerator !== 'undefined')
+        ? DailyReviewGenerator.generate({
+            date: todayStr,
+            routineTasks,
+            scheduledBlocks,
+            diagnostics: ss.incompleteDiagnostics || {},
+            careerEvidences
+        })
+        : { markdownReport: '# 每日工程复盘报表' };
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.saveDailyReviewRecord === 'function') {
+        stateManager.saveDailyReviewRecord(todayStr, review);
+    }
+
+    switchSchedulerTab('review', true);
+    if (typeof showToast === 'function') {
+        showToast('已生成今日复盘报表（已打通 Phase 6 真实凭证）！');
+    }
+}
+
+function copyReviewMarkdownToClipboard() {
+    const el = document.getElementById('scheduler-review-content');
+    if (!el || !el.innerText) return;
+    copyTextToClipboard(el.innerText, '已复制今日复盘 Markdown 报表');
+}
+
+function downloadReviewMarkdown() {
+    const el = document.getElementById('scheduler-review-content');
+    if (!el || !el.innerText) return;
+    const todayStr = (typeof RFC5545Parser !== 'undefined' && RFC5545Parser.getTodayDateStr)
+        ? RFC5545Parser.getTodayDateStr()
+        : new Date().toISOString().slice(0, 10);
+
+    const blob = new Blob([el.innerText], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `daily_engineering_review_${todayStr}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if (typeof showToast === 'function') showToast('每日复盘 Markdown 档案已导出下载');
 }
 
 // 笔记本与沙盒 (View 4)
@@ -5482,6 +6257,27 @@ if (typeof window !== 'undefined') {
     window.jumpToEvidence = jumpToEvidence;
     window.copyStarStory = copyStarStory;
     window.copyResumeBullet = copyResumeBullet;
+
+    // Phase 7 方法挂载
+    window.switchSchedulerTab = switchSchedulerTab;
+    window.renderSchedulerSystem = renderSchedulerSystem;
+    window.renderSchedulerPlanner = renderSchedulerPlanner;
+    window.renderSchedulerCalendar = renderSchedulerCalendar;
+    window.renderSchedulerDiagnostics = renderSchedulerDiagnostics;
+    window.renderSchedulerReview = renderSchedulerReview;
+    window.openCalendarImportModal = openCalendarImportModal;
+    window.closeCalendarImportModal = closeCalendarImportModal;
+    window.setCalendarImportTab = setCalendarImportTab;
+    window.submitCalendarImport = submitCalendarImport;
+    window.processIcsContent = processIcsContent;
+    window.runSmartScheduleCalculation = runSmartScheduleCalculation;
+    window.toggleScheduledBlockStatus = toggleScheduledBlockStatus;
+    window.openTaskDiagnosticModal = openTaskDiagnosticModal;
+    window.closeTaskDiagnosticModal = closeTaskDiagnosticModal;
+    window.submitTaskDiagnostic = submitTaskDiagnostic;
+    window.generateAndExportDailyReview = generateAndExportDailyReview;
+    window.copyReviewMarkdownToClipboard = copyReviewMarkdownToClipboard;
+    window.downloadReviewMarkdown = downloadReviewMarkdown;
 }
 
 if (typeof globalThis !== 'undefined') {
@@ -5549,6 +6345,27 @@ if (typeof globalThis !== 'undefined') {
     globalThis.jumpToEvidence = jumpToEvidence;
     globalThis.copyStarStory = copyStarStory;
     globalThis.copyResumeBullet = copyResumeBullet;
+
+    // Phase 7 方法挂载
+    globalThis.switchSchedulerTab = switchSchedulerTab;
+    globalThis.renderSchedulerSystem = renderSchedulerSystem;
+    globalThis.renderSchedulerPlanner = renderSchedulerPlanner;
+    globalThis.renderSchedulerCalendar = renderSchedulerCalendar;
+    globalThis.renderSchedulerDiagnostics = renderSchedulerDiagnostics;
+    globalThis.renderSchedulerReview = renderSchedulerReview;
+    globalThis.openCalendarImportModal = openCalendarImportModal;
+    globalThis.closeCalendarImportModal = closeCalendarImportModal;
+    globalThis.setCalendarImportTab = setCalendarImportTab;
+    globalThis.submitCalendarImport = submitCalendarImport;
+    globalThis.processIcsContent = processIcsContent;
+    globalThis.runSmartScheduleCalculation = runSmartScheduleCalculation;
+    globalThis.toggleScheduledBlockStatus = toggleScheduledBlockStatus;
+    globalThis.openTaskDiagnosticModal = openTaskDiagnosticModal;
+    globalThis.closeTaskDiagnosticModal = closeTaskDiagnosticModal;
+    globalThis.submitTaskDiagnostic = submitTaskDiagnostic;
+    globalThis.generateAndExportDailyReview = generateAndExportDailyReview;
+    globalThis.copyReviewMarkdownToClipboard = copyReviewMarkdownToClipboard;
+    globalThis.downloadReviewMarkdown = downloadReviewMarkdown;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -5604,7 +6421,26 @@ if (typeof module !== 'undefined' && module.exports) {
         submitMockRating,
         jumpToEvidence,
         copyStarStory,
-        copyResumeBullet
+        copyResumeBullet,
+        switchSchedulerTab,
+        renderSchedulerSystem,
+        renderSchedulerPlanner,
+        renderSchedulerCalendar,
+        renderSchedulerDiagnostics,
+        renderSchedulerReview,
+        openCalendarImportModal,
+        closeCalendarImportModal,
+        setCalendarImportTab,
+        submitCalendarImport,
+        processIcsContent,
+        runSmartScheduleCalculation,
+        toggleScheduledBlockStatus,
+        openTaskDiagnosticModal,
+        closeTaskDiagnosticModal,
+        submitTaskDiagnostic,
+        generateAndExportDailyReview,
+        copyReviewMarkdownToClipboard,
+        downloadReviewMarkdown
     };
 }
 

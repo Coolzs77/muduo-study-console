@@ -176,6 +176,29 @@
         activeCareerTab: 'evidence' // 'evidence' | 'capability' | 'interview' | 'mock' | 'star'
       },
 
+      // ---------- Phase 7: 智能任务调度与日历同步系统 ----------
+      schedulerSystem: {
+        calendarSource: {
+          type: 'none', // 'none' | 'ics' | 'tasks' | 'manual'
+          fileName: '',
+          lastSyncTime: null,
+          events: []    // [{ id, summary, startRaw, endRaw, startTimeStr, endTimeStr, durationMinutes, isAllDay, busy, location }]
+        },
+        googleTasks: [],
+        dailySchedule: {
+          date: getTodayDateStr(),
+          availableMinutes: 840,
+          freeSlots: [],
+          scheduledBlocks: [],
+          deficitMinutes: 0,
+          compressionApplied: false,
+          compressionLogs: []
+        },
+        incompleteDiagnostics: {}, // { [taskId]: { reasonKey, reasonName, note, timestamp, suggestedAction } }
+        dailyReviews: {},           // { [date]: { date, totalFocusedMinutes, completedCount, incompleteCount, evidenceCount, markdownReport } }
+        activeSchedulerTab: 'planner' // 'planner' | 'calendar' | 'diagnostics' | 'review'
+      },
+
       // ---------- 运行时与界面交互状态 ----------
       currentView: 'dashboard',
       weekFilter: 0,
@@ -451,6 +474,56 @@
         }
       }
 
+      // P7: 净化与补齐 schedulerSystem
+      if (!merged.schedulerSystem || typeof merged.schedulerSystem !== 'object') {
+        merged.schedulerSystem = {
+          calendarSource: { type: 'none', fileName: '', lastSyncTime: null, events: [] },
+          googleTasks: [],
+          dailySchedule: {
+            date: getTodayDateStr(),
+            availableMinutes: 840,
+            freeSlots: [],
+            scheduledBlocks: [],
+            deficitMinutes: 0,
+            compressionApplied: false,
+            compressionLogs: []
+          },
+          incompleteDiagnostics: {},
+          dailyReviews: {},
+          activeSchedulerTab: 'planner'
+        };
+      } else {
+        if (!merged.schedulerSystem.calendarSource || typeof merged.schedulerSystem.calendarSource !== 'object') {
+          merged.schedulerSystem.calendarSource = { type: 'none', fileName: '', lastSyncTime: null, events: [] };
+        }
+        if (!Array.isArray(merged.schedulerSystem.calendarSource.events)) {
+          merged.schedulerSystem.calendarSource.events = [];
+        }
+        if (!Array.isArray(merged.schedulerSystem.googleTasks)) {
+          merged.schedulerSystem.googleTasks = [];
+        }
+        if (!merged.schedulerSystem.dailySchedule || typeof merged.schedulerSystem.dailySchedule !== 'object') {
+          merged.schedulerSystem.dailySchedule = {
+            date: getTodayDateStr(),
+            availableMinutes: 840,
+            freeSlots: [],
+            scheduledBlocks: [],
+            deficitMinutes: 0,
+            compressionApplied: false,
+            compressionLogs: []
+          };
+        }
+        if (!merged.schedulerSystem.incompleteDiagnostics || typeof merged.schedulerSystem.incompleteDiagnostics !== 'object') {
+          merged.schedulerSystem.incompleteDiagnostics = {};
+        }
+        if (!merged.schedulerSystem.dailyReviews || typeof merged.schedulerSystem.dailyReviews !== 'object') {
+          merged.schedulerSystem.dailyReviews = {};
+        }
+        if (!merged.schedulerSystem.activeSchedulerTab) {
+          merged.schedulerSystem.activeSchedulerTab = 'planner';
+        }
+      }
+
       if (merged.activeTimer) {
         merged.activeTimer.running = false;
         merged.activeTimer.timerId = null;
@@ -648,7 +721,9 @@
           dailyRoutineCompletedCount: (state.dailyRoutine?.tasks || []).filter(t => t.completed).length,
           learningAlgoReviewedCount: Object.values(state.learningSystem?.algoReviewQueue || {}).filter(v => v === 'mastered').length,
           careerEvidenceCount: (state.careerSystem?.evidences || []).length + (state.careerSystem?.customEvidences || []).length,
-          mockInterviewCount: (state.careerSystem?.mockInterviewLogs || []).length
+          mockInterviewCount: (state.careerSystem?.mockInterviewLogs || []).length,
+          schedulerEventCount: (state.schedulerSystem?.calendarSource?.events || []).length,
+          schedulerDailyReviewCount: Object.keys(state.schedulerSystem?.dailyReviews || {}).length
         },
         payload: {
           completedDays: state.completedDays || [],
@@ -678,6 +753,14 @@
             mockInterviewLogs: [],
             bookmarkedQuestions: [],
             activeCareerTab: 'evidence'
+          },
+          schedulerSystem: state.schedulerSystem || {
+            calendarSource: { type: 'none', fileName: '', lastSyncTime: null, events: [] },
+            googleTasks: [],
+            dailySchedule: { date: getTodayDateStr(), availableMinutes: 840, freeSlots: [], scheduledBlocks: [], deficitMinutes: 0, compressionApplied: false, compressionLogs: [] },
+            incompleteDiagnostics: {},
+            dailyReviews: {},
+            activeSchedulerTab: 'planner'
           }
         }
       };
@@ -750,6 +833,18 @@
             mockInterviewLogs: [],
             bookmarkedQuestions: [],
             activeCareerTab: 'evidence'
+          };
+        }
+        if (payload.schedulerSystem && typeof payload.schedulerSystem === 'object') {
+          this._state.schedulerSystem = JSON.parse(JSON.stringify(payload.schedulerSystem));
+        } else {
+          this._state.schedulerSystem = {
+            calendarSource: { type: 'none', fileName: '', lastSyncTime: null, events: [] },
+            googleTasks: [],
+            dailySchedule: { date: getTodayDateStr(), availableMinutes: 840, freeSlots: [], scheduledBlocks: [], deficitMinutes: 0, compressionApplied: false, compressionLogs: [] },
+            incompleteDiagnostics: {},
+            dailyReviews: {},
+            activeSchedulerTab: 'planner'
           };
         }
       } else {
@@ -954,6 +1049,43 @@
             curCS.bookmarkedQuestions = [...new Set([...(curCS.bookmarkedQuestions || []), ...incCS.bookmarkedQuestions])];
           }
         }
+
+        // 14. 合并 Phase 7 智能任务调度与日历同步系统 (schedulerSystem)
+        if (payload.schedulerSystem && typeof payload.schedulerSystem === 'object') {
+          if (!this._state.schedulerSystem) {
+            this._state.schedulerSystem = {
+              calendarSource: { type: 'none', fileName: '', lastSyncTime: null, events: [] },
+              googleTasks: [],
+              dailySchedule: { date: getTodayDateStr(), availableMinutes: 840, freeSlots: [], scheduledBlocks: [], deficitMinutes: 0, compressionApplied: false, compressionLogs: [] },
+              incompleteDiagnostics: {},
+              dailyReviews: {},
+              activeSchedulerTab: 'planner'
+            };
+          }
+          const curSS = this._state.schedulerSystem;
+          const incSS = payload.schedulerSystem;
+          if (incSS.calendarSource && Array.isArray(incSS.calendarSource.events)) {
+            const existingEvtIds = new Set((curSS.calendarSource.events || []).map(e => e.id));
+            incSS.calendarSource.events.forEach(evt => {
+              if (!existingEvtIds.has(evt.id)) (curSS.calendarSource.events = curSS.calendarSource.events || []).push(evt);
+            });
+            curSS.calendarSource.type = incSS.calendarSource.type || curSS.calendarSource.type;
+            curSS.calendarSource.fileName = incSS.calendarSource.fileName || curSS.calendarSource.fileName;
+            curSS.calendarSource.lastSyncTime = incSS.calendarSource.lastSyncTime || curSS.calendarSource.lastSyncTime;
+          }
+          if (Array.isArray(incSS.googleTasks)) {
+            const existingTaskIds = new Set((curSS.googleTasks || []).map(t => t.id));
+            incSS.googleTasks.forEach(gt => {
+              if (!existingTaskIds.has(gt.id)) (curSS.googleTasks = curSS.googleTasks || []).push(gt);
+            });
+          }
+          if (incSS.incompleteDiagnostics && typeof incSS.incompleteDiagnostics === 'object') {
+            curSS.incompleteDiagnostics = Object.assign(curSS.incompleteDiagnostics || {}, incSS.incompleteDiagnostics);
+          }
+          if (incSS.dailyReviews && typeof incSS.dailyReviews === 'object') {
+            curSS.dailyReviews = Object.assign(curSS.dailyReviews || {}, incSS.dailyReviews);
+          }
+        }
       }
 
       this.save(true);
@@ -1101,6 +1233,79 @@
       return cs.bookmarkedQuestions.includes(questionId);
     }
 
+    // Phase 7 智能任务调度与日历系统专用操作助手
+    _ensureSchedulerSystem() {
+      if (!this._state.schedulerSystem || typeof this._state.schedulerSystem !== 'object') {
+        this._state.schedulerSystem = {
+          calendarSource: { type: 'none', fileName: '', lastSyncTime: null, events: [] },
+          googleTasks: [],
+          dailySchedule: {
+            date: getTodayDateStr(),
+            availableMinutes: 840,
+            freeSlots: [],
+            scheduledBlocks: [],
+            deficitMinutes: 0,
+            compressionApplied: false,
+            compressionLogs: []
+          },
+          incompleteDiagnostics: {},
+          dailyReviews: {},
+          activeSchedulerTab: 'planner'
+        };
+      }
+      return this._state.schedulerSystem;
+    }
+
+    setSchedulerTab(tabKey) {
+      const ss = this._ensureSchedulerSystem();
+      ss.activeSchedulerTab = tabKey;
+      this.save();
+      this._notify();
+    }
+
+    importCalendarSource(params) {
+      const ss = this._ensureSchedulerSystem();
+      const p = params || {};
+      ss.calendarSource.type = p.type || 'ics';
+      ss.calendarSource.fileName = p.fileName || 'calendar.ics';
+      ss.calendarSource.lastSyncTime = new Date().toISOString();
+      if (Array.isArray(p.events)) {
+        ss.calendarSource.events = p.events;
+      }
+      if (Array.isArray(p.googleTasks)) {
+        ss.googleTasks = p.googleTasks;
+      }
+      this.save(true);
+      this._notify();
+      return ss.calendarSource;
+    }
+
+    updateDailySchedule(scheduleData) {
+      const ss = this._ensureSchedulerSystem();
+      ss.dailySchedule = Object.assign(ss.dailySchedule || {}, scheduleData);
+      this.save(true);
+      this._notify();
+      return ss.dailySchedule;
+    }
+
+    recordTaskDiagnostic(taskId, diagnosticData) {
+      const ss = this._ensureSchedulerSystem();
+      if (!ss.incompleteDiagnostics) ss.incompleteDiagnostics = {};
+      ss.incompleteDiagnostics[taskId] = diagnosticData;
+      this.save(true);
+      this._notify();
+      return diagnosticData;
+    }
+
+    saveDailyReviewRecord(dateStr, reviewRecord) {
+      const ss = this._ensureSchedulerSystem();
+      if (!ss.dailyReviews) ss.dailyReviews = {};
+      ss.dailyReviews[dateStr] = reviewRecord;
+      this.save(true);
+      this._notify();
+      return reviewRecord;
+    }
+
     // 重置系统纯净状态 (保留备份)
     resetToDefault() {
       // 预先备份当前数据
@@ -1139,6 +1344,7 @@
     window.STORAGE_KEYS = STORAGE_KEYS;
     window.CURRENT_SCHEMA_VERSION = CURRENT_SCHEMA_VERSION;
     window.StateManager = StateManager;
+    window.stateManager = StateManager;
     window.StateManagerClass = StateManagerClass;
     window.SchemaMigrationV6 = SchemaMigrationV6;
   }
@@ -1147,6 +1353,7 @@
     globalThis.STORAGE_KEYS = STORAGE_KEYS;
     globalThis.CURRENT_SCHEMA_VERSION = CURRENT_SCHEMA_VERSION;
     globalThis.StateManager = StateManager;
+    globalThis.stateManager = StateManager;
     globalThis.StateManagerClass = StateManagerClass;
     globalThis.SchemaMigrationV6 = SchemaMigrationV6;
   }
@@ -1157,6 +1364,7 @@
       STORAGE_KEYS,
       CURRENT_SCHEMA_VERSION,
       StateManager,
+      stateManager: StateManager,
       StateManagerClass,
       SchemaMigrationV6
     };
