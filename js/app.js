@@ -25,9 +25,8 @@ function getPitfallsDataset() {
 }
 
 var appState = {
-    // 全局根状态对象
-
-    version: "5.0.0",
+    // 全局根状态对象 (V6.0.0 双核架构规范)
+    version: "6.0.0",
     completedDays: [],
     mastery: {},         // { [day]: { level: 0..5, read: false, quizPassed: false, demo: false, independentImpl: false, sourceUnderstood: false, completedAt: null, score: 0, quizScores: null } }
     reviews: {},         // { [day]: { stage: 0..5, nextReviewDate: '', lastReviewDate: '', intervalDays: 1, reviewCount: 0, history: [] } }
@@ -37,6 +36,14 @@ var appState = {
     dayNotes: {},
     experimentNotes: {},
     globalNotes: "",
+    quizRecords: [],
+    knowledgeMastery: {},
+    knowledgeFavorites: [],
+    knowledgeRecent: [],
+    projectsProgress: {
+        proj_muduo: { activeDay: 1, currentTrack: "l0_foundation", totalDays: 28 },
+        proj_cppai: { activeArticle: "01_http_overview", currentTrack: "l3_protocol", totalArticles: 17 }
+    },
     currentView: 'dashboard',
     weekFilter: 0,
     filterStatus: 'all', // 'all', 'pending', 'mastered', 'due_review'
@@ -110,9 +117,15 @@ function showToast(text, isSuccess = true) {
     }, 2400);
 }
 
-// 持久化存储与版本兼容
+// 持久化存储与版本兼容 (接入 StateManager V6 集中架构)
 function loadAndMigrateState() {
     try {
+        if (typeof StateManager !== 'undefined') {
+            appState = StateManager.init(appState);
+            window.appState = appState;
+            return;
+        }
+
         const v5Saved = localStorage.getItem('muduo_v5_data');
         if (v5Saved) {
             const parsed = JSON.parse(v5Saved);
@@ -191,6 +204,11 @@ function loadAndMigrateState() {
 
 function persistState() {
     try {
+        if (typeof StateManager !== 'undefined') {
+            StateManager.update(appState, { save: true, immediate: false });
+            return;
+        }
+
         localStorage.setItem('muduo_v5_data', JSON.stringify({
             version: appState.version,
             completedDays: appState.completedDays,
@@ -1942,32 +1960,44 @@ function openResetModal() {
     });
 }
 
-// 导入与导出 JSON
+// 导入与导出 JSON (对接 StateManager V6 规范)
 function exportDataBackup() {
-    const data = {
-        version: appState.version,
-        exportedAt: new Date().toISOString(),
-        completedDays: appState.completedDays,
-        mastery: appState.mastery,
-        reviews: appState.reviews,
-        sourceStatus: appState.sourceStatus,
-        pitfalls: appState.pitfalls,
-        studySessions: appState.studySessions,
-        dayNotes: appState.dayNotes,
-        experimentNotes: appState.experimentNotes,
-        globalNotes: appState.globalNotes,
-        knowledgeMastery: appState.knowledgeMastery || {},
-        knowledgeFavorites: appState.knowledgeFavorites || [],
-        knowledgeRecent: appState.knowledgeRecent || []
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    let exportedData;
+    if (typeof StateManager !== 'undefined') {
+        exportedData = StateManager.exportJson();
+    } else {
+        exportedData = {
+            schema: "https://muduo-cppai-console.local/schema/v6.json",
+            version: appState.version || "6.0.0",
+            exportedAt: new Date().toISOString(),
+            metadata: {
+                completedDaysCount: (appState.completedDays || []).length,
+                studySessionsCount: (appState.studySessions || []).length
+            },
+            payload: {
+                completedDays: appState.completedDays,
+                mastery: appState.mastery,
+                reviews: appState.reviews,
+                sourceStatus: appState.sourceStatus,
+                pitfalls: appState.pitfalls,
+                studySessions: appState.studySessions,
+                dayNotes: appState.dayNotes,
+                experimentNotes: appState.experimentNotes,
+                globalNotes: appState.globalNotes,
+                knowledgeMastery: appState.knowledgeMastery || {},
+                knowledgeFavorites: appState.knowledgeFavorites || [],
+                knowledgeRecent: appState.knowledgeRecent || []
+            }
+        };
+    }
+    const blob = new Blob([JSON.stringify(exportedData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `muduo_v5_study_backup_${getTodayDateStr()}.json`;
+    a.download = `muduo_cppai_v6_backup_${getTodayDateStr()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast("完整 JSON 备份文件已下载");
+    showToast("完整双核架构 JSON 备份文件已下载");
 }
 
 function handleJsonImport(event) {
@@ -1983,10 +2013,12 @@ function handleJsonImport(event) {
                 return;
             }
 
-            // Schema 验证：检查是否包含核心数据结构
-            const hasMastery = imported.mastery && typeof imported.mastery === 'object';
-            const hasCompleted = Array.isArray(imported.completedDays);
-            if (!hasMastery && !hasCompleted) {
+            // Schema 验证：兼容 V6 payload 与扁平 V5/V4
+            const payload = imported.payload || imported;
+            const hasMastery = payload.mastery && typeof payload.mastery === 'object';
+            const hasCompleted = Array.isArray(payload.completedDays);
+            const hasCppai = payload.knowledgeMastery && typeof payload.knowledgeMastery === 'object';
+            if (!hasMastery && !hasCompleted && !hasCppai) {
                 showToast("导入失败：未通过 Schema 结构校验，缺少核心学习数据字段", false);
                 return;
             }
@@ -1994,7 +2026,7 @@ function handleJsonImport(event) {
             // 弹出自定义导入确认框：合并 vs 覆盖
             const msgEl = document.getElementById('modal-message');
             const btns = document.getElementById('modal-buttons-container');
-            document.getElementById('modal-title').innerText = "JSON 导入方式选择";
+            document.getElementById('modal-title').innerText = "双核系统 JSON 导入方式选择";
             msgEl.innerText = "请选择导入策略：【合并数据】将保留本地更高级别的掌握度与笔记；【完全覆盖】将完全替换本地所有进度。";
             
             btns.innerHTML = `
@@ -2014,108 +2046,112 @@ function handleJsonImport(event) {
 
 function executeImportMerge(imported) {
     closeModal();
-    // 合并 completedDays
-    if (Array.isArray(imported.completedDays)) {
-        appState.completedDays = [...new Set([...appState.completedDays, ...imported.completedDays])];
+    if (typeof StateManager !== 'undefined') {
+        appState = StateManager.importJson(imported, 'merge');
+        window.appState = appState;
+    } else {
+        const payload = imported.payload || imported;
+        if (Array.isArray(payload.completedDays)) {
+            appState.completedDays = [...new Set([...appState.completedDays, ...payload.completedDays])];
+        }
+        if (payload.mastery) {
+            Object.keys(payload.mastery).forEach(k => {
+                const oldLvl = appState.mastery[k]?.level || 0;
+                const newLvl = payload.mastery[k]?.level || 0;
+                if (newLvl >= oldLvl) appState.mastery[k] = payload.mastery[k];
+            });
+        }
+        if (payload.dayNotes) appState.dayNotes = Object.assign(appState.dayNotes, payload.dayNotes);
+        if (payload.experimentNotes) appState.experimentNotes = Object.assign(appState.experimentNotes, payload.experimentNotes);
+        if (payload.globalNotes && !appState.globalNotes) appState.globalNotes = payload.globalNotes;
+        if (Array.isArray(payload.pitfalls)) {
+            const existIds = new Set(appState.pitfalls.map(p => p.id));
+            payload.pitfalls.forEach(p => { if (!existIds.has(p.id)) appState.pitfalls.push(p); });
+        }
+        if (Array.isArray(payload.studySessions)) {
+            const existSessIds = new Set(appState.studySessions.map(s => s.id));
+            payload.studySessions.forEach(s => { if (!existSessIds.has(s.id)) appState.studySessions.push(s); });
+        }
+        if (payload.knowledgeMastery && typeof payload.knowledgeMastery === 'object') {
+            if (!appState.knowledgeMastery) appState.knowledgeMastery = {};
+            Object.keys(payload.knowledgeMastery).forEach(k => {
+                const oldLvl = appState.knowledgeMastery[k] || 0;
+                const newLvl = payload.knowledgeMastery[k] || 0;
+                if (newLvl >= oldLvl) appState.knowledgeMastery[k] = newLvl;
+            });
+        }
+        if (Array.isArray(payload.knowledgeFavorites)) {
+            appState.knowledgeFavorites = [...new Set([...(appState.knowledgeFavorites || []), ...payload.knowledgeFavorites])];
+        }
+        if (Array.isArray(payload.knowledgeRecent)) {
+            appState.knowledgeRecent = [...new Set([...(appState.knowledgeRecent || []), ...payload.knowledgeRecent])].slice(0, 10);
+        }
+        persistState();
     }
-    // 合并 mastery：保留高 level
-    if (imported.mastery) {
-        Object.keys(imported.mastery).forEach(k => {
-            const oldLvl = appState.mastery[k]?.level || 0;
-            const newLvl = imported.mastery[k]?.level || 0;
-            if (newLvl >= oldLvl) {
-                appState.mastery[k] = imported.mastery[k];
-            }
-        });
-    }
-    // 合并手记
-    if (imported.dayNotes) {
-        appState.dayNotes = Object.assign(appState.dayNotes, imported.dayNotes);
-    }
-    if (imported.experimentNotes) {
-        appState.experimentNotes = Object.assign(appState.experimentNotes, imported.experimentNotes);
-    }
-    if (imported.globalNotes && !appState.globalNotes) {
-        appState.globalNotes = imported.globalNotes;
-    }
-    // 合并踩坑记录
-    if (Array.isArray(imported.pitfalls)) {
-        const existIds = new Set(appState.pitfalls.map(p => p.id));
-        imported.pitfalls.forEach(p => {
-            if (!existIds.has(p.id)) appState.pitfalls.push(p);
-        });
-    }
-    // 合并 studySessions
-    if (Array.isArray(imported.studySessions)) {
-        const existSessIds = new Set(appState.studySessions.map(s => s.id));
-        imported.studySessions.forEach(s => {
-            if (!existSessIds.has(s.id)) appState.studySessions.push(s);
-        });
-    }
-    // 合并语雀专栏知识库掌握度
-    if (imported.knowledgeMastery && typeof imported.knowledgeMastery === 'object') {
-        if (!appState.knowledgeMastery) appState.knowledgeMastery = {};
-        Object.keys(imported.knowledgeMastery).forEach(k => {
-            const oldLvl = appState.knowledgeMastery[k] || 0;
-            const newLvl = imported.knowledgeMastery[k] || 0;
-            if (newLvl >= oldLvl) {
-                appState.knowledgeMastery[k] = newLvl;
-            }
-        });
-    }
-    if (Array.isArray(imported.knowledgeFavorites)) {
-        appState.knowledgeFavorites = [...new Set([...(appState.knowledgeFavorites || []), ...imported.knowledgeFavorites])];
-    }
-    if (Array.isArray(imported.knowledgeRecent)) {
-        appState.knowledgeRecent = [...new Set([...(appState.knowledgeRecent || []), ...imported.knowledgeRecent])].slice(0, 10);
-    }
-    if (typeof saveYuqueState === 'function') saveYuqueState();
 
-    persistState();
+    if (typeof saveYuqueState === 'function') saveYuqueState();
     updateDashboardMetrics();
     renderDailyCards();
-    showToast("🎉 数据合并导入成功！");
+    if (typeof renderYuqueKnowledgeExplorer === 'function') {
+        renderYuqueKnowledgeExplorer();
+    }
+    showToast("🎉 双核数据合并导入成功！");
 }
 
 function executeImportOverwrite(imported) {
     closeModal();
-    appState.completedDays = imported.completedDays || [];
-    appState.mastery = imported.mastery || {};
-    appState.reviews = imported.reviews || {};
-    appState.sourceStatus = imported.sourceStatus || {};
-    appState.pitfalls = imported.pitfalls || [...getPitfallsDataset()];
-    appState.studySessions = imported.studySessions || [];
-    appState.dayNotes = imported.dayNotes || {};
-    appState.experimentNotes = imported.experimentNotes || {};
-    appState.globalNotes = imported.globalNotes || "";
-    appState.knowledgeMastery = imported.knowledgeMastery || {};
-    appState.knowledgeFavorites = imported.knowledgeFavorites || [];
-    appState.knowledgeRecent = imported.knowledgeRecent || [];
-    if (typeof saveYuqueState === 'function') saveYuqueState();
+    if (typeof StateManager !== 'undefined') {
+        appState = StateManager.importJson(imported, 'overwrite');
+        window.appState = appState;
+    } else {
+        const payload = imported.payload || imported;
+        appState.completedDays = payload.completedDays || [];
+        appState.mastery = payload.mastery || {};
+        appState.reviews = payload.reviews || {};
+        appState.sourceStatus = payload.sourceStatus || {};
+        appState.pitfalls = payload.pitfalls || [...getPitfallsDataset()];
+        appState.studySessions = payload.studySessions || [];
+        appState.dayNotes = payload.dayNotes || {};
+        appState.experimentNotes = payload.experimentNotes || {};
+        appState.globalNotes = payload.globalNotes || "";
+        appState.knowledgeMastery = payload.knowledgeMastery || {};
+        appState.knowledgeFavorites = payload.knowledgeFavorites || [];
+        appState.knowledgeRecent = payload.knowledgeRecent || [];
+        persistState();
+    }
 
-    persistState();
+    if (typeof saveYuqueState === 'function') saveYuqueState();
     updateDashboardMetrics();
     renderDailyCards();
-    showToast("🎉 数据已完全覆盖导入！");
+    if (typeof renderYuqueKnowledgeExplorer === 'function') {
+        renderYuqueKnowledgeExplorer();
+    }
+    showToast("🎉 双核数据已完全覆盖导入！");
 }
 
-// 导出 Markdown 个人学习档案
+// 导出 Markdown 双核个人学习攻坚档案
 function exportMarkdownReport() {
-    let md = `# 我的 muduo C++ 个人攻坚与训练档案\n\n`;
+    let md = `# CppAIService & muduo 双核工程学习与攻坚档案\n\n`;
     md += `> **生成时间**: ${new Date().toLocaleString()}  \n`;
-    md += `> **系统版本**: muduo C++ 个人训练系统 V5.0  \n\n`;
+    md += `> **系统架构**: CppAIService & muduo Dual-Core Engineering OS (V6.0.0)  \n\n`;
 
-    const total = 28;
     const streak = calculateRealStreak();
     let totalMins = 0;
-    appState.studySessions.forEach(s => totalMins += (s.duration || 0));
+    (appState.studySessions || []).forEach(s => totalMins += (s.duration || 0));
 
-    md += `## 一、攻坚综合总览\n\n`;
+    // 计算语雀掌握度统计
+    const yqMastery = appState.knowledgeMastery || {};
+    const masteredYqCount = Object.values(yqMastery).filter(lvl => lvl >= 3).length;
+    const yqFavsCount = (appState.knowledgeFavorites || []).length;
+
+    md += `## 一、双核工程综合战况总览\n\n`;
     md += `- **真实连续学习**: ${streak} 天\n`;
     md += `- **累计专注投入**: ${(totalMins / 60).toFixed(1)} 小时 (${totalMins} 分钟)\n`;
-    md += `- **完成任务数量**: ${appState.completedDays.length} / 28 天\n\n`;
+    md += `- **底层 muduo 任务进展**: ${appState.completedDays.length} / 28 天 (${((appState.completedDays.length / 28) * 100).toFixed(0)}%)\n`;
+    md += `- **上层 CppAIService 专栏掌握**: ${masteredYqCount} / 17 篇 (熟练及以上，重点收藏: ${yqFavsCount} 篇)\n`;
+    md += `- **生产避坑事故积累**: ${(appState.pitfalls || []).length} 条\n\n`;
 
-    md += `## 二、28 天掌握度全景矩阵\n\n`;
+    md += `## 二、muduo 底层网络库 28 天掌握度全景矩阵\n\n`;
     md += `| Day | 重点课题 | 掌握评级 | 自测表现 | Demo 状态 | 独立实现 | 源码理解 |\n`;
     md += `|:---:|:---|:---:|:---:|:---:|:---:|:---:|\n`;
 
@@ -2126,7 +2162,23 @@ function exportMarkdownReport() {
         md += `| Day ${item.day} | ${item.title} | L${m.level || 0} (${stars}) | ${scoreStr} | ${m.demo ? '✅ 跑通' : '❌ 未完'} | ${m.independentImpl ? '✅ 是' : '❌ 否'} | ${m.sourceUnderstood ? '✅ 是' : '❌ 否'} |\n`;
     });
 
-    md += `\n## 三、每日手记与微实验心得\n\n`;
+    md += `\n## 三、CppAIService 17 篇核心专栏与微服务掌握画像\n\n`;
+    md += `| 专栏编号 | 篇章课题 | 掌握评级 | 收藏状态 | 关联模块 |\n`;
+    md += `|:---:|:---|:---:|:---:|:---|\n`;
+
+    if (typeof YUQUE_ARTICLES_DATASET !== 'undefined' && Array.isArray(YUQUE_ARTICLES_DATASET)) {
+        const favSet = new Set(appState.knowledgeFavorites || []);
+        YUQUE_ARTICLES_DATASET.forEach(art => {
+            const lvl = yqMastery[art.slug] || yqMastery[art.id] || 0;
+            const isFav = favSet.has(art.slug) || favSet.has(art.id);
+            const stars = "★".repeat(lvl) + "☆".repeat(5 - lvl);
+            md += `| ${art.number} | ${art.title} | L${lvl} (${stars}) | ${isFav ? '⭐ 已收藏' : '-'} | ${art.linkedModule || '核心微服务'} |\n`;
+        });
+    } else {
+        md += `| - | *专栏数据未加载* | - | - | - |\n`;
+    }
+
+    md += `\n## 四、每日手记与微实验心得\n\n`;
     let hasNotes = false;
     DAYS_DATASET.forEach(item => {
         const note = appState.dayNotes[item.day];
@@ -2141,7 +2193,7 @@ function exportMarkdownReport() {
     });
     if (!hasNotes) md += `*暂未记录每日手记*\n\n`;
 
-    md += `## 四、muduo 8 阶核心源码研读进展\n\n`;
+    md += `## 五、muduo 8 阶核心源码研读进展\n\n`;
     getSourceRoadmap().forEach(node => {
         const s = appState.sourceStatus[node.id] || { status: '未读', notes: '' };
         md += `### ${node.name} (${node.layer})\n`;
@@ -2151,9 +2203,9 @@ function exportMarkdownReport() {
         md += `\n`;
     });
 
-    md += `## 五、个人 C++ 踩坑事故档案\n\n`;
-    appState.pitfalls.forEach(p => {
-        md += `### ${p.title} (Day ${p.day})\n`;
+    md += `## 六、双核工程避坑与生产事故档案\n\n`;
+    (appState.pitfalls || []).forEach(p => {
+        md += `### ${p.title} (${p.day ? 'Day ' + p.day : '生产事故'})\n`;
         md += `- **现象**: ${p.errorSymptom}\n`;
         md += `- **根因**: ${p.errorCause}\n`;
         md += `- **工程铁律**: ${p.conclusion}\n\n`;
@@ -2163,10 +2215,10 @@ function exportMarkdownReport() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `我的_muduo_学习档案_${getTodayDateStr()}.md`;
+    a.download = `我的_双核工程学习档案_${getTodayDateStr()}.md`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast("我的 muduo 学习档案.md 已成功生成！");
+    showToast("我的双核工程学习档案.md 已成功生成！");
 }
 
 // 全局键盘快捷键监听

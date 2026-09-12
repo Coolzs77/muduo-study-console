@@ -647,12 +647,20 @@ window.createPitfallFromYuque = function(artId) {
     }
 };
 
-// 数据持久化
+// 数据持久化 (接入 StateManager 集中架构)
 function saveYuqueState() {
     try {
-        localStorage.setItem('cppai_knowledge_mastery', JSON.stringify(appState.knowledgeMastery));
-        localStorage.setItem('cppai_knowledge_favs', JSON.stringify(appState.knowledgeFavorites));
-        localStorage.setItem('cppai_knowledge_recent', JSON.stringify(appState.knowledgeRecent));
+        if (typeof StateManager !== 'undefined') {
+            StateManager.update({
+                knowledgeMastery: appState.knowledgeMastery,
+                knowledgeFavorites: appState.knowledgeFavorites,
+                knowledgeRecent: appState.knowledgeRecent
+            }, { save: true, immediate: false });
+        } else {
+            localStorage.setItem('cppai_knowledge_mastery', JSON.stringify(appState.knowledgeMastery));
+            localStorage.setItem('cppai_knowledge_favs', JSON.stringify(appState.knowledgeFavorites));
+            localStorage.setItem('cppai_knowledge_recent', JSON.stringify(appState.knowledgeRecent));
+        }
     } catch (e) {
         console.error("保存语雀状态失败:", e);
     }
@@ -824,16 +832,23 @@ function renderFloatingNavWidget(art) {
     tocList.innerHTML = tocHtml;
 }
 
-// 启动时自动恢复持久化
+// 启动时自动恢复持久化 (对接 StateManager)
 function loadYuqueState() {
     ensureYuqueState();
     try {
-        const m = localStorage.getItem('cppai_knowledge_mastery');
-        if (m) appState.knowledgeMastery = JSON.parse(m);
-        const f = localStorage.getItem('cppai_knowledge_favs');
-        if (f) appState.knowledgeFavorites = JSON.parse(f);
-        const r = localStorage.getItem('cppai_knowledge_recent');
-        if (r) appState.knowledgeRecent = JSON.parse(r);
+        if (typeof StateManager !== 'undefined') {
+            const state = StateManager.getState();
+            if (state.knowledgeMastery) appState.knowledgeMastery = state.knowledgeMastery;
+            if (state.knowledgeFavorites) appState.knowledgeFavorites = state.knowledgeFavorites;
+            if (state.knowledgeRecent) appState.knowledgeRecent = state.knowledgeRecent;
+        } else {
+            const m = localStorage.getItem('cppai_knowledge_mastery');
+            if (m) appState.knowledgeMastery = JSON.parse(m);
+            const f = localStorage.getItem('cppai_knowledge_favs');
+            if (f) appState.knowledgeFavorites = JSON.parse(f);
+            const r = localStorage.getItem('cppai_knowledge_recent');
+            if (r) appState.knowledgeRecent = JSON.parse(r);
+        }
 
         // 恢复侧边栏折叠状态
         const isCollapsed = localStorage.getItem('cppai_sidebar_collapsed');
