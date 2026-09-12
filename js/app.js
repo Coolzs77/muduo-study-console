@@ -317,10 +317,71 @@ function calculateRealStreak() {
     return streak;
 }
 
-// 视图切换
+// 今日待办侧边栏切换与持久化
+function toggleTaskSidebar(forceState) {
+    const sidebar = document.getElementById('task-sidebar');
+    const fab = document.getElementById('task-sidebar-fab');
+    const backdrop = document.getElementById('task-sidebar-backdrop');
+    const navBtn = document.getElementById('nav-tasks');
+    const viewTasks = document.getElementById('view-tasks');
+    if (!sidebar) return;
+
+    const isCurrentlyHidden = sidebar.classList.contains('hidden');
+    const targetOpen = typeof forceState === 'boolean' ? forceState : isCurrentlyHidden;
+
+    if (targetOpen) {
+        sidebar.classList.remove('hidden');
+        if (viewTasks) viewTasks.classList.remove('hidden');
+        if (fab) fab.classList.add('hidden');
+        if (backdrop) backdrop.classList.remove('hidden');
+        if (navBtn) {
+            navBtn.classList.add('bg-indigo-100', 'border-indigo-400');
+            navBtn.classList.remove('bg-indigo-50');
+            navBtn.setAttribute('aria-expanded', 'true');
+        }
+        try { localStorage.setItem('task_sidebar_open', 'true'); } catch(e) {}
+        if (typeof renderTaskHub === 'function') renderTaskHub();
+    } else {
+        sidebar.classList.add('hidden');
+        if (fab) fab.classList.remove('hidden');
+        if (backdrop) backdrop.classList.add('hidden');
+        if (navBtn) {
+            navBtn.classList.remove('bg-indigo-100', 'border-indigo-400');
+            navBtn.classList.add('bg-indigo-50');
+            navBtn.setAttribute('aria-expanded', 'false');
+        }
+        try { localStorage.setItem('task_sidebar_open', 'false'); } catch(e) {}
+    }
+}
+
+function initTaskSidebar() {
+    let saved = null;
+    try {
+        saved = localStorage.getItem('task_sidebar_open');
+    } catch(e) {}
+    if (saved === 'false') {
+        toggleTaskSidebar(false);
+    } else if (saved === 'true') {
+        toggleTaskSidebar(true);
+    } else {
+        // 首次访问：宽屏 (>= 1280px) 默认展开常驻，小屏幕 (< 1280px) 默认折叠以保持专注
+        const isWide = typeof window !== 'undefined' && window.innerWidth ? window.innerWidth >= 1280 : true;
+        toggleTaskSidebar(isWide);
+    }
+}
+
+// 视图切换 (核心学习视图在工作区内切换，今日待办在侧边栏联动)
 function switchView(viewName) {
+    if (viewName === 'tasks') {
+        toggleTaskSidebar(true);
+        const viewTasks = document.getElementById('view-tasks');
+        if (viewTasks) viewTasks.classList.remove('hidden');
+        renderTaskHub();
+        return;
+    }
+
     appState.currentView = viewName;
-    const views = ['dashboard', 'tasks', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
+    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -337,9 +398,7 @@ function switchView(viewName) {
         }
     });
 
-    if (viewName === 'tasks') {
-        renderTaskHub();
-    } else if (viewName === 'daily') {
+    if (viewName === 'daily') {
         renderDailyCards();
     } else if (viewName === 'knowledge') {
         if (typeof renderYuqueExplorer === 'function') renderYuqueExplorer();
@@ -566,19 +625,30 @@ function updateDashboardMetrics() {
     if (elCardAvg) elCardAvg.innerText = `${avgMins}m`;
 
     // 渲染子模块
-    // 更新今日任务导航待办角标
+    // 更新今日任务导航待办角标与悬浮胶囊角标
     const elBadgeTasks = document.getElementById('badge-nav-tasks');
-    if (elBadgeTasks && appState.dailyRoutine && Array.isArray(appState.dailyRoutine.tasks)) {
+    const elBadgeFab = document.getElementById('badge-sidebar-fab');
+    if (appState.dailyRoutine && Array.isArray(appState.dailyRoutine.tasks)) {
         let prog = null;
         if (typeof TaskDomain !== 'undefined' && typeof TaskDomain.calculateRoutineProgress === 'function') {
             prog = TaskDomain.calculateRoutineProgress(appState.dailyRoutine.tasks, appState.dailyRoutine.mode);
         }
         const pendingCount = prog ? (prog.activeTotal - prog.completed) : 0;
-        if (pendingCount > 0) {
-            elBadgeTasks.innerText = pendingCount;
-            elBadgeTasks.classList.remove('hidden');
-        } else {
-            elBadgeTasks.classList.add('hidden');
+        if (elBadgeTasks) {
+            if (pendingCount > 0) {
+                elBadgeTasks.innerText = pendingCount;
+                elBadgeTasks.classList.remove('hidden');
+            } else {
+                elBadgeTasks.classList.add('hidden');
+            }
+        }
+        if (elBadgeFab) {
+            if (pendingCount > 0) {
+                elBadgeFab.innerText = pendingCount;
+                elBadgeFab.classList.remove('hidden');
+            } else {
+                elBadgeFab.classList.add('hidden');
+            }
         }
     }
 
@@ -2827,6 +2897,10 @@ document.addEventListener('keydown', (e) => {
         if (typeof toggleFloatingNav === 'function') {
             toggleFloatingNav();
         }
+    } else if (e.key === 't' || e.key === 'T') {
+        if (typeof toggleTaskSidebar === 'function') {
+            toggleTaskSidebar();
+        }
     }
 });
 
@@ -2836,6 +2910,8 @@ window.addEventListener('DOMContentLoaded', () => {
     try { if (typeof initStudyTimer === 'function') initStudyTimer(); } catch(e) { console.error('initStudyTimer error:', e); }
     try { initQuizDaySelector(); } catch(e) { console.error('initQuizDaySelector error:', e); }
     try { setWorkspaceMode(appState.workspaceMode || 'full'); } catch(e) { console.error('setWorkspaceMode error:', e); }
+    try { initTaskSidebar(); } catch(e) { console.error('initTaskSidebar error:', e); }
+    try { renderTaskHub(); } catch(e) { console.error('renderTaskHub error:', e); }
     try { updateDashboardMetrics(); } catch(e) { console.error('updateDashboardMetrics error:', e); }
     try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
     try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
@@ -3131,29 +3207,29 @@ function renderTaskHub() {
             : (isSusp ? 'border-stone-200 bg-stone-50/50 opacity-60' : 'border-stone-200 bg-white');
 
         return `
-            <div class="p-4 rounded-xl border ${cardBorder} transition hover:border-stone-400 shadow-xs">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" onchange="toggleTaskCompleted('${task.id}')" ${isDone ? 'checked' : ''} ${isSusp ? 'disabled' : ''} class="mt-1 w-4 h-4 rounded text-sky-700 focus:ring-sky-600 cursor-pointer">
-                        <div>
-                            <div class="flex items-center gap-2 flex-wrap">
+            <div class="p-3 sm:p-3.5 rounded-xl border ${cardBorder} transition hover:border-stone-400 shadow-2xs">
+                <div class="flex items-start justify-between gap-2.5">
+                    <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                        <input type="checkbox" onchange="toggleTaskCompleted('${task.id}')" ${isDone ? 'checked' : ''} ${isSusp ? 'disabled' : ''} class="mt-0.5 w-4 h-4 rounded text-sky-700 focus:ring-sky-600 cursor-pointer shrink-0">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
                                 ${badgePriority}
                                 ${suspensionBadge}
-                                <span class="text-xs font-bold ${isDone ? 'line-through text-stone-400' : 'text-stone-900'}">${escapeHtml(task.title)}</span>
                             </div>
-                            <p class="text-[11px] text-stone-500 mt-1 leading-relaxed ${isDone ? 'line-through text-stone-400' : ''}">
+                            <div class="text-xs font-bold mt-1 leading-snug ${isDone ? 'line-through text-stone-400' : 'text-stone-900'}">${escapeHtml(task.title)}</div>
+                            <p class="text-[11px] text-stone-500 mt-0.5 leading-relaxed ${isDone ? 'line-through text-stone-400' : ''}">
                                 ${escapeHtml(task.subtitle || task.description || '')}
                             </p>
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-2 shrink-0 font-serifMono">
-                        <span class="text-[11px] text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    <div class="flex items-center gap-1.5 shrink-0 font-serifMono">
+                        <span class="text-[10px] text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                             <i class="fa-regular fa-clock"></i> ${timeLabel}
                         </span>
-                        <button onclick="startTimerForTask('${task.id}', '${escapeHtml(task.title)}', '${task.category || 'coding'}', ${task.estimatedMinutes || 30})" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-lg transition flex items-center gap-1 cursor-pointer" title="一键带入专注计时器">
-                            <i class="fa-solid fa-stopwatch text-amber-600"></i>
-                            <span class="hidden sm:inline">计时</span>
+                        <button onclick="startTimerForTask('${task.id}', '${escapeHtml(task.title)}', '${task.category || 'coding'}', ${task.estimatedMinutes || 30})" class="px-2 py-0.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-bold rounded transition flex items-center gap-1 cursor-pointer" title="一键带入专注计时器">
+                            <i class="fa-solid fa-stopwatch text-amber-600 text-[10px]"></i>
+                            <span>计时</span>
                         </button>
                         ${deleteBtn}
                     </div>
@@ -3279,12 +3355,12 @@ function renderTaskHistoryStrip() {
         else if (rate > 0) rateColor = 'bg-sky-50 border-sky-300 text-sky-900';
 
         return `
-            <div class="p-2.5 rounded-xl border ${rateColor} font-serifMono text-center flex flex-col justify-between">
-                <div class="text-[10px] text-stone-500 font-bold flex items-center justify-center gap-1">
-                    ${isToday ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 今日' : dStr.slice(5)}
+            <div class="p-1.5 rounded-lg border ${rateColor} font-serifMono text-center flex flex-col justify-between">
+                <div class="text-[9px] text-stone-500 font-bold flex items-center justify-center gap-0.5">
+                    ${isToday ? '<span class="w-1 h-1 rounded-full bg-emerald-500 shrink-0"></span>今' : dStr.slice(5)}
                 </div>
-                <div class="text-base font-bold my-1">${rate}%</div>
-                <div class="text-[10px] text-stone-400 truncate">${completed}/${total} 项 (${mode === 'compact' ? '紧凑' : '全量'})</div>
+                <div class="text-xs font-bold my-0.5">${rate}%</div>
+                <div class="text-[8px] text-stone-400 truncate">${completed}/${total}</div>
             </div>
         `;
     }).join('');
@@ -3594,6 +3670,8 @@ if (typeof window !== 'undefined') {
     window.switchEnvModalTab = switchEnvModalTab;
 
     // Phase 4 方法挂载
+    window.toggleTaskSidebar = toggleTaskSidebar;
+    window.initTaskSidebar = initTaskSidebar;
     window.renderTaskHub = renderTaskHub;
     window.toggleTaskCompleted = toggleTaskCompleted;
     window.setRoutineMode = setRoutineMode;
@@ -3622,6 +3700,8 @@ if (typeof globalThis !== 'undefined') {
     globalThis.closeTopologyDrawer = closeTopologyDrawer;
 
     // Phase 4 方法挂载
+    globalThis.toggleTaskSidebar = toggleTaskSidebar;
+    globalThis.initTaskSidebar = initTaskSidebar;
     globalThis.renderTaskHub = renderTaskHub;
     globalThis.toggleTaskCompleted = toggleTaskCompleted;
     globalThis.setRoutineMode = setRoutineMode;
@@ -3652,6 +3732,8 @@ if (typeof module !== 'undefined' && module.exports) {
         closeTopologyDrawer,
         updateDashboardMetrics,
         renderTodayMissionCard,
+        toggleTaskSidebar,
+        initTaskSidebar,
         renderTaskHub,
         toggleTaskCompleted,
         setRoutineMode,

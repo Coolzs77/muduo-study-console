@@ -16,6 +16,10 @@ console.log('[Test 1] 验证 index.html 中 Phase 4 DOM 容器与模态框完整
 const requiredDomIds = [
     'nav-tasks',
     'badge-nav-tasks',
+    'task-sidebar',
+    'task-sidebar-fab',
+    'badge-sidebar-fab',
+    'task-sidebar-backdrop',
     'view-tasks',
     'task-hub-date-str',
     'btn-mode-normal',
@@ -246,6 +250,17 @@ console.log('  ✓ 切换为 compact 紧凑保底模式：B/C 任务免除，保
 context.setRoutineMode('normal');
 assert.strictEqual(domStore['compact-mode-alert'].classList.contains('hidden'), true, 'compact-mode-alert should be hidden in normal mode');
 console.log('  ✓ 切换回 normal 常规模式：所有任务恢复活跃');
+
+// 验证右侧边栏折叠收起与展开唤出 (toggleTaskSidebar)
+context.toggleTaskSidebar(false);
+assert.strictEqual(domStore['task-sidebar'].classList.contains('hidden'), true, 'Sidebar should be hidden when collapsed');
+assert.strictEqual(domStore['task-sidebar-fab'].classList.contains('hidden'), false, 'FAB button should be visible when collapsed');
+console.log('  ✓ 侧边栏折叠验证：#task-sidebar 成功隐藏，右侧悬浮胶囊 #task-sidebar-fab 唤出');
+
+context.toggleTaskSidebar(true);
+assert.strictEqual(domStore['task-sidebar'].classList.contains('hidden'), false, 'Sidebar should be visible when expanded');
+assert.strictEqual(domStore['task-sidebar-fab'].classList.contains('hidden'), true, 'FAB button should be hidden when expanded');
+console.log('  ✓ 侧边栏展开验证：#task-sidebar 成功恢复，悬浮胶囊隐藏');
 console.log('✓ Test 7 Passed!\n');
 
 // 8. 验证算法、书本、求职与自定义任务弹窗操作

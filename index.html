@@ -63,7 +63,7 @@
     <span id="toast-msg">记录已保存</span>
 </div>
 
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-7 w-full">
+<div class="max-w-[1720px] mx-auto px-3 sm:px-5 lg:px-8 xl:px-10 pt-4 sm:pt-6 w-full transition-all duration-300">
     
     <!-- 头部学术看板与统计总览 (优化布局：顶栏标题与操作指引，下栏 7 维全宽指标卡片) -->
     <header class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card mb-6 sm:mb-8 relative overflow-hidden">
@@ -225,37 +225,51 @@
         </div>
     </header>
 
-    <!-- 顶部主视图切换导航 (8大核心模块) -->
-    <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-3 mb-6 font-serifHeading text-xs sm:text-sm" id="view-tabs" role="tablist" aria-label="主视图导航">
-        <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="学习概览与架构拓扑">
-            <i class="fa-solid fa-chart-pie text-sky-700"></i> 学习概览与架构拓扑
-        </button>
-        <button onclick="switchView('tasks')" id="nav-tasks" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="今日任务调度中心">
-            <i class="fa-solid fa-list-check text-indigo-600"></i> 今日任务调度
-            <span id="badge-nav-tasks" class="hidden text-[10px] font-serifMono font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900">0</span>
-        </button>
-        <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="CppAIService 专栏知识库">
-            <i class="fa-solid fa-book-bookmark text-blue-600"></i> CppAIService 知识库
-        </button>
-        <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
-            <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
-        </button>
-        <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="语法 ➔ muduo 映射矩阵">
-            <i class="fa-solid fa-sitemap text-emerald-600"></i> 语法 ➔ muduo 映射矩阵
-        </button>
-        <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="每日自测中心">
-            <i class="fa-solid fa-clipboard-question text-purple-600"></i> 每日自测中心
-        </button>
-        <button onclick="switchView('source')" id="nav-source" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="muduo 源码路线">
-            <i class="fa-solid fa-code-branch text-teal-600"></i> muduo 源码路线
-        </button>
-        <button onclick="switchView('pitfalls')" id="nav-pitfalls" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="C++ 踩坑档案">
-            <i class="fa-solid fa-bug text-rose-600"></i> C++ 踩坑档案
-        </button>
-    </nav>
+    <!-- 顶部主视图切换导航与右侧边栏待办快捷开关 -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <!-- 7大核心学习视图切换导航 -->
+        <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-0 font-serifHeading text-xs sm:text-sm flex-1 min-w-0" id="view-tabs" role="tablist" aria-label="主视图导航">
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="学习概览与架构拓扑">
+                <i class="fa-solid fa-chart-pie text-sky-700"></i> 学习概览与架构拓扑
+            </button>
+            <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="CppAIService 专栏知识库">
+                <i class="fa-solid fa-book-bookmark text-blue-600"></i> CppAIService 知识库
+            </button>
+            <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
+                <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
+            </button>
+            <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="语法 ➔ muduo 映射矩阵">
+                <i class="fa-solid fa-sitemap text-emerald-600"></i> 语法 ➔ muduo 映射矩阵
+            </button>
+            <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="每日自测中心">
+                <i class="fa-solid fa-clipboard-question text-purple-600"></i> 每日自测中心
+            </button>
+            <button onclick="switchView('source')" id="nav-source" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="muduo 源码路线">
+                <i class="fa-solid fa-code-branch text-teal-600"></i> muduo 源码路线
+            </button>
+            <button onclick="switchView('pitfalls')" id="nav-pitfalls" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="C++ 踩坑档案">
+                <i class="fa-solid fa-bug text-rose-600"></i> C++ 踩坑档案
+            </button>
+        </nav>
 
-    <!-- ==================== VIEW 1: 仪表盘与架构拓扑 ==================== -->
-    <section id="view-dashboard" class="space-y-6">
+        <!-- 任务边栏常驻快捷开关按钮 -->
+        <div class="flex items-center gap-2 shrink-0">
+            <button onclick="toggleTaskSidebar()" id="nav-tasks" class="px-3.5 py-2 rounded-xl flex items-center gap-2 font-serifHeading text-xs sm:text-sm font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border border-indigo-200/80 shadow-xs transition whitespace-nowrap cursor-pointer" title="展开 / 收起今日任务待办侧边栏" aria-label="今日任务待办">
+                <i class="fa-solid fa-list-check text-indigo-600"></i>
+                <span>今日待办</span>
+                <span id="badge-nav-tasks" class="text-[11px] font-serifMono font-bold px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 双核工作台主布局 (左侧核心学习工作区 + 右侧任务待办伴侣边栏) -->
+    <div class="flex flex-col xl:flex-row items-start gap-6 relative w-full mb-8">
+        
+        <!-- 左侧/中部：核心学习工作区 (Dashboard, Knowledge, Daily, Mapping, Quiz, Source, Pitfalls) -->
+        <main id="main-content-area" class="flex-1 min-w-0 w-full transition-all duration-300 space-y-6">
+
+            <!-- ==================== VIEW 1: 仪表盘与架构拓扑 ==================== -->
+            <section id="view-dashboard" class="space-y-6">
         
         <!-- 今日最高优先级任务卡 (Today's Mission) -->
         <div id="today-mission-card" class="bg-gradient-to-r from-amber-50 via-white to-sky-50 rounded-2xl p-5 sm:p-6 border border-amber-200/80 academic-card">
@@ -1116,109 +1130,8 @@
         </div>
     </section>
 
-    <!-- ==================== VIEW: 今日任务调度中心 (Tasks) ==================== -->
-    <section id="view-tasks" class="hidden space-y-6">
-        <!-- 任务中心顶栏状态与模式切换卡片 -->
-        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-5 border-b border-stone-100">
-                <div>
-                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-serifMono mb-1.5">
-                        <i class="fa-solid fa-calendar-check text-indigo-600"></i>
-                        <span id="task-hub-date-str">今日日程</span>
-                        <span class="text-stone-300">•</span>
-                        <span>Google Tasks 映射</span>
-                    </div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-stone-900 font-serif-heading flex items-center gap-2">
-                        <span>双轨统一今日任务调度中心</span>
-                    </h2>
-                    <p class="text-stone-600 text-xs sm:text-sm mt-1 max-w-3xl leading-relaxed">
-                        基于 S/A/B/C 优先级构建主线，对齐 IT 攻坚 (3h)、算法手撕 (1.5h)、专业书目 (1h)、八股自测 (0.5h) 与通识就业日程，支持动态工时降级保护与一键专注计时联动。
-                    </p>
-                </div>
+    <!-- (view-tasks 已移至右侧常驻/折叠待办边栏 #task-sidebar) -->
 
-                <!-- 模式切换控制器与添加任务 -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 font-serifMono">
-                    <!-- 动态降级模式切换 -->
-                    <div class="flex items-center p-1 bg-stone-100 rounded-xl border border-stone-200 text-xs">
-                        <button onclick="setRoutineMode('normal')" id="btn-mode-normal" class="px-3 py-1.5 rounded-lg font-bold bg-white text-stone-900 shadow-xs transition cursor-pointer flex items-center gap-1.5" title="标准全量模式 (7.0h)">
-                            <i class="fa-solid fa-compass text-sky-700"></i>
-                            <span>标准全量 (7.0h)</span>
-                        </button>
-                        <button onclick="setRoutineMode('compact')" id="btn-mode-compact" class="px-3 py-1.5 rounded-lg font-semibold text-stone-600 hover:text-stone-900 transition cursor-pointer flex items-center gap-1.5" title="紧凑保底模式 (5.5h，免除B/C级任务，主攻S/A主干)">
-                            <i class="fa-solid fa-shield-halved text-amber-700"></i>
-                            <span>紧凑保底 (5.5h)</span>
-                        </button>
-                    </div>
-
-                    <button onclick="openAddTaskModal()" class="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
-                        <i class="fa-solid fa-plus text-sky-400"></i> 新增任务
-                    </button>
-                </div>
-            </div>
-
-            <!-- 动态降级提示条 (仅在 compact 模式时显示) -->
-            <div id="compact-mode-alert" class="hidden mt-4 p-3.5 bg-amber-50/90 border border-amber-200 rounded-xl flex items-center justify-between text-xs font-serifMono">
-                <div class="flex items-center gap-2 text-amber-900">
-                    <i class="fa-solid fa-shield-cat text-amber-700 text-base"></i>
-                    <span><strong>紧凑保底模式已生效：</strong>仅保留 S 级项目攻坚与 A 级算法/底层书目，B 级与 C 级任务已置为今日免除，不计入断签惩罚。</span>
-                </div>
-                <button onclick="setRoutineMode('normal')" class="text-amber-800 hover:text-amber-950 underline font-bold ml-2 shrink-0 cursor-pointer">切回全量</button>
-            </div>
-
-            <!-- 今日指标概览卡片行 -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-stone-100 font-serifMono text-center">
-                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200/80">
-                    <div class="text-xs text-stone-500 font-bold">任务完成数</div>
-                    <div class="text-xl sm:text-2xl font-bold text-stone-900 my-1" id="hub-stat-completed">0 / 7</div>
-                    <div class="text-[11px] text-stone-400 font-semibold truncate" id="hub-stat-completed-desc">已完成 / 今日任务</div>
-                </div>
-                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200/80">
-                    <div class="text-xs text-stone-500 font-bold">今日完成率</div>
-                    <div class="text-xl sm:text-2xl font-bold text-indigo-700 my-1" id="hub-stat-rate">0%</div>
-                    <div class="text-[11px] text-stone-400 font-semibold truncate">基于当前模式</div>
-                </div>
-                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200/80">
-                    <div class="text-xs text-stone-500 font-bold">预计总工时</div>
-                    <div class="text-xl sm:text-2xl font-bold text-sky-800 my-1" id="hub-stat-total-mins">420 min</div>
-                    <div class="text-[11px] text-stone-400 font-semibold truncate" id="hub-stat-hours-desc">约 7.0 小时</div>
-                </div>
-                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200/80">
-                    <div class="text-xs text-stone-500 font-bold">剩余预估工时</div>
-                    <div class="text-xl sm:text-2xl font-bold text-amber-700 my-1" id="hub-stat-remain-mins">420 min</div>
-                    <div class="text-[11px] text-stone-400 font-semibold truncate">今日待投入</div>
-                </div>
-            </div>
-
-            <!-- 今日任务完成进度大条 -->
-            <div class="mt-4 pt-3 border-t border-stone-100">
-                <div class="flex items-center justify-between text-xs text-stone-500 font-serifMono mb-1.5">
-                    <span>今日任务推进流水线</span>
-                    <span id="hub-progress-text" class="text-indigo-700 font-bold">0% 完成</span>
-                </div>
-                <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden border border-stone-200/80">
-                    <div id="hub-progress-fill" class="h-full bg-gradient-to-r from-sky-600 via-indigo-600 to-emerald-600 transition-all duration-500 rounded-full" style="width: 0%;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 任务清单渲染容器 (由 JS 动态分为 S / A / B / C 模块) -->
-        <div id="task-hub-list-container" class="space-y-6">
-            <!-- 动态渲染 S / A / B / C 卡片组 -->
-        </div>
-
-        <!-- 过去 7 天打卡完成历史看板 -->
-        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serif-heading flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-sky-700"></i> 近 7 天任务执行历史
-                </h3>
-                <span class="text-xs font-serifMono text-stone-500">自动按日留存快照</span>
-            </div>
-            <div id="task-history-strip" class="grid grid-cols-2 sm:grid-cols-7 gap-2.5 pt-2">
-                <!-- 动态填充 7 天状态快照 -->
-            </div>
-        </div>
-    </section>
 
     <!-- ==================== VIEW 2: 28天任务与实验 ==================== -->
     <section id="view-daily" class="hidden space-y-6">
@@ -1561,6 +1474,122 @@
             </div>
         </div>
     </section>
+        </main>
+
+        <!-- 移动端遮罩层 (在小于 xl 屏幕抽屉打开时显示) -->
+        <div id="task-sidebar-backdrop" onclick="toggleTaskSidebar(false)" class="hidden fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-40 xl:hidden"></div>
+
+        <!-- 右侧边栏：今日任务待办 (Todo Dock) -->
+        <aside id="task-sidebar" class="w-full xl:w-[410px] shrink-0 sticky top-4 self-start transition-all duration-300 z-40">
+            <section id="view-tasks" class="w-full bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 academic-card flex flex-col max-h-[calc(100vh-2rem)] overflow-y-auto task-sidebar-scroll">
+                <!-- 顶栏：标题 + 日期 + 模式切换 + 操作按钮 -->
+                <div class="pb-3 border-b border-stone-100 flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+                            <h2 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading flex items-center gap-1.5">
+                                <span>今日任务待办</span>
+                            </h2>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="openAddTaskModal()" class="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-[11px] font-serifMono font-bold transition flex items-center gap-1 shadow-xs cursor-pointer" title="添加自定义任务">
+                                <i class="fa-solid fa-plus text-sky-400 text-[10px]"></i> 新增
+                            </button>
+                            <button onclick="toggleTaskSidebar(false)" class="px-2 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-serifMono transition flex items-center gap-1 cursor-pointer" title="收起待办侧边栏">
+                                <i class="fa-solid fa-chevron-right text-[11px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 text-[11px] font-serifMono">
+                        <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-50/80 border border-indigo-100 text-indigo-900 text-[11px]">
+                            <i class="fa-solid fa-calendar-day text-indigo-600"></i>
+                            <span id="task-hub-date-str">今日日程</span>
+                        </div>
+
+                        <!-- 动态降级模式切换 -->
+                        <div class="flex items-center p-0.5 bg-stone-100 rounded-lg border border-stone-200">
+                            <button onclick="setRoutineMode('normal')" id="btn-mode-normal" class="px-2 py-0.5 rounded-md font-bold bg-white text-stone-900 shadow-xs transition cursor-pointer text-[11px]" title="标准全量模式 (7.0h)">
+                                7.0h
+                            </button>
+                            <button onclick="setRoutineMode('compact')" id="btn-mode-compact" class="px-2 py-0.5 rounded-md font-semibold text-stone-600 hover:text-stone-900 transition cursor-pointer text-[11px]" title="紧凑保底模式 (5.5h，免除B/C级任务，主攻S/A主干)">
+                                5.5h保底
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 动态降级提示条 (仅在 compact 模式时显示) -->
+                <div id="compact-mode-alert" class="hidden my-2.5 p-2.5 bg-amber-50/90 border border-amber-200 rounded-xl flex items-center justify-between text-[11px] font-serifMono">
+                    <div class="flex items-center gap-1.5 text-amber-900 leading-tight">
+                        <i class="fa-solid fa-shield-cat text-amber-700 text-sm shrink-0"></i>
+                        <span><strong>紧凑保底中：</strong>仅保留S/A级主干，B/C级免除。</span>
+                    </div>
+                    <button onclick="setRoutineMode('normal')" class="text-amber-800 hover:text-amber-950 underline font-bold ml-1 shrink-0 cursor-pointer">恢复</button>
+                </div>
+
+                <!-- 今日指标紧凑网格 -->
+                <div class="grid grid-cols-2 gap-2 my-2.5 font-serifMono text-center">
+                    <div class="bg-stone-50 p-2 rounded-xl border border-stone-200/70">
+                        <div class="text-[10px] text-stone-500 font-bold">任务完成数</div>
+                        <div class="text-base font-bold text-stone-900 my-0.5" id="hub-stat-completed">0 / 7</div>
+                        <div class="text-[10px] text-stone-400 font-medium truncate" id="hub-stat-completed-desc">已完成 / 今日任务</div>
+                    </div>
+                    <div class="bg-stone-50 p-2 rounded-xl border border-stone-200/70">
+                        <div class="text-[10px] text-stone-500 font-bold">今日完成率</div>
+                        <div class="text-base font-bold text-indigo-700 my-0.5" id="hub-stat-rate">0%</div>
+                        <div class="text-[10px] text-stone-400 font-medium truncate">基于当前模式</div>
+                    </div>
+                    <div class="bg-stone-50 p-2 rounded-xl border border-stone-200/70">
+                        <div class="text-[10px] text-stone-500 font-bold">预计总工时</div>
+                        <div class="text-base font-bold text-sky-800 my-0.5" id="hub-stat-total-mins">420 min</div>
+                        <div class="text-[10px] text-stone-400 font-medium truncate" id="hub-stat-hours-desc">约 7.0 小时</div>
+                    </div>
+                    <div class="bg-stone-50 p-2 rounded-xl border border-stone-200/70">
+                        <div class="text-[10px] text-stone-500 font-bold">剩余预估工时</div>
+                        <div class="text-base font-bold text-amber-700 my-0.5" id="hub-stat-remain-mins">420 min</div>
+                        <div class="text-[10px] text-stone-400 font-medium truncate">今日待投入</div>
+                    </div>
+                </div>
+
+                <!-- 今日任务完成进度条 -->
+                <div class="pb-2.5 mb-2 border-b border-stone-100">
+                    <div class="flex items-center justify-between text-[11px] text-stone-500 font-serifMono mb-1">
+                        <span>推进流水线</span>
+                        <span id="hub-progress-text" class="text-indigo-700 font-bold">0% 完成</span>
+                    </div>
+                    <div class="w-full h-2 bg-stone-100 rounded-full overflow-hidden border border-stone-200/80">
+                        <div id="hub-progress-fill" class="h-full bg-gradient-to-r from-sky-600 via-indigo-600 to-emerald-600 transition-all duration-500 rounded-full" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- 任务清单渲染容器 (由 JS 动态分为 S / A / B / C 模块) -->
+                <div id="task-hub-list-container" class="space-y-4 flex-1">
+                    <!-- 动态渲染 S / A / B / C 卡片组 -->
+                </div>
+
+                <!-- 过去 7 天打卡完成历史看板 -->
+                <div class="mt-4 pt-3 border-t border-stone-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-bold text-stone-800 font-serif-heading flex items-center gap-1.5">
+                            <i class="fa-solid fa-clock-rotate-left text-sky-700"></i> 近 7 天执行历史
+                        </h3>
+                        <span class="text-[10px] font-serifMono text-stone-400">自动归档</span>
+                    </div>
+                    <div id="task-history-strip" class="grid grid-cols-7 gap-1 pt-1">
+                        <!-- 动态填充 7 天状态快照 -->
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div> <!-- 闭合双核工作台主布局 flex flex-col xl:flex-row -->
+
+    <!-- 右侧浮动常驻唤出胶囊 (当侧边栏折叠隐藏时显示) -->
+    <button id="task-sidebar-fab" onclick="toggleTaskSidebar(true)" class="hidden fixed right-0 top-1/2 -translate-y-1/2 z-30 bg-stone-900/95 hover:bg-stone-800 text-white pl-3 pr-2 py-3 rounded-l-2xl shadow-xl transition flex flex-col items-center gap-1.5 cursor-pointer task-fab font-serifMono border-l border-t border-b border-stone-700">
+        <i class="fa-solid fa-list-check text-sky-400 text-sm"></i>
+        <span class="[writing-mode:vertical-rl] text-[11px] font-bold tracking-widest py-1">今日待办</span>
+        <span id="badge-sidebar-fab" class="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-400 text-stone-950">0</span>
+    </button>
 
     <!-- 底部持久化与备份状态栏 -->
     <footer class="mt-8 bg-white border border-stone-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500 font-serifMono">
