@@ -24,9 +24,34 @@ function getPitfallsDataset() {
     return [];
 }
 
+function getDomainModulesDataset() {
+    if (typeof DOMAIN_MODULES !== 'undefined' && Array.isArray(DOMAIN_MODULES)) return DOMAIN_MODULES;
+    if (typeof window !== 'undefined' && window.DOMAIN_MODULES && Array.isArray(window.DOMAIN_MODULES)) return window.DOMAIN_MODULES;
+    return [];
+}
+
+function getDomainKnowledgeDataset() {
+    if (typeof DOMAIN_KNOWLEDGE_NODES !== 'undefined' && Array.isArray(DOMAIN_KNOWLEDGE_NODES)) return DOMAIN_KNOWLEDGE_NODES;
+    if (typeof window !== 'undefined' && window.DOMAIN_KNOWLEDGE_NODES && Array.isArray(window.DOMAIN_KNOWLEDGE_NODES)) return window.DOMAIN_KNOWLEDGE_NODES;
+    return [];
+}
+
+function getDomainPitfallsDataset() {
+    if (typeof DOMAIN_PITFALLS_CATALOG !== 'undefined' && Array.isArray(DOMAIN_PITFALLS_CATALOG)) return DOMAIN_PITFALLS_CATALOG;
+    if (typeof window !== 'undefined' && window.DOMAIN_PITFALLS_CATALOG && Array.isArray(window.DOMAIN_PITFALLS_CATALOG)) return window.DOMAIN_PITFALLS_CATALOG;
+    return [];
+}
+
+function getYuqueDataset() {
+    if (typeof YUQUE_ARTICLES_DATASET !== 'undefined' && Array.isArray(YUQUE_ARTICLES_DATASET)) return YUQUE_ARTICLES_DATASET;
+    if (typeof window !== 'undefined' && window.YUQUE_ARTICLES_DATASET && Array.isArray(window.YUQUE_ARTICLES_DATASET)) return window.YUQUE_ARTICLES_DATASET;
+    return [];
+}
+
 var appState = {
     // 全局根状态对象 (V6.0.0 双核架构规范)
     version: "6.0.0",
+    workspaceMode: "full", // 'full' | 'muduo' | 'cppai'
     completedDays: [],
     mastery: {},         // { [day]: { level: 0..5, read: false, quizPassed: false, demo: false, independentImpl: false, sourceUnderstood: false, completedAt: null, score: 0, quizScores: null } }
     reviews: {},         // { [day]: { stage: 0..5, nextReviewDate: '', lastReviewDate: '', intervalDays: 1, reviewCount: 0, history: [] } }
@@ -326,9 +351,104 @@ function switchView(viewName) {
     }
 }
 
-// 顶部 Dashboard 指标计算与更新
+// ==================== 双核工作台与拓扑控制导航 (Dual-Core Workspace & Topology) ====================
+
+// 1. 双核工作台模式切换 ('full' | 'muduo' | 'cppai')
+function setWorkspaceMode(mode) {
+    appState.workspaceMode = mode;
+    const btnFull = document.getElementById('ws-btn-full');
+    const btnMuduo = document.getElementById('ws-btn-muduo');
+    const btnCppai = document.getElementById('ws-btn-cppai');
+
+    if (btnFull) {
+        btnFull.className = mode === 'full'
+            ? 'px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer'
+            : 'px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200 cursor-pointer';
+    }
+    if (btnMuduo) {
+        btnMuduo.className = mode === 'muduo'
+            ? 'px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-sky-800 text-white border-sky-800 shadow-xs cursor-pointer'
+            : 'px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100 cursor-pointer';
+    }
+    if (btnCppai) {
+        btnCppai.className = mode === 'cppai'
+            ? 'px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-amber-700 text-white border-amber-700 shadow-xs cursor-pointer'
+            : 'px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100 cursor-pointer';
+    }
+
+    if (mode === 'muduo') {
+        switchTopologyTab('muduo');
+    } else if (mode === 'cppai') {
+        switchTopologyTab('cppai');
+    } else {
+        switchTopologyTab('endtoend');
+    }
+
+    // 联动刷新今日任务推荐
+    const today = getTodayDateStr();
+    let dueCount = 0;
+    const total = (DAYS_DATASET || []).length || 28;
+    for (let d = 1; d <= total; d++) {
+        const r = appState.reviews[d];
+        if (r && r.nextReviewDate && r.nextReviewDate <= today) dueCount++;
+    }
+    renderTodayMissionCard(dueCount);
+
+    if (typeof persistState === 'function') {
+        persistState();
+    }
+}
+
+// 2. 拓扑画板多视图切换 ('endtoend' | 'muduo' | 'cppai')
+function switchTopologyTab(tabName) {
+    const tabs = ['endtoend', 'muduo', 'cppai'];
+    tabs.forEach(t => {
+        const svgEl = document.getElementById(`topo-svg-${t}`);
+        const btnEl = document.getElementById(`tab-topo-${t}`);
+        if (t === tabName) {
+            if (svgEl) svgEl.classList.remove('hidden');
+            if (btnEl) {
+                btnEl.className = 'px-3 py-1.5 rounded-lg font-bold bg-white text-stone-900 shadow-xs transition cursor-pointer';
+            }
+        } else {
+            if (svgEl) svgEl.classList.add('hidden');
+            if (btnEl) {
+                btnEl.className = 'px-3 py-1.5 rounded-lg font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 transition cursor-pointer';
+            }
+        }
+    });
+}
+
+// 3. 平滑滚动直达架构拓扑画板
+function scrollToTopology() {
+    if (appState.currentView !== 'dashboard') {
+        switchView('dashboard');
+    }
+    setTimeout(() => {
+        const card = document.getElementById('topology-card');
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            card.classList.add('ring-4', 'ring-amber-500/30');
+            setTimeout(() => card.classList.remove('ring-4', 'ring-amber-500/30'), 1500);
+        }
+    }, 80);
+}
+
+// 4. 直达 CppAIService 语雀深度专栏文章
+function openYuqueArticle(slugOrId) {
+    switchView('knowledge');
+    setTimeout(() => {
+        if (typeof selectYuqueArticle === 'function') {
+            selectYuqueArticle(slugOrId);
+        } else if (typeof window.selectYuqueArticle === 'function') {
+            window.selectYuqueArticle(slugOrId);
+        }
+    }, 120);
+}
+
+// 5. 顶部 Dashboard 指标计算与更新 (双核全面指标)
 function updateDashboardMetrics() {
-    const total = DAYS_DATASET.length; // 28
+    const total = DAYS_DATASET.length || 28;
     
     // 学习进度：至少达到 level 1
     let progressCount = 0;
@@ -347,7 +467,11 @@ function updateDashboardMetrics() {
     const progressPercent = Math.round((progressCount / total) * 100);
     const masteryPercent = Math.round((totalMasteryLevels / (total * 5)) * 100);
 
-    // 源码阅读完成数
+    // CppAIService 专栏掌握统计 (mastered articles count where lvl >= 3)
+    const yqMastery = appState.knowledgeMastery || {};
+    const cppaiMasteryCount = Object.values(yqMastery).filter(lvl => (typeof lvl === 'number' ? lvl : lvl.level || 0) >= 3).length;
+
+    // 源码研读完成数
     const sourceReadCount = Object.values(appState.sourceStatus).filter(s => s && (s.status === '已精读' || s.status === '研读中')).length;
 
     // 今日学习时间
@@ -378,29 +502,62 @@ function updateDashboardMetrics() {
 
     const streakDays = calculateRealStreak();
 
-    // 更新 DOM
-    document.getElementById('stat-progress-val').innerText = `${progressPercent}%`;
-    document.getElementById('stat-progress-count').innerText = `${progressCount} / ${total} 天`;
-    document.getElementById('stat-mastery-val').innerText = `${masteryPercent}%`;
-    document.getElementById('stat-demo-val').innerText = `${demoCount} / ${total}`;
-    document.getElementById('stat-source-val').innerText = `${sourceReadCount} / 8`;
-    document.getElementById('stat-today-time').innerText = `${todayMinutes} min`;
-    document.getElementById('stat-reviews-val').innerText = `${dueReviewCount} 项`;
-    document.getElementById('stat-streak').innerText = `${streakDays} 天`;
+    // 更新 DOM 核心指标
+    const elProgVal = document.getElementById('stat-progress-val');
+    if (elProgVal) elProgVal.innerText = `${progressPercent}%`;
+
+    const elProgCount = document.getElementById('stat-progress-count');
+    if (elProgCount) elProgCount.innerText = `${progressCount} / ${total} 天任务`;
+
+    const elMasteryVal = document.getElementById('stat-mastery-val');
+    if (elMasteryVal) elMasteryVal.innerText = `${cppaiMasteryCount} / 17`;
+
+    const elMasterySub = document.getElementById('stat-mastery-sub');
+    if (elMasterySub) elMasterySub.innerText = `${cppaiMasteryCount} 篇已掌握(≥L3)`;
+
+    const elDemoVal = document.getElementById('stat-demo-val');
+    if (elDemoVal) elDemoVal.innerText = `${demoCount} / ${total}`;
+
+    const elSourceVal = document.getElementById('stat-source-val');
+    if (elSourceVal) elSourceVal.innerText = sourceReadCount > 0 ? `${sourceReadCount} / 19 研读` : '19 模块';
+
+    const elTodayTime = document.getElementById('stat-today-time');
+    if (elTodayTime) elTodayTime.innerText = `${todayMinutes} min`;
+
+    const elReviewsVal = document.getElementById('stat-reviews-val');
+    if (elReviewsVal) elReviewsVal.innerText = `${dueReviewCount} 项`;
+
+    const elStreak = document.getElementById('stat-streak');
+    if (elStreak) elStreak.innerText = `${streakDays} 天`;
 
     // 进度条
-    document.getElementById('progress-fill').style.width = `${progressPercent}%`;
-    const remaining = total - progressCount;
-    document.getElementById('progress-bar-text').innerText = 
-        remaining === 0 ? "🏆 全周期攻坚完成！你可以毫无语言阻碍地通读 muduo 源码了！" : `还剩 ${remaining} 天任务正式踏入 muduo 源码大门`;
+    const elProgFill = document.getElementById('progress-fill');
+    if (elProgFill) elProgFill.style.width = `${progressPercent}%`;
 
-    // 学习时间卡片
-    document.getElementById('stat-card-today').innerText = `${todayMinutes}m`;
-    document.getElementById('stat-card-week').innerText = `${Math.round(weekMinutes / 60 * 10) / 10}h`;
-    document.getElementById('stat-total-hours').innerText = (Math.round(totalMinutes / 60 * 10) / 10).toFixed(1);
-    document.getElementById('stat-card-sessions').innerText = `${appState.studySessions.length}次`;
+    const remaining = total - progressCount;
+    const elProgText = document.getElementById('progress-bar-text');
+    if (elProgText) {
+        elProgText.innerText = remaining === 0 
+            ? "🏆 全周期攻坚完成！你可以毫无语言阻碍地通读 muduo 源码并驾驭 CppAIService！" 
+            : `还剩 ${remaining} 天任务正式踏入 muduo 源码大门`;
+    }
+
+    // 学习时间卡片 (兼容检查)
+    const elCardToday = document.getElementById('stat-card-today');
+    if (elCardToday) elCardToday.innerText = `${todayMinutes}m`;
+
+    const elCardWeek = document.getElementById('stat-card-week');
+    if (elCardWeek) elCardWeek.innerText = `${Math.round(weekMinutes / 60 * 10) / 10}h`;
+
+    const elTotalHours = document.getElementById('stat-total-hours');
+    if (elTotalHours) elTotalHours.innerText = (Math.round(totalMinutes / 60 * 10) / 10).toFixed(1);
+
+    const elCardSessions = document.getElementById('stat-card-sessions');
+    if (elCardSessions) elCardSessions.innerText = `${appState.studySessions.length}次`;
+
     const avgMins = appState.studySessions.length > 0 ? Math.round(totalMinutes / Math.max(1, new Set(appState.studySessions.map(s => s.date)).size)) : 0;
-    document.getElementById('stat-card-avg').innerText = `${avgMins}m`;
+    const elCardAvg = document.getElementById('stat-card-avg');
+    if (elCardAvg) elCardAvg.innerText = `${avgMins}m`;
 
     // 渲染子模块
     renderTodayMissionCard(dueReviewCount);
@@ -409,12 +566,13 @@ function updateDashboardMetrics() {
     renderDueReviewList();
 }
 
-// 今日任务卡渲染 (Today's Mission Card)
+// 6. 双核今日任务推荐卡渲染 (Today's Mission Card: Dual-Track Recommendations)
 function renderTodayMissionCard(dueCount) {
     const container = document.getElementById('today-mission-card');
     if (!container) return;
 
     const today = getTodayDateStr();
+    const mode = appState.workspaceMode || 'full';
 
     // 检查是否有由于复习到期的高优先级任务
     let dueDay = null;
@@ -426,39 +584,7 @@ function renderTodayMissionCard(dueCount) {
         }
     }
 
-    if (dueDay) {
-        container.innerHTML = `
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-start gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 text-rose-700 flex items-center justify-center text-xl shrink-0">
-                        <i class="fa-solid fa-bell-ring animate-bounce"></i>
-                    </div>
-                    <div>
-                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-serifMono font-bold mb-1">
-                            HIGHEST PRIORITY • 今日复习到期 (${dueCount}项待温故)
-                        </div>
-                        <h3 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading">
-                            Day ${dueDay.day < 10 ? '0' + dueDay.day : dueDay.day}: ${escapeHtml(dueDay.title)}
-                        </h3>
-                        <p class="text-xs text-stone-600 mt-1">
-                            艾宾浩斯记忆提醒：该知识点到达遗忘曲线临界点，请通过闪卡复盘其底层汇编机理与 muduo 映射。
-                        </p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2.5 shrink-0 self-end sm:self-auto font-serifMono">
-                    <button onclick="openReviewModal(${dueDay.day})" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-bolt"></i> 立即复习
-                    </button>
-                    <button onclick="scrollToDay(${dueDay.day})" class="px-3.5 py-2 bg-white border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
-                        查看详情
-                    </button>
-                </div>
-            </div>
-        `;
-        return;
-    }
-
-    // 寻找下一个尚未掌握到 Level 5 的任务
+    // 寻找 muduo 下一个尚未掌握到 Level 5 的任务
     let nextDay = null;
     for (let d = 1; d <= 28; d++) {
         const m = appState.mastery[d];
@@ -468,58 +594,191 @@ function renderTodayMissionCard(dueCount) {
         }
     }
 
-    if (!nextDay) {
-        container.innerHTML = `
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-900 font-serif-heading">🏆 恭喜！28 天全部达到顶级掌握度！</h3>
-                        <p class="text-xs text-stone-600 mt-0.5">你已攻克全部 28 天任务与 8 阶源码路线，建议开启 muduo 源码通读与自主仿写。</p>
-                    </div>
-                </div>
-                <button onclick="switchView('source')" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold font-serifMono rounded-xl transition">
-                    打开源码精读路线
-                </button>
-            </div>
-        `;
-        return;
+    // 寻找 CppAIService 下一个未掌握（level < 3）的专栏文章
+    const yqList = getYuqueDataset();
+    let nextArticle = null;
+    for (const art of yqList) {
+        const lvl = (appState.knowledgeMastery && (appState.knowledgeMastery[art.id] || appState.knowledgeMastery[art.slug])) || 0;
+        if (lvl < 3) {
+            nextArticle = art;
+            break;
+        }
+    }
+    if (!nextArticle && yqList.length > 0) {
+        nextArticle = yqList[0];
     }
 
-    const m = appState.mastery[nextDay.day] || { level: 0 };
     const levelNames = ["未开始", "已阅读", "已理解", "Demo已跑通", "独立实现", "源码贯通"];
+    const nextDayMastery = nextDay ? (appState.mastery[nextDay.day] || { level: 0 }) : { level: 5 };
+    const nextArtMasteryLvl = nextArticle ? ((appState.knowledgeMastery && (appState.knowledgeMastery[nextArticle.id] || appState.knowledgeMastery[nextArticle.slug])) || 0) : 5;
 
-    container.innerHTML = `
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="flex items-start gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-sky-100 border border-sky-200 text-sky-800 flex items-center justify-center text-xl shrink-0">
-                    <i class="fa-solid fa-compass"></i>
-                </div>
-                <div>
-                    <div class="inline-flex items-center gap-2 text-[10px] font-serifMono mb-1">
-                        <span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold">TODAY'S MISSION</span>
-                        <span class="text-amber-700 font-bold">建议耗时: ${nextDay.estimatedMinutes} min</span>
-                        <span class="text-stone-400">当前阶段: ${levelNames[m.level]}</span>
+    // 复习警报条 (如果到期复习存在)
+    let reviewAlertHtml = '';
+    if (dueDay && dueCount > 0) {
+        reviewAlertHtml = `
+            <div class="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-bell-ring animate-bounce"></i>
+                    </span>
+                    <div>
+                        <div class="text-[11px] font-serifMono font-bold text-rose-800">
+                            HIGHEST PRIORITY • 今日复习到期 (${dueCount}项待温故)
+                        </div>
+                        <div class="text-xs font-bold text-stone-900 mt-0.5">
+                            Day ${dueDay.day < 10 ? '0' + dueDay.day : dueDay.day}: ${escapeHtml(dueDay.title)}
+                        </div>
                     </div>
-                    <h3 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading">
+                </div>
+                <div class="flex items-center gap-2 shrink-0 font-serifMono">
+                    <button onclick="openReviewModal(${dueDay.day})" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-bolt"></i> 立即复习
+                    </button>
+                    <button onclick="scrollToDay(${dueDay.day})" class="px-3.5 py-1.5 bg-white border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-lg transition cursor-pointer">
+                        查看卡片
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // muduo 卡片片段
+    let muduoCardHtml = '';
+    if (nextDay) {
+        muduoCardHtml = `
+            <div class="flex-1 bg-white/90 p-4 rounded-xl border border-sky-200/80 flex flex-col justify-between shadow-xs hover:border-sky-400 transition">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-serifMono font-bold">
+                            <i class="fa-solid fa-server text-sky-600"></i> Track 1 · muduo 网络底座
+                        </span>
+                        <span class="text-[11px] font-serifMono text-amber-700 font-bold">
+                            <i class="fa-regular fa-clock"></i> ${nextDay.estimatedMinutes} min
+                        </span>
+                    </div>
+                    <h4 class="text-sm sm:text-base font-bold text-stone-900 font-serif-heading line-clamp-1">
                         Day ${nextDay.day < 10 ? '0' + nextDay.day : nextDay.day}: ${escapeHtml(nextDay.title)}
-                    </h3>
-                    <p class="text-xs text-stone-600 mt-1">
-                        ${escapeHtml(nextDay.points[0].replace(/<[^>]+>/g, '').slice(0, 70))}...
+                    </h4>
+                    <p class="text-xs text-stone-600 mt-1 line-clamp-2 leading-relaxed">
+                        ${escapeHtml(nextDay.points[0].replace(/<[^>]+>/g, ''))}
                     </p>
                 </div>
+                <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono">
+                    <span class="text-[11px] text-stone-400">状态: <strong class="text-stone-700">${levelNames[nextDayMastery.level] || '未开始'}</strong></span>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="scrollToDay(${nextDay.day})" class="px-3 py-1.5 bg-sky-800 hover:bg-sky-900 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-play text-[10px]"></i> 攻坚任务
+                        </button>
+                        <button onclick="openQuizForDay(${nextDay.day})" class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-900 text-xs font-semibold rounded-lg transition cursor-pointer">
+                            自测
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center gap-2.5 shrink-0 self-end sm:self-auto font-serifMono">
-                <button onclick="scrollToDay(${nextDay.day})" class="px-4 py-2 bg-sky-800 hover:bg-sky-900 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-play"></i> 进入攻坚
-                </button>
-                <button onclick="openQuizForDay(${nextDay.day})" class="px-3.5 py-2 bg-white border border-stone-300 hover:bg-stone-100 text-purple-700 text-xs font-semibold rounded-xl transition">
-                    立即自测
-                </button>
+        `;
+    } else {
+        muduoCardHtml = `
+            <div class="flex-1 bg-white/90 p-4 rounded-xl border border-emerald-200 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-stone-900">🏆 muduo 28 天任务已通关！</h4>
+                    <p class="text-xs text-stone-500">已完整掌握底层 Reactor 与现代 C++ 规范。</p>
+                </div>
             </div>
+        `;
+    }
+
+    // CppAIService 卡片片段
+    let cppaiCardHtml = '';
+    if (nextArticle) {
+        cppaiCardHtml = `
+            <div class="flex-1 bg-white/90 p-4 rounded-xl border border-amber-200/80 flex flex-col justify-between shadow-xs hover:border-amber-400 transition">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-serifMono font-bold">
+                            <i class="fa-solid fa-microchip text-amber-600"></i> Track 2 · CppAIService 平台
+                        </span>
+                        <span class="text-[11px] font-serifMono text-stone-500">
+                            ${escapeHtml(nextArticle.category || '核心微服务')}
+                        </span>
+                    </div>
+                    <h4 class="text-sm sm:text-base font-bold text-stone-900 font-serif-heading line-clamp-1">
+                        ${escapeHtml(nextArticle.title)}
+                    </h4>
+                    <p class="text-xs text-stone-600 mt-1 line-clamp-2 leading-relaxed">
+                        ${escapeHtml(nextArticle.summary || '深入探究现代 C++17 微服务架构、HTTP 协议编解码、MCP 两段式推理与分布式消息削峰。')}
+                    </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono">
+                    <span class="text-[11px] text-stone-400">研读掌握: <strong class="text-amber-700">Level ${nextArtMasteryLvl} / 5</strong></span>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="openYuqueArticle('${nextArticle.slug || nextArticle.id}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-book-open-reader text-[10px]"></i> 研读专栏
+                        </button>
+                        <button onclick="switchTopologyTab('cppai'); scrollToTopology();" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-xs font-semibold rounded-lg transition cursor-pointer">
+                            查看架构
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        cppaiCardHtml = `
+            <div class="flex-1 bg-white/90 p-4 rounded-xl border border-emerald-200 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-stone-900">🎉 CppAIService 专栏已全部精读！</h4>
+                    <p class="text-xs text-stone-500">已完整贯通 AI 服务平台全链路工程实践。</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // 根据模式决定展示布局
+    let tracksLayout = '';
+    if (mode === 'muduo') {
+        tracksLayout = `
+            <div class="space-y-3">
+                <div class="text-xs font-serifMono text-sky-800 font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-crosshairs"></i> 当前模式：muduo 底座专项攻坚
+                </div>
+                ${muduoCardHtml}
+            </div>
+        `;
+    } else if (mode === 'cppai') {
+        tracksLayout = `
+            <div class="space-y-3">
+                <div class="text-xs font-serifMono text-amber-800 font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-crosshairs"></i> 当前模式：CppAIService 智能平台专项攻坚
+                </div>
+                ${cppaiCardHtml}
+            </div>
+        `;
+    } else {
+        // full mode: 双核并进
+        tracksLayout = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                ${muduoCardHtml}
+                ${cppaiCardHtml}
+            </div>
+        `;
+    }
+
+    container.innerHTML = `
+        ${reviewAlertHtml}
+        <div class="flex items-center justify-between mb-3 font-serifMono text-xs text-stone-500">
+            <span class="font-bold flex items-center gap-1.5 text-stone-700">
+                <i class="fa-solid fa-layer-group text-amber-600"></i> 双核今日攻坚推荐 · 双轨并进
+            </span>
+            <span class="text-[11px] text-stone-400">
+                模式: <strong class="text-stone-800">${mode === 'muduo' ? 'muduo底座' : (mode === 'cppai' ? 'CppAI平台' : '双核全栈全景')}</strong>
+            </span>
         </div>
+        ${tracksLayout}
     `;
 }
 
@@ -1716,6 +1975,22 @@ const TOPOLOGY_DRAWER_DATA = {
     step_7: { title: "std::bind 绑定类成员", tag: "C++ 8 阶底座", role: "消除类成员函数对隐藏 this 指针的调用依赖，将其转化为标准无状态回调。", members: ["std::bind(&TcpServer::newConnection, this, _1, _2)"], functions: ["placeholders::_1 映射形参偏序"], relatedDays: [19, 20] },
     step_8: { title: "模板基础 / 虚析构", tag: "C++ 8 阶底座", role: "泛型阻塞队列 BlockingQueue；Poller::~Poller() 虚析构防止通过基类 delete 派生类发生泄漏。", members: ["template<typename T> class BlockingQueue", "virtual ~Poller() = default"], functions: ["dynamic dispatch via vtable"], relatedDays: [25, 26] },
     mutexlockguard: { title: "MutexLockGuard", tag: "Reactor 调度基础", role: "RAII 互斥锁守护类，构造时 lock()，析构时自动 unlock()，杜绝由于分支 return 遗漏解锁造成的永久死锁灾难。", members: ["MutexLock& mutex_: 绑定的互斥锁引用"], functions: ["explicit MutexLockGuard(MutexLock& m)", "~MutexLockGuard()"], relatedDays: [3] },
+    callbacks: {
+        title: "Callbacks / 现代 std::function 体系",
+        tag: "解耦机制",
+        role: "muduo 风格回调体系。将网络事件与具体业务彻底解耦，使用 std::function/std::bind 替换繁琐的虚函数多态继承，使 TcpConnection / TcpServer 具备极高通用性与轻量性。",
+        members: [
+            "typedef std::function<void(const TcpConnectionPtr&)> ConnectionCallback",
+            "typedef std::function<void(const TcpConnectionPtr&, Buffer*, Timestamp)> MessageCallback",
+            "typedef std::function<void(const TcpConnectionPtr&)> CloseCallback"
+        ],
+        functions: [
+            "void setConnectionCallback(const ConnectionCallback& cb)",
+            "void setMessageCallback(const MessageCallback& cb)",
+            "void setWriteCompleteCallback(const WriteCompleteCallback& cb)"
+        ],
+        relatedDays: [17, 18, 19]
+    },
     eventloop: { title: "EventLoop", tag: "反应堆心脏", role: "One Loop Per Thread 模式中枢。独占一个专属 I/O 线程，连续调用 Poller::poll 获取就绪事件，并通过 eventfd 跨线程安全唤醒队列。", members: ["unique_ptr<Poller> poller_: 独占的 I/O 多路复用器", "int wakeupFd_: 跨线程唤醒 eventfd 句柄", "vector<Functor> pendingFunctors_: 跨线程投递任务队列", "MutexLock mutex_: 保护任务队列的互斥锁"], functions: ["void loop(): 核心事件分发死循环", "void runInLoop(Functor cb): 同步或投递执行", "void queueInLoop(Functor cb): 移入队列并唤醒", "void wakeup(): 写 8 字节唤醒 epoll_wait"], relatedDays: [6, 8, 18, 21] },
     poller: { title: "Poller / EPollPoller", tag: "I/O 多路复用", role: "抽象 epoll/poll 操作，调用 epoll_wait 阻塞监听注册的套接字描述符，并将发生事件的 Channel 填入 activeChannels 供 EventLoop 派发。", members: ["EventLoop* ownerLoop_: 所属反应堆", "map<int, Channel*> channels_: 按 fd 映射管理的通道索引", "struct epoll_event events_[]: 内核事件接收缓冲区"], functions: ["virtual ~Poller() = default: 虚析构必须声明", "virtual Timestamp poll(int timeout, ChannelList* activeChannels) = 0", "virtual void updateChannel(Channel* c) = 0", "virtual void removeChannel(Channel* c) = 0"], relatedDays: [8, 13, 26] },
     channel: { title: "Channel", tag: "通道适配器", role: "独占一个特定的 socket 文件描述符，负责注册该 fd 感兴趣的读写事件，并分发事件回调给对应的业务处理函数。", members: ["const int fd_: 独占套接字句柄", "EventLoop* loop_: 所属事件循环", "int events_: 关心的事件掩码", "int revents_: 实际就绪的事件掩码", "weak_ptr<void> tie_: 弱引用绑定所属宿主防止悬空析构"], functions: ["void tie(const shared_ptr<void>&)", "void enableReading(): events_ |= POLLIN; update()", "void handleEvent(Timestamp receiveTime)"], relatedDays: [1, 10, 18, 19] },
@@ -1726,53 +2001,263 @@ const TOPOLOGY_DRAWER_DATA = {
 };
 
 function openTopologyDrawer(nodeId) {
-    const data = TOPOLOGY_DRAWER_DATA[nodeId];
-    if (!data) return;
+    if (!nodeId) return;
 
-    document.getElementById('drawer-tag').innerText = data.tag;
-    document.getElementById('drawer-title').innerText = data.title;
+    // 别名映射与规范化
+    const ALIAS_MAP = {
+        'eventloop': 'mod_net_eventloop',
+        'channel': 'mod_net_channel',
+        'poller': 'mod_net_poller',
+        'buffer': 'mod_net_buffer',
+        'tcpserver': 'mod_net_tcpserver',
+        'tcpconnection': 'mod_net_tcpconnection',
+        'handleeventwithguard': 'mod_net_channel'
+    };
+    const effectiveId = ALIAS_MAP[nodeId] || nodeId;
 
+    const modules = getDomainModulesDataset();
+    const knowledgeList = getDomainKnowledgeDataset();
+    const pitfallsList = getDomainPitfallsDataset();
+    const yuqueArticles = getYuqueDataset();
+
+    const mod = modules.find(m => m.id === effectiveId);
+    const legacy = TOPOLOGY_DRAWER_DATA[nodeId];
+
+    const drawerTag = document.getElementById('drawer-tag');
+    const drawerTitle = document.getElementById('drawer-title');
     const content = document.getElementById('drawer-content');
-    
-    let daysHtml = (data.relatedDays || []).map(d => `
-        <button onclick="closeTopologyDrawer(); scrollToDay(${d});" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg text-xs font-serifMono font-bold transition">
-            Day ${d} 任务卡片 ➔
-        </button>
-    `).join(' ');
+    if (!content) return;
 
-    let membersHtml = (data.members || []).map(m => `
-        <li class="font-mono-code text-[11px] text-stone-700 bg-stone-50 p-2 rounded border border-stone-200">${escapeHtml(m)}</li>
-    `).join('');
+    if (mod) {
+        const isMuduo = mod.projectId === 'proj_muduo';
+        if (drawerTag) {
+            drawerTag.innerText = `${isMuduo ? 'muduo 网络底座' : 'CppAIService 智能平台'} · ${mod.layer}`;
+            drawerTag.className = isMuduo
+                ? "text-[10px] font-serifMono uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold"
+                : "text-[10px] font-serifMono uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold";
+        }
+        if (drawerTitle) {
+            drawerTitle.innerText = mod.name;
+        }
 
-    let funcsHtml = (data.functions || []).map(f => `
-        <li class="font-mono-code text-[11px] text-sky-900 bg-sky-50/60 p-2 rounded border border-sky-200">${escapeHtml(f)}</li>
-    `).join('');
+        // 查找对应的知识节点
+        const kn = knowledgeList.find(k => k.moduleId === effectiveId);
 
-    content.innerHTML = `
-        <div class="bg-stone-50 p-3 rounded-xl border border-stone-200">
-            <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1">核心工程职责:</div>
-            <p class="text-stone-800 text-xs leading-relaxed">${escapeHtml(data.role)}</p>
-        </div>
+        // 收集源码文件列表
+        const sourceFilesHtml = (mod.sourceFiles || []).map(f => `
+            <li class="font-mono-code text-[11px] text-stone-800 bg-stone-50 p-2 rounded-lg border border-stone-200/90 flex items-center justify-between gap-2">
+                <span class="flex items-center gap-1.5 truncate">
+                    <i class="fa-regular fa-file-code ${isMuduo ? 'text-sky-700' : 'text-amber-700'}"></i>
+                    <span class="truncate">${escapeHtml(f)}</span>
+                </span>
+                <span class="text-[10px] text-stone-400 font-serifMono shrink-0">${f.endsWith('.h') ? '头文件' : '源文件'}</span>
+            </li>
+        `).join('');
 
-        <div>
-            <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1.5">
-                <i class="fa-solid fa-cube text-teal-700 mr-1"></i>关键成员与所有权:
+        // 收集核心类与接口
+        const classesHtml = (mod.classes || []).map(c => `
+            <span class="px-2 py-0.5 bg-stone-100 text-stone-800 rounded font-mono-code text-[11px] border border-stone-200">
+                class ${escapeHtml(c)}
+            </span>
+        `).join(' ');
+
+        const funcsHtml = (mod.functions || []).map(f => `
+            <li class="font-mono-code text-[11px] ${isMuduo ? 'text-sky-950 bg-sky-50/70 border-sky-200' : 'text-amber-950 bg-amber-50/70 border-amber-200'} p-1.5 rounded border flex items-center gap-1.5">
+                <i class="fa-solid fa-code text-[10px] ${isMuduo ? 'text-sky-600' : 'text-amber-600'}"></i>
+                <span>${escapeHtml(f)}</span>
+            </li>
+        `).join('');
+
+        // 收集关键概念
+        const conceptsHtml = (mod.keyConcepts || []).map(cp => `
+            <span class="px-2 py-0.5 rounded-full ${isMuduo ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-amber-50 text-amber-800 border border-amber-200'} text-[10px] font-serifMono font-semibold">
+                # ${escapeHtml(cp)}
+            </span>
+        `).join(' ');
+
+        // 关联 muduo Days
+        let days = [];
+        if (kn && Array.isArray(kn.muduoDays)) {
+            days = kn.muduoDays;
+        } else if (legacy && Array.isArray(legacy.relatedDays)) {
+            days = legacy.relatedDays;
+        }
+        const daysButtonsHtml = days.length > 0 ? days.map(d => `
+            <button onclick="closeTopologyDrawer(); scrollToDay(${d});" class="px-2.5 py-1 bg-sky-100 hover:bg-sky-200 text-sky-900 rounded-lg text-xs font-serifMono font-bold transition flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-calendar-check text-sky-700"></i> Day ${d < 10 ? '0' + d : d} 任务卡片 ➔
+            </button>
+        `).join(' ') : '<span class="text-stone-400 text-xs">底层网络公共模块</span>';
+
+        // 关联 CppAIService 专栏文章
+        let relatedArticles = [];
+        if (kn && Array.isArray(kn.yuqueDocIds)) {
+            kn.yuqueDocIds.forEach(idOrSlug => {
+                const found = yuqueArticles.find(a => a.id === idOrSlug || a.slug === idOrSlug);
+                if (found) relatedArticles.push(found);
+            });
+        }
+        if (relatedArticles.length === 0 && !isMuduo) {
+            // 根据分类模糊匹配
+            relatedArticles = yuqueArticles.filter(a => (a.category && a.category === mod.category) || (a.title && a.title.includes(mod.name.slice(0, 4)))).slice(0, 3);
+        }
+        const yuqueButtonsHtml = relatedArticles.length > 0 ? relatedArticles.map(art => `
+            <button onclick="closeTopologyDrawer(); openYuqueArticle('${art.slug || art.id}');" class="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg text-xs font-serifMono font-bold transition flex items-center gap-1.5 cursor-pointer text-left truncate max-w-full">
+                <i class="fa-solid fa-book-bookmark text-amber-700 shrink-0"></i>
+                <span class="truncate">${escapeHtml(art.title)} ➔</span>
+            </button>
+        `).join(' ') : (isMuduo ? '<span class="text-stone-400 text-xs">底层 Reactor 网络基础设施 (无直接应用专栏)</span>' : '<span class="text-stone-400 text-xs">暂无关联专栏</span>');
+
+        // 高频面试考点与避坑指南
+        let interviewBoxHtml = '';
+        if (kn && kn.interviewTrap) {
+            interviewBoxHtml = `
+                <div class="bg-rose-50/80 p-3 rounded-xl border border-rose-200">
+                    <div class="text-[11px] font-bold font-serifMono text-rose-800 mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> 高频面试深度考点:
+                    </div>
+                    <p class="text-rose-900 text-xs leading-relaxed font-medium">
+                        ${escapeHtml(kn.interviewTrap)}
+                    </p>
+                </div>
+            `;
+        }
+
+        // 关联生产事故避坑
+        const relatedPitfalls = pitfallsList.filter(p => {
+            if (p.project && p.project !== mod.projectId) return false;
+            return p.category === mod.category || p.id.includes(mod.id.replace('mod_', ''));
+        });
+        let pitfallBoxHtml = '';
+        if (relatedPitfalls.length > 0) {
+            const pit = relatedPitfalls[0];
+            pitfallBoxHtml = `
+                <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200">
+                    <div class="text-[11px] font-bold font-serifMono text-amber-900 mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-cat text-amber-700"></i> 生产避坑铁律:
+                    </div>
+                    <div class="text-xs font-bold text-stone-900 mb-1">${escapeHtml(pit.title)}</div>
+                    <p class="text-stone-700 text-xs leading-relaxed mb-2">${escapeHtml(pit.rootCause)}</p>
+                    <div class="text-[11px] font-serifMono font-bold text-amber-800 bg-white/80 p-2 rounded border border-amber-200">
+                        ⚡ 铁律：${escapeHtml(pit.ironRule)}
+                    </div>
+                </div>
+            `;
+        }
+
+        content.innerHTML = `
+            <!-- 核心工程职责 -->
+            <div class="bg-stone-50 p-3.5 rounded-xl border border-stone-200">
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1 flex items-center gap-1">
+                    <i class="fa-solid fa-bullseye text-stone-600"></i> 核心工程职责:
+                </div>
+                <p class="text-stone-800 text-xs leading-relaxed font-medium">${escapeHtml(mod.desc)}</p>
             </div>
-            <ul class="space-y-1.5">${membersHtml}</ul>
-        </div>
 
-        <div>
-            <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1.5">
-                <i class="fa-solid fa-bolt text-sky-700 mr-1"></i>核心函数与调用逻辑:
+            <!-- 并发与线程安全模型 -->
+            <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-200">
+                <div class="text-[11px] font-bold font-serifMono text-indigo-900 mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved text-indigo-700"></i> 并发与线程安全模型:
+                </div>
+                <p class="text-indigo-950 text-xs leading-relaxed font-mono-code">${escapeHtml(mod.threadModel)}</p>
             </div>
-            <ul class="space-y-1.5">${funcsHtml}</ul>
-        </div>
 
-        <div class="pt-3 border-t border-stone-200">
-            <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-2">直达对应现代 C++ 学习任务:</div>
-            <div class="flex items-center gap-2 flex-wrap">${daysHtml}</div>
-        </div>
-    `;
+            <!-- 核心概念与关键机制 -->
+            <div>
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1.5">
+                    <i class="fa-solid fa-tags text-teal-700 mr-1"></i>核心概念与关键机制:
+                </div>
+                <div class="flex flex-wrap gap-1.5">${conceptsHtml}</div>
+            </div>
+
+            <!-- 真实源码文件路径 -->
+            <div>
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1.5">
+                    <i class="fa-solid fa-folder-tree text-stone-700 mr-1"></i>真实项目源码落地路径:
+                </div>
+                <ul class="space-y-1.5">${sourceFilesHtml}</ul>
+            </div>
+
+            <!-- 核心类与关键接口 -->
+            <div>
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1.5">
+                    <i class="fa-solid fa-cube text-sky-700 mr-1"></i>核心类与关键接口:
+                </div>
+                <div class="mb-2 flex flex-wrap gap-1">${classesHtml}</div>
+                <ul class="space-y-1">${funcsHtml}</ul>
+            </div>
+
+            ${interviewBoxHtml}
+            ${pitfallBoxHtml}
+
+            <!-- 双向直达学习任务与专栏 -->
+            <div class="pt-4 border-t border-stone-200 space-y-3">
+                <div>
+                    <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-2 flex items-center gap-1">
+                        <i class="fa-solid fa-calendar-check text-sky-700"></i> 直达对应 28 天现代 C++ 任务:
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">${daysButtonsHtml}</div>
+                </div>
+                <div>
+                    <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-2 flex items-center gap-1">
+                        <i class="fa-solid fa-book-bookmark text-amber-700"></i> 直达 CppAIService 深度专栏:
+                    </div>
+                    <div class="flex flex-col gap-1.5">${yuqueButtonsHtml}</div>
+                </div>
+            </div>
+        `;
+    } else if (legacy) {
+        // Legacy 回退 (step_1~step_8 等旧节点)
+        if (drawerTag) {
+            drawerTag.innerText = legacy.tag;
+            drawerTag.className = "text-[10px] font-serifMono uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold";
+        }
+        if (drawerTitle) {
+            drawerTitle.innerText = legacy.title;
+        }
+
+        let daysHtml = (legacy.relatedDays || []).map(d => `
+            <button onclick="closeTopologyDrawer(); scrollToDay(${d});" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg text-xs font-serifMono font-bold transition flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-calendar-check text-amber-700"></i> Day ${d < 10 ? '0' + d : d} 任务卡片 ➔
+            </button>
+        `).join(' ');
+
+        let membersHtml = (legacy.members || []).map(m => `
+            <li class="font-mono-code text-[11px] text-stone-700 bg-stone-50 p-2 rounded border border-stone-200">${escapeHtml(m)}</li>
+        `).join('');
+
+        let funcsHtml = (legacy.functions || []).map(f => `
+            <li class="font-mono-code text-[11px] text-sky-900 bg-sky-50/60 p-2 rounded border border-sky-200">${escapeHtml(f)}</li>
+        `).join('');
+
+        content.innerHTML = `
+            <div class="bg-stone-50 p-3 rounded-xl border border-stone-200">
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1">核心工程职责:</div>
+                <p class="text-stone-800 text-xs leading-relaxed">${escapeHtml(legacy.role)}</p>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1.5">
+                    <i class="fa-solid fa-cube text-teal-700 mr-1"></i>关键成员与所有权:
+                </div>
+                <ul class="space-y-1.5">${membersHtml}</ul>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1.5">
+                    <i class="fa-solid fa-bolt text-sky-700 mr-1"></i>核心函数与调用逻辑:
+                </div>
+                <ul class="space-y-1.5">${funcsHtml}</ul>
+            </div>
+
+            <div class="pt-3 border-t border-stone-200">
+                <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-2">直达对应现代 C++ 学习任务:</div>
+                <div class="flex items-center gap-2 flex-wrap">${daysHtml}</div>
+            </div>
+        `;
+    } else {
+        console.warn(`[openTopologyDrawer] Unknown node ID: ${nodeId}`);
+        return;
+    }
 
     document.getElementById('topology-drawer')?.classList.remove('translate-x-full');
     document.getElementById('drawer-overlay')?.classList.remove('hidden');
@@ -2277,6 +2762,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try { loadAndMigrateState(); } catch(e) { console.error('loadAndMigrateState error:', e); }
     try { if (typeof initStudyTimer === 'function') initStudyTimer(); } catch(e) { console.error('initStudyTimer error:', e); }
     try { initQuizDaySelector(); } catch(e) { console.error('initQuizDaySelector error:', e); }
+    try { setWorkspaceMode(appState.workspaceMode || 'full'); } catch(e) { console.error('setWorkspaceMode error:', e); }
     try { updateDashboardMetrics(); } catch(e) { console.error('updateDashboardMetrics error:', e); }
     try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
     try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
@@ -2326,6 +2812,42 @@ function switchEnvModalTab(tabId) {
             }
         }
     });
+}
+
+// 全局方法挂载 (用于 HTML onclick 与跨模块调用)
+if (typeof window !== 'undefined') {
+    window.setWorkspaceMode = setWorkspaceMode;
+    window.switchTopologyTab = switchTopologyTab;
+    window.scrollToTopology = scrollToTopology;
+    window.openYuqueArticle = openYuqueArticle;
+    window.openTopologyDrawer = openTopologyDrawer;
+    window.closeTopologyDrawer = closeTopologyDrawer;
+    window.openEnvGuideModal = openEnvGuideModal;
+    window.closeEnvGuideModal = closeEnvGuideModal;
+    window.switchEnvModalTab = switchEnvModalTab;
+}
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.setWorkspaceMode = setWorkspaceMode;
+    globalThis.switchTopologyTab = switchTopologyTab;
+    globalThis.scrollToTopology = scrollToTopology;
+    globalThis.openYuqueArticle = openYuqueArticle;
+    globalThis.openTopologyDrawer = openTopologyDrawer;
+    globalThis.closeTopologyDrawer = closeTopologyDrawer;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        appState,
+        setWorkspaceMode,
+        switchTopologyTab,
+        scrollToTopology,
+        openYuqueArticle,
+        openTopologyDrawer,
+        closeTopologyDrawer,
+        updateDashboardMetrics,
+        renderTodayMissionCard
+    };
 }
 
 

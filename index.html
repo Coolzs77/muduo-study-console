@@ -72,25 +72,48 @@
         <!-- 第一行：系统标题与右侧环境指引 -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
             <div>
-                <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-serifMono mb-2.5">
-                    <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-                    <span>INDUSTRIAL REACTOR ENGINE</span>
-                    <span class="text-amber-400">•</span>
-                    <span class="font-bold">面向 muduo 源码攻坚 • V5.0 个人训练系统</span>
+                <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-300/80 text-stone-800 text-xs font-serifMono mb-2.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="font-bold text-sky-800">DUAL-CORE OS V6.0</span>
+                    <span class="text-stone-300">•</span>
+                    <span>L0~L2 muduo 高并发底座 ⇋ L3~L5 CppAIService 分布式微服务平台</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-serif-heading">
-                    muduo C++ 个人训练系统 V5
+                    CppAIService & muduo 双核攻坚控制台
                 </h1>
                 <p class="text-stone-600 text-xs sm:text-sm mt-1.5 max-w-3xl leading-relaxed">
-                    以《C++ Primer Plus 第6版（中文版）》实体排版为精准基准，构建从<strong>学习 ➔ 实验 ➔ 自测 ➔ 掌握 ➔ 复习 ➔ 源码 ➔ 实战</strong>的完整工业级闭环。直击生命周期、RAII、智能指针、STL 容器、Lambda 闭包与 bind 回调，穿透 Reactor 架构！
+                    以工业级高并发与分布式微服务为基准，纵向贯穿<strong>底层 Reactor 反应堆（muduo C++11）</strong>与<strong>上层现代 AI 应用服务平台（CppAIService C++17）</strong>。从 epoll I/O 多路复用与零拷贝 Buffer，穿透至 HTTP 动态路由、两段式推理 MCP 协议、多模型协同与 RabbitMQ 异步削峰！
                 </p>
+
+                <!-- 双核工作台模式切换条 (Dual-Core Workspace Switcher) -->
+                <div class="mt-4 flex flex-wrap items-center gap-2 font-serifMono text-xs" id="workspace-mode-switcher">
+                    <span class="text-stone-500 font-bold flex items-center gap-1.5 shrink-0">
+                        <i class="fa-solid fa-layer-group text-sky-700"></i> 双核工作台：
+                    </span>
+                    <button onclick="setWorkspaceMode('full')" id="ws-btn-full" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
+                        <i class="fa-solid fa-globe text-sky-400"></i>
+                        <span>双核全景全栈模式</span>
+                    </button>
+                    <button onclick="setWorkspaceMode('muduo')" id="ws-btn-muduo" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100 cursor-pointer">
+                        <i class="fa-solid fa-server text-sky-700"></i>
+                        <span>muduo 网络底座 (L0~L2)</span>
+                    </button>
+                    <button onclick="setWorkspaceMode('cppai')" id="ws-btn-cppai" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100 cursor-pointer">
+                        <i class="fa-solid fa-robot text-amber-700"></i>
+                        <span>CppAIService 智能平台 (L3~L5)</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- 右侧快捷指引按钮 -->
-            <div class="flex items-center gap-2.5 shrink-0 self-start md:self-auto font-serifMono">
+            <!-- 右侧快捷指引与架构概览 -->
+            <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-end gap-2.5 shrink-0 self-start md:self-auto font-serifMono">
                 <button onclick="openEnvGuideModal()" class="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold transition flex items-center gap-2 shadow-xs group cursor-pointer" aria-label="开发环境与企业实战工作流指引">
                     <i class="fa-solid fa-server text-sky-700 group-hover:scale-110 transition"></i>
                     <span>企业级开发环境指引</span>
+                </button>
+                <button onclick="scrollToTopology()" class="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold transition flex items-center gap-2 shadow-xs group cursor-pointer" aria-label="直达架构拓扑大图">
+                    <i class="fa-solid fa-network-wired text-amber-700 group-hover:scale-110 transition"></i>
+                    <span>双核架构全景拓扑 ➔</span>
                 </button>
             </div>
         </div>
@@ -99,18 +122,18 @@
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3 mt-6 pt-5 border-t border-stone-100 font-serifMono">
             <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-sky-300 transition">
                 <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-compass text-sky-700 text-xs"></i> 学习进度
+                    <i class="fa-solid fa-compass text-sky-700 text-xs"></i> muduo底座
                 </div>
                 <div class="text-xl sm:text-2xl font-bold text-sky-800 my-1" id="stat-progress-val">0%</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate" id="stat-progress-count">0 / 28 天</div>
+                <div class="text-[11px] text-stone-400 font-semibold truncate" id="stat-progress-count">0 / 28 天任务</div>
             </div>
 
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-emerald-300 transition">
+            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-amber-300 transition">
                 <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-award text-emerald-600 text-xs"></i> 知识掌握
+                    <i class="fa-solid fa-robot text-amber-700 text-xs"></i> CppAI专栏
                 </div>
-                <div class="text-xl sm:text-2xl font-bold text-emerald-700 my-1" id="stat-mastery-val">0%</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate" id="stat-mastery-sub">L0 ~ L5 评级</div>
+                <div class="text-xl sm:text-2xl font-bold text-amber-700 my-1" id="stat-mastery-val">0 / 17</div>
+                <div class="text-[11px] text-stone-400 font-semibold truncate" id="stat-mastery-sub">17 篇核心专栏</div>
             </div>
 
             <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-indigo-300 transition">
@@ -123,10 +146,10 @@
 
             <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-teal-300 transition">
                 <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-code-branch text-teal-700 text-xs"></i> 源码研读
+                    <i class="fa-solid fa-code-branch text-teal-700 text-xs"></i> 核心模块
                 </div>
-                <div class="text-xl sm:text-2xl font-bold text-teal-800 my-1" id="stat-source-val">0 / 8</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">核心流水线</div>
+                <div class="text-xl sm:text-2xl font-bold text-teal-800 my-1" id="stat-source-val">19 模块</div>
+                <div class="text-[11px] text-stone-400 font-semibold truncate">8底座 + 11平台</div>
             </div>
 
             <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-amber-300 transition">
@@ -328,29 +351,336 @@
             </div>
         </div>
 
-        <!-- 知识推导路线与 muduo 架构拓扑 (可点击交互式工程蓝图) -->
-        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card overflow-hidden">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+        <!-- 双核全景架构拓扑与交互式工程蓝图工坊 -->
+        <div id="topology-card" class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card overflow-hidden">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5 pb-4 border-b border-stone-100">
                 <div>
                     <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-sky-50 border border-sky-200 text-sky-800 text-[11px] font-serifMono uppercase tracking-wider mb-1">
-                        Interactive Topology & Reactor Architecture
+                        Dual-Core Architecture Topology & Request Flow
                     </div>
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        现代 C++ 递进路线 ➔ muduo 架构拓扑映射
+                        <i class="fa-solid fa-network-wired text-sky-700"></i> 双核交互式全景拓扑与请求穿透画板
                     </h2>
                     <p class="text-xs text-stone-500 mt-0.5">
-                        💡 <strong>节点可点击交互：</strong>点击 EventLoop、Channel、Poller、Buffer 等任意组件查看职责、成员、核心函数与关联学习日。
+                        💡 <strong>全量节点可点击交互：</strong>点击 EventLoop、HttpContext、Router、MCPRegistry、RabbitMQ 等任意组件即可呼出源码映射、线程模型与专栏直达。
                     </p>
                 </div>
-                <div class="flex items-center gap-3 text-xs font-serifMono text-stone-600">
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-50 border border-amber-300 inline-block"></span> C++ 核心机制</span>
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-50 border border-sky-300 inline-block"></span> 事件驱动调度</span>
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-50 border border-emerald-300 inline-block"></span> 业务连接实体</span>
+                <!-- 拓扑标签切换器 -->
+                <div class="flex items-center gap-1.5 p-1 bg-stone-100 rounded-xl border border-stone-200 font-serifMono text-xs shrink-0 self-start lg:self-auto">
+                    <button onclick="switchTopologyTab('endtoend')" id="tab-topo-endtoend" class="px-3 py-1.5 rounded-lg font-bold bg-white text-stone-900 shadow-xs transition cursor-pointer">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-sky-700"></i> 端到端全链路穿透
+                    </button>
+                    <button onclick="switchTopologyTab('muduo')" id="tab-topo-muduo" class="px-3 py-1.5 rounded-lg font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 transition cursor-pointer">
+                        <i class="fa-solid fa-server text-indigo-700"></i> muduo Reactor 底座
+                    </button>
+                    <button onclick="switchTopologyTab('cppai')" id="tab-topo-cppai" class="px-3 py-1.5 rounded-lg font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 transition cursor-pointer">
+                        <i class="fa-solid fa-microchip text-amber-700"></i> CppAIService 微服务
+                    </button>
+                </div>
+            </div>
+
+            <!-- 图例说明与快捷指示 -->
+            <div class="flex items-center justify-between flex-wrap gap-2 text-xs font-serifMono text-stone-600 mb-3 px-1">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-50 border border-sky-400 inline-block"></span> muduo 网络底座 (L0~L2)</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-50 border border-amber-400 inline-block"></span> HTTP 协议与路由 (L3)</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-purple-50 border border-purple-400 inline-block"></span> AI 业务与 MCP 推理 (L4)</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-50 border border-emerald-400 inline-block"></span> 多模态与异步削峰 (L5)</span>
+                </div>
+                <div class="text-[11px] text-stone-400">
+                    <i class="fa-solid fa-hand-pointer text-amber-600 mr-1"></i>悬停节点高亮，点击查看源码与直达任务
                 </div>
             </div>
             
-            <!-- 浅色工程蓝图风格 SVG 拓扑图 (带点击事件) -->
-            <div class="w-full overflow-x-auto border border-stone-200 rounded-xl p-3 bg-stone-50/50">
+            <!-- ==================== TAB 1: 端到端全链路穿透大图 (End-to-End Pipeline) ==================== -->
+            <div id="topo-svg-endtoend" class="w-full overflow-x-auto border border-stone-200 rounded-xl p-3 bg-stone-50/50">
+                <svg viewBox="0 0 1180 540" class="min-w-[1080px] w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <pattern id="grid-endtoend" width="24" height="24" patternUnits="userSpaceOnUse">
+                            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#ede7dd" stroke-width="0.8"/>
+                        </pattern>
+                        <marker id="arrow-stone-e" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#78716c"/>
+                        </marker>
+                        <marker id="arrow-sky-e" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#0284c7"/>
+                        </marker>
+                        <marker id="arrow-amber-e" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#d97706"/>
+                        </marker>
+                        <marker id="arrow-purple-e" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#7c3aed"/>
+                        </marker>
+                        <marker id="arrow-emerald-e" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#059669"/>
+                        </marker>
+                    </defs>
+
+                    <rect width="1180" height="540" fill="url(#grid-endtoend)" rx="8"/>
+
+                    <!-- === 列 1: 物理接入与 Linux 内核 I/O (x=20) === -->
+                    <g transform="translate(20, 18)">
+                        <rect width="210" height="504" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+                        <text x="105" y="26" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#1e293b">① 接入与内核 I/O</text>
+                        <line x1="15" y1="36" x2="195" y2="36" stroke="#f1f5f9" stroke-width="1.5"/>
+
+                        <!-- Client 客户端连接 -->
+                        <g transform="translate(15, 45)">
+                            <rect width="180" height="48" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#334155">Client 外部并发请求</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#64748b">• HTTP RESTful / SSE 流式 / 8080</text>
+                        </g>
+
+                        <!-- epoll 内核多路复用 -->
+                        <g transform="translate(15, 100)">
+                            <rect width="180" height="48" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#334155">Linux 内核 epoll</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#64748b">• epoll_wait 等待就绪事件 (LT/ET)</text>
+                        </g>
+
+                        <!-- mod_net_poller -->
+                        <g transform="translate(15, 156)" class="topo-node" onclick="openTopologyDrawer('mod_net_poller')">
+                            <rect width="180" height="62" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.2"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">Poller / EPollPoller</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• I/O 多路复用解耦封装</text>
+                            <text x="10" y="48" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• ChannelMap 维护活跃通道</text>
+                        </g>
+
+                        <!-- mod_net_channel -->
+                        <g transform="translate(15, 226)" class="topo-node" onclick="openTopologyDrawer('mod_net_channel')">
+                            <rect width="180" height="66" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.2"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">Channel 事件分发通道</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• 单 fd 事件生命期管理与回调</text>
+                            <text x="10" y="48" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• tie_ weak_ptr 防异步悬挂</text>
+                        </g>
+
+                        <!-- 基础并发线程池 -->
+                        <g transform="translate(15, 300)" class="topo-node" onclick="openTopologyDrawer('mod_base_threadpool')">
+                            <rect width="180" height="64" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11" fill="#475569">ThreadPool 工作线程池</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#64748b">• 任务队列与 SubReactor 分发</text>
+                            <text x="10" y="48" font-family="'Noto Serif SC', serif" font-size="9" fill="#64748b">• 条件变量安全通知</text>
+                        </g>
+
+                        <!-- 异步日志系统 -->
+                        <g transform="translate(15, 372)" class="topo-node" onclick="openTopologyDrawer('mod_base_logging')">
+                            <rect width="180" height="64" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11" fill="#475569">AsyncLogging 异步日志</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#64748b">• 双缓冲 (Double Buffering) 极速落盘</text>
+                            <text x="10" y="48" font-family="'Noto Serif SC', serif" font-size="9" fill="#64748b">• 规避磁盘 I/O 阻塞网络主循环</text>
+                        </g>
+                    </g>
+
+                    <!-- 跨列连线 1 -> 2 -->
+                    <path d="M 230 187 L 250 187" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky-e)"/>
+                    <path d="M 230 259 C 240 259, 240 250, 250 250" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky-e)"/>
+
+                    <!-- === 列 2: muduo Reactor 反应堆与连接层 (x=250) === -->
+                    <g transform="translate(250, 18)">
+                        <rect width="210" height="504" rx="8" fill="#ffffff" stroke="#bae6fd" stroke-width="1.5"/>
+                        <text x="105" y="26" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#0369a1">② Reactor 反应堆驱动</text>
+                        <line x1="15" y1="36" x2="195" y2="36" stroke="#f0f9ff" stroke-width="1.5"/>
+
+                        <!-- mod_net_tcpserver -->
+                        <g transform="translate(15, 48)" class="topo-node" onclick="openTopologyDrawer('mod_net_tcpserver')">
+                            <rect width="180" height="74" rx="6" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">TcpServer (MainReactor)</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• Acceptor 监听新连接</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• 轮询 Round-Robin 分发至 SubLoop</text>
+                            <text x="10" y="64" font-family="'Courier Prime', monospace" font-size="8.5" fill="#0284c7">muduo/net/TcpServer.cc</text>
+                        </g>
+
+                        <!-- mod_net_eventloop -->
+                        <g transform="translate(15, 142)" class="topo-node" onclick="openTopologyDrawer('mod_net_eventloop')">
+                            <rect width="180" height="96" rx="6" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.5"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">EventLoop 核心循环</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• One Loop Per Thread 核心发动机</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• loop() 驱动 Poller 派发事件</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• eventfd 唤醒 + 仿死锁双缓冲</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8.5" fill="#0369a1">queueInLoop(pendingFunctors_)</text>
+                        </g>
+
+                        <!-- mod_net_tcpconnection -->
+                        <g transform="translate(15, 258)" class="topo-node" onclick="openTopologyDrawer('mod_net_tcpconnection')">
+                            <rect width="180" height="96" rx="6" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">TcpConnection 长连接</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• 全双工连接抽象与状态机</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• enable_shared_from_this 自保</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• shutdownWrite 四次优雅挥手</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8.5" fill="#0284c7">muduo/net/TcpConnection.cc</text>
+                        </g>
+
+                        <!-- mod_net_buffer -->
+                        <g transform="translate(15, 374)" class="topo-node" onclick="openTopologyDrawer('mod_net_buffer')">
+                            <rect width="180" height="94" rx="6" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">Buffer 自适应缓冲区</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• 连续内存 vector&lt;char&gt; 零拷贝</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• readerIndex / writerIndex 游标</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#0c4a6e">• readv 分散读 + 64KB 临时栈缓冲</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8.5" fill="#0284c7">muduo/net/Buffer.cc</text>
+                        </g>
+                    </g>
+
+                    <!-- 跨列连线 2 -> 3 -->
+                    <path d="M 460 306 L 480 180" stroke="#d97706" stroke-width="1.5" marker-end="url(#arrow-amber-e)"/>
+                    <path d="M 460 421 C 470 421, 470 240, 480 240" stroke="#d97706" stroke-width="1.5" marker-end="url(#arrow-amber-e)"/>
+
+                    <!-- === 列 3: 自研 HTTP 协议引擎与路由层 (x=480) === -->
+                    <g transform="translate(480, 18)">
+                        <rect width="215" height="504" rx="8" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+                        <text x="107" y="26" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#c2410c">③ 自研 HTTP 协议引擎</text>
+                        <line x1="15" y1="36" x2="200" y2="36" stroke="#fff7ed" stroke-width="1.5"/>
+
+                        <!-- mod_http_server -->
+                        <g transform="translate(15, 48)" class="topo-node" onclick="openTopologyDrawer('mod_http_server')">
+                            <rect width="185" height="74" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#b45309">HttpServer 服务主干</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 派生 muduo::net::TcpServer</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 挂接 onMessage 触发协议解析</text>
+                            <text x="10" y="64" font-family="'Courier Prime', monospace" font-size="8.5" fill="#d97706">HttpServer/HttpServer.cpp</text>
+                        </g>
+
+                        <!-- mod_http_codec (FSM 状态机) -->
+                        <g transform="translate(15, 142)" class="topo-node" onclick="openTopologyDrawer('mod_http_codec')">
+                            <rect width="185" height="96" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#b45309">HttpContext (FSM 状态机)</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 逐行状态机流式解包 (Zero-Copy)</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 请求行 ➔ 请求头 ➔ 请求体解析</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• HttpRequest / HttpResponse 封装</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8.5" fill="#b45309">HttpRequestParseState 状态机</text>
+                        </g>
+
+                        <!-- mod_http_router -->
+                        <g transform="translate(15, 258)" class="topo-node" onclick="openTopologyDrawer('mod_http_router')">
+                            <rect width="185" height="74" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#b45309">Router 动态路由引擎</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• RESTful 方法与路径精确哈希</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• std::regex 动态通配符提取路径参数</text>
+                            <text x="10" y="64" font-family="'Courier Prime', monospace" font-size="8.5" fill="#d97706">HttpServer/Router.cpp</text>
+                        </g>
+
+                        <!-- mod_http_session & middleware -->
+                        <g transform="translate(15, 352)" class="topo-node" onclick="openTopologyDrawer('mod_http_session')">
+                            <rect width="185" height="60" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#b45309">SessionManager 会话管理</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• SESSIONID Cookie 分发与校验</text>
+                            <text x="10" y="48" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 内存会话生命周期与主动超时剔除</text>
+                        </g>
+
+                        <g transform="translate(15, 428)" class="topo-node" onclick="openTopologyDrawer('mod_http_middleware')">
+                            <rect width="185" height="60" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#b45309">MiddlewareChain 中间件链</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 洋葱模型拦截请求前置与后置</text>
+                            <text x="10" y="48" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 跨域 CORS / 访问日志 / 鉴权白名单</text>
+                        </g>
+                    </g>
+
+                    <!-- 跨列连线 3 -> 4 -->
+                    <path d="M 695 295 L 715 150" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow-purple-e)"/>
+
+                    <!-- === 列 4: AI 业务调度与策略平台 (x=715) === -->
+                    <g transform="translate(715, 18)">
+                        <rect width="220" height="504" rx="8" fill="#ffffff" stroke="#ddd6fe" stroke-width="1.5"/>
+                        <text x="110" y="26" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#6d28d9">④ AI 业务与 MCP 推理</text>
+                        <line x1="15" y1="36" x2="205" y2="36" stroke="#f5f3ff" stroke-width="1.5"/>
+
+                        <!-- ChatServer 智能业务网关 -->
+                        <g transform="translate(15, 48)">
+                            <rect width="190" height="84" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#6d28d9">ChatServer 核心调度</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#5b21b6">• 单用户多会话隔离</text>
+                            <text x="10" y="50" font-family="'Courier Prime', monospace" font-size="8.5" fill="#6d28d9">chatInformation[userId][sessionId]</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#5b21b6">• SSE 流式响应与断线恢复</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8.5" fill="#7c3aed">AIApps/ChatServer/src</text>
+                        </g>
+
+                        <!-- mod_ai_strategy -->
+                        <g transform="translate(15, 150)" class="topo-node" onclick="openTopologyDrawer('mod_ai_strategy')">
+                            <rect width="190" height="96" rx="6" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#5b21b6">AIStrategy 策略工厂</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#4c1d95">• 策略模式解耦多厂商模型接口</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#4c1d95">• Qwen 阿里通义 / Doubao 火山豆包</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#4c1d95">• OpenAI 官方协议适配</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8.5" fill="#6d28d9">AIFactory::createStrategy()</text>
+                        </g>
+
+                        <!-- mod_ai_mcp_registry -->
+                        <g transform="translate(15, 268)" class="topo-node" onclick="openTopologyDrawer('mod_ai_mcp_registry')">
+                            <rect width="190" height="110" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#5b21b6">MCP 两段式推理中心</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#4c1d95">• Model Context Protocol 工具注册</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#4c1d95">• 第一段：Prompt 动态注入工具元数据</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#4c1d95">• 大模型生成 Tool Call JSON 决策</text>
+                            <text x="10" y="78" font-family="'Noto Serif SC', serif" font-size="9" fill="#4c1d95">• 第二段：本地执行计算并二次推理</text>
+                            <text x="10" y="94" font-family="'Courier Prime', monospace" font-size="8.5" fill="#7c3aed">AIApps/ChatServer/MCPRegistry</text>
+                        </g>
+
+                        <!-- RAG 知识检索增强 -->
+                        <g transform="translate(15, 400)">
+                            <rect width="190" height="66" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+                            <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#5b21b6">RAG 检索增强生成</text>
+                            <text x="10" y="34" font-family="'Noto Serif SC', serif" font-size="9" fill="#5b21b6">• 本地向量索引与语义匹配召回</text>
+                            <text x="10" y="48" font-family="'Noto Serif SC', serif" font-size="9" fill="#5b21b6">• 上下文动态裁剪与 Token 预算控制</text>
+                        </g>
+                    </g>
+
+                    <!-- 跨列连线 4 -> 5 -->
+                    <path d="M 935 323 L 960 100" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald-e)"/>
+                    <path d="M 935 323 L 960 215" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald-e)"/>
+                    <path d="M 935 90 C 945 90, 945 340, 960 340" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald-e)"/>
+
+                    <!-- === 列 5: 多模态计算与异步存储层 (x=960) === -->
+                    <g transform="translate(960, 18)">
+                        <rect width="200" height="504" rx="8" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
+                        <text x="100" y="26" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#047857">⑤ 异步削峰与基础设施</text>
+                        <line x1="15" y1="36" x2="185" y2="36" stroke="#ecfdf5" stroke-width="1.5"/>
+
+                        <!-- mod_ai_onnx_vision -->
+                        <g transform="translate(15, 48)" class="topo-node" onclick="openTopologyDrawer('mod_ai_onnx_vision')">
+                            <rect width="170" height="84" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#065f46">ONNX Runtime 图像</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• C++ 原生 ONNX 推理引擎</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• OpenCV 图像缩放与归一化</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• ResNet-50 极速离线分类</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8" fill="#059669">AIApps/VisionServer</text>
+                        </g>
+
+                        <!-- mod_ai_tts_speech -->
+                        <g transform="translate(15, 150)" class="topo-node" onclick="openTopologyDrawer('mod_ai_tts_speech')">
+                            <rect width="170" height="84" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#065f46">百度语音 TTS / ASR</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• 百度云 Token 自动缓存换新</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• PCM 音频分帧与 base64 编解码</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• 对话结果转语音流式播放</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8" fill="#059669">AIApps/SpeechServer</text>
+                        </g>
+
+                        <!-- mod_mq_rabbitmq_manager -->
+                        <g transform="translate(15, 252)" class="topo-node" onclick="openTopologyDrawer('mod_mq_rabbitmq_manager')">
+                            <rect width="170" height="114" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#065f46">RabbitMQ 异步削峰</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• 数据库写入与业务线程彻底解耦</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• 高峰期对话日志先入 Direct 交换机</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• 后台消费者平滑批量持久化入库</text>
+                            <text x="10" y="78" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• 死信队列 (DLX) 处理畸形消息</text>
+                            <text x="10" y="94" font-family="'Courier Prime', monospace" font-size="8" fill="#047857">AIApps/ChatServer/RabbitMQ</text>
+                        </g>
+
+                        <!-- mod_storage_mysql_pool -->
+                        <g transform="translate(15, 384)" class="topo-node" onclick="openTopologyDrawer('mod_storage_mysql_pool')">
+                            <rect width="170" height="96" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.2"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#065f46">MySQL 线程安全连接池</text>
+                            <text x="10" y="36" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• RAII 自动借还连接包装器</text>
+                            <text x="10" y="50" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• 互斥锁与条件变量控制并发量</text>
+                            <text x="10" y="64" font-family="'Noto Serif SC', serif" font-size="9" fill="#064e3b">• 定时心跳与断线自愈重连机制</text>
+                            <text x="10" y="78" font-family="'Courier Prime', monospace" font-size="8" fill="#059669">AIApps/ChatServer/DbPool</text>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- ==================== TAB 2: muduo Reactor 底座拓扑 (从原版继承增强) ==================== -->
+            <div id="topo-svg-muduo" class="w-full overflow-x-auto border border-stone-200 rounded-xl p-3 bg-stone-50/50 hidden">
                 <svg viewBox="0 0 1120 480" class="min-w-[980px] w-full h-auto" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <pattern id="academic-grid" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -444,73 +774,75 @@
                             <text x="12" y="34" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">构造加锁，离开作用域析构自动解锁，杜绝死锁</text>
                         </g>
 
-                        <g transform="translate(18, 104)" class="topo-node" onclick="openTopologyDrawer('eventloop')">
+                        <g transform="translate(18, 104)" class="topo-node" onclick="openTopologyDrawer('mod_net_eventloop')">
                             <rect width="329" height="100" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.5"/>
                             <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#0369a1">EventLoop (One Loop Per Thread)</text>
                             <text x="12" y="46" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• loop() 驱动循环；eventfd 跨线程安全唤醒</text>
-                            <text x="12" y="66" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• queueInLoop(Functor) 异步安全任务队列</text>
-                            <text x="12" y="86" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• 独占 unique_ptr&lt;Poller&gt; 负责 I/O 监听</text>
+                            <text x="12" y="66" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• queueInLoop() 跨线程转移计算，规避跨线程竞态死锁</text>
+                            <text x="12" y="86" font-family="'Courier Prime', monospace" font-size="9" fill="#0284c7">assertInLoopThread(); pendingFunctors_.swap(functors);</text>
                         </g>
 
-                        <g transform="translate(18, 214)" class="topo-node" onclick="openTopologyDrawer('poller')">
-                            <rect width="155" height="85" rx="5" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
-                            <text x="10" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#1e293b">Poller / epoll</text>
-                            <text x="10" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#475569">虚基类抽象接口</text>
-                            <text x="10" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#475569">epoll_wait() 阻塞</text>
-                            <text x="10" y="74" font-family="'Courier Prime', monospace" font-size="9" fill="#0284c7">map&lt;int, Channel*&gt;</text>
+                        <g transform="translate(18, 220)" class="topo-node" onclick="openTopologyDrawer('mod_net_channel')">
+                            <rect width="156" height="100" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.2"/>
+                            <text x="10" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">Channel (通道)</text>
+                            <text x="10" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#0c4a6e">• 包装单一 fd</text>
+                            <text x="10" y="60" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#0c4a6e">• 注册事件关注掩码</text>
+                            <text x="10" y="78" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#0c4a6e">• 分发 read/write 回调</text>
+                            <text x="10" y="94" font-family="'Courier Prime', monospace" font-size="8.5" fill="#0284c7">tie_ 弱引用防悬挂</text>
                         </g>
 
-                        <g transform="translate(190, 214)" class="topo-node" onclick="openTopologyDrawer('channel')">
-                            <rect width="157" height="85" rx="5" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.5"/>
-                            <text x="10" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">Channel (通道适配)</text>
-                            <text x="10" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#075985">独占单一 Socket fd</text>
-                            <text x="10" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#075985">注册读写事件与回调</text>
-                            <text x="10" y="74" font-family="'Courier Prime', monospace" font-size="9" fill="#b45309">weak_ptr&lt;void&gt; tie_</text>
+                        <g transform="translate(191, 220)" class="topo-node" onclick="openTopologyDrawer('mod_net_poller')">
+                            <rect width="156" height="100" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.2"/>
+                            <text x="10" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#0369a1">Poller (I/O复用)</text>
+                            <text x="10" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#0c4a6e">• 封装 epoll 系统调用</text>
+                            <text x="10" y="60" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#0c4a6e">• update/removeChannel</text>
+                            <text x="10" y="78" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#0c4a6e">• 填充 activeChannels</text>
+                            <text x="10" y="94" font-family="'Courier Prime', monospace" font-size="8.5" fill="#0284c7">EPollPoller 边缘触发</text>
                         </g>
 
-                        <g transform="translate(18, 310)" class="topo-node" onclick="openTopologyDrawer('handleeventwithguard')">
-                            <rect width="329" height="114" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="11" fill="#334155">Channel::handleEventWithGuard()</text>
-                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">1. tie_.lock() 安全提升为 shared_ptr 保证连接存活</text>
-                            <text x="12" y="62" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">2. EPOLLIN  ➜ 触发 readCallback_(receiveTime)</text>
-                            <text x="12" y="82" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">3. EPOLLOUT ➜ 触发 writeCallback_()</text>
-                            <text x="12" y="102" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">4. EPOLLERR ➜ 触发 errorCallback_()</text>
+                        <g transform="translate(18, 336)" class="topo-node" onclick="openTopologyDrawer('callbacks')">
+                            <rect width="329" height="90" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#334155">Callbacks 回调系统</text>
+                            <text x="12" y="42" font-family="'Courier Prime', monospace" font-size="9.5" fill="#0284c7">typedef function&lt;void(const TcpConnectionPtr&amp;)&gt; ConnectionCallback;</text>
+                            <text x="12" y="60" font-family="'Courier Prime', monospace" font-size="9.5" fill="#0284c7">typedef function&lt;void(const TcpConnectionPtr&amp;, Buffer*, Timestamp)&gt; MessageCallback;</text>
+                            <text x="12" y="80" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">消除虚函数继承膨胀，拥抱轻量现代 C++ 基于对象架构</text>
                         </g>
 
-                        <path d="M 95 204 L 95 212" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
-                        <path d="M 173 256 L 188 256" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
-                        <path d="M 268 300 L 268 308" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
+                        <path d="M 96 204 L 96 220" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
+                        <path d="M 269 204 L 269 220" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
+                        <path d="M 174 270 L 191 270" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
                     </g>
 
-                    <path d="M 710 160 L 755 160" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-sky)"/>
-                    <path d="M 710 270 L 755 270" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
+                    <!-- 连接跨越：Reactor -> 业务实体 -->
+                    <path d="M 710 140 C 725 140, 725 100, 740 100" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
+                    <path d="M 710 240 C 725 240, 725 230, 740 230" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
 
-                    <!-- === 第三列：业务层与网络连接实体 (右翼结果) === -->
-                    <g transform="translate(760, 20)">
-                        <rect width="335" height="440" rx="8" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
-                        <text x="167" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13.5" fill="#065f46">网络连接与数据实体 (Tcp 服务)</text>
-                        <line x1="20" y1="38" x2="315" y2="38" stroke="#f0fdf4" stroke-width="1.5"/>
+                    <!-- === 第三列：业务连接与存储层实体 (右翼落地) === -->
+                    <g transform="translate(745, 20)">
+                        <rect width="350" height="440" rx="8" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
+                        <text x="175" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13.5" fill="#065f46">业务连接与缓冲区实体 (TCP 上层)</text>
+                        <line x1="20" y1="38" x2="330" y2="38" stroke="#ecfdf5" stroke-width="1.5"/>
 
-                        <g transform="translate(16, 50)" class="topo-node" onclick="openTopologyDrawer('tcpserver')">
-                            <rect width="303" height="116" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
-                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#047857">TcpServer (高层服务器大总管)</text>
-                            <text x="12" y="48" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• map&lt;string, TcpConnectionPtr&gt; conns_</text>
-                            <text x="12" y="68" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 管理全服所有活跃客户端连接生命周期</text>
-                            <text x="12" y="88" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• std::bind 绑定 newConnection 回调挂入 Acceptor</text>
-                            <text x="12" y="106" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• noncopyable 阻止非法的对象复制</text>
+                        <g transform="translate(16, 50)" class="topo-node" onclick="openTopologyDrawer('mod_net_tcpserver')">
+                            <rect width="318" height="116" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#047857">TcpServer (总控服务器)</text>
+                            <text x="12" y="46" font-family="'Noto Serif SC', serif" font-size="10" fill="#064e3b">• 持有 Acceptor 监听物理端口</text>
+                            <text x="12" y="66" font-family="'Noto Serif SC', serif" font-size="10" fill="#064e3b">• 管理 EventLoopThreadPool (单线程 Reactor ➔ 主从多线程)</text>
+                            <text x="12" y="86" font-family="'Noto Serif SC', serif" font-size="10" fill="#064e3b">• ConnectionMap 管理全部活跃客户端长连接</text>
+                            <text x="12" y="104" font-family="'Courier Prime', monospace" font-size="9" fill="#059669">map&lt;string, TcpConnectionPtr&gt; connections_;</text>
                         </g>
 
-                        <g transform="translate(16, 180)" class="topo-node" onclick="openTopologyDrawer('tcpconnection')">
-                            <rect width="303" height="120" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
-                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#047857">TcpConnection (客户端长连接核心)</text>
-                            <text x="12" y="48" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• shared_ptr&lt;TcpConnection&gt; 共享生存期</text>
+                        <g transform="translate(16, 180)" class="topo-node" onclick="openTopologyDrawer('mod_net_tcpconnection')">
+                            <rect width="318" height="120" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#047857">TcpConnection (单客户端连接)</text>
+                            <text x="12" y="48" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 代表一条真实的已连接物理套接字 Socket</text>
                             <text x="12" y="68" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• enable_shared_from_this 跨线程自保</text>
                             <text x="12" y="88" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 拥有独立 inputBuffer_ 与 outputBuffer_</text>
-                            <text x="12" y="106" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• std::bind 组装 onMessage / onClose 回调</text>
+                            <text x="12" y="106" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• std::bind 组装 onMessage / onClose 回调</text>
                         </g>
 
-                        <g transform="translate(16, 314)" class="topo-node" onclick="openTopologyDrawer('buffer')">
-                            <rect width="303" height="106" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+                        <g transform="translate(16, 314)" class="topo-node" onclick="openTopologyDrawer('mod_net_buffer')">
+                            <rect width="318" height="106" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
                             <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#334155">Buffer (自适应非阻塞缓冲器)</text>
                             <text x="12" y="44" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">• 底层为连续内存 std::vector&lt;char&gt;</text>
                             <text x="12" y="62" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#64748b">• 采用 prepends / readable / writable 游标</text>
@@ -518,16 +850,185 @@
                             <text x="12" y="98" font-family="'Courier Prime', monospace" font-size="9" fill="#0284c7">size_t readableBytes() const;</text>
                         </g>
 
-                        <path d="M 167 166 L 167 178" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
-                        <path d="M 167 300 L 167 312" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
+                        <path d="M 175 166 L 175 178" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
+                        <path d="M 175 300 L 175 312" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
                     </g>
                 </svg>
             </div>
 
-            <!-- 拓扑关键结论批注 -->
-            <div class="mt-4 p-4 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs leading-relaxed text-amber-950 font-serifHeading">
-                <span class="font-bold font-serifMono text-amber-900">📌 拓扑关键结论：</span>
-                muduo 源码之所以在现代 C++ 网络工程中极为精悍，是因为它<strong>彻底抛弃了层层深继承的传统 OOP 虚函数包袱</strong>，转而采用以 <code>std::function / std::bind</code> 为核心的“基于对象（Object-based）”回调模式。配合 <code>shared_ptr/weak_ptr</code>，极为优雅地解决了多线程异步网络编程中“对象正在析构但回调恰好到来”的并发竞态问题。
+            <!-- ==================== TAB 3: CppAIService 分布式微服务架构拓扑 ==================== -->
+            <div id="topo-svg-cppai" class="w-full overflow-x-auto border border-stone-200 rounded-xl p-3 bg-stone-50/50 hidden">
+                <svg viewBox="0 0 1180 500" class="min-w-[1080px] w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <pattern id="grid-cppai" width="24" height="24" patternUnits="userSpaceOnUse">
+                            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#ede7dd" stroke-width="0.8"/>
+                        </pattern>
+                        <marker id="arrow-amber-m" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#d97706"/>
+                        </marker>
+                        <marker id="arrow-purple-m" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#7c3aed"/>
+                        </marker>
+                        <marker id="arrow-emerald-m" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1 L 8 5 L 0 9 z" fill="#059669"/>
+                        </marker>
+                    </defs>
+
+                    <rect width="1180" height="500" fill="url(#grid-cppai)" rx="8"/>
+
+                    <!-- 1. HttpServer 微服务网关 (Port 8080) -->
+                    <g transform="translate(25, 20)">
+                        <rect width="340" height="460" rx="8" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+                        <text x="170" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#c2410c">自研 HTTP 服务微网关 (Port: 8080)</text>
+                        <line x1="20" y1="38" x2="320" y2="38" stroke="#fff7ed" stroke-width="1.5"/>
+
+                        <g transform="translate(18, 50)" class="topo-node" onclick="openTopologyDrawer('mod_http_server')">
+                            <rect width="304" height="84" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#b45309">HttpServer (主从 Reactor 服务)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">• 派生 muduo::net::TcpServer，承载万级长连接</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">• 统一注册 onConnection 与 onMessage 回调</text>
+                            <text x="12" y="74" font-family="'Courier Prime', monospace" font-size="8.5" fill="#d97706">HttpServer/HttpServer.cpp</text>
+                        </g>
+
+                        <g transform="translate(18, 146)" class="topo-node" onclick="openTopologyDrawer('mod_http_codec')">
+                            <rect width="304" height="84" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#b45309">HttpContext (有限状态机 FSM 解包)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">• 流式解析 \r\n 状态转移，杜绝 TCP 粘包拆包</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">• HttpRequest / HttpResponse 对象封装</text>
+                            <text x="12" y="74" font-family="'Courier Prime', monospace" font-size="8.5" fill="#b45309">HttpServer/HttpContext.cpp</text>
+                        </g>
+
+                        <g transform="translate(18, 242)" class="topo-node" onclick="openTopologyDrawer('mod_http_router')">
+                            <rect width="304" height="84" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#b45309">Router 动态路由分发引擎</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">• 精确匹配哈希表 + std::regex 动态通配路由</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">• 支持 GET / POST / OPTIONS / PUT 全动词映射</text>
+                            <text x="12" y="74" font-family="'Courier Prime', monospace" font-size="8.5" fill="#d97706">HttpServer/Router.cpp</text>
+                        </g>
+
+                        <g transform="translate(18, 338)" class="topo-node" onclick="openTopologyDrawer('mod_http_middleware')">
+                            <rect width="144" height="100" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="11" fill="#b45309">Middleware 拦截链</text>
+                            <text x="10" y="38" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 洋葱模型顺序递归</text>
+                            <text x="10" y="54" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 日志耗时打点</text>
+                            <text x="10" y="70" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• CORS 跨域放行</text>
+                            <text x="10" y="86" font-family="'Courier Prime', monospace" font-size="8" fill="#d97706">Middleware.cpp</text>
+                        </g>
+
+                        <g transform="translate(178, 338)" class="topo-node" onclick="openTopologyDrawer('mod_http_session')">
+                            <rect width="144" height="100" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+                            <text x="10" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="11" fill="#b45309">SessionManager</text>
+                            <text x="10" y="38" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• SESSIONID Cookie</text>
+                            <text x="10" y="54" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 会话内存自增隔离</text>
+                            <text x="10" y="70" font-family="'Noto Serif SC', serif" font-size="9" fill="#78350f">• 定时超时回收</text>
+                            <text x="10" y="86" font-family="'Courier Prime', monospace" font-size="8" fill="#d97706">SessionManager.cpp</text>
+                        </g>
+                    </g>
+
+                    <!-- 连线：网关 -> 核心业务 ChatServer -->
+                    <path d="M 365 250 L 415 250" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow-purple-m)"/>
+
+                    <!-- 2. ChatServer 核心业务与推理引擎 (Port 9090) -->
+                    <g transform="translate(420, 20)">
+                        <rect width="360" height="460" rx="8" fill="#ffffff" stroke="#ddd6fe" stroke-width="1.5"/>
+                        <text x="180" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#6d28d9">ChatServer 核心智能调度中心 (Port: 9090)</text>
+                        <line x1="20" y1="38" x2="340" y2="38" stroke="#f5f3ff" stroke-width="1.5"/>
+
+                        <g transform="translate(18, 50)">
+                            <rect width="324" height="84" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#6d28d9">ChatServer 主业务调度器</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#5b21b6">• 单用户多会话隔离：chatInformation[userId][sessionId]</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#5b21b6">• 消息解析、历史上下文拉取、Token 预算把控</text>
+                            <text x="12" y="74" font-family="'Courier Prime', monospace" font-size="8.5" fill="#7c3aed">AIApps/ChatServer/src/ChatServer.cpp</text>
+                        </g>
+
+                        <g transform="translate(18, 146)" class="topo-node" onclick="openTopologyDrawer('mod_ai_strategy')">
+                            <rect width="324" height="106" rx="6" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#5b21b6">AIStrategy 策略模式工厂</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#4c1d95">• 纯虚接口定义标准推理生命周期：chat(), chatStream()</text>
+                            <text x="12" y="60" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#4c1d95">• 策略子类：QwenStrategy (阿里通义百炼) / DoubaoStrategy (火山豆包)</text>
+                            <text x="12" y="78" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#4c1d95">• AIFactory 根据运行时配置热切换模型驱动，业务无感升级</text>
+                            <text x="12" y="94" font-family="'Courier Prime', monospace" font-size="8.5" fill="#6d28d9">AIApps/ChatServer/include/AIStrategy.h</text>
+                        </g>
+
+                        <g transform="translate(18, 264)" class="topo-node" onclick="openTopologyDrawer('mod_ai_mcp_registry')">
+                            <rect width="324" height="116" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#5b21b6">MCP 两段式推理中心 (Model Context Protocol)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#4c1d95">• 工具注册中心：注册计算器、天气、知识库、数据库查询工具</text>
+                            <text x="12" y="60" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#4c1d95">• 两段式推理第一段：自动组装 Tool JSON Schema 注入 System Prompt</text>
+                            <text x="12" y="78" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#4c1d95">• 大模型识别返回 Tool Call 指令 ➔ 本地分派执行并将结果塞回上下文</text>
+                            <text x="12" y="96" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#4c1d95">• 两段式推理第二段：大模型完成最终人类可读总结，完成闭环</text>
+                        </g>
+
+                        <g transform="translate(18, 392)">
+                            <rect width="324" height="56" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                            <text x="12" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="11" fill="#475569">RAG 检索增强引擎</text>
+                            <text x="12" y="38" font-family="'Noto Serif SC', serif" font-size="9" fill="#64748b">• 向量嵌入距离计算、私有知识召回、前置防幻觉纠偏</text>
+                        </g>
+                    </g>
+
+                    <!-- 连线：业务 -> 异步存储与多模态 -->
+                    <path d="M 780 200 L 830 140" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald-m)"/>
+                    <path d="M 780 320 L 830 360" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-emerald-m)"/>
+
+                    <!-- 3. 异步消息队列与多模态计算层 (右侧) -->
+                    <g transform="translate(835, 20)">
+                        <rect width="320" height="460" rx="8" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
+                        <text x="160" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13" fill="#047857">异步削峰、多模态与存储基建</text>
+                        <line x1="20" y1="38" x2="300" y2="38" stroke="#ecfdf5" stroke-width="1.5"/>
+
+                        <!-- RabbitMQ Manager -->
+                        <g transform="translate(18, 50)" class="topo-node" onclick="openTopologyDrawer('mod_mq_rabbitmq_manager')">
+                            <rect width="284" height="106" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#065f46">RabbitMQ 异步削峰写库管理器</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• 解耦业务请求与磁盘 I/O，吞吐量飞跃提升</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• Direct Exchange 绑定消息队列，消息持久化 delivery_mode=2</text>
+                            <text x="12" y="74" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• 独立消费者工作线程池平滑消费，DLX 死信兜底</text>
+                            <text x="12" y="92" font-family="'Courier Prime', monospace" font-size="8.5" fill="#047857">AIApps/ChatServer/include/RabbitMQManager.h</text>
+                        </g>
+
+                        <!-- DbConnectionPool -->
+                        <g transform="translate(18, 168)" class="topo-node" onclick="openTopologyDrawer('mod_storage_mysql_pool')">
+                            <rect width="284" height="96" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.2"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#065f46">MySQL 数据库连接池 (DbPool)</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• 避免频繁握手消耗，维持常驻活跃 TCP 管道</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• RAII 自动借还连接包装器，防连接泄漏</text>
+                            <text x="12" y="74" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• 互斥锁与条件变量控制并发量，心跳保活断线自愈</text>
+                            <text x="12" y="88" font-family="'Courier Prime', monospace" font-size="8.5" fill="#059669">AIApps/ChatServer/DbPool/DbConnectionPool.cpp</text>
+                        </g>
+
+                        <!-- ONNX Runtime -->
+                        <g transform="translate(18, 276)" class="topo-node" onclick="openTopologyDrawer('mod_ai_onnx_vision')">
+                            <rect width="284" height="84" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.2"/>
+                            <text x="12" y="22" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#065f46">ONNX Runtime 图像识别微服务</text>
+                            <text x="12" y="42" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• 现代 C++17 原生接入 ONNX Runtime C++ API</text>
+                            <text x="12" y="58" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• OpenCV 处理归一化张量，ResNet-50 离线推理</text>
+                            <text x="12" y="74" font-family="'Courier Prime', monospace" font-size="8.5" fill="#059669">AIApps/VisionServer/src/VisionServer.cpp</text>
+                        </g>
+
+                        <!-- Baidu Speech -->
+                        <g transform="translate(18, 372)" class="topo-node" onclick="openTopologyDrawer('mod_ai_tts_speech')">
+                            <rect width="284" height="74" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.2"/>
+                            <text x="12" y="20" font-family="'Courier Prime', monospace" font-weight="700" font-size="12" fill="#065f46">百度语音合成 (TTS / ASR)</text>
+                            <text x="12" y="38" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• 自动鉴权 Token 缓存，PCM 音频分帧流式转码</text>
+                            <text x="12" y="54" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#064e3b">• 与 ChatServer 对话结果联动，输出生动语音流</text>
+                            <text x="12" y="68" font-family="'Courier Prime', monospace" font-size="8.5" fill="#059669">AIApps/SpeechServer/src/SpeechServer.cpp</text>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- 拓扑关键结论与架构通感批注 -->
+            <div class="mt-4 p-4 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs leading-relaxed text-amber-950 font-serifHeading flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <span class="font-bold font-serifMono text-amber-900">📌 双核架构穿透铁律：</span>
+                    底层 muduo 解决了<strong>每秒数万高并发连接下的 epoll 事件分发、零拷贝 Buffer 积压与无锁线程池唤醒</strong>；上层 CppAIService 继承了这一高性能底座，演进出<strong>自研 HTTP FSM 状态机、MCP 两段式推理、多模型协同与 RabbitMQ 异步削峰</strong>。两者上下穿透，构成了一套高含金量的工业级服务端硬核系统！
+                </div>
+                <div class="shrink-0">
+                    <button onclick="openTopologyDrawer('mod_ai_mcp_registry')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-serifMono font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                        <span>剖析核心大招: MCP 两段式推理 ➔</span>
+                    </button>
+                </div>
             </div>
         </div>
 
