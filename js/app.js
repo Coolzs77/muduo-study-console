@@ -1630,7 +1630,7 @@ function renderLearningCppTab() {
                         知识体系与进度大纲
                     </h3>
                     <p class="text-xs text-stone-500 mt-0.5">
-                        严格对齐语雀 8,292 字真实笔记
+                        学习路线与教材页码对照
                     </p>
                 </div>
 
@@ -1737,7 +1737,7 @@ function renderLearningCppTab() {
                                             <!-- 面试考点 -->
                                             <div class="p-2.5 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs font-serifHeading text-amber-950">
                                                 <span class="font-bold text-amber-800 font-serifMono text-[11px] block mb-0.5">
-                                                    <i class="fa-solid fa-circle-question"></i> 面试真题考点：
+                                                    <i class="fa-solid fa-circle-question"></i> 面试考点：
                                                 </span>
                                                 <p class="text-[11px] text-stone-700 leading-relaxed">${escapeHtml(item.interviewPoint)}</p>
                                             </div>
@@ -1794,10 +1794,10 @@ function renderLearningLinuxTab() {
                         <span>《鸟哥的Linux私房菜》</span>
                     </div>
                     <h3 class="text-sm font-bold text-stone-900 font-serifHeading">
-                        基础学习篇完整底座
+                        基础学习篇目录大纲
                     </h3>
                     <p class="text-xs text-stone-500 mt-0.5">
-                        全章节实战与页码对照
+                        章节实战与页码对照
                     </p>
                 </div>
 
@@ -1814,7 +1814,7 @@ function renderLearningLinuxTab() {
 
                 <!-- 章节快速跳转索引 -->
                 <div class="space-y-1 font-serifMono text-xs pt-1">
-                    <div class="text-[11px] text-stone-400 font-bold uppercase tracking-wider mb-2">篇章目录速览</div>
+                    <div class="text-[11px] text-stone-400 font-bold uppercase tracking-wider mb-2">章节目录</div>
                     ${chapters.map((chap, idx) => {
                         const chapLearned = chap.items.filter(it => (typeof stateManager !== 'undefined' && typeof stateManager.isLinuxLearned === 'function') ? stateManager.isLinuxLearned(it.id) : false).length;
                         const isAll = chapLearned === chap.items.length && chap.items.length > 0;
@@ -1877,7 +1877,7 @@ function renderLearningLinuxTab() {
                                                 </div>
                                                 <div class="flex items-center gap-2 font-serifMono text-xs shrink-0">
                                                     <button onclick="openCrossLinkModal('${escapeHtml(item.id)}')" class="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold transition text-[11px] cursor-pointer">
-                                                        关联穿透
+                                                        关联模块
                                                     </button>
                                                 </div>
                                             </div>
@@ -1888,7 +1888,7 @@ function renderLearningLinuxTab() {
                                             </div>
 
                                             <div class="text-xs text-stone-700 leading-relaxed font-serifHeading">
-                                                <strong class="font-bold text-stone-900 font-serifMono">实战场景：</strong>
+                                                <strong class="font-bold text-stone-900 font-serifMono">实战应用：</strong>
                                                 ${escapeHtml(item.projectScene)}
                                             </div>
 
@@ -1904,7 +1904,7 @@ function renderLearningLinuxTab() {
                                             <!-- 面试考点 -->
                                             <div class="p-2.5 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs font-serifHeading text-amber-950">
                                                 <span class="font-bold text-amber-800 font-serifMono text-[11px] block mb-0.5">
-                                                    <i class="fa-solid fa-circle-question"></i> 面试考点与排查思路：
+                                                    <i class="fa-solid fa-circle-question"></i> 面试考点：
                                                 </span>
                                                 <p class="text-[11px] text-stone-700 leading-relaxed">${escapeHtml(item.interviewPoint)}</p>
                                             </div>
