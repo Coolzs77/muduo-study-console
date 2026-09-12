@@ -250,6 +250,9 @@
             <button onclick="switchView('pitfalls')" id="nav-pitfalls" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="C++ 踩坑档案">
                 <i class="fa-solid fa-bug text-rose-600"></i> C++ 踩坑档案
             </button>
+            <button onclick="switchView('career')" id="nav-career" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="求职能力与工程凭证">
+                <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力与凭证 (P6)
+            </button>
         </nav>
 
         <!-- 任务边栏常驻快捷开关按钮 -->
@@ -1565,6 +1568,109 @@
                     <!-- 动态生成 h2 / h3 链接 -->
                 </div>
             </div>
+    <!-- ==================== VIEW: 求职能力与工程凭证体系 (Phase 6) ==================== -->
+    <section id="view-career" class="hidden space-y-6">
+        <!-- 头部导航与体系介绍 -->
+        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-stone-100">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-serifMono mb-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span class="font-bold">CAREER EVIDENCE & CAPABILITY SYSTEM</span>
+                        <span class="text-stone-300">•</span>
+                        <span>真实凭证 ➔ 闭环晋级 ➔ 拿捏面试</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
+                        <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力矩阵与真实工程凭证中心 (P6)
+                    </h2>
+                    <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
+                        把“我学过”转化成“我能够证明我会”。严禁虚构经历，能力等级由真实代码改动、Bug 修复、性能压测等
+                        <span class="font-semibold text-stone-700 font-serifMono">9 类工程凭证</span> 驱动判定。
+                        集成 14 维能力矩阵、4-Hop 逆向穿透、全真模拟面试与高分 STAR 履历陈述。
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 font-serifMono shrink-0">
+                    <button onclick="openNewEvidenceModal()" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                        <i class="fa-solid fa-plus"></i> 录入工程凭证
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5 大子体系切换标签导航 -->
+            <div class="flex items-center gap-2 overflow-x-auto pt-4 pb-1 font-serifMono text-xs" id="career-subtabs-nav">
+                <button onclick="switchCareerTab('evidence')" id="career-tab-btn-evidence" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-certificate text-emerald-400"></i> 1. 工程凭证库
+                </button>
+                <button onclick="switchCareerTab('capability')" id="career-tab-btn-capability" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-layer-group text-sky-600"></i> 2. 14维能力矩阵
+                </button>
+                <button onclick="switchCareerTab('interview')" id="career-tab-btn-interview" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-diagram-project text-amber-600"></i> 3. 项目面试全案 (4-Hop)
+                </button>
+                <button onclick="switchCareerTab('mock')" id="career-tab-btn-mock" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-microphone text-purple-600"></i> 4. 模拟面试大厅
+                </button>
+                <button onclick="switchCareerTab('star')" id="career-tab-btn-star" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-file-lines text-rose-600"></i> 5. STAR 故事与简历
+                </button>
+            </div>
+        </div>
+
+        <!-- 子面板 1: 工程凭证库 (Evidence Hub) -->
+        <div id="career-pane-evidence" class="space-y-6">
+            <div id="career-evidence-stats-container"></div>
+            <div class="flex items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-stone-200">
+                <div class="flex items-center gap-2 overflow-x-auto text-xs font-serifMono" id="evidence-type-filter-bar">
+                    <!-- 过滤按钮 -->
+                </div>
+                <div class="text-xs text-stone-500 font-serifMono shrink-0" id="evidence-count-badge">
+                    共 0 条工程凭证
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="career-evidence-grid">
+                <!-- 动态填充凭证卡片 -->
+            </div>
+        </div>
+
+        <!-- 子面板 2: 14维能力矩阵 (Capability Matrix) -->
+        <div id="career-pane-capability" class="space-y-6 hidden">
+            <div id="career-capability-summary-container"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="career-capability-grid">
+                <!-- 动态填充 14 维能力卡片 -->
+            </div>
+        </div>
+
+        <!-- 子面板 3: 项目面试全案与 4-Hop 穿透 (Project Interview) -->
+        <div id="career-pane-interview" class="space-y-6 hidden">
+            <div id="career-interview-nav-container"></div>
+            <div class="space-y-6" id="career-interview-content-container">
+                <!-- 动态填充 7 大全案 + 4-Hop 逆向题目 -->
+            </div>
+        </div>
+
+        <!-- 子面板 4: 模拟面试竞技场 (Mock Arena) -->
+        <div id="career-pane-mock" class="space-y-6 hidden">
+            <div id="career-mock-arena-container">
+                <!-- 动态填充模拟面试交互区 -->
+            </div>
+            <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
+                <h3 class="text-sm font-bold text-stone-900 font-serifHeading mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-purple-600"></i> 面试实战与评分历史
+                </h3>
+                <div class="overflow-x-auto" id="career-mock-history-container">
+                    <!-- 历史记录 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 子面板 5: STAR 面试故事与量化简历 (STAR & Resume) -->
+        <div id="career-pane-star" class="space-y-6 hidden">
+            <div id="career-star-stories-container" class="space-y-5">
+                <!-- STAR 故事 -->
+            </div>
+            <div id="career-resume-bullets-container" class="space-y-5">
+                <!-- 简历 Bullet Points -->
+            </div>
         </div>
     </section>
         </main>
@@ -2428,6 +2534,86 @@ add_executable(my_server ${SOURCES})</pre>
     </div>
 </div>
 
+<!-- ==================== Phase 6: 录入新工程凭证 Modal ==================== -->
+<div id="new-evidence-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-5" role="dialog" aria-modal="true" aria-label="录入真实工程凭证">
+    <div class="relative bg-white rounded-2xl max-w-xl w-full p-5 sm:p-7 shadow-2xl border border-stone-300 max-h-[90vh] overflow-y-auto flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-4 border-b border-stone-200 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-base border border-amber-200">
+                        <i class="fa-solid fa-certificate"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-stone-900 text-base font-serifHeading">录入真实工程凭证</h4>
+                        <p class="text-xs text-stone-500 font-serifMono">严禁虚构 · 凭证驱动 · 支撑能力晋级</p>
+                    </div>
+                </div>
+                <button onclick="closeNewEvidenceModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="new-evidence-form" onsubmit="handleSaveCustomEvidence(event)" class="space-y-4 text-xs font-serifMono">
+                <div>
+                    <label class="block text-stone-700 font-bold mb-1">凭证名称 / 动作概述 *</label>
+                    <input type="text" id="evidence-input-title" required placeholder="如: 修复 Buffer 动态扩容越界崩溃" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-amber-500 font-sans" />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">凭证类型 *</label>
+                        <select id="evidence-input-type" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-amber-500">
+                            <option value="source_reading">源码精读 (Source Reading)</option>
+                            <option value="code_modification">代码实现/修改 (Code Modification)</option>
+                            <option value="bug_fix">缺陷排查与修复 (Bug Fix)</option>
+                            <option value="testing">单元/集成测试断言 (Testing)</option>
+                            <option value="benchmark">性能基准与压测 (Benchmark)</option>
+                            <option value="experiment">实验沙盒验证 (Experiment)</option>
+                            <option value="git_commit">版本控制提交 (Git Commit)</option>
+                            <option value="tech_summary">技术复盘与手记 (Summary)</option>
+                            <option value="trace_proof">运行轨迹与证明 (Trace Proof)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">关联任务 / 来源 *</label>
+                        <input type="text" id="evidence-input-task" required placeholder="如: Day 14 或 CppAIService #07" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-amber-500" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">源码精确定位</label>
+                        <input type="text" id="evidence-input-source" placeholder="如: muduo/net/Buffer.cc:L85" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-amber-500" />
+                    </div>
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">Commit Hash / 校验哈希</label>
+                        <input type="text" id="evidence-input-commit" placeholder="如: 7f8a1b2 或 n/a" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-amber-500" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-stone-700 font-bold mb-1">关联能力标签 (逗号隔开) *</label>
+                    <input type="text" id="evidence-input-tags" required placeholder="如: muduo, C++, Concurrency, Debugging" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-amber-500" />
+                </div>
+
+                <div>
+                    <label class="block text-stone-700 font-bold mb-1">详细经过、验证结论与量化指标 *</label>
+                    <textarea id="evidence-input-details" rows="4" required placeholder="阐述背景、具体技术动作、测试用例/复现步骤及最终验证数据..." class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-amber-500 font-sans"></textarea>
+                </div>
+
+                <div class="pt-3 border-t border-stone-200 flex items-center justify-end gap-2">
+                    <button type="button" onclick="closeNewEvidenceModal()" class="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold transition cursor-pointer">
+                        取消
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold transition cursor-pointer shadow-xs">
+                        保存并写入凭证库
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
     <!-- 模块化外部脚本加载（无打包依赖，原生静态秒开） -->
     <script src="js/dataset-28days.js?v=5.4.1"></script>
     <script src="js/dataset-mappings.js?v=5.4.1"></script>
@@ -2435,6 +2621,7 @@ add_executable(my_server ${SOURCES})</pre>
     <script src="js/dataset-domain.js?v=6.0.0"></script>
     <script src="js/dataset-tasks.js?v=6.0.0"></script>
     <script src="js/dataset-learning.js?v=6.0.0"></script>
+    <script src="js/dataset-career.js?v=6.0.0"></script>
     <script src="js/state-manager.js?v=6.0.0"></script>
     <script src="js/timer.js?v=6.0.0"></script>
     <script src="js/yuque-explorer.js?v=6.0.0"></script>

@@ -381,7 +381,7 @@ function switchView(viewName) {
     }
 
     appState.currentView = viewName;
-    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
+    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls', 'career'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -412,6 +412,8 @@ function switchView(viewName) {
         renderSourceRoadmap();
     } else if (viewName === 'pitfalls') {
         renderPitfallsList();
+    } else if (viewName === 'career') {
+        renderCareerSystem();
     }
 }
 
@@ -2196,6 +2198,1047 @@ function toggleQAMastery(qaId) {
     return appState.learningSystem.qaMastery[qaId];
 }
 
+// ==========================================================================
+// Phase 6: 求职能力与工程凭证体系 (Career Evidence, Capabilities & Mock Interview)
+// ==========================================================================
+
+// 当前选中的面试全案模块与模拟面试状态
+appState.activeInterviewModule = 'pitch'; // 'pitch', 'arch', 'difficulties', 'bugs', 'perf', 'selection', 'tradeoff'
+appState.currentMockQuestion = null;
+appState.mockFollowUpRevealed = false;
+appState.mockAnswerRevealed = false;
+appState.careerFilterType = 'all';
+
+function getCareerSystemState() {
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getState === 'function') {
+        const s = stateManager.getState();
+        if (s && s.careerSystem) return s.careerSystem;
+    }
+    if (!appState.careerSystem) {
+        appState.careerSystem = {
+            evidences: typeof DEFAULT_EVIDENCE_CATALOG !== 'undefined' ? [...DEFAULT_EVIDENCE_CATALOG] : [],
+            customEvidences: [],
+            mockInterviewLogs: [],
+            bookmarkedQuestions: [],
+            activeCareerTab: 'evidence'
+        };
+    }
+    return appState.careerSystem;
+}
+
+function getAllEvidences() {
+    const cs = getCareerSystemState();
+    const defaults = Array.isArray(cs.evidences) && cs.evidences.length > 0 ? cs.evidences : (typeof DEFAULT_EVIDENCE_CATALOG !== 'undefined' ? DEFAULT_EVIDENCE_CATALOG : []);
+    const customs = Array.isArray(cs.customEvidences) ? cs.customEvidences : [];
+    return [...defaults, ...customs];
+}
+
+// 1. 顶层子标签切换器
+function switchCareerTab(tabKey, updateState = true) {
+    const tabs = ['evidence', 'capability', 'interview', 'mock', 'star'];
+    if (!tabs.includes(tabKey)) tabKey = 'evidence';
+
+    if (updateState) {
+        if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.setCareerTab === 'function') {
+            stateManager.setCareerTab(tabKey);
+        } else {
+            const cs = getCareerSystemState();
+            cs.activeCareerTab = tabKey;
+            persistState();
+        }
+    }
+
+    tabs.forEach(t => {
+        const pane = document.getElementById('career-pane-' + t);
+        const btn = document.getElementById('career-tab-btn-' + t);
+        if (pane) {
+            if (t === tabKey) pane.classList.remove('hidden');
+            else pane.classList.add('hidden');
+        }
+        if (btn) {
+            if (t === tabKey) {
+                btn.className = "px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer";
+            } else {
+                btn.className = "px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer";
+            }
+        }
+    });
+
+    if (tabKey === 'evidence') {
+        renderCareerEvidenceTab();
+    } else if (tabKey === 'capability') {
+        renderCareerCapabilityTab();
+    } else if (tabKey === 'interview') {
+        renderCareerInterviewTab();
+    } else if (tabKey === 'mock') {
+        renderCareerMockTab();
+    } else if (tabKey === 'star') {
+        renderCareerStarTab();
+    }
+}
+
+function renderCareerSystem() {
+    const cs = getCareerSystemState();
+    const activeTab = cs.activeCareerTab || 'evidence';
+    switchCareerTab(activeTab, false);
+}
+
+// 2. 子面板 1: 工程凭证库渲染器
+function renderCareerEvidenceTab() {
+    const statsContainer = document.getElementById('career-evidence-stats-container');
+    const filterBar = document.getElementById('evidence-type-filter-bar');
+    const badgeEl = document.getElementById('evidence-count-badge');
+    const gridEl = document.getElementById('career-evidence-grid');
+    if (!gridEl) return;
+
+    const allEv = getAllEvidences();
+    const evTypes = (typeof EVIDENCE_TYPES !== 'undefined') ? EVIDENCE_TYPES : {};
+
+    // 统计各类型数量
+    const countsByType = {};
+    Object.keys(evTypes).forEach(k => countsByType[k] = 0);
+    allEv.forEach(e => {
+        if (countsByType[e.type] !== undefined) countsByType[e.type]++;
+    });
+
+    // 渲染统计指标卡
+    if (statsContainer) {
+        statsContainer.innerHTML = `
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                    <span class="text-[11px] font-serifMono text-stone-400 font-bold block">有效凭证总数</span>
+                    <span class="text-xl font-bold font-serifMono text-stone-900">${allEv.length}</span>
+                    <span class="text-[10px] text-emerald-700 block mt-0.5">100% 真实源码/日志</span>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                    <span class="text-[11px] font-serifMono text-stone-400 font-bold block">代码修改 & 修复</span>
+                    <span class="text-xl font-bold font-serifMono text-sky-700">${(countsByType.code_modification || 0) + (countsByType.bug_fix || 0)}</span>
+                    <span class="text-[10px] text-stone-500 block mt-0.5">动手攻坚实录</span>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                    <span class="text-[11px] font-serifMono text-stone-400 font-bold block">性能调优 & 压测</span>
+                    <span class="text-xl font-bold font-serifMono text-amber-700">${countsByType.benchmark || 0}</span>
+                    <span class="text-[10px] text-stone-500 block mt-0.5">QPS/延迟量化</span>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                    <span class="text-[11px] font-serifMono text-stone-400 font-bold block">Git Commit 凭据</span>
+                    <span class="text-xl font-bold font-serifMono text-indigo-700">${countsByType.git_commit || 0}</span>
+                    <span class="text-[10px] text-stone-500 block mt-0.5">可审计哈希追踪</span>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                    <span class="text-[11px] font-serifMono text-stone-400 font-bold block">测试断言 & 实验</span>
+                    <span class="text-xl font-bold font-serifMono text-purple-700">${(countsByType.testing || 0) + (countsByType.experiment || 0)}</span>
+                    <span class="text-[10px] text-stone-500 block mt-0.5">自动化防护网</span>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                    <span class="text-[11px] font-serifMono text-stone-400 font-bold block">排错日志 & 总结</span>
+                    <span class="text-xl font-bold font-serifMono text-rose-700">${(countsByType.trace_proof || 0) + (countsByType.tech_summary || 0)}</span>
+                    <span class="text-[10px] text-stone-500 block mt-0.5">复盘证据链</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // 渲染过滤标签栏
+    if (filterBar) {
+        const curFilter = appState.careerFilterType || 'all';
+        let filterHtml = `
+            <button onclick="filterEvidenceByType('all')" class="px-2.5 py-1 rounded-lg text-xs font-serifMono font-bold transition cursor-pointer ${curFilter === 'all' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}">
+                全部 (${allEv.length})
+            </button>
+        `;
+        Object.keys(evTypes).forEach(tk => {
+            const tInfo = evTypes[tk];
+            const cnt = countsByType[tk] || 0;
+            const isSel = curFilter === tk;
+            filterHtml += `
+                <button onclick="filterEvidenceByType('${tk}')" class="px-2.5 py-1 rounded-lg text-xs font-serifMono font-bold transition whitespace-nowrap cursor-pointer ${isSel ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}">
+                    ${escapeHtml(tInfo.label)} (${cnt})
+                </button>
+            `;
+        });
+        filterBar.innerHTML = filterHtml;
+    }
+
+    // 过滤列表
+    const curFilter = appState.careerFilterType || 'all';
+    const filtered = curFilter === 'all' ? allEv : allEv.filter(e => e.type === curFilter);
+
+    if (badgeEl) {
+        badgeEl.innerText = `显示 ${filtered.length} / 共 ${allEv.length} 条工程凭证`;
+    }
+
+    if (filtered.length === 0) {
+        gridEl.innerHTML = `
+            <div class="col-span-full bg-white p-8 rounded-2xl border border-stone-200 text-center text-stone-400 font-serifMono text-xs">
+                <i class="fa-solid fa-folder-open text-2xl mb-2 text-stone-300 block"></i>
+                当前分类下暂无凭证。点击右上角「录入工程凭证」添加。
+            </div>
+        `;
+        return;
+    }
+
+    gridEl.innerHTML = filtered.map(ev => {
+        const tInfo = evTypes[ev.type] || { label: ev.type, color: 'stone' };
+        const isCustom = ev.isCustom || (typeof ev.id === 'string' && ev.id.startsWith('custom_ev_'));
+        return `
+            <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col justify-between hover:border-amber-300 transition" id="evidence-card-${escapeHtml(ev.id)}">
+                <div>
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold font-serifMono">
+                                ${escapeHtml(tInfo.label)}
+                            </span>
+                            <span class="text-xs font-serifMono text-stone-500 font-medium">
+                                <i class="fa-solid fa-link text-stone-400"></i> ${escapeHtml(ev.taskId || '')}
+                            </span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10.5px] font-serifMono font-bold flex items-center gap-1 shrink-0">
+                            <i class="fa-solid fa-shield-halved text-emerald-600"></i> 真实核验
+                        </span>
+                    </div>
+
+                    <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-1.5">
+                        ${escapeHtml(ev.title)}
+                    </h4>
+
+                    <p class="text-xs text-stone-600 font-sans leading-relaxed mb-3">
+                        ${escapeHtml(ev.details || '')}
+                    </p>
+
+                    <div class="space-y-1.5 bg-stone-50 p-2.5 rounded-xl border border-stone-200/80 font-serifMono text-[11px] text-stone-600 mb-3">
+                        ${ev.sourceLocation ? `
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-stone-400 font-bold shrink-0">源码位置:</span>
+                                <code class="text-sky-800 bg-sky-50 px-1 rounded truncate">${escapeHtml(ev.sourceLocation)}</code>
+                            </div>
+                        ` : ''}
+                        ${ev.commitHash ? `
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-stone-400 font-bold shrink-0">Commit:</span>
+                                <code class="text-indigo-800 bg-indigo-50 px-1 rounded font-bold">${escapeHtml(ev.commitHash)}</code>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="flex flex-wrap gap-1 mb-2">
+                        ${(ev.capabilityTags || []).map(tag => `
+                            <span class="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-[10.5px] font-serifMono font-semibold">
+                                #${escapeHtml(tag)}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="pt-3 mt-2 border-t border-stone-100 flex items-center justify-between text-xs font-serifMono text-stone-400">
+                    <span class="text-[10px]">${ev.createdAt ? new Date(ev.createdAt).toLocaleDateString() : '预设核心凭证'}</span>
+                    ${isCustom ? `
+                        <button onclick="deleteCustomEvidence('${escapeHtml(ev.id)}')" class="text-rose-600 hover:text-rose-800 font-bold transition cursor-pointer">
+                            <i class="fa-solid fa-trash-can mr-1"></i>删除
+                        </button>
+                    ` : `
+                        <span class="text-stone-400 text-[10px]">内置规范凭证</span>
+                    `}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterEvidenceByType(type) {
+    appState.careerFilterType = type;
+    renderCareerEvidenceTab();
+}
+
+// 3. 子面板 2: 14 维能力矩阵渲染器 (严格凭证驱动计算)
+function renderCareerCapabilityTab() {
+    const summaryContainer = document.getElementById('career-capability-summary-container');
+    const gridEl = document.getElementById('career-capability-grid');
+    if (!gridEl) return;
+
+    const allEv = getAllEvidences();
+    const matrix = (typeof CAPABILITIES_MATRIX !== 'undefined') ? CAPABILITIES_MATRIX : {};
+    const capKeys = Object.keys(matrix);
+
+    // 计算全部能力等级
+    const evaluated = capKeys.map(k => {
+        const item = matrix[k];
+        let calc = { level: 0, title: '概念已知', fulfilledTypes: [], missingTypes: [], evidenceCount: 0 };
+        if (typeof calculateCapabilityLevel === 'function') {
+            calc = calculateCapabilityLevel(k, allEv);
+        }
+        return {
+            key: k,
+            item,
+            calc
+        };
+    });
+
+    const totalCaps = evaluated.length;
+    const avgLevel = (evaluated.reduce((acc, c) => acc + c.calc.level, 0) / (totalCaps || 1)).toFixed(1);
+    const maxLevel = Math.max(0, ...evaluated.map(c => c.calc.level));
+    const l3PlusCount = evaluated.filter(c => c.calc.level >= 3).length;
+
+    if (summaryContainer) {
+        summaryContainer.innerHTML = `
+            <div class="bg-gradient-to-r from-sky-50 via-white to-amber-50 rounded-2xl p-5 border border-sky-200/80 academic-card">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-900 text-xs font-serifMono font-bold">
+                            STRICT EVIDENCE EVALUATION
+                        </span>
+                        <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1.5 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-sky-600"></i> 14 维后端核心能力矩阵评估态势
+                        </h3>
+                        <p class="text-xs text-stone-600 mt-1 max-w-2xl leading-relaxed">
+                            <strong>反浮夸原则：</strong>能力等级<strong>严禁</strong>通过打勾或阅读时长自动解锁，必须由代码修改、调优断言、Bug 修复等真实有效工程凭证驱动晋级。
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 font-serifMono shrink-0">
+                        <div class="bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-center shadow-xs">
+                            <span class="text-[10px] text-stone-400 font-bold block">平均能力评级</span>
+                            <span class="text-base font-bold text-sky-700">L${avgLevel} / 6.0</span>
+                        </div>
+                        <div class="bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-center shadow-xs">
+                            <span class="text-[10px] text-stone-400 font-bold block">工程达标 (L3+)</span>
+                            <span class="text-base font-bold text-emerald-700">${l3PlusCount} / ${totalCaps} 项</span>
+                        </div>
+                        <div class="bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-center shadow-xs">
+                            <span class="text-[10px] text-stone-400 font-bold block">巅峰单项等级</span>
+                            <span class="text-base font-bold text-amber-600">L${maxLevel}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    gridEl.innerHTML = evaluated.map(({ key, item, calc }) => {
+        const levelPct = Math.min(100, Math.round((calc.level / 6) * 100));
+        const levelColor = calc.level >= 5 ? 'text-amber-700 bg-amber-50 border-amber-200' :
+                           calc.level >= 3 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
+                           calc.level >= 1 ? 'text-sky-700 bg-sky-50 border-sky-200' :
+                           'text-stone-500 bg-stone-50 border-stone-200';
+        return `
+            <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col justify-between hover:border-sky-300 transition" id="cap-card-${escapeHtml(key)}">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="px-2.5 py-0.5 rounded-full ${levelColor} border text-xs font-bold font-serifMono">
+                            L${calc.level} · ${escapeHtml(calc.title)}
+                        </span>
+                        <span class="text-[11px] font-serifMono text-stone-400 font-medium">
+                            凭证支撑: <strong class="text-stone-700">${calc.evidenceCount}</strong> 项
+                        </span>
+                    </div>
+
+                    <h4 class="text-base font-bold text-stone-900 font-serifHeading mb-0.5">
+                        ${escapeHtml(item.name)}
+                    </h4>
+                    <p class="text-xs text-stone-500 font-serifMono mb-3">
+                        ${escapeHtml(item.category || item.name)}
+                    </p>
+
+                    <!-- 进度条 -->
+                    <div class="w-full bg-stone-100 rounded-full h-1.5 mb-3 overflow-hidden">
+                        <div class="bg-sky-600 h-1.5 rounded-full transition-all duration-500" style="width: ${levelPct}%"></div>
+                    </div>
+
+                    <!-- 当前等级定义 -->
+                    <div class="bg-stone-50 p-2.5 rounded-xl border border-stone-200/80 mb-3 text-xs text-stone-700 font-sans leading-relaxed">
+                        <span class="text-[10.5px] font-serifMono font-bold text-stone-400 block mb-0.5">等级定义与界限：</span>
+                        ${escapeHtml(item.levels ? (item.levels['L' + calc.level] || item.description || '') : (item.description || ''))}
+                    </div>
+
+                    <!-- 已具备凭证类型 -->
+                    <div class="mb-3">
+                        <span class="text-[10.5px] font-serifMono font-bold text-stone-400 block mb-1">已激活凭据维度：</span>
+                        <div class="flex flex-wrap gap-1">
+                            ${calc.fulfilledTypes.length > 0 ? calc.fulfilledTypes.map(t => `
+                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded text-[10.5px] font-serifMono">
+                                    ✓ ${escapeHtml(t)}
+                                </span>
+                            `).join('') : `
+                                <span class="text-[11px] text-stone-400 font-serifMono">尚未提交关联凭据</span>
+                            `}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-stone-100 font-serifMono text-[11px] text-stone-500 flex items-center justify-between">
+                    <span>晋升下一级要求:</span>
+                    <span class="text-amber-800 font-bold">
+                        ${calc.level < 6 ? (calc.missingTypes.length > 0 ? `需补充: ${calc.missingTypes.join(', ')}` : '已满足下一级凭证') : '已达巅峰抽象级'}
+                    </span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// 4. 子面板 3: 项目面试全案与 4-Hop 穿透渲染器
+function switchInterviewModule(modKey) {
+    appState.activeInterviewModule = modKey;
+    renderCareerInterviewTab();
+}
+
+function renderCareerInterviewTab() {
+    const navContainer = document.getElementById('career-interview-nav-container');
+    const contentContainer = document.getElementById('career-interview-content-container');
+    if (!contentContainer) return;
+
+    const interviewData = (typeof PROJECT_INTERVIEW_DATA !== 'undefined') ? PROJECT_INTERVIEW_DATA : {};
+    const reverseQuestions = (typeof PROJECT_REVERSE_QUESTIONS !== 'undefined') ? PROJECT_REVERSE_QUESTIONS : [];
+    const activeMod = appState.activeInterviewModule || 'pitch';
+
+    const modules = [
+        { id: 'pitch', label: '1. 电梯演讲 (30s/1m/3m)', icon: 'fa-stopwatch' },
+        { id: 'arch', label: '2. 双核架构全景剖析', icon: 'fa-network-wired' },
+        { id: 'difficulties', label: '3. 核心技术难点攻坚', icon: 'fa-mountain' },
+        { id: 'bugs', label: '4. 典型生产 Bug 复盘', icon: 'fa-bug' },
+        { id: 'perf', label: '5. 性能压测与极限调优', icon: 'fa-gauge-high' },
+        { id: 'selection', label: '6. 技术选型理性辩护', icon: 'fa-scale-balanced' },
+        { id: 'tradeoff', label: '7. 工程决策与 Trade-off', icon: 'fa-code-fork' }
+    ];
+
+    if (navContainer) {
+        navContainer.innerHTML = `
+            <div class="bg-white p-3.5 rounded-2xl border border-stone-200 academic-card">
+                <div class="text-[11px] font-serifMono text-stone-400 font-bold mb-2">
+                    <i class="fa-solid fa-briefcase text-amber-600 mr-1"></i> 项目面试 7 大攻坚全案导航：
+                </div>
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-serifMono">
+                    ${modules.map(m => `
+                        <button onclick="switchInterviewModule('${m.id}')" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${m.id === activeMod ? 'bg-amber-600 text-white border-amber-600 shadow-xs' : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200'}">
+                            <i class="fa-solid ${m.icon}"></i> ${m.label}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // 渲染选中的项目全案内容
+    let modHtml = '';
+    if (activeMod === 'pitch') {
+        const p = interviewData.elevatorPitch || {};
+        modHtml = `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
+                        <span class="px-2.5 py-0.5 rounded-md bg-stone-100 text-stone-800 text-xs font-serifMono font-bold">30 秒闪电速通</span>
+                        <span class="text-xs text-stone-400 font-serifMono">HR / 初筛</span>
+                    </div>
+                    <p class="text-xs text-stone-700 font-sans leading-relaxed whitespace-pre-line">${escapeHtml(p['30s'] || '基于 Reactor 模型与现代化 C++ 设计的高性能网络服务底座与 AI 编排系统。')}</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
+                        <span class="px-2.5 py-0.5 rounded-md bg-sky-50 text-sky-800 text-xs font-serifMono font-bold">1 分钟技术概述</span>
+                        <span class="text-xs text-sky-600 font-serifMono">一面前半段</span>
+                    </div>
+                    <p class="text-xs text-stone-700 font-sans leading-relaxed whitespace-pre-line">${escapeHtml(p['1m'] || '深入剖析 muduo 事件循环与 nonblocking IO，并构建 CppAIService 现代化 HTTP 异步服务。')}</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
+                        <span class="px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 text-xs font-serifMono font-bold">3 分钟架构沉浸</span>
+                        <span class="text-xs text-amber-600 font-serifMono">架构师 / 主管面</span>
+                    </div>
+                    <p class="text-xs text-stone-700 font-sans leading-relaxed whitespace-pre-line">${escapeHtml(p['3m'] || '覆盖多线程 EventLoopThreadPool、两段式线程池、零拷贝 readv 优化与内存生命周期防护。')}</p>
+                </div>
+            </div>
+        `;
+    } else if (activeMod === 'arch') {
+        const arch = interviewData.architecture || {};
+        modHtml = `
+            <div class="bg-white p-6 rounded-2xl border border-stone-200 academic-card space-y-4">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-serifMono font-bold">双核架构剖析</span>
+                    <span class="text-xs text-stone-400 font-serifMono">muduo 底座 ➔ CppAIService 业务微服务</span>
+                </div>
+                <h4 class="text-base font-bold text-stone-900 font-serifHeading">${escapeHtml(arch.title || '双核多线程 Reactor 架构设计')}</h4>
+                <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 font-mono text-xs text-stone-800 overflow-x-auto leading-relaxed whitespace-pre">
+${escapeHtml(arch.diagram || `+--------------------------------------------------------------+
+|                    Client Connections (epoll)                |
++--------------------------------------------------------------+
+                             |
+                             v
++--------------------------------------------------------------+
+|                 MainReactor (EventLoop)                      |
+|            Acceptor -> listenfd -> newConnection             |
++--------------------------------------------------------------+
+                             |  Round-Robin
+                             v
++--------------------------------------------------------------+
+|        SubReactor Pool (EventLoopThreadPool, N threads)       |
+|   TcpConnection (nonblocking socket, readv 64KB stack buffer)|
++--------------------------------------------------------------+
+                             |  Async Dispatch
+                             v
++--------------------------------------------------------------+
+|             Business Thread Pool (Worker Threads)            |
+|       HTTP Parser / Router / MCP Dispatch / MySQL Pool       |
++--------------------------------------------------------------+`)}
+                </div>
+                <p class="text-xs text-stone-600 font-sans leading-relaxed">${escapeHtml(arch.explanation || '采用 one loop per thread 模型，MainReactor 只负责 accept 连接，通过轮询分发给 SubReactor 处理 IO 事件；重型业务与数据库查询移交独立的业务工作线程池，杜绝阻塞事件循环。')}</p>
+            </div>
+        `;
+    } else {
+        const itemData = interviewData[activeMod] || [];
+        modHtml = `
+            <div class="space-y-4">
+                ${Array.isArray(itemData) && itemData.length > 0 ? itemData.map((item, idx) => `
+                    <div class="bg-white p-5 rounded-2xl border border-stone-200 academic-card space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-md bg-stone-100 text-stone-800 text-xs font-serifMono font-bold">#0${idx + 1} · ${escapeHtml(item.title || item.topic || '攻坚点')}</span>
+                            ${item.tag ? `<span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded text-[11px] font-serifMono font-semibold">${escapeHtml(item.tag)}</span>` : ''}
+                        </div>
+                        <p class="text-xs text-stone-700 font-sans leading-relaxed">${escapeHtml(item.content || item.desc || item.detail || '')}</p>
+                        ${item.solution ? `
+                            <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-200 text-xs text-emerald-950 font-sans">
+                                <strong>解决与落地：</strong>${escapeHtml(item.solution)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('') : `
+                    <div class="bg-white p-6 rounded-2xl border border-stone-200 text-center text-stone-400 font-serifMono text-xs">
+                        该模块解析正在沉淀中。
+                    </div>
+                `}
+            </div>
+        `;
+    }
+
+    // 下半部分：4-Hop 逆向真题穿透展示
+    let reverseHtml = `
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 academic-card space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+                <div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-serifMono font-bold">
+                        4-HOP REVERSE INTERVIEW CHAIN
+                    </span>
+                    <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-amber-600"></i> 面试真题逆向 4-Hop 穿透穿行
+                    </h3>
+                    <p class="text-xs text-stone-500 mt-0.5 font-serifMono">
+                        Question (面试题) ➔ Source (源码精确定位) ➔ Knowledge (理论深度剖析) ➔ Commit (真实提交凭据)
+                    </p>
+                </div>
+                <span class="text-xs text-stone-400 font-serifMono">${reverseQuestions.length} 道高频大厂真题</span>
+            </div>
+
+            <div class="space-y-4">
+                ${reverseQuestions.map((q, idx) => `
+                    <div class="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-3" id="reverse-q-${escapeHtml(q.id || String(idx))}">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="w-6 h-6 rounded-lg bg-amber-600 text-white font-bold text-xs flex items-center justify-center font-serifMono">
+                                    Q${idx + 1}
+                                </span>
+                                <h4 class="text-sm font-bold text-stone-900 font-serifHeading">
+                                    ${escapeHtml(q.question)}
+                                </h4>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-md bg-stone-200 text-stone-700 text-[10.5px] font-serifMono font-semibold shrink-0">
+                                ${escapeHtml(q.tag || '核心考点')}
+                            </span>
+                        </div>
+
+                        <div class="text-xs text-stone-700 font-sans leading-relaxed bg-white p-3 rounded-lg border border-stone-200/80">
+                            <strong class="text-stone-900 block mb-1 font-serifMono">精要答案：</strong>
+                            ${escapeHtml(q.answer)}
+                        </div>
+
+                        <!-- 4-Hop 穿透链接按钮组 -->
+                        <div class="flex flex-wrap items-center gap-2 pt-1 font-serifMono text-xs">
+                            <span class="text-[11px] text-stone-400 font-bold">4-Hop 联动:</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white border border-stone-200 text-stone-700 flex items-center gap-1 text-[11px]">
+                                <i class="fa-solid fa-code text-sky-600"></i> Hop 2: <code>${escapeHtml(q.sourceLocation || 'muduo/net')}</code>
+                            </span>
+                            ${q.relatedArticleSlug ? `
+                                <button onclick="openYuqueArticle('${escapeHtml(q.relatedArticleSlug)}')" class="px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 hover:bg-blue-100 transition flex items-center gap-1 text-[11px] cursor-pointer">
+                                    <i class="fa-solid fa-book-bookmark text-blue-600"></i> Hop 3: 查阅专栏剖析
+                                </button>
+                            ` : ''}
+                            ${q.commitHash ? `
+                                <button onclick="jumpToEvidence('${escapeHtml(q.commitHash)}')" class="px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-800 hover:bg-indigo-100 transition flex items-center gap-1 text-[11px] cursor-pointer">
+                                    <i class="fa-solid fa-code-commit text-indigo-600"></i> Hop 4: 查看 Commit 凭证 (${escapeHtml(q.commitHash)})
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    contentContainer.innerHTML = modHtml + reverseHtml;
+}
+
+// 5. 子面板 4: 模拟面试竞技场渲染器
+function renderCareerMockTab() {
+    const arenaContainer = document.getElementById('career-mock-arena-container');
+    const historyContainer = document.getElementById('career-mock-history-container');
+    if (!arenaContainer) return;
+
+    const cs = getCareerSystemState();
+    const curQ = appState.currentMockQuestion;
+    const followUpRevealed = appState.mockFollowUpRevealed;
+    const answerRevealed = appState.mockAnswerRevealed;
+
+    arenaContainer.innerHTML = `
+        <div class="bg-white rounded-2xl p-6 border border-stone-200 academic-card space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                <div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-900 border border-purple-200 text-xs font-serifMono font-bold">
+                        MOCK ARENA
+                    </span>
+                    <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1 flex items-center gap-2">
+                        <i class="fa-solid fa-microphone text-purple-600"></i> 真实模拟面试演练场
+                    </h3>
+                    <p class="text-xs text-stone-500 mt-0.5">随机抽取真题 · 考官连环追问 · 评分沉淀</p>
+                </div>
+
+                <div class="flex items-center gap-2 font-serifMono text-xs">
+                    <button onclick="startMockQuestion('random')" class="px-3 py-1.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold transition flex items-center gap-1 cursor-pointer shadow-xs">
+                        <i class="fa-solid fa-dice"></i> 随机全真抽检
+                    </button>
+                    <button onclick="startMockQuestion('project')" class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold transition flex items-center gap-1 cursor-pointer shadow-xs">
+                        <i class="fa-solid fa-diagram-project"></i> 项目深度深挖
+                    </button>
+                    <button onclick="startMockQuestion('classic')" class="px-3 py-1.5 rounded-xl bg-sky-700 hover:bg-sky-800 text-white font-bold transition flex items-center gap-1 cursor-pointer shadow-xs">
+                        <i class="fa-solid fa-code"></i> 八股高频突击
+                    </button>
+                </div>
+            </div>
+
+            ${curQ ? `
+                <div class="p-5 bg-purple-50/40 rounded-2xl border border-purple-200 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-900 text-xs font-serifMono font-bold">
+                            考官出题 [${curQ.mode === 'project' ? '项目深挖' : curQ.mode === 'classic' ? '八股突击' : '随机抽检'}]
+                        </span>
+                        <span class="text-xs text-purple-700 font-serifMono font-semibold">
+                            ${escapeHtml(curQ.tag || 'C++ 高并发')}
+                        </span>
+                    </div>
+
+                    <h4 class="text-base font-bold text-stone-900 font-serifHeading leading-snug">
+                        “${escapeHtml(curQ.question)}”
+                    </h4>
+
+                    <!-- 交互控制区：展开追问 / 查看参考答案 -->
+                    <div class="flex flex-wrap items-center gap-2 pt-2 font-serifMono text-xs">
+                        <button onclick="revealMockFollowUp()" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-person-circle-question text-purple-700"></i> ${followUpRevealed ? '收起连环追问' : '考官连环追问 (Follow-up)'}
+                        </button>
+                        <button onclick="revealMockAnswer()" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-lightbulb text-amber-600"></i> ${answerRevealed ? '隐藏参考答案' : '展开标准答案与避坑'}
+                        </button>
+                    </div>
+
+                    <!-- 连环追问展示区 -->
+                    ${followUpRevealed ? `
+                        <div class="p-4 bg-white rounded-xl border border-purple-200 text-xs space-y-1.5 font-sans">
+                            <div class="font-bold font-serifMono text-purple-900 flex items-center gap-1.5">
+                                <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> 考官追问：
+                            </div>
+                            <p class="text-stone-700 leading-relaxed">${escapeHtml(curQ.followUp || '如果此时突发大量突发连接耗尽文件描述符 (EMFILE)，你的服务如何优雅处理而不崩溃？')}</p>
+                        </div>
+                    ` : ''}
+
+                    <!-- 参考答案展示区 -->
+                    ${answerRevealed ? `
+                        <div class="p-4 bg-white rounded-xl border border-amber-200 text-xs space-y-2 font-sans">
+                            <div class="font-bold font-serifMono text-amber-900 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-check text-emerald-600"></i> 参考要点与避坑指南：
+                            </div>
+                            <p class="text-stone-700 leading-relaxed">${escapeHtml(curQ.answer || '')}</p>
+                            ${curQ.trap ? `
+                                <div class="text-rose-800 bg-rose-50 p-2.5 rounded-lg border border-rose-200 text-[11px] font-serifMono">
+                                    <strong>高危避错点:</strong> ${escapeHtml(curQ.trap)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : ''}
+
+                    <!-- 自我评分条 -->
+                    <div class="pt-3 border-t border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <span class="text-xs font-serifMono text-stone-600">回答完毕，请打分完成复盘：</span>
+                        <div class="flex items-center gap-1.5 font-serifMono text-xs">
+                            ${[1, 2, 3, 4, 5].map(star => `
+                                <button onclick="submitMockRating(${star})" class="px-2.5 py-1 rounded-lg bg-white border border-stone-200 hover:border-amber-400 text-stone-700 hover:text-amber-600 transition flex items-center gap-1 cursor-pointer font-bold">
+                                    ${star} <i class="fa-solid fa-star text-amber-500 text-[10px]"></i>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            ` : `
+                <div class="p-8 bg-stone-50 rounded-2xl border border-stone-200 text-center space-y-2 font-serifMono">
+                    <i class="fa-solid fa-headset text-3xl text-stone-300 block"></i>
+                    <h4 class="text-sm font-bold text-stone-700">尚未开始模拟面试</h4>
+                    <p class="text-xs text-stone-400">点击上方按钮抽取题目，模拟大厂真实面试追问现场。</p>
+                </div>
+            `}
+        </div>
+    `;
+
+    // 渲染历史演练记录
+    if (historyContainer) {
+        const logs = cs.mockInterviewLogs || [];
+        if (logs.length === 0) {
+            historyContainer.innerHTML = `
+                <div class="text-center py-6 text-stone-400 font-serifMono text-xs">
+                    暂无模拟面试评测记录。
+                </div>
+            `;
+        } else {
+            historyContainer.innerHTML = `
+                <table class="w-full text-left text-xs font-serifMono">
+                    <thead class="text-stone-400 border-b border-stone-100">
+                        <tr>
+                            <th class="pb-2">演练时间</th>
+                            <th class="pb-2">模式</th>
+                            <th class="pb-2">考核题目</th>
+                            <th class="pb-2 text-center">自我评分</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        ${logs.slice().reverse().slice(0, 10).map(l => `
+                            <tr>
+                                <td class="py-2.5 text-stone-400 whitespace-nowrap">${new Date(l.timestamp).toLocaleDateString()}</td>
+                                <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-stone-100 text-stone-700 text-[10.5px]">${escapeHtml(l.mode || '模拟')}</span></td>
+                                <td class="py-2.5 text-stone-800 font-sans max-w-md truncate" title="${escapeHtml(l.question)}">${escapeHtml(l.question)}</td>
+                                <td class="py-2.5 text-center whitespace-nowrap">
+                                    <span class="text-amber-600 font-bold">${l.rating || 5}</span>
+                                    <i class="fa-solid fa-star text-amber-500 text-[10px]"></i>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+    }
+}
+
+function startMockQuestion(mode) {
+    const reverseQuestions = (typeof PROJECT_REVERSE_QUESTIONS !== 'undefined') ? PROJECT_REVERSE_QUESTIONS : [];
+    let pool = [...reverseQuestions];
+
+    if (pool.length === 0) {
+        pool = [{
+            question: "请详细阐述 muduo 的双缓冲 (Buffer) 扩容原理以及为什么使用 readv 配合栈空间？",
+            tag: "Buffer 零拷贝",
+            answer: "muduo 在栈上开辟 64KB 临时空间 extrabuf，配合套接字非阻塞接收，使用 readv 一次性填满缓冲区，既减少了系统调用，又避免了为每个连接预先分配过大缓冲区造成的内存膨胀。",
+            followUp: "当 readv 读到的数据超过了 Buffer 当前 writable 字节数时，muduo 底层是如何追加扩容的？扩容时涉及哪些指针偏移重置？",
+            trap: "千万不能回答每次收到数据都 realloc 重新申请内存，这会导致大量内存碎片和系统调用开销。"
+        }];
+    }
+
+    const picked = pool[Math.floor(Math.random() * pool.length)];
+    appState.currentMockQuestion = {
+        mode,
+        question: picked.question,
+        tag: picked.tag,
+        answer: picked.answer,
+        followUp: picked.followUp || "请深入剖析该方案在高并发边缘条件下的潜在瓶颈与容灾措施。",
+        trap: picked.trap || "切忌只回答八股理论，结合具体代码与压测参数才是高分关键。"
+    };
+    appState.mockFollowUpRevealed = false;
+    appState.mockAnswerRevealed = false;
+    renderCareerMockTab();
+}
+
+function revealMockFollowUp() {
+    appState.mockFollowUpRevealed = !appState.mockFollowUpRevealed;
+    renderCareerMockTab();
+}
+
+function revealMockAnswer() {
+    appState.mockAnswerRevealed = !appState.mockAnswerRevealed;
+    renderCareerMockTab();
+}
+
+function submitMockRating(rating) {
+    if (!appState.currentMockQuestion) return;
+    const log = {
+        mode: appState.currentMockQuestion.mode,
+        question: appState.currentMockQuestion.question,
+        rating,
+        notes: `自我评分 ${rating} 星`
+    };
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.addMockInterviewLog === 'function') {
+        stateManager.addMockInterviewLog(log);
+    } else {
+        const cs = getCareerSystemState();
+        if (!Array.isArray(cs.mockInterviewLogs)) cs.mockInterviewLogs = [];
+        log.id = 'mock_' + Date.now();
+        log.timestamp = new Date().toISOString();
+        cs.mockInterviewLogs.push(log);
+        persistState();
+    }
+
+    appState.currentMockQuestion = null;
+    appState.mockFollowUpRevealed = false;
+    appState.mockAnswerRevealed = false;
+    renderCareerMockTab();
+    if (typeof showToast === 'function') {
+        showToast(`模拟演练已完成并沉淀评分: ${rating} 星`);
+    }
+}
+
+// 6. 子面板 5: STAR 面试故事与简历要点渲染器
+function renderCareerStarTab() {
+    const starContainer = document.getElementById('career-star-stories-container');
+    const resumeContainer = document.getElementById('career-resume-bullets-container');
+    if (!starContainer) return;
+
+    const stories = (typeof CAREER_STAR_STORIES !== 'undefined') ? CAREER_STAR_STORIES : [];
+    const bullets = (typeof RESUME_BULLETS !== 'undefined') ? RESUME_BULLETS : [];
+
+    starContainer.innerHTML = `
+        <div class="bg-white rounded-2xl p-6 border border-stone-200 academic-card space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+                <div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-900 border border-rose-200 text-xs font-serifMono font-bold">
+                        STAR INTERVIEW METHODOLOGY
+                    </span>
+                    <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1 flex items-center gap-2">
+                        <i class="fa-solid fa-star text-amber-500"></i> 4 大核心 STAR 结构化面试故事
+                    </h3>
+                    <p class="text-xs text-stone-500 font-serifMono">情境 (Situation) ➔ 任务 (Task) ➔ 行动 (Action) ➔ 量化结果 (Result) ➔ 工程反思 (Reflection)</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                ${stories.map((st, idx) => `
+                    <div class="p-5 bg-stone-50 rounded-2xl border border-stone-200 space-y-3" id="star-story-${escapeHtml(st.id || String(idx))}">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-stone-900 font-serifHeading flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-rose-700 text-white text-xs font-bold font-serifMono flex items-center justify-center">
+                                    0${idx + 1}
+                                </span>
+                                ${escapeHtml(st.title)}
+                            </h4>
+                            <button onclick="copyStarStory('${escapeHtml(st.id || String(idx))}')" class="px-2.5 py-1 bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 rounded-lg text-xs font-serifMono font-bold transition flex items-center gap-1 cursor-pointer">
+                                <i class="fa-regular fa-copy"></i> 复制 STAR 文本
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans">
+                            <div class="bg-white p-3 rounded-xl border border-stone-200/80">
+                                <strong class="text-stone-900 font-serifMono block mb-1">【S · 情境】</strong>
+                                <p class="text-stone-600 leading-relaxed">${escapeHtml(st.situation)}</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-stone-200/80">
+                                <strong class="text-stone-900 font-serifMono block mb-1">【T · 任务】</strong>
+                                <p class="text-stone-600 leading-relaxed">${escapeHtml(st.task)}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-xl border border-stone-200/80 text-xs font-sans">
+                            <strong class="text-sky-900 font-serifMono block mb-1">【A · 行动与决策】</strong>
+                            <p class="text-stone-700 leading-relaxed">${escapeHtml(st.action)}</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans">
+                            <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-200 text-emerald-950">
+                                <strong class="font-serifMono block mb-1 text-emerald-900">【R · 量化结果】</strong>
+                                <p class="leading-relaxed">${escapeHtml(st.result)}</p>
+                            </div>
+                            <div class="bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-amber-950">
+                                <strong class="font-serifMono block mb-1 text-amber-900">【反思 · 认知升级】</strong>
+                                <p class="leading-relaxed">${escapeHtml(st.reflection || '')}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    if (resumeContainer) {
+        resumeContainer.innerHTML = `
+            <div class="bg-white rounded-2xl p-6 border border-stone-200 academic-card space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+                    <div>
+                        <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200 text-xs font-serifMono font-bold">
+                            RESUME READY BULLETS
+                        </span>
+                        <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1 flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice text-emerald-600"></i> 量化简历交付物 (Ready-to-use)
+                        </h3>
+                        <p class="text-xs text-stone-500 font-serifMono">具备具体动词、真实技术栈、量化参数与指标的生产级简历 Bullet Points</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    ${bullets.map((b, idx) => `
+                        <div class="p-4 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row sm:items-start justify-between gap-3 text-xs">
+                            <div class="space-y-1.5 flex-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="px-2 py-0.5 rounded bg-stone-200 text-stone-800 text-[10.5px] font-serifMono font-bold">
+                                        #0${idx + 1}
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10.5px] font-serifMono font-semibold">
+                                        ${escapeHtml(b.role || 'C++ 后端研发')}
+                                    </span>
+                                </div>
+                                <p class="text-stone-800 font-sans leading-relaxed text-xs">
+                                    ${escapeHtml(b.text)}
+                                </p>
+                            </div>
+                            <button onclick="copyResumeBullet('${escapeHtml(b.text)}')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 font-serifMono font-bold text-xs transition flex items-center gap-1 shrink-0 cursor-pointer">
+                                <i class="fa-regular fa-copy"></i> 复制
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+}
+
+// 7. 模态框与辅助交互函数
+function openNewEvidenceModal() {
+    const modal = document.getElementById('new-evidence-modal');
+    if (!modal) return;
+    const form = document.getElementById('new-evidence-form');
+    if (form) form.reset();
+    modal.classList.remove('hidden');
+}
+
+function closeNewEvidenceModal() {
+    const modal = document.getElementById('new-evidence-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function handleSaveCustomEvidence(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const titleEl = document.getElementById('evidence-input-title');
+    const typeEl = document.getElementById('evidence-input-type');
+    const taskEl = document.getElementById('evidence-input-task');
+    const sourceEl = document.getElementById('evidence-input-source');
+    const commitEl = document.getElementById('evidence-input-commit');
+    const tagsEl = document.getElementById('evidence-input-tags');
+    const detailsEl = document.getElementById('evidence-input-details');
+
+    const title = titleEl ? titleEl.value.trim() : '';
+    const type = typeEl ? typeEl.value : 'code_mod';
+    const taskId = taskEl ? taskEl.value.trim() : '';
+    const sourceLocation = sourceEl ? sourceEl.value.trim() : '';
+    const commitHash = commitEl ? commitEl.value.trim() : '';
+    const rawTags = tagsEl ? tagsEl.value.trim() : '';
+    const details = detailsEl ? detailsEl.value.trim() : '';
+
+    if (!title || !details) {
+        if (typeof showToast === 'function') showToast('请填写完整的凭证标题与详细经过');
+        return;
+    }
+
+    const tags = rawTags.split(/[,，\s]+/).filter(Boolean);
+
+    const newEv = {
+        title,
+        type,
+        taskId: taskId || '日常工程攻坚',
+        sourceLocation,
+        commitHash,
+        capabilityTags: tags.length > 0 ? tags : ['C++', '工程实践'],
+        details,
+        verified: true,
+        isCustom: true
+    };
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.addCustomEvidence === 'function') {
+        stateManager.addCustomEvidence(newEv);
+    } else {
+        const cs = getCareerSystemState();
+        if (!Array.isArray(cs.customEvidences)) cs.customEvidences = [];
+        newEv.id = 'custom_ev_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+        newEv.createdAt = new Date().toISOString();
+        cs.customEvidences.push(newEv);
+        persistState();
+    }
+
+    closeNewEvidenceModal();
+    renderCareerEvidenceTab();
+    renderCareerCapabilityTab();
+    if (typeof showToast === 'function') {
+        showToast(`已录入工程凭证「${title}」`);
+    }
+}
+
+function deleteCustomEvidence(evId) {
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.deleteCustomEvidence === 'function') {
+        stateManager.deleteCustomEvidence(evId);
+    } else {
+        const cs = getCareerSystemState();
+        if (Array.isArray(cs.customEvidences)) {
+            cs.customEvidences = cs.customEvidences.filter(e => e.id !== evId);
+            persistState();
+        }
+    }
+    renderCareerEvidenceTab();
+    renderCareerCapabilityTab();
+    if (typeof showToast === 'function') {
+        showToast('已删除工程凭证');
+    }
+}
+
+function jumpToEvidence(commitHash) {
+    switchView('career');
+    switchCareerTab('evidence');
+    if (commitHash) {
+        appState.careerFilterType = 'git_commit';
+        renderCareerEvidenceTab();
+        if (typeof showToast === 'function') {
+            showToast(`已定位 Commit 凭据: ${commitHash}`);
+        }
+    }
+}
+
+function copyStarStory(storyId) {
+    const stories = (typeof CAREER_STAR_STORIES !== 'undefined') ? CAREER_STAR_STORIES : [];
+    const st = stories.find(s => s.id === storyId) || stories[0];
+    if (!st) return;
+    const text = `【${st.title}】\n情境(Situation): ${st.situation}\n任务(Task): ${st.task}\n行动(Action): ${st.action}\n结果(Result): ${st.result}\n工程反思: ${st.reflection || ''}`;
+    copyTextToClipboard(text, `已复制 STAR 故事「${st.title}」`);
+}
+
+function copyResumeBullet(text) {
+    copyTextToClipboard(text, '已复制简历要点');
+}
+
+function copyTextToClipboard(text, successMsg = '已复制到剪贴板') {
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            if (typeof showToast === 'function') showToast(successMsg);
+        }).catch(() => {
+            fallbackCopyText(text, successMsg);
+        });
+    } else {
+        fallbackCopyText(text, successMsg);
+    }
+}
+
+function fallbackCopyText(text, successMsg) {
+    try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (typeof showToast === 'function') showToast(successMsg);
+    } catch (e) {
+        console.warn('Copy failed:', e);
+    }
+}
+
 // 笔记本与沙盒 (View 4)
 const debouncedSaveGlobalNotes = debounce(() => {
     const el = document.getElementById('notebook-textarea');
@@ -3627,6 +4670,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
     try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
     try { renderLearningSystem(); } catch(e) { console.error('renderLearningSystem error:', e); }
+    try { renderCareerSystem(); } catch(e) { console.error('renderCareerSystem error:', e); }
     try { if (typeof loadYuqueState === 'function') loadYuqueState(); } catch(e) { console.error('loadYuqueState error:', e); }
 
     // 绑定笔记本自动存盘
@@ -4416,6 +5460,28 @@ if (typeof window !== 'undefined') {
     window.toggleAlgoReview = toggleAlgoReview;
     window.adjustBookDailyGoal = adjustBookDailyGoal;
     window.toggleQAMastery = toggleQAMastery;
+
+    // Phase 6 方法挂载
+    window.switchCareerTab = switchCareerTab;
+    window.renderCareerSystem = renderCareerSystem;
+    window.renderCareerEvidenceTab = renderCareerEvidenceTab;
+    window.renderCareerCapabilityTab = renderCareerCapabilityTab;
+    window.renderCareerInterviewTab = renderCareerInterviewTab;
+    window.renderCareerMockTab = renderCareerMockTab;
+    window.renderCareerStarTab = renderCareerStarTab;
+    window.switchInterviewModule = switchInterviewModule;
+    window.openNewEvidenceModal = openNewEvidenceModal;
+    window.closeNewEvidenceModal = closeNewEvidenceModal;
+    window.handleSaveCustomEvidence = handleSaveCustomEvidence;
+    window.deleteCustomEvidence = deleteCustomEvidence;
+    window.filterEvidenceByType = filterEvidenceByType;
+    window.startMockQuestion = startMockQuestion;
+    window.revealMockFollowUp = revealMockFollowUp;
+    window.revealMockAnswer = revealMockAnswer;
+    window.submitMockRating = submitMockRating;
+    window.jumpToEvidence = jumpToEvidence;
+    window.copyStarStory = copyStarStory;
+    window.copyResumeBullet = copyResumeBullet;
 }
 
 if (typeof globalThis !== 'undefined') {
@@ -4461,6 +5527,28 @@ if (typeof globalThis !== 'undefined') {
     globalThis.toggleAlgoReview = toggleAlgoReview;
     globalThis.adjustBookDailyGoal = adjustBookDailyGoal;
     globalThis.toggleQAMastery = toggleQAMastery;
+
+    // Phase 6 方法挂载
+    globalThis.switchCareerTab = switchCareerTab;
+    globalThis.renderCareerSystem = renderCareerSystem;
+    globalThis.renderCareerEvidenceTab = renderCareerEvidenceTab;
+    globalThis.renderCareerCapabilityTab = renderCareerCapabilityTab;
+    globalThis.renderCareerInterviewTab = renderCareerInterviewTab;
+    globalThis.renderCareerMockTab = renderCareerMockTab;
+    globalThis.renderCareerStarTab = renderCareerStarTab;
+    globalThis.switchInterviewModule = switchInterviewModule;
+    globalThis.openNewEvidenceModal = openNewEvidenceModal;
+    globalThis.closeNewEvidenceModal = closeNewEvidenceModal;
+    globalThis.handleSaveCustomEvidence = handleSaveCustomEvidence;
+    globalThis.deleteCustomEvidence = deleteCustomEvidence;
+    globalThis.filterEvidenceByType = filterEvidenceByType;
+    globalThis.startMockQuestion = startMockQuestion;
+    globalThis.revealMockFollowUp = revealMockFollowUp;
+    globalThis.revealMockAnswer = revealMockAnswer;
+    globalThis.submitMockRating = submitMockRating;
+    globalThis.jumpToEvidence = jumpToEvidence;
+    globalThis.copyStarStory = copyStarStory;
+    globalThis.copyResumeBullet = copyResumeBullet;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -4496,7 +5584,27 @@ if (typeof module !== 'undefined' && module.exports) {
         closeCrossLinkModal,
         toggleAlgoReview,
         adjustBookDailyGoal,
-        toggleQAMastery
+        toggleQAMastery,
+        switchCareerTab,
+        renderCareerSystem,
+        renderCareerEvidenceTab,
+        renderCareerCapabilityTab,
+        renderCareerInterviewTab,
+        renderCareerMockTab,
+        renderCareerStarTab,
+        switchInterviewModule,
+        openNewEvidenceModal,
+        closeNewEvidenceModal,
+        handleSaveCustomEvidence,
+        deleteCustomEvidence,
+        filterEvidenceByType,
+        startMockQuestion,
+        revealMockFollowUp,
+        revealMockAnswer,
+        submitMockRating,
+        jumpToEvidence,
+        copyStarStory,
+        copyResumeBullet
     };
 }
 

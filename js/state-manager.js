@@ -167,6 +167,15 @@
         activeTab: 'cpp'
       },
 
+      // ---------- Phase 6: 求职能力与工程凭证系统 ----------
+      careerSystem: {
+        evidences: typeof DEFAULT_EVIDENCE_CATALOG !== 'undefined' ? [...DEFAULT_EVIDENCE_CATALOG] : [],
+        customEvidences: [],
+        mockInterviewLogs: [],     // [{ id, mode, question, rating, notes, timestamp }]
+        bookmarkedQuestions: [],    // [questionId]
+        activeCareerTab: 'evidence' // 'evidence' | 'capability' | 'interview' | 'mock' | 'star'
+      },
+
       // ---------- 运行时与界面交互状态 ----------
       currentView: 'dashboard',
       weekFilter: 0,
@@ -415,6 +424,33 @@
         }
       }
 
+      // P6: 净化与补齐 careerSystem
+      if (!merged.careerSystem || typeof merged.careerSystem !== 'object') {
+        merged.careerSystem = {
+          evidences: typeof DEFAULT_EVIDENCE_CATALOG !== 'undefined' ? [...DEFAULT_EVIDENCE_CATALOG] : [],
+          customEvidences: [],
+          mockInterviewLogs: [],
+          bookmarkedQuestions: [],
+          activeCareerTab: 'evidence'
+        };
+      } else {
+        if (!Array.isArray(merged.careerSystem.evidences)) {
+          merged.careerSystem.evidences = typeof DEFAULT_EVIDENCE_CATALOG !== 'undefined' ? [...DEFAULT_EVIDENCE_CATALOG] : [];
+        }
+        if (!Array.isArray(merged.careerSystem.customEvidences)) {
+          merged.careerSystem.customEvidences = [];
+        }
+        if (!Array.isArray(merged.careerSystem.mockInterviewLogs)) {
+          merged.careerSystem.mockInterviewLogs = [];
+        }
+        if (!Array.isArray(merged.careerSystem.bookmarkedQuestions)) {
+          merged.careerSystem.bookmarkedQuestions = [];
+        }
+        if (!merged.careerSystem.activeCareerTab) {
+          merged.careerSystem.activeCareerTab = 'evidence';
+        }
+      }
+
       if (merged.activeTimer) {
         merged.activeTimer.running = false;
         merged.activeTimer.timerId = null;
@@ -562,7 +598,8 @@
           knowledgeFavorites: state.knowledgeFavorites,
           knowledgeRecent: state.knowledgeRecent,
           dailyRoutine: state.dailyRoutine,
-          learningSystem: state.learningSystem
+          learningSystem: state.learningSystem,
+          careerSystem: state.careerSystem
         });
         safeSetItem(STORAGE_KEYS.V5_DATA, v5Payload);
 
@@ -609,7 +646,9 @@
           studySessionsCount: (state.studySessions || []).length,
           pitfallsCount: (state.pitfalls || []).length,
           dailyRoutineCompletedCount: (state.dailyRoutine?.tasks || []).filter(t => t.completed).length,
-          learningAlgoReviewedCount: Object.values(state.learningSystem?.algoReviewQueue || {}).filter(v => v === 'mastered').length
+          learningAlgoReviewedCount: Object.values(state.learningSystem?.algoReviewQueue || {}).filter(v => v === 'mastered').length,
+          careerEvidenceCount: (state.careerSystem?.evidences || []).length + (state.careerSystem?.customEvidences || []).length,
+          mockInterviewCount: (state.careerSystem?.mockInterviewLogs || []).length
         },
         payload: {
           completedDays: state.completedDays || [],
@@ -632,6 +671,13 @@
             qaMastery: {},
             bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
             activeTab: 'cpp'
+          },
+          careerSystem: state.careerSystem || {
+            evidences: [],
+            customEvidences: [],
+            mockInterviewLogs: [],
+            bookmarkedQuestions: [],
+            activeCareerTab: 'evidence'
           }
         }
       };
@@ -693,6 +739,17 @@
             qaMastery: {},
             bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
             activeTab: 'cpp'
+          };
+        }
+        if (payload.careerSystem && typeof payload.careerSystem === 'object') {
+          this._state.careerSystem = JSON.parse(JSON.stringify(payload.careerSystem));
+        } else {
+          this._state.careerSystem = {
+            evidences: typeof DEFAULT_EVIDENCE_CATALOG !== 'undefined' ? [...DEFAULT_EVIDENCE_CATALOG] : [],
+            customEvidences: [],
+            mockInterviewLogs: [],
+            bookmarkedQuestions: [],
+            activeCareerTab: 'evidence'
           };
         }
       } else {
@@ -860,6 +917,43 @@
             curLS.bookDynamicGoals = Object.assign(curLS.bookDynamicGoals || {}, incLS.bookDynamicGoals);
           }
         }
+
+        // 13. 合并 Phase 6 求职能力与工程凭证系统 (careerSystem)
+        if (payload.careerSystem && typeof payload.careerSystem === 'object') {
+          if (!this._state.careerSystem) {
+            this._state.careerSystem = {
+              evidences: typeof DEFAULT_EVIDENCE_CATALOG !== 'undefined' ? [...DEFAULT_EVIDENCE_CATALOG] : [],
+              customEvidences: [],
+              mockInterviewLogs: [],
+              bookmarkedQuestions: [],
+              activeCareerTab: 'evidence'
+            };
+          }
+          const curCS = this._state.careerSystem;
+          const incCS = payload.careerSystem;
+          // 合并自定义凭证 (不重复)
+          if (Array.isArray(incCS.customEvidences)) {
+            const existingIds = new Set((curCS.customEvidences || []).map(e => e.id));
+            incCS.customEvidences.forEach(ev => {
+              if (!existingIds.has(ev.id)) {
+                curCS.customEvidences.push(ev);
+              }
+            });
+          }
+          // 合并模拟面试记录
+          if (Array.isArray(incCS.mockInterviewLogs)) {
+            const existingLogIds = new Set((curCS.mockInterviewLogs || []).map(l => l.id));
+            incCS.mockInterviewLogs.forEach(log => {
+              if (!existingLogIds.has(log.id)) {
+                curCS.mockInterviewLogs.push(log);
+              }
+            });
+          }
+          // 合并书签
+          if (Array.isArray(incCS.bookmarkedQuestions)) {
+            curCS.bookmarkedQuestions = [...new Set([...(curCS.bookmarkedQuestions || []), ...incCS.bookmarkedQuestions])];
+          }
+        }
       }
 
       this.save(true);
@@ -940,6 +1034,71 @@
       this.save(true);
       this._notify();
       return m[qaId];
+    }
+
+    // Phase 6 求职能力与工程凭证系统专用操作助手
+    _ensureCareerSystem() {
+      if (!this._state.careerSystem || typeof this._state.careerSystem !== 'object') {
+        this._state.careerSystem = {
+          evidences: typeof DEFAULT_EVIDENCE_CATALOG !== 'undefined' ? [...DEFAULT_EVIDENCE_CATALOG] : [],
+          customEvidences: [],
+          mockInterviewLogs: [],
+          bookmarkedQuestions: [],
+          activeCareerTab: 'evidence'
+        };
+      }
+      return this._state.careerSystem;
+    }
+
+    setCareerTab(tabKey) {
+      const cs = this._ensureCareerSystem();
+      cs.activeCareerTab = tabKey;
+      this.save();
+      this._notify();
+    }
+
+    addCustomEvidence(evidence) {
+      const cs = this._ensureCareerSystem();
+      if (!Array.isArray(cs.customEvidences)) cs.customEvidences = [];
+      evidence.id = 'custom_ev_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+      evidence.createdAt = new Date().toISOString();
+      cs.customEvidences.push(evidence);
+      this.save(true);
+      this._notify();
+      return evidence;
+    }
+
+    deleteCustomEvidence(evidenceId) {
+      const cs = this._ensureCareerSystem();
+      if (!Array.isArray(cs.customEvidences)) return;
+      cs.customEvidences = cs.customEvidences.filter(e => e.id !== evidenceId);
+      this.save(true);
+      this._notify();
+    }
+
+    addMockInterviewLog(log) {
+      const cs = this._ensureCareerSystem();
+      if (!Array.isArray(cs.mockInterviewLogs)) cs.mockInterviewLogs = [];
+      log.id = 'mock_' + Date.now();
+      log.timestamp = new Date().toISOString();
+      cs.mockInterviewLogs.push(log);
+      this.save(true);
+      this._notify();
+      return log;
+    }
+
+    toggleBookmarkQuestion(questionId) {
+      const cs = this._ensureCareerSystem();
+      if (!Array.isArray(cs.bookmarkedQuestions)) cs.bookmarkedQuestions = [];
+      const idx = cs.bookmarkedQuestions.indexOf(questionId);
+      if (idx >= 0) {
+        cs.bookmarkedQuestions.splice(idx, 1);
+      } else {
+        cs.bookmarkedQuestions.push(questionId);
+      }
+      this.save(true);
+      this._notify();
+      return cs.bookmarkedQuestions.includes(questionId);
     }
 
     // 重置系统纯净状态 (保留备份)
