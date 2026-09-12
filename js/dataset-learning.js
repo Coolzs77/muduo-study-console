@@ -6,13 +6,13 @@
 // 六维穿透：Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview
 // ==========================================================================
 
-// 1. C++ 核心知识体系 (8 大维度)
+// 1. C++ 核心知识体系 (8 大维度 - 对齐语雀 C++ 学习路线，兼顾 muduo 与 CppAIService 项目)
 var CPP_KNOWLEDGE_SYSTEM = [
   {
     id: "cpp_dim_modern",
     dimension: "Modern C++",
-    title: "现代 C++11/14/17 标准演进与特性选型",
-    coreConcept: "从 auto、decltype 类型推导，到 constexpr 编译期计算、结构化绑定与 if-init。在高性能服务端中减少冗余样板代码，强化编译期安全校验。",
+    title: "C++11/14/17 现代语法与核心特性",
+    coreConcept: "掌握 auto/decltype 类型推导、Lambda 表达式、nullptr、constexpr 常量表达式与 C++17 结构化绑定。在服务端开发中减少重复冗余代码，提升编译期类型安全与运算能力。",
     cppaiModule: "mod_http_router",
     moduleName: "HttpServer / 路由分发模块",
     sourceFile: "HttpServer/Router.cpp",
@@ -20,21 +20,21 @@ var CPP_KNOWLEDGE_SYSTEM = [
     yuqueDocId: "yq_07",
     yuqueTitle: "07_路由模块",
     taskDay: 2,
-    taskTitle: "Day 2: 现代 C++11/14 特性在网络服务中的落地",
-    interviewPoint: "C++17 结构化绑定 (Structured Binding) 底层是如何实现的？constexpr 函数在不同编译优化级别下的内联与常量折叠机制是什么？",
+    taskTitle: "Day 2: 现代 C++ 常用特性在网络服务中的应用",
+    interviewPoint: "C++17 结构化绑定的底层实现机制是什么？constexpr 与普通 inline 函数的区别是什么？Lambda 表达式值捕获与引用捕获在异步任务中如何避免悬垂引用？",
     learnLoop: {
-      learn: "精读 C++11/14/17 核心语法标准，重点掌握右值引用、可变参数模板与类型萃取。",
-      apply: "在 Router.cpp 中采用 std::tuple 与结构化绑定解析路由匹配参数。",
-      build: "编写微型路由注册与正则通配符提取 Demo，验证编译期分发速度。",
-      explain: "口述：为什么现代网络库尽量避免宏定义，转而使用 constexpr 与类型安全模板？",
-      review: "对比 C++03 与 C++17 在路由表哈希查找代码量与二进制指令精简程度。"
+      learn: "学习 C++11/14/17 核心语法标准，掌握类型推导、Lambda 闭包与结构化绑定规范。",
+      apply: "在 Router.cpp 中使用 std::tuple 与结构化绑定解析路由匹配参数。",
+      build: "编写基础路由匹配与动态参数提取测试用例，验证类型安全。",
+      explain: "口述：现代 C++ 如何通过 constexpr 和强类型模板替代 C 语言传统宏定义？",
+      review: "排查异步回调中使用 Lambda 捕获局部变量时是否存在生命周期越界问题。"
     }
   },
   {
     id: "cpp_dim_memory",
     dimension: "Memory",
-    title: "内存管理、对齐与无锁内存布局",
-    coreConcept: "理解栈、堆、数据段内存分布，掌握 Cacheline 64 字节对齐、伪共享 (False Sharing) 规避与 Buffer 空间预分配策略。",
+    title: "内存管理、对象生命周期与 RAII 原则",
+    coreConcept: "理解 Linux 进程虚拟内存分布（栈、堆、数据段、代码段），掌握内存对齐 (Alignment) 与填充机制。遵循 RAII 原则，通过对象生命周期自动管理资源，并在应用层 Buffer 中设计读写指针避免频繁内存拷贝。",
     cppaiModule: "mod_net_buffer",
     moduleName: "muduo / Buffer 缓冲区",
     sourceFile: "muduo/net/Buffer.cc",
@@ -42,21 +42,21 @@ var CPP_KNOWLEDGE_SYSTEM = [
     yuqueDocId: "yq_06",
     yuqueTitle: "06_HTTP报文解析封装模块",
     taskDay: 8,
-    taskTitle: "Day 8: Buffer 连续内存与 readv 栈上分散读机制",
-    interviewPoint: "muduo Buffer 为什么使用 std::vector<char> 而非原生 char*？为什么在读取时需要借助 64KB 栈上临时缓冲区 (readv)？",
+    taskTitle: "Day 8: Buffer 连续内存与 readv 分散读机制",
+    interviewPoint: "muduo 的 Buffer 为什么选用 std::vector<char> 实现？readv 系统调用搭配 64KB 栈上临时缓冲区解决了什么问题？",
     learnLoop: {
-      learn: "学习计算机体系结构中的 CPU L1/L2/L3 缓存行与虚存分页原理。",
-      apply: "在 Buffer 中利用 cheapPrependable + readerIndex + writerIndex 消除频繁移动内存。",
-      build: "用 readv 系统调用同时向 Buffer 和栈空间读入大报文，验证零浪费动态扩容。",
-      explain: "口述：如何排查内存对齐导致的内存空洞与多线程 cacheline 竞争穿透？",
-      review: "使用 valgrind 或 ASan 监测长时间运行下的内存增长斜率。"
+      learn: "学习进程内存布局与堆栈生长方向，掌握 new/delete 与 malloc/free 的底层区别。",
+      apply: "在 Buffer.cc 中通过 readerIndex 与 writerIndex 维护可读可写区间，实现动态扩容。",
+      build: "编写简单的 readv 分散读测试，验证大报文接收时零浪费动态扩容效果。",
+      explain: "口述：什么是 RAII 原则？为什么服务端开发要求资源在析构函数中自动释放？",
+      review: "使用 AddressSanitizer (ASan) 检测内存申请后未释放与越界访问问题。"
     }
   },
   {
     id: "cpp_dim_stl",
     dimension: "STL",
-    title: "STL 容器特化、迭代器失效与并发安全边界",
-    coreConcept: "深入 std::vector 扩容缩容机制、std::unordered_map 哈希桶再哈希 (rehash) 惩罚，以及 std::list 双向链表节点缓存。",
+    title: "STL 常用容器原理、扩容机制与迭代器安全",
+    coreConcept: "深入理解 std::vector 动态扩容机制（增长因子与重新分配成本）、std::unordered_map 哈希桶分布与 rehash 惩罚、std::list 双向链表结构。掌握各类容器在增删元素时迭代器失效的规则与防范措施。",
     cppaiModule: "mod_http_session",
     moduleName: "HttpServer / Session 会话管理",
     sourceFile: "HttpServer/SessionManager.cpp",
@@ -64,21 +64,21 @@ var CPP_KNOWLEDGE_SYSTEM = [
     yuqueDocId: "yq_08",
     yuqueTitle: "08_会话管理模块",
     taskDay: 10,
-    taskTitle: "Day 10: STL 容器选型与二维 Session 映射表设计",
-    interviewPoint: "std::unordered_map 在并发读写时插入元素导致 rehash，为什么会造成迭代器失效甚至死锁？如何设计分段锁保护？",
+    taskTitle: "Day 10: STL 容器选型与 Session 会话映射",
+    interviewPoint: "std::vector 在 push_back 触发扩容时内部发生了什么？std::unordered_map 与 std::map 的底层数据结构各是什么？在遍历 map 时调用 erase 需要注意什么？",
     learnLoop: {
-      learn: "研读 libc++ / libstdc++ 中 unordered_map 与 vector 底层实现源码。",
-      apply: "在 SessionManager 中使用 std::unordered_map<int, std::unordered_map<string, shared_ptr<Session>>> 存储双层上下文。",
-      build: "构建高并发下大量客户端连接建立与销毁基准，监控 map 扩容时的瞬时耗时。",
-      explain: "口述：为什么在多线程网络库中遍历 STL 容器时必须注意读写锁的升级死锁风险？",
-      review: "定期执行错题自测，牢记不同容器在 erase() 时的迭代器自增规范。"
+      learn: "研读 STL 序列容器与关联容器的底层实现，熟悉常用算法与复杂度。",
+      apply: "在 SessionManager 中使用 std::unordered_map 管理会话对象与用户状态。",
+      build: "编写多线程环境下查找与删除 map 元素的测试用例，观察迭代器失效场景。",
+      explain: "口述：哈希表为什么会发生 rehash？负载因子达到多少会触发扩容？",
+      review: "总结 vector、list、map 在 erase 时的正确迭代器更新写法。"
     }
   },
   {
     id: "cpp_dim_template",
     dimension: "Template",
-    title: "泛型编程、模板元编程与 SFINAE 萃取",
-    coreConcept: "通过函数模板与类模板实现基础设施组件的强类型复用，利用 std::enable_if 和 type_traits 在编译期完成类型特化检查。",
+    title: "泛型编程、模板类/函数与可变参数模板",
+    coreConcept: "通过函数模板与类模板实现通用数据结构和组件封装，利用可变参数模板 (Variadic Templates) 接收任意数量与类型的参数，结合 std::enable_if 和 type_traits 在编译期实施类型检查与特化。",
     cppaiModule: "mod_storage_mysql_pool",
     moduleName: "Common / 数据库连接池与通用连接管理",
     sourceFile: "HttpServer/DbConnectionPool.h",
@@ -86,21 +86,21 @@ var CPP_KNOWLEDGE_SYSTEM = [
     yuqueDocId: "yq_10",
     yuqueTitle: "10_集成数据库连接池模块",
     taskDay: 22,
-    taskTitle: "Day 22: 泛型连接池与资源生命周期模板抽象",
-    interviewPoint: "C++ 模板特化与偏特化的规则是什么？SFINAE (匹配失败非错误) 在现代网络库接口设计中如何避免歧义调用？",
+    taskTitle: "Day 22: 泛型资源池与连接管理模板封装",
+    interviewPoint: "C++ 模板特化与偏特化有什么区别？可变参数模板包展开的常见语法有哪些？为什么模板实现通常必须写在头文件中？",
     learnLoop: {
-      learn: "掌握模板推导规则、完美转发 (std::forward) 与可变参数包解包。",
-      apply: "实现通用的 RAII 资源借还智能守卫 ResourceGuard<PoolType>。",
-      build: "手写泛型 BlockingQueue<T> 阻塞队列并在工作线程池中调度异构任务。",
-      explain: "口述：为什么模板代码一般需要在头文件中完整定义？模板膨胀 (Code Bloat) 如何控制？",
-      review: "复查项目中的通用组件，确认模板约束与编译期报错信息的可读性。"
+      learn: "掌握函数模板、类模板、模板特化及类型推导规则。",
+      apply: "在 DbConnectionPool 中设计通用的 RAII 资源借还守卫类。",
+      build: "手写简易泛型阻塞队列 BlockingQueue<T> 并接入线程池进行任务分发。",
+      explain: "口述：C++ 模板实例化是在什么阶段完成的？模板元编程如何减少运行期开销？",
+      review: "排查头文件包含中的模板冗余定义，确认编译错误提示清晰可读。"
     }
   },
   {
     id: "cpp_dim_smart_pointer",
     dimension: "Smart Pointer",
-    title: "智能指针所有权哲学与引用计数多线程安全",
-    coreConcept: "彻底划分独占语义 (std::unique_ptr)、共享语义 (std::shared_ptr) 与观察者语义 (std::weak_ptr)。理解内部控制块 (Control Block) 的强弱引用计数机制。",
+    title: "智能指针所有权语义与生命周期管理",
+    coreConcept: "明确 std::unique_ptr（独占所有权）、std::shared_ptr（共享所有权与引用计数控制块）、std::weak_ptr（弱引用不增加计数、打破循环引用）。掌握利用 weak_ptr 监控对象生命周期并安全升级为 shared_ptr 的机制。",
     cppaiModule: "mod_net_channel",
     moduleName: "muduo / Channel 事件分发通道",
     sourceFile: "muduo/net/Channel.cc",
@@ -108,21 +108,21 @@ var CPP_KNOWLEDGE_SYSTEM = [
     yuqueDocId: "yq_03",
     yuqueTitle: "03_2.项目介绍",
     taskDay: 14,
-    taskTitle: "Day 14: Channel::tie_ 弱引用防御悬垂指针与对象析构撕裂",
-    interviewPoint: "shared_ptr 自身的引用计数是线程安全的，为什么指向的对象不是？Channel::tie_ 的底层原理是什么？为什么必须先 lock() 再使用？",
+    taskTitle: "Day 14: Channel::tie_ 弱引用生命周期管理与防野指针",
+    interviewPoint: "std::shared_ptr 的引用计数本身是线程安全的吗？它指向的对象读写安全吗？为什么 Channel::tie_ 需要使用 weak_ptr 先 lock() 再调用？",
     learnLoop: {
-      learn: "学习《Linux多线程服务端编程》第 1 章对象生命周期管理。",
-      apply: "在 Channel::handleEventWithGuard 中通过 tie_.lock() 升级强引用保护活动连接。",
-      build: "模拟客户端在发生读事件处理中途发起主动断开，验证 weak_ptr 阻止野指针崩溃。",
-      explain: "口述：为什么在构造函数中调用 shared_from_this() 会抛出 bad_weak_ptr 异常？",
-      review: "审查项目中全部 raw pointer，确保无任何未受管辖的裸指针暴露给异步线程。"
+      learn: "研读陈硕《Linux多线程服务端编程》第 1 章对象生命周期管理。",
+      apply: "在 Channel::handleEventWithGuard 中通过 tie_.lock() 升级为 shared_ptr 确保回调安全。",
+      build: "模拟多线程环境下连接在中途断开的场景，验证 weak_ptr 能否防止野指针崩溃。",
+      explain: "口述：shared_ptr 与 weak_ptr 的控制块 (Control Block) 内部结构是怎样的？",
+      review: "检查项目中所有原生指针使用位置，确保所有权清晰、无未受管裸指针暴露。"
     }
   },
   {
     id: "cpp_dim_move",
     dimension: "Move",
     title: "右值引用、移动语义与完美转发",
-    coreConcept: "深入区分左值 (lvalue)、将亡值 (xvalue) 与纯右值 (prvalue)。掌握 std::move 的强制类型转换本质与 std::forward 的引用折叠规则，彻底消灭深拷贝。",
+    coreConcept: "区分左值 (lvalue)、将亡值 (xvalue) 与纯右值 (prvalue)。理解 std::move 的本质是无条件的 static_cast 强制类型转换，掌握移动构造函数与移动赋值运算符的编写规范（标记 noexcept），配合 std::forward 实现引用折叠与完美转发。",
     cppaiModule: "mod_net_eventloop",
     moduleName: "muduo / EventLoop 异步任务投递队列",
     sourceFile: "muduo/net/EventLoop.cc",
@@ -130,153 +130,153 @@ var CPP_KNOWLEDGE_SYSTEM = [
     yuqueDocId: "yq_09",
     yuqueTitle: "09_中间件模块",
     taskDay: 16,
-    taskTitle: "Day 16: EventLoop::queueInLoop 中的移动语义与双缓冲任务转移",
-    interviewPoint: "移动语义会释放源对象的资源吗？std::move 内部是如何利用 static_cast 实现的？什么情况下 move 仍然会退化为深拷贝？",
+    taskTitle: "Day 16: EventLoop::queueInLoop 中的移动语义与任务转移",
+    interviewPoint: "std::move 内部是如何实现的？为什么移动构造函数必须尽量声明为 noexcept？std::forward 是如何利用引用折叠规则保留参数左值/右值特性的？",
     learnLoop: {
-      learn: "精读 Effective Modern C++ 关于移动语义与完美转发的条款。",
-      apply: "在 pendingFunctors_.push_back(std::move(cb)) 中无缝转移回调函数对象所有权。",
-      build: "对比在 100 万次异步投递中传引用、传值拷贝与 std::move 的执行耗时与分配次数。",
-      explain: "口述：移动构造函数为什么要标记 noexcept？未标 noexcept 对 vector 扩容有何灾难性影响？",
-      review: "检查所有自定义类是否正确遵守 Rule of Five (五法则)。"
+      learn: "学习 C++11 右值引用规范与值类别分类，理解资源所有权转移机制。",
+      apply: "在 EventLoop::queueInLoop 中使用 push_back(std::move(cb)) 转移回调对象所有权。",
+      build: "对比传值深拷贝与 std::move 移动传递在大字符串对象上的耗时差异。",
+      explain: "口述：移动构造函数执行后，被移动的对象处于什么状态？还能正常使用吗？",
+      review: "检查自定义核心类是否符合 Rule of Five (五法则) 的资源释放规范。"
     }
   },
   {
     id: "cpp_dim_concurrency",
     dimension: "Concurrency",
-    title: "多线程同步原语、原子操作与内存序 (Memory Order)",
-    coreConcept: "精通 std::mutex、std::lock_guard、std::unique_lock 与 std::condition_variable。深入 std::atomic、acquire-release 语义与无锁队列设计思想。",
+    title: "多线程并发编程、同步原语与死锁防范",
+    coreConcept: "掌握 std::thread 线程创建与生命周期管理，熟练使用 std::mutex 互斥锁、std::unique_lock/lock_guard、std::condition_variable 条件变量通知机制与 std::atomic 原子类型，严格遵循互斥锁加锁顺序以避免死锁。",
     cppaiModule: "mod_base_threadpool",
     moduleName: "muduo / ThreadPool 工作线程池",
     sourceFile: "muduo/base/ThreadPool.cc",
-    sourceLine: "L30-L85",
-    yuqueDocId: "yq_04",
-    yuqueTitle: "04_3.环境准备",
+    sourceLine: "L20-L75",
+    yuqueDocId: "yq_01",
+    yuqueTitle: "01_学习建议",
     taskDay: 18,
-    taskTitle: "Day 18: 条件变量惊群与虚假唤醒 (Spurious Wakeup) 防御",
-    interviewPoint: "为什么条件变量 wait() 必须使用 while 循环检查条件而不是 if？MutexLockGuard RAII 是如何防死锁的？",
+    taskTitle: "Day 18: 线程池任务队列与条件变量同步",
+    interviewPoint: "条件变量的 wait() 为什么必须搭配互斥锁使用？虚假唤醒 (Spurious Wakeup) 的原因是什么？如何避免死锁？",
     learnLoop: {
-      learn: "学习 POSIX pthread 线程库与 C++11 <thread>/<mutex>/<atomic> 标准模型。",
-      apply: "在 ThreadPool::take() 中通过 while(queue_.empty()) 防范虚假唤醒并由条件变量通知。",
-      build: "构建多生产者多消费者高并发任务队列，验证 graceful shutdown 优雅退出机制。",
-      explain: "口述：死锁产生的四大必要条件是什么？如何在工程上通过加锁顺序破坏环路等待？",
-      review: "在开发环境下运行 ThreadSanitizer (TSan) 扫描数据竞争 (Data Race)。"
+      learn: "阅读陈硕《Linux多线程服务端编程》第 2 章互斥锁与条件变量使用规范。",
+      apply: "在 ThreadPool.cc 中使用 mutex 与 notEmpty/notFull 条件变量实现生产者消费者队列。",
+      build: "编写多线程生产与消费任务程序，使用 while 循环检查条件以防范虚假唤醒。",
+      explain: "口述：什么是自旋锁？什么场景适合用互斥锁，什么场景适合用原子变量？",
+      review: "复查项目中所有互斥锁调用，确保锁的作用域尽可能小，绝不跨网络 I/O 持有锁。"
     }
   },
   {
-    id: "cpp_dim_pattern",
+    id: "cpp_dim_design_pattern",
     dimension: "Design Pattern",
-    title: "服务端经典设计模式与工程解耦实践",
-    coreConcept: "在网络与 AI 服务中落地单例模式 (Meyer's Singleton)、工厂模式、策略模式、观察者模式与洋葱拦截器中间件链。",
+    title: "面向对象设计模式在服务端的实践",
+    coreConcept: "在工程中合理应用设计模式解耦系统复杂度：单例模式 (Meyers Singleton 局部静态变量保证线程安全)、简单工厂/注册式工厂模式（统一实例创建）、策略模式（不同业务算法或模型协议隔离）与洋葱模型中间件链。",
     cppaiModule: "mod_ai_strategy",
-    moduleName: "AIApps / 多模型策略工厂与工具适配",
+    moduleName: "AIApps / 多模型策略工厂与适配",
     sourceFile: "AIApps/ChatServer/src/AIStrategy.cpp",
     sourceLine: "L25-L90",
     yuqueDocId: "yq_16",
     yuqueTitle: "16_9. AI应用服务平台第一版",
     taskDay: 20,
-    taskTitle: "Day 20: 策略模式 + 注册式工厂支持多厂商大模型无缝插拔",
-    interviewPoint: "C++11 局部静态变量实现的单例模式 (Meyer's Singleton) 为什么天然线程安全？策略模式与简单工厂结合的优越性是什么？",
+    taskTitle: "Day 20: 策略模式与工厂模式实现多模型适配",
+    interviewPoint: "C++11 局部静态变量实现的单例模式为什么是线程安全的？策略模式与工厂模式结合使用相比于大量 if-else 分支有什么优势？",
     learnLoop: {
-      learn: "深入 23 种设计模式在 C++ 服务端架构中的现实映射，避免为了模式而模式。",
-      apply: "AIStrategy 基类声明统一的 callLLM 接口，各厂商实现具体子类，由 AIFactory 统一创建。",
-      build: "新增一个本地 Mock 模型策略子类，不修改任何上层业务代码完成动态路由验证。",
-      explain: "口述：如何用责任链模式 (Chain of Responsibility) 实现 HTTP 中间件流水线？",
-      review: "对照开闭原则 (OCP)，评估现有模块在引入新需求时的修改扩散范围。"
+      learn: "学习常用面向对象设计原则（开闭原则、单一职责原则、依赖倒置原则）。",
+      apply: "定义 AIStrategy 抽象基类统一接口，由不同厂商的具体子类实现，通过 AIFactory 统一构造。",
+      build: "新增一个测试用 Mock 模型策略子类，验证上层业务调用无须修改即可无缝接入。",
+      explain: "口述：如何用责任链模式实现 HTTP 请求前置与后置中间件流水线？",
+      review: "对照开闭原则评估现有代码，检查新增模型或组件时是否做到只扩充不修改原有逻辑。"
     }
   }
 ];
 
-// 2. Linux 基础与系统调用实战体系 (9 大维度)
+// 2. Linux 系统底座体系 (9 大维度 - 严格基于《鸟哥的Linux私房菜》章节规范)
 var LINUX_SYSTEM_KNOWLEDGE = [
   {
     id: "linux_dim_bash",
     dimension: "Bash",
-    title: "Linux Shell 脚本自动化、环境变量与运维排障",
-    syscallOrCmd: "bash / env / export / pipe | / redirect > &2",
-    projectScene: "编译自动化、服务守护进程拉起与生产环境配置管理",
+    title: "Bash 环境、变量配置与数据流重定向",
+    syscallOrCmd: "export / env / PATH / alias / > / >> / 2>&1 / |",
+    projectScene: "《鸟哥私房菜》第10章：环境变量配置、管道组合、错误重定向与项目启动脚本编写",
     cppaiModule: "mod_base_logging",
     sourceLink: "scripts/build_static.cjs / CMakeLists.txt",
-    interviewPoint: "Shell 脚本中 $?、$#、$*、$@ 的含义是什么？重定向 2>&1 的执行机制是什么？如何优雅处理进程后台运行 nohup 与信号挂断？"
+    interviewPoint: "Linux 环境变量与普通局部变量有什么区别？export 的作用是什么？重定向命令 2>&1 的执行原理是什么？"
   },
   {
     id: "linux_dim_fs",
     dimension: "File System",
-    title: "VFS 虚拟文件系统、文件描述符 (fd) 与零拷贝 (sendfile)",
-    syscallOrCmd: "open() / read() / write() / fcntl() / sendfile()",
-    projectScene: "HTTP 静态资源大文件极速传输与 socket 描述符非阻塞属性配置",
+    title: "文件与目录权限、FHS 规范与软硬链接",
+    syscallOrCmd: "chmod / chown / umask / ls -l / ln -s / df / du",
+    projectScene: "《鸟哥私房菜》第5-7章：用户/群组 rwx 权限控制、FHS 标准目录组织、inode 与 block 存储原理",
     cppaiModule: "mod_http_server",
     sourceLink: "HttpServer/HttpServer.cpp (静态文件分发)",
-    interviewPoint: "Linux 文件描述符泄露的根本原因是什么？如何通过 /proc/pid/fd 实时监控？sendfile 为什么能减少上下文切换与 CPU 拷贝？"
+    interviewPoint: "rwx 权限对文件和目录的含义有什么不同？符号链接 (软链接) 与硬链接在 inode 层面有什么区别？umask 的计算逻辑是什么？"
   },
   {
     id: "linux_dim_process",
     dimension: "Process",
-    title: "进程生命周期、fork/exec 派生、孤儿进程与僵尸进程",
-    syscallOrCmd: "fork() / execve() / waitpid() / getpid()",
-    projectScene: "多进程模型比对、守护进程 (Daemon) 改造与子进程退出清理",
+    title: "进程管理、后台任务调度与信号处理",
+    syscallOrCmd: "ps aux / top / pstree / kill -9 / jobs / fg / bg / nohup",
+    projectScene: "《鸟哥私房菜》第16章：查看系统进程状态、前后台任务切换、nohup 运行守护服务与防僵尸进程",
     cppaiModule: "mod_kernel_epoll",
     sourceLink: "muduo/net/poller/EPollPoller.cc",
-    interviewPoint: "写时复制 (COW, Copy-On-Write) 的底层硬件 MMU 支持原理是什么？如何避免僵尸进程 (Zombie Process) 的产生？"
+    interviewPoint: "什么是僵尸进程 (Zombie) 与孤儿进程 (Orphan)？如何产生以及系统如何回收？kill -9 与 kill -15 有什么区别？"
   },
   {
     id: "linux_dim_thread",
     dimension: "Thread",
-    title: "POSIX 线程模型、线程局部存储 (__thread) 与上下文开销",
-    syscallOrCmd: "pthread_create() / pthread_join() / __thread / pthread_self()",
-    projectScene: "One Loop Per Thread 架构下线程专属 EventLoop 与日志缓冲管理",
+    title: "多线程状态观察、轻量级进程与资源监控",
+    syscallOrCmd: "ps -T -p PID / top -H / /proc/PID/status / pstack",
+    projectScene: "《鸟哥私房菜》进程与资源：观察多线程服务的 CPU/内存消耗、排查线程假死与死锁堆栈",
     cppaiModule: "mod_net_eventloop",
     sourceLink: "muduo/net/EventLoop.cc (t_loopInThisThread)",
-    interviewPoint: "__thread 与 C++11 thread_local 的区别是什么？内核轻量级进程 (LWP) 与用户态线程是如何 1:1 映射的？"
+    interviewPoint: "在 Linux 中线程与进程的关系是什么？什么是轻量级进程 (LWP)？如何通过 /proc/PID 查看当前进程创建的线程数量？"
   },
   {
     id: "linux_dim_signal",
     dimension: "Signal",
-    title: "Linux 信号机制、异步信号安全函数与 SIGPIPE 致命忽略",
-    syscallOrCmd: "signal() / sigaction() / sigprocmask()",
-    projectScene: "网络连接对端 RST 关闭时写入触发 SIGPIPE 默认退出的致命防御",
+    title: "Linux 信号机制与网络服务中的 SIGPIPE 防御",
+    syscallOrCmd: "signal() / sigaction() / kill / SIGINT / SIGTERM / SIGPIPE",
+    projectScene: "《鸟哥私房菜》第16章信号概念：处理终止信号平滑退出，网络端写已关闭连接触发 SIGPIPE 忽略",
     cppaiModule: "mod_net_client",
     sourceLink: "muduo/net/TcpConnection.cc",
-    interviewPoint: "为什么网络服务器启动时必须调用 signal(SIGPIPE, SIG_IGN)？什么是可重入函数 (Reentrant Function)？为什么信号处理函数不能调用 malloc？"
+    interviewPoint: "为什么网络服务端启动时必须调用 signal(SIGPIPE, SIG_IGN)？什么是不可忽略的信号？信号处理函数为什么必须是异步安全的？"
   },
   {
     id: "linux_dim_socket",
     dimension: "Socket",
-    title: "BSD Socket 套接字编程、TCP 状态机与选项参数调优",
-    syscallOrCmd: "socket() / bind() / listen() / accept4() / setsockopt()",
-    projectScene: "高并发 TCP 服务器快速重启 SO_REUSEADDR/SO_REUSEPORT 与防慢连接",
+    title: "网络状态诊断、端口监听与常用排查工具",
+    syscallOrCmd: "ss -tulnp / netstat -tulnp / ping / traceroute / lsof -i:port",
+    projectScene: "《鸟哥私房菜》网络章节：排查服务监听端口占用、检查 TCP 连接状态 (ESTABLISHED, TIME_WAIT)",
     cppaiModule: "mod_net_tcpserver",
     sourceLink: "muduo/net/Socket.cc / muduo/net/SocketsOps.cc",
-    interviewPoint: "TIME_WAIT 状态存在的必要性是什么？设置 SO_REUSEADDR 能解决什么问题？TCP_NODELAY 禁用 Nagle 算法在 HTTP 服务中的权衡？"
+    interviewPoint: "ss 命令相比于 netstat 为什么查询更快？TCP 三次握手与四次挥手对应的 socket API 是什么？TIME_WAIT 状态过多的原因与排查思路？"
   },
   {
     id: "linux_dim_epoll",
     dimension: "epoll",
-    title: "I/O 多路复用深水区：epoll 核心数据结构与 LT / ET 极限触发",
-    syscallOrCmd: "epoll_create1() / epoll_ctl() / epoll_wait()",
-    projectScene: "muduo 与 CppAIService 底座高吞吐量 I/O 事件循环主驱动器",
+    title: "I/O 多路复用系统调用与事件驱动模型",
+    syscallOrCmd: "epoll_create1() / epoll_ctl() / epoll_wait() / fcntl(O_NONBLOCK)",
+    projectScene: "《鸟哥私房菜》系统调用基础：基于 epoll 的高效事件轮询，配合非阻塞 I/O 驱动网络并发",
     cppaiModule: "mod_net_poller",
     sourceLink: "muduo/net/poller/EPollPoller.cc",
-    interviewPoint: "epoll 底层为什么使用红黑树和就绪链表？epoll_ctl 增加监听 fd 的复杂度是多少？边缘触发 (ET) 为什么必须搭配非阻塞 I/O 且一直读到 EAGAIN？"
+    interviewPoint: "epoll 相比于 select 和 poll 的核心改进是什么？水平触发 (LT) 和边缘触发 (ET) 有什么区别？边缘触发模式下为什么必须使用非阻塞 I/O？"
   },
   {
     id: "linux_dim_gdb",
     dimension: "gdb",
-    title: "GDB 调试艺术：多线程死锁定位、Core Dump 逆向反查与断点追踪",
-    syscallOrCmd: "gdb / bt / thread apply all bt / info registers / print",
-    projectScene: "多线程死锁现场排查、段错误 (Segmentation fault) coredump 快速复盘",
+    title: "命令行程序调试、Core Dump 核心转储与断点排查",
+    syscallOrCmd: "ulimit -c unlimited / gdb ./server core / bt / b / p / info threads",
+    projectScene: "《鸟哥私房菜》程序排错篇：配置系统核心转储，使用 GDB 查看崩溃堆栈与定位段错误 (Segmentation Fault)",
     cppaiModule: "mod_base_threadpool",
-    sourceLink: "docs/experiment_trace.md",
-    interviewPoint: "线上服务遭遇 CPU 100% 卡死时，如何用 GDB attach 到进程排查死循环位置？如何配置 ulimit -c 生成并分析 core dump 文件？"
+    sourceLink: "docs/8_WEEK_ROADMAP.md (Week 1 GDB 调试)",
+    interviewPoint: "线上服务出现段错误崩溃时如何快速排查？如何使用 gdb attach 到运行中的后台进程？如何打印全部线程的调用栈？"
   },
   {
     id: "linux_dim_perf",
     dimension: "perf",
-    title: "性能剖析与火焰图 (FlameGraph)：CPU 热点与系统调用损耗定点爆破",
-    syscallOrCmd: "perf record / perf report / FlameGraph / strace / top -H",
-    projectScene: "HttpServer 压测瓶颈分析与 JSON 序列化热点耗时定位",
+    title: "系统性能分析、资源监控与瓶颈定位",
+    syscallOrCmd: "vmstat / iostat / top / sar / perf record -g / perf report",
+    projectScene: "《鸟哥私房菜》系统资源观察篇：监控 CPU、磁盘 I/O 瓶颈，利用 perf 分析函数调用耗时分布",
     cppaiModule: "mod_http_codec",
-    sourceLink: "docs/8_WEEK_ROADMAP.md (Week 4 基准压测)",
-    interviewPoint: "如何通过 perf record -F 99 -p pid -g 生成 CPU 调用栈火焰图？火焰图横轴与纵轴各代表什么含义？系统调用开销过高时如何优化？"
+    sourceLink: "docs/8_WEEK_ROADMAP.md (Week 4 性能分析)",
+    interviewPoint: "如何用 vmstat 判断系统是 CPU 密集型还是 I/O 密集型？perf 工具的采样原理是什么？如何生成火焰图排查性能热点？"
   }
 ];
 

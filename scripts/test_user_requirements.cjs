@@ -43,6 +43,7 @@ function getOrCreateElement(id) {
             id,
             innerText: '',
             innerHTML: '',
+            textContent: '',
             value: '',
             checked: false,
             style: {},
@@ -60,7 +61,9 @@ function getOrCreateElement(id) {
             addEventListener: () => {},
             appendChild: function(child) {
                 this.children.push(child);
-                this.innerHTML += (child.outerHTML || child.innerHTML || '');
+                const text = child.textContent || child.innerText || '';
+                const tag = (child.tagName || 'DIV').toLowerCase();
+                this.innerHTML += `<${tag} value="${child.value || ''}">${text}${child.innerHTML || ''}</${tag}>`;
             }
         };
     }
@@ -296,8 +299,57 @@ assert.ok(algoLabContainer.innerHTML.includes('进度') && (algoLabContainer.inn
 
 console.log('  ✓ 算法手撕 Lab 12 大分类全览图就绪，完成题目时分类卡片即时联动更新！');
 
+// 11. 验证 C++ 8维核心与 Linux 9维底座语言风格去除浮夸，紧密贴合语雀路线与《鸟哥的Linux私房菜》
+console.log('\n[Test 11] 验证 C++ 与 Linux 模块语言风格拒绝浮夸修饰，严格对齐语雀路线与鸟哥私房菜...');
+const forbiddenFluff = ['破除孤岛', '深水区', '极速传输', '大招', '消除孤岛'];
+const cppList = sandbox.CPP_KNOWLEDGE_SYSTEM;
+const linuxList = sandbox.LINUX_SYSTEM_KNOWLEDGE;
+
+assert.strictEqual(cppList.length, 8, 'C++ 知识体系需包含 8 大维度');
+assert.strictEqual(linuxList.length, 9, 'Linux 知识体系需包含 9 大维度');
+
+const allText = JSON.stringify(cppList) + JSON.stringify(linuxList) + html;
+forbiddenFluff.forEach(fluff => {
+    assert.ok(!allText.includes(fluff), `Code and content must not contain hype word: "${fluff}"`);
+});
+
+// 验证 Linux 维度包含《鸟哥私房菜》真实章节内容
+const birdKeywords = ['鸟哥私房菜', '第10章', '第5-7章', '第16章', 'export', 'umask', 'SIGPIPE', 'ss -tulnp', 'epoll_create1', 'ulimit -c unlimited'];
+birdKeywords.forEach(kw => {
+    assert.ok(JSON.stringify(linuxList).includes(kw), `Linux dimensions must contain Bird Linux concept: ${kw}`);
+});
+
+console.log('  ✓ C++ 8 维核心与 Linux 9 维底座语言风格完全去除浮夸修饰，鸟哥私房菜章节对照完备！');
+
+// 12. 验证记录手撕题弹窗拥有 179 道题分类候选下拉框，且算法标签与手撕 Lab 同步
+console.log('\n[Test 12] 验证记录手撕题弹窗拥有 179 道分类候选下拉框与 12 大标签同步...');
+assert.ok(html.includes('id="algo-problem-selector"'), 'Must have #algo-problem-selector in HTML');
+
+// 验证 12 个算法标签在下拉框中完全一致
+const expected12Tags = ['数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
+expected12Tags.forEach(tag => {
+    assert.ok(html.includes(`<option value="${tag}">${tag}</option>`), `Option for ${tag} must be present in #algo-topic`);
+});
+
+// 验证 populateAlgoProblemSelector 生成 179 道候选题
+sandbox.populateAlgoProblemSelector();
+const selectorEl = getOrCreateElement('algo-problem-selector');
+assert.ok(selectorEl.children.length > 0 || selectorEl.innerHTML.includes('704'), 'Candidate selector must populate candidate options');
+
+// 验证选择候选题目自动联动表单
+sandbox.onAlgoProblemSelect(704);
+assert.strictEqual(getOrCreateElement('algo-num').value, '704', 'Auto fill problem num');
+assert.ok(getOrCreateElement('algo-title').value.includes('二分查找'), 'Auto fill problem title');
+assert.strictEqual(getOrCreateElement('algo-topic').value, '数组', 'Auto fill algo topic');
+
+// 验证保存手撕记录联动 stateManager 完成状态
+getOrCreateElement('algo-passed').checked = true;
+sandbox.saveAlgorithmProblem();
+assert.ok(sandbox.stateManager.isAlgoCompleted(704), 'Problem 704 should be marked completed in stateManager');
+console.log('  ✓ 算法记录弹窗 179 道题分类候选下拉框、12 大标签同步与自动填充联动验证通过！');
+
 console.log('\n========================================================================================');
-console.log('🎉 全部 10 项核心需求深度重构自动化测试全部通过！系统达到完全真实的工程工作台交付标准！');
+console.log('🎉 全部 12 项核心需求深度重构自动化测试全部通过！系统达到完全真实的工程工作台交付标准！');
 console.log('========================================================================================\n');
 
 

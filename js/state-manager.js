@@ -1418,6 +1418,15 @@
       return !cur;
     }
 
+    setAlgoCompleted(algoNum, completed = true) {
+      if (!this._state.learningSystem) this._state.learningSystem = {};
+      if (!this._state.learningSystem.completedAlgos) this._state.learningSystem.completedAlgos = {};
+      this._state.learningSystem.completedAlgos[algoNum] = !!completed;
+      this.save();
+      this._notify();
+      return !!completed;
+    }
+
     isAlgoCompleted(algoNum) {
       if (!this._state.learningSystem || !this._state.learningSystem.completedAlgos) return false;
       return !!this._state.learningSystem.completedAlgos[algoNum];

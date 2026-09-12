@@ -1135,23 +1135,23 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-stone-100">
                 <div>
                     <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-serifMono mb-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="font-bold"></span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="font-bold">知识体系与工程源码对照</span>
                         <span class="text-stone-300">•</span>
-                        <span>六维关联 ➔ 实践成长</span>
+                        <span>系统化实践沉淀</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
                         <i class="fa-solid fa-graduation-cap text-emerald-700"></i> 统一学习系统与知识与实践关联中心
                     </h2>
                     <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
-                        消除孤岛：将 C++ 语法、Linux 底层、专业书目、算法手撕、技术八股与通识阅读全面连通。通过
-                        <span class="font-semibold text-stone-700 font-serifMono">Learn ➔ Apply ➔ Build ➔ Explain ➔ Review</span> 五步闭环，
-                        实现任何知识点在 <span class="font-semibold text-emerald-800 font-serifMono">Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview</span> 的关联追溯。
+                        系统化对照：将 C++ 核心语法、Linux 系统原理、经典专业书目、算法手撕训练与项目实战代码建立对应关联。遵循
+                        <span class="font-semibold text-stone-700 font-serifMono">Learn ➔ Apply ➔ Build ➔ Explain ➔ Review</span> 渐进式学习路径，
+                        在 <span class="font-semibold text-emerald-800 font-serifMono">理论知识 ➔ 工程模块 ➔ 源码实现 ➔ 日程任务 ➔ 面试考点</span> 之间形成清晰追溯。
                     </p>
                 </div>
                 <div class="flex items-center gap-2 font-serifMono shrink-0">
                     <button onclick="openCrossLinkModal('cpp_dim_modern')" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
-                        <i class="fa-solid fa-crosshairs"></i> 查看六维关联透视
+                        <i class="fa-solid fa-diagram-project"></i> 查看知识与工程全景关联
                     </button>
                 </div>
             </div>
@@ -2143,14 +2143,23 @@ add_executable(my_server ${SOURCES})</pre>
         </div>
 
         <div class="space-y-3 font-serifMono text-xs">
+            <div>
+                <label class="block text-stone-600 font-bold mb-1">
+                    <i class="fa-solid fa-list-ul text-indigo-600"></i> 从 179 道题库中选择候选（选择后自动填入）
+                </label>
+                <select id="algo-problem-selector" onchange="onAlgoProblemSelect(this.value)" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 text-stone-800 focus:ring-1 focus:ring-indigo-500">
+                    <option value="">-- 手动输入或从 179 道分类题单中选择候选题 --</option>
+                </select>
+            </div>
+
             <div class="grid grid-cols-3 gap-2">
                 <div class="col-span-1">
                     <label class="block text-stone-600 font-bold mb-1">题号</label>
-                    <input type="text" id="algo-num" placeholder="如: 206" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500">
+                    <input type="text" id="algo-num" placeholder="如: 704" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500">
                 </div>
                 <div class="col-span-2">
                     <label class="block text-stone-600 font-bold mb-1">题名</label>
-                    <input type="text" id="algo-title" placeholder="如: 反转链表" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500">
+                    <input type="text" id="algo-title" placeholder="如: 704. 二分查找" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500">
                 </div>
             </div>
 
@@ -2158,17 +2167,18 @@ add_executable(my_server ${SOURCES})</pre>
                 <div>
                     <label class="block text-stone-600 font-bold mb-1">算法标签</label>
                     <select id="algo-topic" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                        <option value="数组">数组</option>
                         <option value="链表">链表</option>
-                        <option value="数组/双指针">数组/双指针</option>
-                        <option value="滑动窗口">滑动窗口</option>
                         <option value="哈希表">哈希表</option>
-                        <option value="二叉树">二叉树</option>
-                        <option value="动态规划">动态规划</option>
-                        <option value="回溯算法">回溯算法</option>
+                        <option value="字符串">字符串</option>
+                        <option value="双指针法">双指针法</option>
                         <option value="栈与队列">栈与队列</option>
-                        <option value="图论">图论</option>
+                        <option value="二叉树">二叉树</option>
+                        <option value="回溯算法">回溯算法</option>
                         <option value="贪心算法">贪心算法</option>
-                        <option value="其他">其他</option>
+                        <option value="动态规划">动态规划</option>
+                        <option value="单调栈">单调栈</option>
+                        <option value="图论">图论</option>
                     </select>
                 </div>
                 <div>

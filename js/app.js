@@ -252,6 +252,10 @@ function loadAndMigrateState() {
 function persistState() {
     try {
         if (typeof StateManager !== 'undefined') {
+            if (StateManager._state && StateManager._state.learningSystem) {
+                if (!appState.learningSystem) appState.learningSystem = {};
+                appState.learningSystem = Object.assign({}, StateManager._state.learningSystem, appState.learningSystem);
+            }
             StateManager.update(appState, { save: true, immediate: false });
             return;
         }
@@ -1621,11 +1625,11 @@ function renderLearningCppTab() {
                         ${escapeHtml(dim.coreConcept)}
                     </p>
 
-                    <!-- 5 步闭环状态 -->
+                    <!-- 5 步路径状态 -->
                     <div class="bg-stone-50/80 p-3 rounded-xl border border-stone-200/80 space-y-1.5 text-xs font-serifMono mb-3">
                         <div class="text-[11px] text-stone-500 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
-                            <span><i class="fa-solid fa-arrows-spin text-emerald-600"></i> 闭环学习流 (5-Step Loop)</span>
-                            <span class="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">贯通</span>
+                            <span><i class="fa-solid fa-list-check text-sky-600"></i> 学习实践路径 (5-Step)</span>
+                            <span class="text-[10px] text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">实践</span>
                         </div>
                         <div class="text-stone-700 text-[11px]"><span class="font-bold text-sky-800">Learn:</span> ${escapeHtml(loop.learn || '')}</div>
                         <div class="text-stone-700 text-[11px]"><span class="font-bold text-emerald-800">Apply:</span> ${escapeHtml(loop.apply || '')}</div>
@@ -1652,7 +1656,7 @@ function renderLearningCppTab() {
                             Day ${dim.taskDay}
                         </button>
                         <button onclick="openCrossLinkModal('${dim.id}')" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition text-[11px] flex items-center gap-1 shadow-xs cursor-pointer">
-                            <i class="fa-solid fa-crosshairs text-[10px]"></i> 六维透视
+                            <i class="fa-solid fa-diagram-project text-[10px]"></i> 关联详情
                         </button>
                     </div>
                 </div>
@@ -1696,7 +1700,7 @@ function renderLearningLinuxTab() {
 
                 <div class="p-2.5 bg-stone-50 rounded-lg border border-stone-200 text-xs mb-3 font-serifHeading">
                     <span class="font-bold text-amber-800 font-serifMono text-[11px] block mb-0.5">
-                        <i class="fa-solid fa-clipboard-question"></i> 面试高频深度：
+                        <i class="fa-solid fa-circle-question"></i> 面试考点与排查思路：
                     </span>
                     <p class="text-[11px] text-stone-600 leading-relaxed">${escapeHtml(item.interviewPoint)}</p>
                 </div>
@@ -1707,7 +1711,7 @@ function renderLearningLinuxTab() {
                     <i class="fa-solid fa-link text-stone-400"></i> ${escapeHtml(item.sourceLink)}
                 </span>
                 <button onclick="openCrossLinkModal('${item.id}')" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition text-[11px] flex items-center gap-1 shadow-xs cursor-pointer shrink-0">
-                    <i class="fa-solid fa-crosshairs text-[10px]"></i> 六维透视
+                    <i class="fa-solid fa-diagram-project text-[10px]"></i> 关联详情
                 </button>
             </div>
         </div>
@@ -6294,8 +6298,68 @@ function setRoutineMode(mode) {
     }
 }
 
+// 填充算法弹窗候选题目下拉列表（179 道题按 12 大分类归类）
+function populateAlgoProblemSelector() {
+    const sel = document.getElementById('algo-problem-selector');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">-- 手动输入或从 179 道分类题单中选择候选题 --</option>';
+    const catalog = (typeof ALGORITHM_LAB_CATALOG !== 'undefined') ? ALGORITHM_LAB_CATALOG : [];
+    
+    const categories = ['数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
+    
+    categories.forEach(cat => {
+        const problems = catalog.filter(p => p.category === cat);
+        if (problems.length > 0) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = `${cat} (${problems.length}题)`;
+            problems.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.num;
+                opt.textContent = `${p.title} [${p.difficulty}]`;
+                optgroup.appendChild(opt);
+            });
+            sel.appendChild(optgroup);
+        }
+    });
+}
+
+function onAlgoProblemSelect(val) {
+    if (!val) return;
+    const catalog = (typeof ALGORITHM_LAB_CATALOG !== 'undefined') ? ALGORITHM_LAB_CATALOG : [];
+    const problem = catalog.find(p => String(p.num) === String(val));
+    if (!problem) return;
+
+    const numEl = document.getElementById('algo-num');
+    if (numEl) numEl.value = String(problem.num);
+
+    const titleEl = document.getElementById('algo-title');
+    if (titleEl) titleEl.value = String(problem.title);
+
+    const topicEl = document.getElementById('algo-topic');
+    if (topicEl) {
+        topicEl.value = String(problem.category || problem.topic || '数组');
+    }
+
+    const timeEl = document.getElementById('algo-time-comp');
+    if (timeEl) timeEl.value = String(problem.timeComp || 'O(n)');
+
+    const spaceEl = document.getElementById('algo-space-comp');
+    if (spaceEl) spaceEl.value = String(problem.spaceComp || 'O(1)');
+
+    const noteEl = document.getElementById('algo-note');
+    if (noteEl && (!noteEl.value || String(noteEl.value).trim() === '')) {
+        let noteParts = [];
+        if (problem.pattern) noteParts.push(`【核心模式】${problem.pattern}`);
+        if (problem.mistakes) noteParts.push(`【注意要点】${problem.mistakes}`);
+        noteEl.value = noteParts.join('\n');
+    }
+}
+
 // 算法记录弹窗
 function openAlgorithmModal() {
+    populateAlgoProblemSelector();
+    const sel = document.getElementById('algo-problem-selector');
+    if (sel) sel.value = '';
     document.getElementById('algorithm-modal')?.classList.remove('hidden');
     const numInput = document.getElementById('algo-num');
     if (numInput) numInput.focus();
@@ -6309,13 +6373,13 @@ function saveAlgorithmProblem() {
     const routine = ensureDailyRoutineInitialized();
     if (!routine) return;
 
-    const num = document.getElementById('algo-num')?.value.trim();
-    const title = document.getElementById('algo-title')?.value.trim();
-    const topic = document.getElementById('algo-topic')?.value || '其他';
-    const timeComp = document.getElementById('algo-time-comp')?.value.trim() || 'O(n)';
-    const spaceComp = document.getElementById('algo-space-comp')?.value.trim() || 'O(1)';
+    const num = String(document.getElementById('algo-num')?.value ?? '').trim();
+    const title = String(document.getElementById('algo-title')?.value ?? '').trim();
+    const topic = String(document.getElementById('algo-topic')?.value || '数组');
+    const timeComp = String(document.getElementById('algo-time-comp')?.value || 'O(n)').trim();
+    const spaceComp = String(document.getElementById('algo-space-comp')?.value || 'O(1)').trim();
     const passed = document.getElementById('algo-passed')?.checked ?? true;
-    const note = document.getElementById('algo-note')?.value.trim() || '';
+    const note = String(document.getElementById('algo-note')?.value ?? '').trim();
 
     if (!title) {
         if (typeof showToast === 'function') showToast('请填写算法题名称', false);
@@ -6348,6 +6412,28 @@ function saveAlgorithmProblem() {
         }
     }
 
+    // 若在 179 题单库中，自动同步完成状态到 stateManager 与 appState
+    const algoNumInt = parseInt(num, 10);
+    if (!isNaN(algoNumInt)) {
+        if (!appState.learningSystem) appState.learningSystem = {};
+        if (!appState.learningSystem.completedAlgos) appState.learningSystem.completedAlgos = {};
+        appState.learningSystem.completedAlgos[algoNumInt] = passed;
+
+        const sm = (typeof stateManager !== 'undefined' && stateManager) ? stateManager :
+                   (typeof window !== 'undefined' && window.stateManager) ? window.stateManager :
+                   (typeof globalThis !== 'undefined' && globalThis.stateManager) ? globalThis.stateManager : null;
+        if (sm) {
+            if (typeof sm.setAlgoCompleted === 'function') {
+                sm.setAlgoCompleted(algoNumInt, passed);
+            } else if (typeof sm.toggleAlgoCompleted === 'function') {
+                const isCompleted = sm.isAlgoCompleted ? sm.isAlgoCompleted(algoNumInt) : false;
+                if (passed !== isCompleted) {
+                    sm.toggleAlgoCompleted(algoNumInt);
+                }
+            }
+        }
+    }
+
     // 清空表单
     const numEl = document.getElementById('algo-num');
     if (numEl) numEl.value = '';
@@ -6355,11 +6441,18 @@ function saveAlgorithmProblem() {
     if (titleEl) titleEl.value = '';
     const noteEl = document.getElementById('algo-note');
     if (noteEl) noteEl.value = '';
+    const selEl = document.getElementById('algo-problem-selector');
+    if (selEl) selEl.value = '';
 
     persistState();
     closeAlgorithmModal();
     renderTaskHub();
     updateDashboardMetrics();
+
+    // 若当前正在算法手撕 Lab，即时刷新分类全览与题目列表
+    if (typeof renderLearningAlgoTab === 'function') {
+        renderLearningAlgoTab();
+    }
 
     if (typeof showToast === 'function') {
         showToast(`算法「#${newRecord.problemNumber} ${title}」已记录！今日已完成 ${routine.records.algorithm.length} 题`);
@@ -7554,6 +7647,10 @@ if (typeof globalThis !== 'undefined') {
     globalThis.openCodeViewerModal = openCodeViewerModal;
     globalThis.closeCodeViewerModal = closeCodeViewerModal;
     globalThis.copyCurrentViewerCode = copyCurrentViewerCode;
+    globalThis.populateAlgoProblemSelector = populateAlgoProblemSelector;
+    globalThis.onAlgoProblemSelect = onAlgoProblemSelect;
+    globalThis.openAlgorithmModal = openAlgorithmModal;
+    globalThis.closeAlgorithmModal = closeAlgorithmModal;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -7573,6 +7670,10 @@ if (typeof module !== 'undefined' && module.exports) {
         toggleTaskCompleted,
         setRoutineMode,
         saveAlgorithmProblem,
+        populateAlgoProblemSelector,
+        onAlgoProblemSelect,
+        openAlgorithmModal,
+        closeAlgorithmModal,
         saveBooksProgress,
         saveCareerNotes,
         saveCustomTask,
