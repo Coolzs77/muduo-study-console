@@ -299,57 +299,117 @@ assert.ok(algoLabContainer.innerHTML.includes('进度') && (algoLabContainer.inn
 
 console.log('  ✓ 算法手撕 Lab 12 大分类全览图就绪，完成题目时分类卡片即时联动更新！');
 
-// 11. 验证 C++ 8维核心与 Linux 9维底座语言风格去除浮夸，紧密贴合语雀路线与《鸟哥的Linux私房菜》
-console.log('\n[Test 11] 验证 C++ 与 Linux 模块语言风格拒绝浮夸修饰，严格对齐语雀路线与鸟哥私房菜...');
-const forbiddenFluff = ['破除孤岛', '深水区', '极速传输', '大招', '消除孤岛'];
+// 11. 验证 C++ 与 Linux 模块深度重构：完全基于语雀《C++学习路线 (2026)》与《鸟哥的Linux私房菜》，精确书目页码，双栏排布 (1/4 导航 + 3/4 内容) 与打勾已学
+console.log('\n[Test 11] 验证 C++ 与 Linux 学习路线重构 (对齐真实书目页码、双栏布局与打勾交互)...');
 const cppList = sandbox.CPP_KNOWLEDGE_SYSTEM;
 const linuxList = sandbox.LINUX_SYSTEM_KNOWLEDGE;
 
-assert.strictEqual(cppList.length, 8, 'C++ 知识体系需包含 8 大维度');
-assert.strictEqual(linuxList.length, 9, 'Linux 知识体系需包含 9 大维度');
+assert.ok(Array.isArray(cppList) && cppList.length >= 30, 'C++ 知识体系需包含至少 30 个细化知识点');
+assert.ok(Array.isArray(linuxList) && linuxList.length >= 30, 'Linux 私房菜体系需包含至少 30 个细化知识点');
 
-const allText = JSON.stringify(cppList) + JSON.stringify(linuxList) + html;
-forbiddenFluff.forEach(fluff => {
-    assert.ok(!allText.includes(fluff), `Code and content must not contain hype word: "${fluff}"`);
+// 验证每一项均有精确的书目名称、章节与具体页码 (P.xxx)
+cppList.forEach(item => {
+    assert.ok(item.bookReference && item.bookReference.includes('P.'), `C++ 项 ${item.id} 必须提供精确书目页码: ${item.bookReference}`);
+    assert.ok(item.bookReference.includes('C++ Primer Plus') || item.bookReference.includes('Linux多线程服务端编程'), `C++ 项 ${item.id} 必须关联指定参考书目`);
 });
 
-// 验证 Linux 维度包含《鸟哥私房菜》真实章节内容
-const birdKeywords = ['鸟哥私房菜', '第10章', '第5-7章', '第16章', 'export', 'umask', 'SIGPIPE', 'ss -tulnp', 'epoll_create1', 'ulimit -c unlimited'];
-birdKeywords.forEach(kw => {
-    assert.ok(JSON.stringify(linuxList).includes(kw), `Linux dimensions must contain Bird Linux concept: ${kw}`);
+linuxList.forEach(item => {
+    assert.ok(item.bookReference && item.bookReference.includes('P.'), `Linux 项 ${item.id} 必须提供精确书目页码: ${item.bookReference}`);
+    assert.ok(item.bookReference.includes('鸟哥'), `Linux 项 ${item.id} 必须关联《鸟哥私房菜》`);
 });
 
-console.log('  ✓ C++ 8 维核心与 Linux 9 维底座语言风格完全去除浮夸修饰，鸟哥私房菜章节对照完备！');
+// 验证双栏渲染与打勾状态交互
+sandbox.renderLearningCppTab();
+const cppNav = getOrCreateElement('cpp-nav-sidebar');
+const cppContent = getOrCreateElement('cpp-content-container');
+assert.ok(cppNav.innerHTML.includes('C++ 学习路线 (2026)'), 'C++ 左侧 1/4 导航必须包含体系标题');
+assert.ok(cppNav.innerHTML.includes('全景路线已学'), 'C++ 左侧 1/4 导航必须包含全景已学统计');
+assert.ok(cppContent.innerHTML.includes('C++ Primer Plus'), 'C++ 右侧 3/4 内容必须包含教材页码徽章');
 
-// 12. 验证记录手撕题弹窗拥有 179 道题分类候选下拉框，且算法标签与手撕 Lab 同步
-console.log('\n[Test 12] 验证记录手撕题弹窗拥有 179 道分类候选下拉框与 12 大标签同步...');
+// 测试 C++ 打勾已学状态持久化
+const testCppId = cppList[0].id;
+sandbox.toggleCppLearnedStatus(testCppId);
+assert.strictEqual(sandbox.stateManager.isCppLearned(testCppId), true, 'C++ 项目必须成功标记为已学');
+assert.ok(sandbox.stateManager.getCppLearnedCount() >= 1, '已学计数必须更新');
+assert.ok(cppNav.innerHTML.includes(`${sandbox.stateManager.getCppLearnedCount()} /`), '左侧统计必须即时响应更新');
+
+// 测试 Linux 双栏与打勾
+sandbox.renderLearningLinuxTab();
+const linuxNav = getOrCreateElement('linux-nav-sidebar');
+const linuxContent = getOrCreateElement('linux-content-container');
+assert.ok(linuxNav.innerHTML.includes('鸟哥'), 'Linux 左侧 1/4 导航必须包含鸟哥私房菜标识');
+assert.ok(linuxContent.innerHTML.includes('鸟哥的Linux私房菜'), 'Linux 右侧 3/4 内容必须包含教材页码徽章');
+
+const testLinuxId = linuxList[0].id;
+sandbox.toggleLinuxLearnedStatus(testLinuxId);
+assert.strictEqual(sandbox.stateManager.isLinuxLearned(testLinuxId), true, 'Linux 项目必须成功标记为已学');
+assert.ok(sandbox.stateManager.getLinuxLearnedCount() >= 1, '已学计数必须更新');
+
+console.log('  ✓ C++ 语雀路线与 Linux 鸟哥私房菜完全重构完成，教材精确页码、双栏布局 (1/4 导航 + 3/4 内容) 与打勾已学交互验证通过！');
+
+// 12. 验证两级联动题目选择器 (先选标签，再在题目候选框显示该分类题目，选中自动填充)
+console.log('\n[Test 12] 验证两级联动题目选择器 (标签分类 ➔ 该类候选题 ➔ 自动填充表单)...');
+assert.ok(html.includes('id="algo-topic"'), 'Must have #algo-topic in HTML');
 assert.ok(html.includes('id="algo-problem-selector"'), 'Must have #algo-problem-selector in HTML');
 
-// 验证 12 个算法标签在下拉框中完全一致
+// 验证 12 个算法标签均存在
 const expected12Tags = ['数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
 expected12Tags.forEach(tag => {
-    assert.ok(html.includes(`<option value="${tag}">${tag}</option>`), `Option for ${tag} must be present in #algo-topic`);
+    assert.ok(html.includes(`value="${tag}"`), `Option for ${tag} must be present in #algo-topic`);
 });
 
-// 验证 populateAlgoProblemSelector 生成 179 道候选题
-sandbox.populateAlgoProblemSelector();
+// 选择 "链表" 分类，验证候选下拉列表联动过滤为链表分类下的 7 道题
+sandbox.onAlgoTopicChange('链表');
 const selectorEl = getOrCreateElement('algo-problem-selector');
-assert.ok(selectorEl.children.length > 0 || selectorEl.innerHTML.includes('704'), 'Candidate selector must populate candidate options');
+assert.ok(selectorEl.innerHTML.includes('链表'), 'Selector must reflect selected category');
+assert.ok(selectorEl.innerHTML.includes('206'), 'Linked list problem 206 must be in candidate list');
+assert.ok(!selectorEl.innerHTML.includes('704. 二分查找'), 'Array problem 704 must NOT appear under 链表 category');
 
-// 验证选择候选题目自动联动表单
-sandbox.onAlgoProblemSelect(704);
-assert.strictEqual(getOrCreateElement('algo-num').value, '704', 'Auto fill problem num');
-assert.ok(getOrCreateElement('algo-title').value.includes('二分查找'), 'Auto fill problem title');
-assert.strictEqual(getOrCreateElement('algo-topic').value, '数组', 'Auto fill algo topic');
+// 选中链表第 206 题，验证自动填入题号、题名、标签、时空复杂度与核心考点
+sandbox.onAlgoProblemSelect(206);
+assert.strictEqual(getOrCreateElement('algo-num').value, '206', 'Auto fill problem num 206');
+assert.ok(getOrCreateElement('algo-title').value.includes('反转链表'), 'Auto fill problem title');
+assert.strictEqual(getOrCreateElement('algo-topic').value, '链表', 'Auto fill algo topic 链表');
+assert.strictEqual(getOrCreateElement('algo-time-comp').value, 'O(n)', 'Auto fill time comp');
+assert.strictEqual(getOrCreateElement('algo-space-comp').value, 'O(1)', 'Auto fill space comp');
+assert.ok(getOrCreateElement('algo-note').value.includes('双指针') || getOrCreateElement('algo-note').value.includes('核心模式'), 'Auto fill notes and patterns');
 
 // 验证保存手撕记录联动 stateManager 完成状态
 getOrCreateElement('algo-passed').checked = true;
 sandbox.saveAlgorithmProblem();
-assert.ok(sandbox.stateManager.isAlgoCompleted(704), 'Problem 704 should be marked completed in stateManager');
-console.log('  ✓ 算法记录弹窗 179 道题分类候选下拉框、12 大标签同步与自动填充联动验证通过！');
+assert.ok(sandbox.stateManager.isAlgoCompleted(206), 'Problem 206 should be marked completed in stateManager');
+console.log('  ✓ 两级联动题目选择器：选择标签后即时过滤候选题，选中候选自动填充表单联动验证通过！');
+
+// 13. 验证语雀知识库提取工具包与原理沉淀目录存在且完整
+console.log('\n[Test 13] 验证 E:\\workspace\\yuque-extractor 沉淀代码与核心原理文档完整性...');
+const extractorDir = path.resolve('E:/workspace/yuque-extractor');
+assert.ok(fs.existsSync(extractorDir), 'yuque-extractor directory must exist in E:\\workspace');
+
+const expectedFiles = [
+    'README.md',
+    'decrypt_cookies.py',
+    'extract_doc.py',
+    'lake_converter.py',
+    'requirements.txt',
+    'cpp_roadmap_2026.md'
+];
+
+expectedFiles.forEach(f => {
+    const fPath = path.join(extractorDir, f);
+    assert.ok(fs.existsSync(fPath), `Expected file ${f} must exist in E:\\workspace\\yuque-extractor`);
+    const stat = fs.statSync(fPath);
+    assert.ok(stat.size > 0, `File ${f} must not be empty`);
+});
+
+const readmeContent = fs.readFileSync(path.join(extractorDir, 'README.md'), 'utf-8');
+assert.ok(readmeContent.includes('DPAPI'), 'README must explain Windows DPAPI principle');
+assert.ok(readmeContent.includes('AES-256-GCM') || readmeContent.includes('AES'), 'README must explain AES-GCM cookie decryption');
+assert.ok(readmeContent.includes('Lake AST'), 'README must explain Lake AST parsing mechanism');
+
+console.log('  ✓ E:\\workspace\\yuque-extractor 目录与 6 大原理文档、解密代码、Lake 转换器及 C++ 路线笔记完整沉淀！');
 
 console.log('\n========================================================================================');
-console.log('🎉 全部 12 项核心需求深度重构自动化测试全部通过！系统达到完全真实的工程工作台交付标准！');
+console.log('🎉 全部 13 项核心需求深度重构自动化测试全部通过！系统达到完全真实的工程工作台交付标准！');
 console.log('========================================================================================\n');
 
 

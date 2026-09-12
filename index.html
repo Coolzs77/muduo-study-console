@@ -1159,10 +1159,10 @@
             <!-- 6 大子体系切换标签导航 -->
             <div class="flex items-center gap-2 overflow-x-auto pt-4 pb-1 font-serifMono text-xs" id="learning-subtabs-nav">
                 <button onclick="switchLearningTab('cpp')" id="learn-tab-btn-cpp" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
-                    <i class="fa-solid fa-code text-sky-400"></i> 1. C++ 8维核心
+                    <i class="fa-solid fa-code text-sky-400"></i> 1. C++ 学习路线
                 </button>
                 <button onclick="switchLearningTab('linux')" id="learn-tab-btn-linux" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-terminal text-emerald-600"></i> 2. Linux 9维底座
+                    <i class="fa-solid fa-terminal text-emerald-600"></i> 2. Linux 私房菜底座
                 </button>
                 <button onclick="switchLearningTab('books')" id="learn-tab-btn-books" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
                     <i class="fa-solid fa-book-open text-amber-600"></i> 3. 专业书目伴读
@@ -1179,53 +1179,72 @@
             </div>
         </div>
 
-        <!-- 1. C++ 8维核心体系面板 -->
+        <!-- 1. C++ 学习路线面板 (双栏布局：左侧 1/4 导航，右侧 3/4 内容) -->
         <div id="learn-panel-cpp" class="space-y-6">
-            <!-- 8维卡片流 -->
-            <div id="cpp-dimensions-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- 由 JS 动态渲染 8 大维度卡片 -->
-            </div>
-
-            <!-- 保留经典：C++ 核心机制 ➔ muduo 源码设计映射全景图 (保证 15 映射与 DOM 100% 兼容) -->
-            <div class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
-                <div class="p-5 sm:p-6 bg-stone-50/80 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div>
-                        <h3 class="font-bold text-stone-900 text-base flex items-center gap-2 font-serifHeading">
-                            <i class="fa-solid fa-table-list text-sky-800"></i> C++ 核心机制 ➔ muduo 源码设计映射全景图
-                        </h3>
-                        <p class="text-xs text-stone-500 mt-1">
-                            对应 C++ 关键语法在 muduo 源码中的所在文件、设计思想与代表性代码片段。
-                        </p>
-                    </div>
-                    <span class="text-xs font-serifMono text-stone-400 bg-white px-3 py-1 rounded-lg border border-stone-200 w-fit">
-                        共 15 项核心映射
-                    </span>
+            <div class="flex flex-col lg:flex-row gap-6 items-start">
+                <!-- 左侧 1/4 导航与进度 -->
+                <div class="w-full lg:w-1/4 shrink-0 lg:sticky lg:top-20 space-y-4" id="cpp-nav-sidebar">
+                    <!-- 由 JS 动态渲染进度条、已学统计与章节跳转导航 -->
                 </div>
+                <!-- 右侧 3/4 详细内容 -->
+                <div class="w-full lg:w-3/4 flex-1 space-y-6">
+                    <div id="cpp-content-container" class="space-y-6">
+                        <!-- 由 JS 动态渲染各章节的学习路线、打勾复选框、书目页码与考点 -->
+                    </div>
+                    <div id="cpp-dimensions-container" class="hidden"></div>
 
-                <!-- 响应式表格 -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-stone-100 text-stone-700 font-bold border-b border-stone-200 font-serifMono">
-                                <th class="p-3.5 w-36 sm:w-44">C++ 语法特性</th>
-                                <th class="p-3.5 w-48 sm:w-60">muduo 源码典型位置</th>
-                                <th class="p-3.5 min-w-[260px]">设计思想与“为什么这么写”</th>
-                                <th class="p-3.5 w-64 sm:w-72">代表性代码片段</th>
-                                <th class="p-3.5 w-24 text-center">对应任务</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-stone-100 font-normal text-stone-600 font-serifHeading" id="mapping-table-body">
-                            <!-- 由 JS 动态填充表格 -->
-                        </tbody>
-                    </table>
+                    <!-- 保留经典：C++ 核心机制 ➔ muduo 源码设计映射全景图 (保证 15 映射与 DOM 100% 兼容) -->
+                    <div class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
+                        <div class="p-5 sm:p-6 bg-stone-50/80 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div>
+                                <h3 class="font-bold text-stone-900 text-base flex items-center gap-2 font-serifHeading">
+                                    <i class="fa-solid fa-table-list text-sky-800"></i> C++ 核心机制 ➔ muduo 源码设计映射全景图
+                                </h3>
+                                <p class="text-xs text-stone-500 mt-1">
+                                    对应 C++ 关键语法在 muduo 源码中的所在文件、设计思想与代表性代码片段。
+                                </p>
+                            </div>
+                            <span class="text-xs font-serifMono text-stone-400 bg-white px-3 py-1 rounded-lg border border-stone-200 w-fit">
+                                共 15 项核心映射
+                            </span>
+                        </div>
+
+                        <!-- 响应式表格 -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-stone-100 text-stone-700 font-bold border-b border-stone-200 font-serifMono">
+                                        <th class="p-3.5 w-36 sm:w-44">C++ 语法特性</th>
+                                        <th class="p-3.5 w-48 sm:w-60">muduo 源码典型位置</th>
+                                        <th class="p-3.5 min-w-[260px]">设计思想与“为什么这么写”</th>
+                                        <th class="p-3.5 w-64 sm:w-72">代表性代码片段</th>
+                                        <th class="p-3.5 w-24 text-center">对应任务</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-100 font-normal text-stone-600 font-serifHeading" id="mapping-table-body">
+                                    <!-- 由 JS 动态填充表格 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Linux 9维底层体系面板 -->
+        <!-- 2. Linux 私房菜底座体系面板 (双栏布局：左侧 1/4 导航，右侧 3/4 内容) -->
         <div id="learn-panel-linux" class="hidden space-y-6">
-            <div id="linux-dimensions-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- 由 JS 动态渲染 9 大维度卡片 -->
+            <div class="flex flex-col lg:flex-row gap-6 items-start">
+                <!-- 左侧 1/4 导航与进度 -->
+                <div class="w-full lg:w-1/4 shrink-0 lg:sticky lg:top-20 space-y-4" id="linux-nav-sidebar">
+                    <!-- 由 JS 动态渲染进度条、已学统计与章节跳转导航 -->
+                </div>
+                <!-- 右侧 3/4 详细内容 -->
+                <div class="w-full lg:w-3/4 flex-1 space-y-6">
+                    <div id="linux-content-container" class="space-y-6">
+                        <!-- 由 JS 动态渲染鸟哥私房菜各章节的学习卡片、打勾复选框、书目页码与实战命令 -->
+                    </div>
+                    <div id="linux-dimensions-container" class="hidden"></div>
+                </div>
             </div>
         </div>
 
@@ -2143,13 +2162,35 @@ add_executable(my_server ${SOURCES})</pre>
         </div>
 
         <div class="space-y-3 font-serifMono text-xs">
-            <div>
-                <label class="block text-stone-600 font-bold mb-1">
-                    <i class="fa-solid fa-list-ul text-indigo-600"></i> 从 179 道题库中选择候选（选择后自动填入）
-                </label>
-                <select id="algo-problem-selector" onchange="onAlgoProblemSelect(this.value)" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 text-stone-800 focus:ring-1 focus:ring-indigo-500">
-                    <option value="">-- 手动输入或从 179 道分类题单中选择候选题 --</option>
-                </select>
+            <!-- 两级联动选题：首先选择算法标签，自动过滤出该分类下的候选题 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">
+                        <i class="fa-solid fa-tags text-indigo-600"></i> 1. 算法标签 (选择分类)
+                    </label>
+                    <select id="algo-topic" onchange="onAlgoTopicChange(this.value)" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 text-stone-800 font-bold focus:ring-1 focus:ring-indigo-500">
+                        <option value="数组">数组 (20题)</option>
+                        <option value="链表">链表 (7题)</option>
+                        <option value="哈希表">哈希表 (8题)</option>
+                        <option value="字符串">字符串 (8题)</option>
+                        <option value="双指针法">双指针法 (10题)</option>
+                        <option value="栈与队列">栈与队列 (7题)</option>
+                        <option value="二叉树">二叉树 (33题)</option>
+                        <option value="回溯算法">回溯算法 (14题)</option>
+                        <option value="贪心算法">贪心算法 (18题)</option>
+                        <option value="动态规划">动态规划 (39题)</option>
+                        <option value="单调栈">单调栈 (5题)</option>
+                        <option value="图论">图论 (10题)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">
+                        <i class="fa-solid fa-list-ul text-indigo-600"></i> 2. 候选题目 (从本类选择)
+                    </label>
+                    <select id="algo-problem-selector" onchange="onAlgoProblemSelect(this.value)" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 text-stone-800 font-semibold focus:ring-1 focus:ring-indigo-500">
+                        <option value="">-- 请选择该分类下的候选题 (自动填入) --</option>
+                    </select>
+                </div>
             </div>
 
             <div class="grid grid-cols-3 gap-2">
@@ -2163,24 +2204,7 @@ add_executable(my_server ${SOURCES})</pre>
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2">
-                <div>
-                    <label class="block text-stone-600 font-bold mb-1">算法标签</label>
-                    <select id="algo-topic" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
-                        <option value="数组">数组</option>
-                        <option value="链表">链表</option>
-                        <option value="哈希表">哈希表</option>
-                        <option value="字符串">字符串</option>
-                        <option value="双指针法">双指针法</option>
-                        <option value="栈与队列">栈与队列</option>
-                        <option value="二叉树">二叉树</option>
-                        <option value="回溯算法">回溯算法</option>
-                        <option value="贪心算法">贪心算法</option>
-                        <option value="动态规划">动态规划</option>
-                        <option value="单调栈">单调栈</option>
-                        <option value="图论">图论</option>
-                    </select>
-                </div>
+            <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-stone-600 font-bold mb-1">时间复杂度</label>
                     <input type="text" id="algo-time-comp" placeholder="O(n)" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">

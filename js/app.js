@@ -1592,131 +1592,348 @@ function renderLearningSystem() {
     switchLearningTab(activeTab, false);
 }
 
-// 1. C++ 8维核心体系渲染器
+// 1. C++ 学习路线体系渲染器 - 双栏布局 (1/4 导航与统计 + 3/4 内容大纲)
 function renderLearningCppTab() {
-    const container = document.getElementById('cpp-dimensions-container');
-    if (!container) return;
+    const sidebar = document.getElementById('cpp-nav-sidebar');
+    const content = document.getElementById('cpp-content-container');
+    const legacyContainer = document.getElementById('cpp-dimensions-container');
     const system = (typeof CPP_KNOWLEDGE_SYSTEM !== 'undefined') ? CPP_KNOWLEDGE_SYSTEM : [];
-    
-    container.innerHTML = system.map(dim => {
-        const loop = dim.learnLoop || {};
-        return `
-            <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col justify-between hover:border-sky-300 transition" id="card-${escapeHtml(dim.id)}">
+
+    // 分组章节
+    const chaptersMap = new Map();
+    system.forEach(item => {
+        const cId = item.chapterId || 'cpp_chap_misc';
+        const cTitle = item.chapterTitle || '学习路线模块';
+        if (!chaptersMap.has(cId)) {
+            chaptersMap.set(cId, { id: cId, title: cTitle, items: [] });
+        }
+        chaptersMap.get(cId).items.push(item);
+    });
+
+    const chapters = Array.from(chaptersMap.values());
+    const totalItems = system.length;
+    const learnedCount = (typeof stateManager !== 'undefined' && typeof stateManager.getCppLearnedCount === 'function') 
+        ? stateManager.getCppLearnedCount() 
+        : 0;
+    const percent = totalItems > 0 ? Math.round((learnedCount / totalItems) * 100) : 0;
+
+    // 渲染左侧 1/4 导航
+    if (sidebar) {
+        sidebar.innerHTML = `
+            <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card space-y-4">
                 <div>
-                    <div class="flex items-center justify-between gap-2 mb-2.5">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="px-2.5 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 text-xs font-bold font-serifMono">
-                                ${escapeHtml(dim.dimension)}
-                            </span>
-                            <span class="text-xs font-serifMono text-stone-500 font-medium">
-                                <i class="fa-solid fa-cube text-sky-600"></i> ${escapeHtml(dim.moduleName)}
-                            </span>
-                        </div>
-                        <span class="text-[11px] font-serifMono px-2 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 shrink-0">
-                            Day ${dim.taskDay}
-                        </span>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-[11px] font-serifMono mb-1.5">
+                        <i class="fa-solid fa-code text-sky-600"></i>
+                        <span>C++ 学习路线 (2026)</span>
                     </div>
-
-                    <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-1.5">
-                        ${escapeHtml(dim.title)}
-                    </h4>
-
-                    <p class="text-xs text-stone-600 leading-relaxed font-serifHeading mb-3">
-                        ${escapeHtml(dim.coreConcept)}
+                    <h3 class="text-sm font-bold text-stone-900 font-serifHeading">
+                        知识体系与进度大纲
+                    </h3>
+                    <p class="text-xs text-stone-500 mt-0.5">
+                        严格对齐语雀 8,292 字真实笔记
                     </p>
+                </div>
 
-                    <!-- 5 步路径状态 -->
-                    <div class="bg-stone-50/80 p-3 rounded-xl border border-stone-200/80 space-y-1.5 text-xs font-serifMono mb-3">
-                        <div class="text-[11px] text-stone-500 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
-                            <span><i class="fa-solid fa-list-check text-sky-600"></i> 学习实践路径 (5-Step)</span>
-                            <span class="text-[10px] text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">实践</span>
-                        </div>
-                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-sky-800">Learn:</span> ${escapeHtml(loop.learn || '')}</div>
-                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-emerald-800">Apply:</span> ${escapeHtml(loop.apply || '')}</div>
-                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-amber-800">Build:</span> ${escapeHtml(loop.build || '')}</div>
-                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-purple-800">Explain:</span> ${escapeHtml(loop.explain || '')}</div>
-                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-rose-800">Review:</span> ${escapeHtml(loop.review || '')}</div>
+                <!-- 进度看板 -->
+                <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
+                    <div class="flex items-center justify-between text-xs font-serifMono">
+                        <span class="text-stone-600 font-bold">全景路线已学</span>
+                        <span class="text-sky-700 font-bold">${learnedCount} / ${totalItems} (${percent}%)</span>
                     </div>
-
-                    <!-- 面试考点小视窗 -->
-                    <div class="p-2.5 rounded-lg bg-amber-50/60 border border-amber-200/80 text-xs font-serifHeading text-amber-950 mb-3">
-                        <div class="font-bold font-serifMono text-[11px] text-amber-800 mb-0.5 flex items-center gap-1">
-                            <i class="fa-solid fa-circle-question"></i> 面试真题考点：
-                        </div>
-                        <p class="text-[11px] text-stone-700 leading-relaxed">${escapeHtml(dim.interviewPoint)}</p>
+                    <div class="w-full bg-stone-200 rounded-full h-2 overflow-hidden">
+                        <div class="bg-sky-600 h-2 rounded-full transition-all duration-300" style="width: ${percent}%"></div>
                     </div>
                 </div>
 
-                <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
-                    <span class="text-stone-400 text-[11px] truncate" title="${dim.sourceFile}:${dim.sourceLine}">
-                        <i class="fa-regular fa-file-code text-stone-500"></i> ${escapeHtml(dim.sourceFile)}
-                    </span>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <button onclick="scrollToDay(${dim.taskDay})" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-lg transition text-[11px] cursor-pointer" title="查看对应任务">
-                            Day ${dim.taskDay}
-                        </button>
-                        <button onclick="openCrossLinkModal('${dim.id}')" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition text-[11px] flex items-center gap-1 shadow-xs cursor-pointer">
-                            <i class="fa-solid fa-diagram-project text-[10px]"></i> 关联详情
-                        </button>
-                    </div>
+                <!-- 章节快速跳转索引 -->
+                <div class="space-y-1 font-serifMono text-xs pt-1">
+                    <div class="text-[11px] text-stone-400 font-bold uppercase tracking-wider mb-2">章节大纲速览</div>
+                    ${chapters.map((chap, idx) => {
+                        const chapLearned = chap.items.filter(it => (typeof stateManager !== 'undefined' && typeof stateManager.isCppLearned === 'function') ? stateManager.isCppLearned(it.id) : false).length;
+                        const isAll = chapLearned === chap.items.length && chap.items.length > 0;
+                        return `
+                            <a href="#${chap.id}" class="flex items-center justify-between p-2 rounded-xl hover:bg-sky-50/60 transition text-stone-700 hover:text-sky-800 group text-[11px]">
+                                <span class="truncate pr-1">${idx + 1}. ${escapeHtml(chap.title.replace(/^\d+\.\s*/, ''))}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] shrink-0 font-bold ${isAll ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-500'}">
+                                    ${chapLearned}/${chap.items.length}
+                                </span>
+                            </a>
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
-    }).join('');
+    }
+
+    // 渲染右侧 3/4 详细内容
+    if (content) {
+        content.innerHTML = chapters.map((chap, cIdx) => {
+            const chapLearned = chap.items.filter(it => (typeof stateManager !== 'undefined' && typeof stateManager.isCppLearned === 'function') ? stateManager.isCppLearned(it.id) : false).length;
+            return `
+                <div id="${chap.id}" class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
+                    <div class="p-4 sm:p-5 bg-stone-50/90 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-sky-100 text-sky-800 font-serifMono font-bold flex items-center justify-center text-xs">
+                                    ${cIdx + 1}
+                                </span>
+                                <h3 class="font-bold text-stone-900 text-sm sm:text-base font-serifHeading">
+                                    ${escapeHtml(chap.title)}
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 font-serifMono text-xs">
+                            <span class="px-2.5 py-1 rounded-lg bg-white border border-stone-200 text-stone-600">
+                                章节掌握: <strong class="text-sky-700 font-bold">${chapLearned}/${chap.items.length}</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="divide-y divide-stone-100">
+                        ${chap.items.map(item => {
+                            const isLearned = (typeof stateManager !== 'undefined' && typeof stateManager.isCppLearned === 'function') ? stateManager.isCppLearned(item.id) : false;
+                            return `
+                                <div class="p-4 sm:p-5 transition hover:bg-stone-50/50 ${isLearned ? 'bg-sky-50/20' : ''}" id="card-${escapeHtml(item.id)}">
+                                    <div class="flex items-start gap-3">
+                                        <div class="pt-0.5">
+                                            <input type="checkbox" id="check-${escapeHtml(item.id)}" onchange="toggleCppLearnedStatus('${escapeHtml(item.id)}')" ${isLearned ? 'checked' : ''} class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-stone-300 cursor-pointer">
+                                        </div>
+                                        <div class="flex-1 space-y-2.5">
+                                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <label for="check-${escapeHtml(item.id)}" class="text-sm font-bold font-serifHeading cursor-pointer ${isLearned ? 'line-through text-stone-400' : 'text-stone-900'}">
+                                                        ${escapeHtml(item.title)}
+                                                    </label>
+                                                    <span class="px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 text-xs font-serifMono font-bold shrink-0">
+                                                        <i class="fa-solid fa-book-bookmark text-sky-600"></i> ${escapeHtml(item.bookReference)}
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center gap-2 font-serifMono text-xs shrink-0">
+                                                    <span class="text-stone-500 text-[11px]"><i class="fa-solid fa-cube text-stone-400"></i> ${escapeHtml(item.moduleName || item.cppaiModule)}</span>
+                                                    <button onclick="openCrossLinkModal('${escapeHtml(item.id)}')" class="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold transition text-[11px] cursor-pointer">
+                                                        穿透
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <p class="text-xs text-stone-600 leading-relaxed font-serifHeading">
+                                                ${escapeHtml(item.coreConcept)}
+                                            </p>
+
+                                            <!-- 核心要点清单 -->
+                                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                                ${(item.keyPoints || []).map(pt => `
+                                                    <span class="px-2 py-0.5 rounded bg-stone-100 text-stone-700 text-[11px] font-serifMono border border-stone-200/80">
+                                                        • ${escapeHtml(pt)}
+                                                    </span>
+                                                `).join('')}
+                                            </div>
+
+                                            <!-- 面试考点 -->
+                                            <div class="p-2.5 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs font-serifHeading text-amber-950">
+                                                <span class="font-bold text-amber-800 font-serifMono text-[11px] block mb-0.5">
+                                                    <i class="fa-solid fa-circle-question"></i> 面试真题考点：
+                                                </span>
+                                                <p class="text-[11px] text-stone-700 leading-relaxed">${escapeHtml(item.interviewPoint)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    if (legacyContainer) {
+        legacyContainer.innerHTML = '';
+    }
 
     renderMappingTable();
 }
 
-// 2. Linux 9维底座体系渲染器
+// 2. Linux 私房菜底座体系渲染器 - 双栏布局 (1/4 导航与统计 + 3/4 内容大纲)
 function renderLearningLinuxTab() {
-    const container = document.getElementById('linux-dimensions-container');
-    if (!container) return;
+    const sidebar = document.getElementById('linux-nav-sidebar');
+    const content = document.getElementById('linux-content-container');
+    const legacyContainer = document.getElementById('linux-dimensions-container');
     const list = (typeof LINUX_SYSTEM_KNOWLEDGE !== 'undefined') ? LINUX_SYSTEM_KNOWLEDGE : [];
 
-    container.innerHTML = list.map(item => `
-        <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col justify-between hover:border-emerald-300 transition" id="card-${escapeHtml(item.id)}">
-            <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                    <span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold font-serifMono">
-                        ${escapeHtml(item.dimension)}
-                    </span>
-                    <span class="text-[11px] font-serifMono text-stone-400">
-                        Linux Syscall
-                    </span>
+    // 分组章节
+    const chaptersMap = new Map();
+    list.forEach(item => {
+        const cId = item.chapterId || 'linux_chap_misc';
+        const cTitle = item.chapterTitle || 'Linux 私房菜篇章';
+        if (!chaptersMap.has(cId)) {
+            chaptersMap.set(cId, { id: cId, title: cTitle, items: [] });
+        }
+        chaptersMap.get(cId).items.push(item);
+    });
+
+    const chapters = Array.from(chaptersMap.values());
+    const totalItems = list.length;
+    const learnedCount = (typeof stateManager !== 'undefined' && typeof stateManager.getLinuxLearnedCount === 'function') 
+        ? stateManager.getLinuxLearnedCount() 
+        : 0;
+    const percent = totalItems > 0 ? Math.round((learnedCount / totalItems) * 100) : 0;
+
+    // 渲染左侧 1/4 导航
+    if (sidebar) {
+        sidebar.innerHTML = `
+            <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card space-y-4">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-serifMono mb-1.5">
+                        <i class="fa-solid fa-terminal text-emerald-600"></i>
+                        <span>《鸟哥的Linux私房菜》</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-stone-900 font-serifHeading">
+                        基础学习篇完整底座
+                    </h3>
+                    <p class="text-xs text-stone-500 mt-0.5">
+                        全章节实战与页码对照
+                    </p>
                 </div>
 
-                <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-2">
-                    ${escapeHtml(item.title)}
-                </h4>
-
-                <div class="p-2 bg-stone-900 text-emerald-400 font-serifMono text-[11px] rounded-lg mb-2.5 overflow-x-auto">
-                    <code>${escapeHtml(item.syscallOrCmd)}</code>
+                <!-- 进度看板 -->
+                <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
+                    <div class="flex items-center justify-between text-xs font-serifMono">
+                        <span class="text-stone-600 font-bold">私房菜掌握度</span>
+                        <span class="text-emerald-700 font-bold">${learnedCount} / ${totalItems} (${percent}%)</span>
+                    </div>
+                    <div class="w-full bg-stone-200 rounded-full h-2 overflow-hidden">
+                        <div class="bg-emerald-600 h-2 rounded-full transition-all duration-300" style="width: ${percent}%"></div>
+                    </div>
                 </div>
 
-                <div class="text-xs text-stone-700 mb-2 leading-relaxed font-serifHeading">
-                    <span class="font-bold text-stone-900 font-serifMono text-[11px]">实战场景：</span>
-                    ${escapeHtml(item.projectScene)}
-                </div>
-
-                <div class="p-2.5 bg-stone-50 rounded-lg border border-stone-200 text-xs mb-3 font-serifHeading">
-                    <span class="font-bold text-amber-800 font-serifMono text-[11px] block mb-0.5">
-                        <i class="fa-solid fa-circle-question"></i> 面试考点与排查思路：
-                    </span>
-                    <p class="text-[11px] text-stone-600 leading-relaxed">${escapeHtml(item.interviewPoint)}</p>
+                <!-- 章节快速跳转索引 -->
+                <div class="space-y-1 font-serifMono text-xs pt-1">
+                    <div class="text-[11px] text-stone-400 font-bold uppercase tracking-wider mb-2">篇章目录速览</div>
+                    ${chapters.map((chap, idx) => {
+                        const chapLearned = chap.items.filter(it => (typeof stateManager !== 'undefined' && typeof stateManager.isLinuxLearned === 'function') ? stateManager.isLinuxLearned(it.id) : false).length;
+                        const isAll = chapLearned === chap.items.length && chap.items.length > 0;
+                        return `
+                            <a href="#${chap.id}" class="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50/60 transition text-stone-700 hover:text-emerald-800 group text-[11px]">
+                                <span class="truncate pr-1">${idx + 1}. ${escapeHtml(chap.title)}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] shrink-0 font-bold ${isAll ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-500'}">
+                                    ${chapLearned}/${chap.items.length}
+                                </span>
+                            </a>
+                        `;
+                    }).join('')}
                 </div>
             </div>
+        `;
+    }
 
-            <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
-                <span class="text-[11px] text-stone-500 truncate" title="${escapeHtml(item.sourceLink)}">
-                    <i class="fa-solid fa-link text-stone-400"></i> ${escapeHtml(item.sourceLink)}
-                </span>
-                <button onclick="openCrossLinkModal('${item.id}')" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition text-[11px] flex items-center gap-1 shadow-xs cursor-pointer shrink-0">
-                    <i class="fa-solid fa-diagram-project text-[10px]"></i> 关联详情
-                </button>
-            </div>
-        </div>
-    `).join('');
+    // 渲染右侧 3/4 详细内容
+    if (content) {
+        content.innerHTML = chapters.map((chap, cIdx) => {
+            const chapLearned = chap.items.filter(it => (typeof stateManager !== 'undefined' && typeof stateManager.isLinuxLearned === 'function') ? stateManager.isLinuxLearned(it.id) : false).length;
+            return `
+                <div id="${chap.id}" class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
+                    <div class="p-4 sm:p-5 bg-stone-50/90 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 font-serifMono font-bold flex items-center justify-center text-xs">
+                                    ${cIdx + 1}
+                                </span>
+                                <h3 class="font-bold text-stone-900 text-sm sm:text-base font-serifHeading">
+                                    ${escapeHtml(chap.title)}
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 font-serifMono text-xs">
+                            <span class="px-2.5 py-1 rounded-lg bg-white border border-stone-200 text-stone-600">
+                                掌握度: <strong class="text-emerald-700 font-bold">${chapLearned}/${chap.items.length}</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="divide-y divide-stone-100">
+                        ${chap.items.map(item => {
+                            const isLearned = (typeof stateManager !== 'undefined' && typeof stateManager.isLinuxLearned === 'function') ? stateManager.isLinuxLearned(item.id) : false;
+                            return `
+                                <div class="p-4 sm:p-5 transition hover:bg-stone-50/50 ${isLearned ? 'bg-emerald-50/20' : ''}" id="card-${escapeHtml(item.id)}">
+                                    <div class="flex items-start gap-3">
+                                        <div class="pt-0.5">
+                                            <input type="checkbox" id="check-${escapeHtml(item.id)}" onchange="toggleLinuxLearnedStatus('${escapeHtml(item.id)}')" ${isLearned ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-stone-300 cursor-pointer">
+                                        </div>
+                                        <div class="flex-1 space-y-2.5">
+                                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <label for="check-${escapeHtml(item.id)}" class="text-sm font-bold font-serifHeading cursor-pointer ${isLearned ? 'line-through text-stone-400' : 'text-stone-900'}">
+                                                        ${escapeHtml(item.title)}
+                                                    </label>
+                                                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-serifMono font-bold shrink-0">
+                                                        <i class="fa-solid fa-book-bookmark text-emerald-600"></i> ${escapeHtml(item.bookReference)}
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center gap-2 font-serifMono text-xs shrink-0">
+                                                    <button onclick="openCrossLinkModal('${escapeHtml(item.id)}')" class="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold transition text-[11px] cursor-pointer">
+                                                        关联穿透
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- 核心命令预览 -->
+                                            <div class="p-2 bg-stone-900 text-emerald-400 font-serifMono text-xs rounded-lg overflow-x-auto">
+                                                <code>${escapeHtml(item.syscallOrCmd)}</code>
+                                            </div>
+
+                                            <div class="text-xs text-stone-700 leading-relaxed font-serifHeading">
+                                                <strong class="font-bold text-stone-900 font-serifMono">实战场景：</strong>
+                                                ${escapeHtml(item.projectScene)}
+                                            </div>
+
+                                            <!-- 核心要点清单 -->
+                                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                                ${(item.keyPoints || []).map(pt => `
+                                                    <span class="px-2 py-0.5 rounded bg-stone-100 text-stone-700 text-[11px] font-serifMono border border-stone-200/80">
+                                                        • ${escapeHtml(pt)}
+                                                    </span>
+                                                `).join('')}
+                                            </div>
+
+                                            <!-- 面试考点 -->
+                                            <div class="p-2.5 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs font-serifHeading text-amber-950">
+                                                <span class="font-bold text-amber-800 font-serifMono text-[11px] block mb-0.5">
+                                                    <i class="fa-solid fa-circle-question"></i> 面试考点与排查思路：
+                                                </span>
+                                                <p class="text-[11px] text-stone-700 leading-relaxed">${escapeHtml(item.interviewPoint)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    if (legacyContainer) {
+        legacyContainer.innerHTML = '';
+    }
 }
+
+// C++ / Linux 已学勾选切换处理
+function toggleCppLearnedStatus(itemId) {
+    if (typeof stateManager !== 'undefined' && typeof stateManager.toggleCppLearned === 'function') {
+        stateManager.toggleCppLearned(itemId);
+    }
+    renderLearningCppTab();
+}
+
+function toggleLinuxLearnedStatus(itemId) {
+    if (typeof stateManager !== 'undefined' && typeof stateManager.toggleLinuxLearned === 'function') {
+        stateManager.toggleLinuxLearned(itemId);
+    }
+    renderLearningLinuxTab();
+}
+
 
 // 3. 专业书目伴读伴学体系渲染器
 function renderLearningBooksTab() {
@@ -6298,29 +6515,29 @@ function setRoutineMode(mode) {
     }
 }
 
-// 填充算法弹窗候选题目下拉列表（179 道题按 12 大分类归类）
-function populateAlgoProblemSelector() {
+// 切换算法分类标签时，两级联动更新候选题目下拉列表
+function onAlgoTopicChange(topic) {
     const sel = document.getElementById('algo-problem-selector');
     if (!sel) return;
-    sel.innerHTML = '<option value="">-- 手动输入或从 179 道分类题单中选择候选题 --</option>';
     const catalog = (typeof ALGORITHM_LAB_CATALOG !== 'undefined') ? ALGORITHM_LAB_CATALOG : [];
+    const problems = catalog.filter(p => (p.category === topic || p.topic === topic));
     
-    const categories = ['数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
-    
-    categories.forEach(cat => {
-        const problems = catalog.filter(p => p.category === cat);
-        if (problems.length > 0) {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = `${cat} (${problems.length}题)`;
-            problems.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.num;
-                opt.textContent = `${p.title} [${p.difficulty}]`;
-                optgroup.appendChild(opt);
-            });
-            sel.appendChild(optgroup);
-        }
+    sel.innerHTML = `<option value="">-- 请选择【${escapeHtml(topic || '本类')}】下的候选题目 (${problems.length}题) --</option>`;
+    problems.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.num;
+        opt.textContent = `${p.num}. ${p.title} [${p.difficulty}]`;
+        sel.appendChild(opt);
     });
+}
+
+function populateAlgoProblemSelector(selectedTopic) {
+    const topicEl = document.getElementById('algo-topic');
+    const topic = selectedTopic || (topicEl ? topicEl.value : '数组') || '数组';
+    if (topicEl && !topicEl.value) {
+        topicEl.value = topic;
+    }
+    onAlgoTopicChange(topic);
 }
 
 function onAlgoProblemSelect(val) {
@@ -6333,11 +6550,15 @@ function onAlgoProblemSelect(val) {
     if (numEl) numEl.value = String(problem.num);
 
     const titleEl = document.getElementById('algo-title');
-    if (titleEl) titleEl.value = String(problem.title);
+    if (titleEl) {
+        const rawTitle = String(problem.title || '');
+        const cleanTitle = rawTitle.replace(new RegExp(`^${problem.num}\\.\\s*`), '');
+        titleEl.value = `${problem.num}. ${cleanTitle}`;
+    }
 
     const topicEl = document.getElementById('algo-topic');
-    if (topicEl) {
-        topicEl.value = String(problem.category || problem.topic || '数组');
+    if (topicEl && problem.category) {
+        topicEl.value = String(problem.category);
     }
 
     const timeEl = document.getElementById('algo-time-comp');
@@ -6347,7 +6568,7 @@ function onAlgoProblemSelect(val) {
     if (spaceEl) spaceEl.value = String(problem.spaceComp || 'O(1)');
 
     const noteEl = document.getElementById('algo-note');
-    if (noteEl && (!noteEl.value || String(noteEl.value).trim() === '')) {
+    if (noteEl) {
         let noteParts = [];
         if (problem.pattern) noteParts.push(`【核心模式】${problem.pattern}`);
         if (problem.mistakes) noteParts.push(`【注意要点】${problem.mistakes}`);
@@ -6357,7 +6578,9 @@ function onAlgoProblemSelect(val) {
 
 // 算法记录弹窗
 function openAlgorithmModal() {
-    populateAlgoProblemSelector();
+    const topicEl = document.getElementById('algo-topic');
+    const currentTopic = topicEl?.value || '数组';
+    populateAlgoProblemSelector(currentTopic);
     const sel = document.getElementById('algo-problem-selector');
     if (sel) sel.value = '';
     document.getElementById('algorithm-modal')?.classList.remove('hidden');
@@ -6664,6 +6887,11 @@ if (typeof window !== 'undefined') {
     window.toggleTaskCompleted = toggleTaskCompleted;
     window.setRoutineMode = setRoutineMode;
     window.openAlgorithmModal = openAlgorithmModal;
+    window.populateAlgoProblemSelector = populateAlgoProblemSelector;
+    window.onAlgoTopicChange = onAlgoTopicChange;
+    window.onAlgoProblemSelect = onAlgoProblemSelect;
+    window.toggleCppLearnedStatus = toggleCppLearnedStatus;
+    window.toggleLinuxLearnedStatus = toggleLinuxLearnedStatus;
     window.closeAlgorithmModal = closeAlgorithmModal;
     window.saveAlgorithmProblem = saveAlgorithmProblem;
     window.openBooksModal = openBooksModal;
@@ -6752,6 +6980,11 @@ if (typeof globalThis !== 'undefined') {
     globalThis.toggleTaskCompleted = toggleTaskCompleted;
     globalThis.setRoutineMode = setRoutineMode;
     globalThis.openAlgorithmModal = openAlgorithmModal;
+    globalThis.populateAlgoProblemSelector = populateAlgoProblemSelector;
+    globalThis.onAlgoTopicChange = onAlgoTopicChange;
+    globalThis.onAlgoProblemSelect = onAlgoProblemSelect;
+    globalThis.toggleCppLearnedStatus = toggleCppLearnedStatus;
+    globalThis.toggleLinuxLearnedStatus = toggleLinuxLearnedStatus;
     globalThis.closeAlgorithmModal = closeAlgorithmModal;
     globalThis.saveAlgorithmProblem = saveAlgorithmProblem;
     globalThis.openBooksModal = openBooksModal;
@@ -7650,6 +7883,9 @@ if (typeof globalThis !== 'undefined') {
     globalThis.populateAlgoProblemSelector = populateAlgoProblemSelector;
     globalThis.onAlgoProblemSelect = onAlgoProblemSelect;
     globalThis.openAlgorithmModal = openAlgorithmModal;
+    globalThis.onAlgoTopicChange = onAlgoTopicChange;
+    globalThis.toggleCppLearnedStatus = toggleCppLearnedStatus;
+    globalThis.toggleLinuxLearnedStatus = toggleLinuxLearnedStatus;
     globalThis.closeAlgorithmModal = closeAlgorithmModal;
 }
 
@@ -7673,6 +7909,9 @@ if (typeof module !== 'undefined' && module.exports) {
         populateAlgoProblemSelector,
         onAlgoProblemSelect,
         openAlgorithmModal,
+        onAlgoTopicChange,
+        toggleCppLearnedStatus,
+        toggleLinuxLearnedStatus,
         closeAlgorithmModal,
         saveBooksProgress,
         saveCareerNotes,

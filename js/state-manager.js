@@ -228,6 +228,8 @@
         algoReviewQueue: {}, // { [num]: 'due' | 'mastered' }
         qaMastery: {},       // { [qaId]: boolean }
         completedAlgos: {},  // { [num]: boolean }
+        cppLearned: [],      // [ itemId ]
+        linuxLearned: [],    // [ itemId ]
         bookDynamicGoals: {
           linuxServer: 10,
           birdLinux: 10
@@ -508,6 +510,9 @@
         merged.learningSystem = {
           algoReviewQueue: {},
           qaMastery: {},
+          completedAlgos: {},
+          cppLearned: [],
+          linuxLearned: [],
           bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
           activeTab: 'cpp'
         };
@@ -517,6 +522,15 @@
         }
         if (!merged.learningSystem.qaMastery || typeof merged.learningSystem.qaMastery !== 'object') {
           merged.learningSystem.qaMastery = {};
+        }
+        if (!merged.learningSystem.completedAlgos || typeof merged.learningSystem.completedAlgos !== 'object') {
+          merged.learningSystem.completedAlgos = {};
+        }
+        if (!Array.isArray(merged.learningSystem.cppLearned)) {
+          merged.learningSystem.cppLearned = [];
+        }
+        if (!Array.isArray(merged.learningSystem.linuxLearned)) {
+          merged.learningSystem.linuxLearned = [];
         }
         if (!merged.learningSystem.bookDynamicGoals || typeof merged.learningSystem.bookDynamicGoals !== 'object') {
           merged.learningSystem.bookDynamicGoals = { linuxServer: 10, birdLinux: 10 };
@@ -1097,6 +1111,9 @@
             this._state.learningSystem = {
               algoReviewQueue: {},
               qaMastery: {},
+              completedAlgos: {},
+              cppLearned: [],
+              linuxLearned: [],
               bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
               activeTab: 'cpp'
             };
@@ -1108,6 +1125,17 @@
           }
           if (incLS.qaMastery && typeof incLS.qaMastery === 'object') {
             curLS.qaMastery = Object.assign(curLS.qaMastery || {}, incLS.qaMastery);
+          }
+          if (incLS.completedAlgos && typeof incLS.completedAlgos === 'object') {
+            curLS.completedAlgos = Object.assign(curLS.completedAlgos || {}, incLS.completedAlgos);
+          }
+          if (Array.isArray(incLS.cppLearned)) {
+            const set = new Set([...(curLS.cppLearned || []), ...incLS.cppLearned]);
+            curLS.cppLearned = Array.from(set);
+          }
+          if (Array.isArray(incLS.linuxLearned)) {
+            const set = new Set([...(curLS.linuxLearned || []), ...incLS.linuxLearned]);
+            curLS.linuxLearned = Array.from(set);
           }
           if (incLS.bookDynamicGoals && typeof incLS.bookDynamicGoals === 'object') {
             curLS.bookDynamicGoals = Object.assign(curLS.bookDynamicGoals || {}, incLS.bookDynamicGoals);
@@ -1436,6 +1464,99 @@
       if (!this._state.learningSystem || !this._state.learningSystem.completedAlgos) return 0;
       return Object.values(this._state.learningSystem.completedAlgos).filter(Boolean).length;
     }
+
+    // ==========================================
+    // C++ 学习路线 (2026) 勾选学习状态助手
+    // ==========================================
+    toggleCppLearned(itemId) {
+      if (!this._state.learningSystem) this._state.learningSystem = {};
+      if (!Array.isArray(this._state.learningSystem.cppLearned)) this._state.learningSystem.cppLearned = [];
+      const list = this._state.learningSystem.cppLearned;
+      const idx = list.indexOf(itemId);
+      let learned = false;
+      if (idx > -1) {
+        list.splice(idx, 1);
+        learned = false;
+      } else {
+        list.push(itemId);
+        learned = true;
+      }
+      this.save();
+      this._notify();
+      return learned;
+    }
+
+    setCppLearned(itemId, learned = true) {
+      if (!this._state.learningSystem) this._state.learningSystem = {};
+      if (!Array.isArray(this._state.learningSystem.cppLearned)) this._state.learningSystem.cppLearned = [];
+      const list = this._state.learningSystem.cppLearned;
+      const idx = list.indexOf(itemId);
+      if (learned && idx === -1) {
+        list.push(itemId);
+      } else if (!learned && idx > -1) {
+        list.splice(idx, 1);
+      }
+      this.save();
+      this._notify();
+      return !!learned;
+    }
+
+    isCppLearned(itemId) {
+      if (!this._state.learningSystem || !Array.isArray(this._state.learningSystem.cppLearned)) return false;
+      return this._state.learningSystem.cppLearned.includes(itemId);
+    }
+
+    getCppLearnedCount() {
+      if (!this._state.learningSystem || !Array.isArray(this._state.learningSystem.cppLearned)) return 0;
+      return this._state.learningSystem.cppLearned.length;
+    }
+
+    // ==========================================
+    // Linux 鸟哥私房菜体系 勾选学习状态助手
+    // ==========================================
+    toggleLinuxLearned(itemId) {
+      if (!this._state.learningSystem) this._state.learningSystem = {};
+      if (!Array.isArray(this._state.learningSystem.linuxLearned)) this._state.learningSystem.linuxLearned = [];
+      const list = this._state.learningSystem.linuxLearned;
+      const idx = list.indexOf(itemId);
+      let learned = false;
+      if (idx > -1) {
+        list.splice(idx, 1);
+        learned = false;
+      } else {
+        list.push(itemId);
+        learned = true;
+      }
+      this.save();
+      this._notify();
+      return learned;
+    }
+
+    setLinuxLearned(itemId, learned = true) {
+      if (!this._state.learningSystem) this._state.learningSystem = {};
+      if (!Array.isArray(this._state.learningSystem.linuxLearned)) this._state.learningSystem.linuxLearned = [];
+      const list = this._state.learningSystem.linuxLearned;
+      const idx = list.indexOf(itemId);
+      if (learned && idx === -1) {
+        list.push(itemId);
+      } else if (!learned && idx > -1) {
+        list.splice(idx, 1);
+      }
+      this.save();
+      this._notify();
+      return !!learned;
+    }
+
+    isLinuxLearned(itemId) {
+      if (!this._state.learningSystem || !Array.isArray(this._state.learningSystem.linuxLearned)) return false;
+      return this._state.learningSystem.linuxLearned.includes(itemId);
+    }
+
+    getLinuxLearnedCount() {
+      if (!this._state.learningSystem || !Array.isArray(this._state.learningSystem.linuxLearned)) return 0;
+      return this._state.learningSystem.linuxLearned.length;
+    }
+
 
     // ==========================================
     // V5.1 工程工作日志与项目模块操作助手

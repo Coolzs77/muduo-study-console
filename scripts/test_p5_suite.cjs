@@ -135,60 +135,38 @@ scriptMatches.forEach(rel => {
 });
 console.log('✓ Test 2 Passed: 全量 10 个核心脚本在沙箱环境中顺序初始化无任何异常！\n');
 
-// 3. 验证 C++ 8 维核心体系与 5 步闭环定义
-console.log('[Test 3] 验证 C++ 8 维核心知识体系与 5 步闭环 (Learn→Apply→Build→Explain→Review)...');
+// 3. 验证 C++ 学习路线体系 (对齐语雀《C++学习路线 (2026)》与教材页码)
+console.log('[Test 3] 验证 C++ 学习路线体系 (对齐语雀《C++学习路线 (2026)》与教材页码)...');
 const cppSystem = context.CPP_KNOWLEDGE_SYSTEM;
 assert.ok(Array.isArray(cppSystem), 'CPP_KNOWLEDGE_SYSTEM should be an array');
-assert.strictEqual(cppSystem.length, 8, 'CPP_KNOWLEDGE_SYSTEM should have exactly 8 dimensions');
+assert.ok(cppSystem.length >= 30, 'CPP_KNOWLEDGE_SYSTEM should have at least 30 detailed topics');
 
-const expectedDims = [
-    'Modern C++',
-    'Memory',
-    'STL',
-    'Template',
-    'Smart Pointer',
-    'Move',
-    'Concurrency',
-    'Design Pattern'
-];
-expectedDims.forEach(d => {
-    const found = cppSystem.find(item => item.dimension === d);
-    assert.ok(found, `Dimension ${d} missing from CPP_KNOWLEDGE_SYSTEM`);
-    assert.ok(found.cppaiModule, `${d} must link to CppAIService module`);
-    assert.ok(found.sourceFile, `${d} must link to source file`);
-    assert.ok(found.taskDay >= 1 && found.taskDay <= 28, `${d} must link to task day`);
-    assert.ok(found.interviewPoint, `${d} must have interview point`);
-    assert.ok(found.learnLoop, `${d} must define 5-step learn loop`);
-    assert.ok(found.learnLoop.learn && found.learnLoop.apply && found.learnLoop.build && found.learnLoop.explain && found.learnLoop.review, `${d} must have all 5 loop steps`);
+cppSystem.forEach(item => {
+    assert.ok(item.id, 'Item must have id');
+    assert.ok(item.title, 'Item must have title');
+    assert.ok(item.bookReference, `${item.id} must cite book reference with page`);
+    assert.ok(item.bookReference.includes('P.'), `${item.id} must have exact page number`);
+    assert.ok(item.interviewPoint, `${item.id} must have interview point`);
+    assert.ok(Array.isArray(item.keyPoints) && item.keyPoints.length > 0, `${item.id} must have keyPoints`);
 });
-console.log(`✓ 全部 8 大 C++ 核心维度与 5 步闭环定义完备校验通过！\n`);
+console.log(`✓ 全部 ${cppSystem.length} 个 C++ 学习路线知识点与精确书目页码校验通过！\n`);
 
-// 4. 验证 Linux 9 维底层系统调用与项目映射
-console.log('[Test 4] 验证 Linux 9 维底层体系与真实服务场景结合...');
+// 4. 验证 Linux 鸟哥私房菜体系 (对齐《鸟哥的Linux私房菜-基础篇》章节与教材页码)
+console.log('[Test 4] 验证 Linux 鸟哥私房菜体系 (对齐《鸟哥的Linux私房菜-基础篇》章节与教材页码)...');
 const linuxSystem = context.LINUX_SYSTEM_KNOWLEDGE;
 assert.ok(Array.isArray(linuxSystem), 'LINUX_SYSTEM_KNOWLEDGE should be an array');
-assert.strictEqual(linuxSystem.length, 9, 'LINUX_SYSTEM_KNOWLEDGE should have exactly 9 dimensions');
+assert.ok(linuxSystem.length >= 30, 'LINUX_SYSTEM_KNOWLEDGE should have at least 30 detailed topics');
 
-const expectedLinuxDims = [
-    'Bash',
-    'File System',
-    'Process',
-    'Thread',
-    'Signal',
-    'Socket',
-    'epoll',
-    'gdb',
-    'perf'
-];
-expectedLinuxDims.forEach(d => {
-    const found = linuxSystem.find(item => item.dimension === d);
-    assert.ok(found, `Linux dimension ${d} missing`);
-    assert.ok(found.syscallOrCmd, `${d} must specify syscall or command`);
-    assert.ok(found.projectScene, `${d} must specify real project scene`);
-    assert.ok(found.sourceLink, `${d} must specify source link`);
-    assert.ok(found.interviewPoint, `${d} must specify interview point`);
+linuxSystem.forEach(item => {
+    assert.ok(item.id, 'Item must have id');
+    assert.ok(item.title, 'Item must have title');
+    assert.ok(item.bookReference, `${item.id} must cite book reference`);
+    assert.ok(item.bookReference.includes('P.'), `${item.id} must have exact page number`);
+    assert.ok(item.syscallOrCmd, `${item.id} must have command or syscall`);
+    assert.ok(item.projectScene, `${item.id} must specify project scene`);
+    assert.ok(item.interviewPoint, `${item.id} must specify interview point`);
 });
-console.log(`✓ 全部 9 大 Linux 维度真实项目映射校验通过！\n`);
+console.log(`✓ 全部 ${linuxSystem.length} 个 Linux 鸟哥私房菜知识点与精确书目页码校验通过！\n`);
 
 // 5. 验证两大专业书目伴读伴学与动态配额调配
 console.log('[Test 5] 验证专业书目伴读 (陈硕 muduo + 鸟哥私房菜 Bash) 与动态配额调配...');
@@ -302,7 +280,8 @@ console.log(`✓ 六维全链路穿透构建器与模态框交互验证通过！
 // 10. 验证子标签切换与经典映射表格保持
 console.log('[Test 10] 验证子标签切换 (switchLearningTab) 与 15 项经典映射表格完整保留...');
 context.renderLearningSystem();
-assert.ok(domStore['cpp-dimensions-container'].innerHTML.includes('Modern C++'), 'Cpp tab should render 8 dimensions');
+const cppHtml = (domStore['cpp-content-container'] && domStore['cpp-content-container'].innerHTML) || (domStore['cpp-dimensions-container'] && domStore['cpp-dimensions-container'].innerHTML);
+assert.ok(cppHtml.includes('C++ Primer Plus') || cppHtml.includes('语言基础'), 'Cpp tab should render roadmap with book references');
 
 // 验证旧版 15 项映射保留
 const mappingRows = domStore['mapping-table-body'].innerHTML;
@@ -314,7 +293,8 @@ assert.ok(mappingRows.includes('虚析构函数'), 'mapping table must contain v
 context.switchLearningTab('linux');
 assert.strictEqual(domStore['learn-panel-linux'].classList.contains('hidden'), false);
 assert.strictEqual(domStore['learn-panel-cpp'].classList.contains('hidden'), true);
-assert.ok(domStore['linux-dimensions-container'].innerHTML.includes('epoll'), 'Linux tab should render epoll');
+const linuxHtml = (domStore['linux-content-container'] && domStore['linux-content-container'].innerHTML) || (domStore['linux-dimensions-container'] && domStore['linux-dimensions-container'].innerHTML);
+assert.ok(linuxHtml.includes('鸟哥') || linuxHtml.includes('BASH'), 'Linux tab should render Bird Linux content');
 
 // 切换到 Books 标签
 context.switchLearningTab('books');
