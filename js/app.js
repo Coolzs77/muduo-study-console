@@ -1841,7 +1841,7 @@ function renderLearningAlgoTab() {
         completedMap = appState.learningSystem.completedAlgos || {};
     }
 
-    const categories = ['全部', '数组', '链表', '哈希表', '字符串', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
+    const categories = ['全部', '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
 
     // 过滤
     const filtered = catalog.filter(p => {
@@ -1892,9 +1892,8 @@ function renderLearningAlgoTab() {
                             <span class="text-xs font-serifMono px-2 py-0.5 rounded bg-indigo-50 text-indigo-800 border border-indigo-200 font-semibold">
                                 ${escapeHtml(p.category)}
                             </span>
-                            <a href="${p.leetcodeUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-serifMono font-bold flex items-center gap-1 transition shadow-2xs" title="打开力扣官方题解">
-                                <span>力扣</span>
-                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                            <a href="${p.leetcodeUrl || p.link || '#'}" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 rounded ${p.leetcodeUrl && p.leetcodeUrl.includes('kamacoder') ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border-indigo-200' : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200'} text-xs font-serifMono font-bold flex items-center gap-1 transition shadow-2xs" title="打开官方题解">
+                                <span>${p.leetcodeUrl && p.leetcodeUrl.includes('kamacoder') ? '卡码 ↗' : '力扣 ↗'}</span>
                             </a>
                         </div>
                         <!-- 完成标记勾选框 -->
@@ -2313,28 +2312,29 @@ function adjustBookDailyGoal(bookKey, delta) {
 }
 
 function toggleQAMastery(qaId) {
+    let res = false;
     if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleQAMastery === 'function') {
-        const res = stateManager.toggleQAMastery(qaId);
+        res = stateManager.toggleQAMastery(qaId);
         if (typeof appState !== 'undefined' && appState) {
             if (!appState.learningSystem) appState.learningSystem = {};
             if (!appState.learningSystem.qaMastery) appState.learningSystem.qaMastery = {};
             appState.learningSystem.qaMastery[qaId] = res;
         }
-        renderLearningQATab();
-        if (typeof showToast === 'function') {
-            showToast(res ? `八股考点已标记掌握` : `八股考点设为待巩固`);
-        }
-        return res;
+    } else {
+        if (!appState.learningSystem) appState.learningSystem = {};
+        if (!appState.learningSystem.qaMastery) appState.learningSystem.qaMastery = {};
+        appState.learningSystem.qaMastery[qaId] = !appState.learningSystem.qaMastery[qaId];
+        res = appState.learningSystem.qaMastery[qaId];
+        if (typeof persistState === 'function') persistState();
     }
-    if (!appState.learningSystem) appState.learningSystem = {};
-    if (!appState.learningSystem.qaMastery) appState.learningSystem.qaMastery = {};
-    appState.learningSystem.qaMastery[qaId] = !appState.learningSystem.qaMastery[qaId];
-    persistState();
-    renderLearningQATab();
+    if (typeof renderLearningQATab === 'function') renderLearningQATab();
+    if (typeof loadInterviewQA === 'function' && document.getElementById('quiz-runner-container')) {
+        loadInterviewQA(qaId);
+    }
     if (typeof showToast === 'function') {
-        showToast(appState.learningSystem.qaMastery[qaId] ? `八股考点已标记掌握` : `八股考点设为待巩固`);
+        showToast(res ? `八股考点已标记掌握` : `八股考点设为待巩固`);
     }
-    return appState.learningSystem.qaMastery[qaId];
+    return res;
 }
 
 // ==========================================================================
@@ -4240,23 +4240,6 @@ function loadInterviewQA(qaId) {
     `;
 }
 
-function toggleQAMastery(qaId) {
-    if (!appState.learningSystem) appState.learningSystem = {};
-    if (!appState.learningSystem.qaMastery) appState.learningSystem.qaMastery = {};
-    appState.learningSystem.qaMastery[qaId] = !appState.learningSystem.qaMastery[qaId];
-    if (typeof persistState === 'function') persistState();
-    loadInterviewQA(qaId);
-    if (typeof showToast === 'function') showToast('面试考点掌握状态已更新');
-    return appState.learningSystem.qaMastery[qaId];
-}
-
-function copyTextToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        if (typeof showToast === 'function') showToast('内容已复制到剪贴板');
-    }).catch(() => {
-        alert('复制失败');
-    });
-}
 
 function copyCurrentInterviewAnswer(qaId) {
     const qaList = (typeof PROJECT_QA_CATALOG !== 'undefined') ? PROJECT_QA_CATALOG : [];
@@ -6099,10 +6082,77 @@ function toggleTaskCompleted(taskId) {
 
     persistState();
     renderTaskHub();
+    if (typeof renderTodayTasks === 'function') renderTodayTasks();
+    if (typeof renderHomeWeeklyMetrics === 'function') renderHomeWeeklyMetrics();
     updateDashboardMetrics();
 
     if (typeof showToast === 'function') {
         showToast(task.completed ? `已完成任务「${task.title}」` : `已取消任务「${task.title}」完成状态`, task.completed);
+    }
+}
+
+function openTaskReflectionModal(taskId) {
+    const modal = document.getElementById('modal-task-reflection');
+    if (!modal) return;
+    const routine = ensureDailyRoutineInitialized();
+    const task = (routine && routine.tasks) ? routine.tasks.find(t => t.id === taskId) : null;
+    const titleEl = document.getElementById('reflection-task-title');
+    const idEl = document.getElementById('reflection-task-id');
+    if (idEl) idEl.value = taskId;
+    if (titleEl && task) titleEl.innerText = task.title;
+    modal.classList.remove('hidden');
+}
+
+function closeTaskReflectionModal(skip) {
+    const modal = document.getElementById('modal-task-reflection');
+    if (modal) modal.classList.add('hidden');
+    if (skip) {
+        const idEl = document.getElementById('reflection-task-id');
+        if (idEl && idEl.value) toggleTaskCompleted(idEl.value);
+    }
+}
+
+function submitTaskReflection(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const idEl = document.getElementById('reflection-task-id');
+    const learnedEl = document.getElementById('reflection-learned');
+    const probEl = document.getElementById('reflection-problem');
+    const nextEl = document.getElementById('reflection-next');
+    const createLogEl = document.getElementById('reflection-create-log');
+
+    const taskId = idEl ? idEl.value : '';
+    const learned = learnedEl ? learnedEl.value.trim() : '';
+    const problem = probEl ? probEl.value.trim() : '无';
+    const next = nextEl ? nextEl.value.trim() : '';
+    const createLog = createLogEl ? createLogEl.checked : false;
+
+    if (taskId) {
+        toggleTaskCompleted(taskId);
+        if (createLog && (learned || problem !== '无' || next)) {
+            if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.addWorkLog === 'function') {
+                stateManager.addWorkLog({
+                    project: 'CppAIService',
+                    module: '待办总结',
+                    logType: 'code_feature',
+                    what: `完成任务打卡与反思`,
+                    problem: problem,
+                    solution: '自测通过',
+                    learned: learned,
+                    next: next
+                });
+            }
+        }
+    }
+    closeTaskReflectionModal(false);
+}
+
+function toggleTaskWithReflection(taskId) {
+    const routine = ensureDailyRoutineInitialized();
+    const task = (routine && routine.tasks) ? routine.tasks.find(t => t.id === taskId) : null;
+    if (task && !task.completed) {
+        openTaskReflectionModal(taskId);
+    } else {
+        toggleTaskCompleted(taskId);
     }
 }
 
@@ -6114,10 +6164,12 @@ function setRoutineMode(mode) {
     routine.mode = mode;
     persistState();
     renderTaskHub();
+    if (typeof renderTodayTasks === 'function') renderTodayTasks();
+    if (typeof renderHomeWeeklyMetrics === 'function') renderHomeWeeklyMetrics();
     updateDashboardMetrics();
 
     if (typeof showToast === 'function') {
-        showToast(mode === 'compact' ? '已切换至紧凑保底模式 (3.5h 聚焦主干)' : '已切换至标准全量模式 (6.5h)');
+        showToast(mode === 'compact' ? '已切换至紧凑保底模式 (5.5h 聚焦主干)' : '已切换至标准全量模式 (7.0h)');
     }
 }
 
@@ -6352,6 +6404,8 @@ function saveCustomTask() {
     persistState();
     closeAddTaskModal();
     renderTaskHub();
+    if (typeof renderTodayTasks === 'function') renderTodayTasks();
+    if (typeof renderHomeWeeklyMetrics === 'function') renderHomeWeeklyMetrics();
     updateDashboardMetrics();
 
     if (typeof showToast === 'function') {
@@ -6368,6 +6422,8 @@ function deleteCustomTask(taskId) {
 
     persistState();
     renderTaskHub();
+    if (typeof renderTodayTasks === 'function') renderTodayTasks();
+    if (typeof renderHomeWeeklyMetrics === 'function') renderHomeWeeklyMetrics();
     updateDashboardMetrics();
 
     if (typeof showToast === 'function') {
@@ -6579,8 +6635,8 @@ if (typeof globalThis !== 'undefined') {
 
 
 // ==========================================================================
-// V5.1: 个人工程学习工作台核心驱动模块 (V5.1 Workbench Core)
-// 首页 5 大区域渲染、工程日志流、打卡反思与下一动作驱动、项目模块地图
+// V5.2: 个人工程学习工作台核心驱动模块 (V5.2 Workbench Core)
+// 首页 5 大区域真实数据渲染、工程日志增删流、代码语法高亮查看器
 // ==========================================================================
 
 function renderHomeDashboard() {
@@ -6597,25 +6653,31 @@ function renderTodayTasks() {
     const badge = document.getElementById('today-tasks-badge');
     if (!container) return;
 
+    const routine = (typeof ensureDailyRoutineInitialized === 'function') ? ensureDailyRoutineInitialized() : null;
     let tasks = [];
-    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getUnifiedTasks === 'function') {
-        tasks = stateManager.getUnifiedTasks();
+    if (routine && Array.isArray(routine.tasks)) {
+        tasks = routine.tasks;
     } else if (appState && Array.isArray(appState.unifiedTasks)) {
         tasks = appState.unifiedTasks;
     }
 
-    const totalMinutes = tasks.reduce((acc, t) => acc + (Number(t.estimatedMinutes) || 0), 0);
-    const completedCount = tasks.filter(t => t.completed).length;
+    const mode = (routine && routine.mode) || 'normal';
+    const activeTasks = (typeof TaskDomain !== 'undefined' && typeof TaskDomain.filterTasksByMode === 'function')
+        ? TaskDomain.filterTasksByMode(tasks, mode)
+        : tasks;
+
+    const totalMinutes = activeTasks.reduce((acc, t) => acc + (Number(t.estimatedMinutes) || 0), 0);
+    const completedCount = activeTasks.filter(t => !!t.completed).length;
     const totalHours = (totalMinutes / 60).toFixed(1);
 
     if (badge) {
-        badge.innerText = `预计 ${totalHours}h · ${completedCount}/${tasks.length} 已完成`;
+        badge.innerText = `预计 ${totalHours}h · ${completedCount}/${activeTasks.length} 已完成`;
     }
 
-    if (tasks.length === 0) {
+    if (activeTasks.length === 0) {
         container.innerHTML = `
-            <div class="text-center py-6 text-stone-400 font-serifMono text-xs">
-                今日无待办任务。<button onclick="openQuickAddTaskModal()" class="text-sky-700 underline font-bold ml-1">立即添加</button>
+            <div class="p-6 text-center text-stone-400 font-serifMono text-xs border border-dashed border-stone-200 rounded-xl bg-stone-50/50">
+                今日暂无待办任务。<button onclick="openAddTaskModal()" class="text-sky-700 underline font-bold ml-1 cursor-pointer">立即添加</button>
             </div>
         `;
         return;
@@ -6629,55 +6691,49 @@ function renderTodayTasks() {
     };
 
     const categoryLabels = {
-        project: '项目核心',
+        project: '项目攻坚',
+        algorithm: '手撕算法',
+        book: '专业书目',
+        quiz: '考点自测',
+        reading: '通识阅读',
+        career: '求职前沿',
         muduo: '源码研读',
-        algo: '手撕算法',
         theory: '八股理论',
-        other: '日常杂项'
+        other: '自定义待办'
     };
 
-    container.innerHTML = tasks.map(t => {
+    container.innerHTML = activeTasks.map(t => {
         const pBadge = priorityBadges[t.priority] || priorityBadges.B;
-        const catLabel = categoryLabels[t.category] || '任务';
+        const catLabel = categoryLabels[t.category] || '待办';
         const isDone = Boolean(t.completed);
         const titleClass = isDone ? 'line-through text-stone-400' : 'text-stone-900 font-bold';
         const timeStr = t.estimatedMinutes >= 60 ? `${(t.estimatedMinutes / 60).toFixed(1)}h` : `${t.estimatedMinutes}m`;
-        
-        let reflectionSnippet = '';
-        if (t.reflection && isDone) {
-            const learnedText = typeof escapeHtml === 'function' ? escapeHtml(t.reflection.learned || '') : (t.reflection.learned || '');
-            const nextStepText = typeof escapeHtml === 'function' ? escapeHtml(t.reflection.nextStep || '') : (t.reflection.nextStep || '');
-            reflectionSnippet = `
-                <div class="mt-1.5 pl-5 text-[11px] text-stone-500 border-l-2 border-emerald-400 ml-2 space-y-0.5">
-                    <div><strong class="text-emerald-700">收获：</strong>${learnedText}</div>
-                    ${t.reflection.nextStep ? `<div><strong class="text-indigo-700">下一步：</strong>${nextStepText}</div>` : ''}
-                </div>
-            `;
-        }
-
         const safeTitle = typeof escapeHtml === 'function' ? escapeHtml(t.title) : t.title;
-        const safeRef = t.sourceRef ? (typeof escapeHtml === 'function' ? escapeHtml(t.sourceRef) : t.sourceRef) : '';
+        const safeSubtitle = t.subtitle ? (typeof escapeHtml === 'function' ? escapeHtml(t.subtitle) : t.subtitle) : '';
 
         return `
-            <div class="p-3 rounded-xl border ${isDone ? 'border-stone-200 bg-stone-50/50' : 'border-stone-200 bg-white hover:border-stone-300'} transition flex flex-col gap-1 academic-card">
+            <div class="p-3 rounded-xl border ${isDone ? 'border-stone-200 bg-stone-50/60' : 'border-stone-200 bg-white hover:border-stone-300'} transition flex flex-col gap-1 academic-card">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-start gap-2.5 min-w-0">
-                        <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskWithReflection('${t.id}')" class="mt-1 w-4 h-4 rounded text-sky-700 border-stone-300 cursor-pointer focus:ring-0" id="chk-${t.id}">
+                        <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskCompleted('${t.id}')" class="mt-1 w-4 h-4 rounded text-sky-700 border-stone-300 cursor-pointer focus:ring-0" id="chk-${t.id}">
                         <div class="min-w-0">
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <span class="px-1.5 py-0.2 text-[10px] rounded ${pBadge}">${t.priority} 级</span>
                                 <span class="text-[10px] px-1.5 py-0.2 rounded bg-stone-100 text-stone-600">${catLabel}</span>
                                 <span class="${titleClass} text-xs font-serifHeading">${safeTitle}</span>
                             </div>
-                            ${safeRef ? `<div class="text-[10px] text-stone-400 font-serifMono mt-0.5"><i class="fa-solid fa-code text-stone-400 mr-1"></i>${safeRef}</div>` : ''}
+                            ${safeSubtitle ? `<div class="text-[10px] text-stone-400 font-serifMono mt-0.5">${safeSubtitle}</div>` : ''}
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0 font-serifMono">
                         <span class="text-[11px] text-stone-500 font-bold">${timeStr}</span>
-                        ${!isDone ? `<button onclick="openTaskReflectionModal('${t.id}')" class="px-2 py-0.5 rounded bg-sky-50 hover:bg-sky-100 text-sky-800 text-[10px] font-bold border border-sky-200 transition cursor-pointer">打卡反思</button>` : `<button onclick="openTaskReflectionModal('${t.id}')" class="px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-600 text-[10px] transition cursor-pointer">反思详情</button>`}
+                        ${t.isCustom ? `
+                            <button onclick="deleteCustomTask('${t.id}')" class="text-stone-300 hover:text-rose-600 transition p-0.5 cursor-pointer" title="删除该待办">
+                                <i class="fa-solid fa-trash-can text-[10px]"></i>
+                            </button>
+                        ` : ''}
                     </div>
                 </div>
-                ${reflectionSnippet}
             </div>
         `;
     }).join('');
@@ -6790,13 +6846,15 @@ function renderRecentWorkLogs() {
         logs = appState.workLogs;
     }
 
+    // 彻底排除假数据
+    logs = logs.filter(l => l && !String(l.id).startsWith('log-seed-'));
     const recentLogs = logs.slice(0, 5);
 
     if (recentLogs.length === 0) {
         container.innerHTML = `
             <div class="p-6 text-center text-stone-400 font-serifMono text-xs border border-dashed border-stone-200 rounded-xl bg-stone-50/50">
                 当前暂无工程记录。<br>
-                <span class="text-stone-500 mt-1 inline-block">在实际编写代码、排查 Bug 或进行实验后，点击上方「+ 记工作日志」即可沉淀你的第一条工程实据。</span>
+                <span class="text-stone-500 mt-1 inline-block">在实际编写代码、排查 Bug 或进行实验后，点击上方「+ 记工作日志」即可记录真实手记。</span>
             </div>
         `;
         return;
@@ -6828,7 +6886,12 @@ function renderRecentWorkLogs() {
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${tBadge.class}">${tBadge.label}</span>
                         <span class="font-bold text-xs text-stone-900">${safeProj} · ${safeMod}</span>
                     </div>
-                    <span class="text-[11px] text-stone-400 font-serifMono">${l.date}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] text-stone-400 font-serifMono">${l.date}</span>
+                        <button onclick="handleDeleteWorkLog('${l.id}')" class="text-stone-300 hover:text-rose-600 transition p-1 cursor-pointer" title="删除此条日志">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="text-xs text-stone-700 font-serifHeading leading-relaxed">
                     ${safeWhat}
@@ -6854,41 +6917,98 @@ function renderRecentWorkLogs() {
     }).join('');
 }
 
+function handleDeleteWorkLog(logId) {
+    if (!confirm('确定要删除此条工程工作日志吗？')) return;
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.deleteWorkLog === 'function') {
+        stateManager.deleteWorkLog(logId);
+    } else if (appState && Array.isArray(appState.workLogs)) {
+        appState.workLogs = appState.workLogs.filter(l => l.id !== logId);
+        persistState();
+    }
+    renderRecentWorkLogs();
+    renderHomeWeeklyMetrics();
+    if (typeof showToast === 'function') showToast('已删除工程工作日志');
+}
+
+function handleClearAllWorkLogs() {
+    if (!confirm('确定要清空全部工程工作日志吗？清空后不可恢复。')) return;
+    if (typeof stateManager !== 'undefined' && stateManager) {
+        stateManager.update(s => {
+            s.workLogs = [];
+        }, { save: true, immediate: true });
+    } else if (appState) {
+        appState.workLogs = [];
+        persistState();
+    }
+    renderRecentWorkLogs();
+    renderHomeWeeklyMetrics();
+    if (typeof showToast === 'function') showToast('已清空全部工程工作日志');
+}
+
 function renderHomeWeeklyMetrics() {
     const el = document.getElementById('home-weekly-metrics-grid');
     if (!el) return;
 
-    let s = (typeof stateManager !== 'undefined' && stateManager) ? stateManager.getState() : appState;
-    const evCount = (s && s.careerSystem) ? ((s.careerSystem.evidences || []).length + (s.careerSystem.customEvidences || []).length) : 10;
-    const tasks = (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getUnifiedTasks === 'function') 
-        ? stateManager.getUnifiedTasks() 
-        : (appState && appState.unifiedTasks ? appState.unifiedTasks : []);
-    
-    const completedTasksCount = tasks.filter(t => t.completed).length;
-    const algoCount = (s && s.dailyRoutine && s.dailyRoutine.records && Array.isArray(s.dailyRoutine.records.algorithm))
-        ? s.dailyRoutine.records.algorithm.length
-        : 8;
+    const s = (typeof stateManager !== 'undefined' && stateManager) ? stateManager.getState() : appState;
+    const routine = (typeof ensureDailyRoutineInitialized === 'function') ? ensureDailyRoutineInitialized() : null;
+    const tasks = (routine && Array.isArray(routine.tasks)) ? routine.tasks : [];
+
+    // 1. 真实学习工时：计算今日已完成待办耗时 + 真实 studySessions
+    let completedMinutes = 0;
+    tasks.forEach(t => {
+        if (t.completed) completedMinutes += (Number(t.estimatedMinutes) || 0);
+    });
+    if (s && Array.isArray(s.studySessions)) {
+        s.studySessions.forEach(sess => {
+            if (sess && sess.duration) completedMinutes += Number(sess.duration);
+        });
+    }
+    const realHours = (completedMinutes / 60).toFixed(1);
+
+    // 2. 真实待办完成进度
+    const completedTasksCount = tasks.filter(t => !!t.completed).length;
+    const totalTasksCount = tasks.length;
+
+    // 3. 真实算法题手撕完成数
+    let solvedAlgosCount = 0;
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getCompletedAlgosCount === 'function') {
+        solvedAlgosCount = stateManager.getCompletedAlgosCount();
+    } else if (s && s.learningSystem && s.learningSystem.completedAlgos) {
+        solvedAlgosCount = Object.keys(s.learningSystem.completedAlgos).filter(k => !!s.learningSystem.completedAlgos[k]).length;
+    }
+
+    // 4. 真实 28 天打卡进度
+    const completedDaysCount = (s && Array.isArray(s.completedDays)) ? s.completedDays.length : 0;
+
+    // 5. 真实工程工作日志数量 (杜绝假日志)
+    let logs = [];
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getWorkLogs === 'function') {
+        logs = stateManager.getWorkLogs();
+    } else if (s && Array.isArray(s.workLogs)) {
+        logs = s.workLogs;
+    }
+    const realLogsCount = logs.filter(l => l && !String(l.id).startsWith('log-seed-')).length;
 
     el.innerHTML = `
         <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
-            <span class="text-[10px] text-stone-400 block font-bold">学习总工时</span>
-            <span class="text-sm font-bold text-stone-900">18.5h</span>
+            <span class="text-[10px] text-stone-400 block font-bold">今日完成工时</span>
+            <span class="text-sm font-bold text-stone-900">${realHours}h</span>
         </div>
         <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
-            <span class="text-[10px] text-stone-400 block font-bold">项目工时</span>
-            <span class="text-sm font-bold text-emerald-800">12.0h</span>
+            <span class="text-[10px] text-stone-400 block font-bold">待办任务完成</span>
+            <span class="text-sm font-bold text-emerald-800">${completedTasksCount} / ${totalTasksCount} 项</span>
         </div>
         <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
-            <span class="text-[10px] text-stone-400 block font-bold">算法题数</span>
-            <span class="text-sm font-bold text-indigo-800">${algoCount + 14} 题</span>
+            <span class="text-[10px] text-stone-400 block font-bold">算法手撕完成</span>
+            <span class="text-sm font-bold text-indigo-800">${solvedAlgosCount} / 178 题</span>
         </div>
         <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
-            <span class="text-[10px] text-stone-400 block font-bold">完成任务</span>
-            <span class="text-sm font-bold text-sky-800">${completedTasksCount + 18} 项</span>
+            <span class="text-[10px] text-stone-400 block font-bold">28天路线打卡</span>
+            <span class="text-sm font-bold text-sky-800">${completedDaysCount} / 28 天</span>
         </div>
         <div class="col-span-2 p-2 bg-amber-50/70 rounded-xl border border-amber-200/80 flex items-center justify-between px-3">
-            <span class="text-[11px] text-amber-900 font-bold">真实工程凭据</span>
-            <span class="text-sm font-bold text-amber-800 font-mono">${evCount} 条有效背书</span>
+            <span class="text-[11px] text-amber-900 font-bold">真实工程手记</span>
+            <span class="text-sm font-bold text-amber-800 font-mono">${realLogsCount} 条解决实录</span>
         </div>
     `;
 }
@@ -6958,10 +7078,7 @@ function handleSaveWorkLog(e) {
                 sourceLocation: files[0] || 'src/main.cpp',
                 commitHash: 'working_tree',
                 capabilityTags: [project, module],
-                details: `${what}
-问题: ${problem}
-解决: ${solution}
-收获: ${learned}`,
+                details: `${what}\n问题: ${problem}\n解决: ${solution}\n收获: ${learned}`,
                 verified: true
             });
         }
@@ -6980,138 +7097,8 @@ function handleSaveWorkLog(e) {
     if (typeof showToast === 'function') showToast('工程工作日志已成功保存');
 }
 
-// ==========================================
-// 任务完成反思驱动器 (Next-Action Driver)
-// ==========================================
-
-function toggleTaskWithReflection(taskId) {
-    let tasks = [];
-    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getUnifiedTasks === 'function') {
-        tasks = stateManager.getUnifiedTasks();
-    } else if (appState && Array.isArray(appState.unifiedTasks)) {
-        tasks = appState.unifiedTasks;
-    }
-
-    const t = tasks.find(item => item.id === taskId);
-    if (!t) return;
-
-    if (!t.completed) {
-        // 未完成时触发反思对话框
-        openTaskReflectionModal(taskId);
-    } else {
-        // 已完成时反选直接取消
-        if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleUnifiedTask === 'function') {
-            stateManager.toggleUnifiedTask(taskId);
-        } else {
-            t.completed = false;
-            t.completedAt = null;
-            if (typeof persistState === 'function') persistState();
-        }
-        renderTodayTasks();
-    }
-}
-
-function openTaskReflectionModal(taskId) {
-    const modal = document.getElementById('modal-task-reflection');
-    if (!modal) return;
-
-    let tasks = [];
-    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getUnifiedTasks === 'function') {
-        tasks = stateManager.getUnifiedTasks();
-    } else if (appState && Array.isArray(appState.unifiedTasks)) {
-        tasks = appState.unifiedTasks;
-    }
-
-    const t = tasks.find(item => item.id === taskId);
-    if (!t) return;
-
-    document.getElementById('reflection-task-id').value = taskId;
-    document.getElementById('reflection-task-title').innerText = t.title;
-
-    if (t.reflection) {
-        document.getElementById('reflection-learned').value = t.reflection.learned || '';
-        document.getElementById('reflection-problem').value = t.reflection.problem || '无';
-        document.getElementById('reflection-next').value = t.reflection.nextStep || '';
-    } else {
-        document.getElementById('reflection-learned').value = '';
-        document.getElementById('reflection-problem').value = '无';
-        document.getElementById('reflection-next').value = '';
-    }
-
-    modal.classList.remove('hidden');
-}
-
-function closeTaskReflectionModal(skipReflection) {
-    const modal = document.getElementById('modal-task-reflection');
-    const taskId = document.getElementById('reflection-task-id')?.value;
-    if (skipReflection && taskId) {
-        if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleUnifiedTask === 'function') {
-            stateManager.toggleUnifiedTask(taskId);
-        }
-        renderTodayTasks();
-    }
-    if (modal) modal.classList.add('hidden');
-}
-
-function submitTaskReflection(e) {
-    e.preventDefault();
-    const taskId = document.getElementById('reflection-task-id')?.value;
-    const learned = document.getElementById('reflection-learned')?.value.trim() || '';
-    const problem = document.getElementById('reflection-problem')?.value.trim() || '无';
-    const nextStep = document.getElementById('reflection-next')?.value.trim() || '';
-    const createLog = document.getElementById('reflection-create-log')?.checked;
-
-    const reflectionData = {
-        learned,
-        problem,
-        solution: '反思总结',
-        nextStep
-    };
-
-    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleUnifiedTask === 'function') {
-        const task = stateManager.toggleUnifiedTask(taskId, reflectionData);
-        if (createLog && task) {
-            stateManager.addWorkLog({
-                project: task.category === 'muduo' ? 'muduo' : 'CppAIService',
-                module: task.moduleRef || 'Core',
-                logType: task.category === 'algo' ? 'demo_experiment' : 'code_feature',
-                what: `完成任务: ${task.title}`,
-                problem,
-                solution: '按规范完成并自测通过',
-                learned,
-                next: nextStep,
-                relatedFiles: task.sourceRef ? [task.sourceRef] : []
-            });
-        }
-    }
-
-    closeTaskReflectionModal(false);
-    renderTodayTasks();
-    renderRecentWorkLogs();
-    renderHomeWeeklyMetrics();
-    if (typeof showToast === 'function') showToast('打卡成功，反思心得已沉淀');
-}
-
 function openQuickAddTaskModal() {
-    const title = prompt('请输入今日任务名称:');
-    if (!title || !title.trim()) return;
-
-    const estStr = prompt('预计耗时（分钟，如 60）:', '60');
-    const minutes = parseInt(estStr) || 60;
-
-    const prioStr = prompt('任务优先级 (S:核心项目, A:源码/算法, B:理论复习, C:其他):', 'A');
-    const priority = ['S', 'A', 'B', 'C'].includes(prioStr.toUpperCase()) ? prioStr.toUpperCase() : 'A';
-
-    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.addUnifiedTask === 'function') {
-        stateManager.addUnifiedTask({
-            title: title.trim(),
-            estimatedMinutes: minutes,
-            priority
-        });
-    }
-
-    renderTodayTasks();
-    if (typeof showToast === 'function') showToast('新任务已加入今日列表');
+    openAddTaskModal();
 }
 
 // ==========================================
@@ -7304,7 +7291,19 @@ function openCodeViewerModal(info) {
     
     currentViewerCode = info.code || '';
     if (preEl) {
-        preEl.innerText = currentViewerCode;
+        if (typeof hljs !== 'undefined' && typeof hljs.highlight === 'function') {
+            try {
+                const highlighted = hljs.highlight(currentViewerCode, { language: 'cpp', ignoreIllegals: true });
+                preEl.innerHTML = highlighted.value;
+                preEl.className = 'hljs language-cpp font-mono text-[12px] leading-relaxed';
+            } catch(e) {
+                preEl.textContent = currentViewerCode;
+                preEl.className = 'font-mono text-emerald-300 text-[12px] leading-relaxed';
+            }
+        } else {
+            preEl.textContent = currentViewerCode;
+            preEl.className = 'font-mono text-emerald-300 text-[12px] leading-relaxed';
+        }
     }
 
     modal.classList.remove('hidden');
@@ -7326,8 +7325,7 @@ function copyCurrentViewerCode() {
 
 function handleModuleSourceClick(name, path) {
     const map = (typeof CPPAI_SOURCES_MAP !== 'undefined') ? CPPAI_SOURCES_MAP : {};
-    const code = map[path] || map[name] || `// 文件位置: ${path}
-// 未在内置数据集中找到该文件，请确认本地工程存在。`;
+    const code = map[path] || map[name] || `// 文件位置: ${path}\n// 未在内置数据集中找到该文件，请确认本地工程存在。`;
 
     openCodeViewerModal({
         title: name,
@@ -7357,15 +7355,7 @@ function handleModuleInterviewClick(name) {
 
 function handleModuleTestClick(name, testFile) {
     const map = (typeof CPPAI_SOURCES_MAP !== 'undefined') ? CPPAI_SOURCES_MAP : {};
-    const code = map[testFile] || map[name] || `// 单元测试与 Demo 验证用例: ${testFile}
-// 编译运行命令:
-// ctest -R ${name.replace('.cpp', '')} --output-on-failure
-
-#include <gtest/gtest.h>
-
-TEST(${name.replace('.cpp', '')}Test, BasicAssertion) {
-    EXPECT_TRUE(true);
-}`;
+    const code = map[testFile] || map[name] || `// 单元测试与 Demo 验证用例: ${testFile}\n// 编译运行命令:\n// ctest -R ${name.replace('.cpp', '')} --output-on-failure\n\n#include <gtest/gtest.h>\n\nTEST(${name.replace('.cpp', '')}Test, BasicAssertion) {\n    EXPECT_TRUE(true);\n}`;
 
     openCodeViewerModal({
         title: `${name} 验证用例与 Demo`,
@@ -7375,6 +7365,54 @@ TEST(${name.replace('.cpp', '')}Test, BasicAssertion) {
     });
 }
 
+// 挂载所有新增函数至 window
+if (typeof window !== 'undefined') {
+    window.renderHomeDashboard = renderHomeDashboard;
+    window.renderTodayTasks = renderTodayTasks;
+    window.renderHomeProjectProgress = renderHomeProjectProgress;
+    window.renderHomeMuduoProgress = renderHomeMuduoProgress;
+    window.renderRecentWorkLogs = renderRecentWorkLogs;
+    window.handleDeleteWorkLog = handleDeleteWorkLog;
+    window.handleClearAllWorkLogs = handleClearAllWorkLogs;
+    window.renderHomeWeeklyMetrics = renderHomeWeeklyMetrics;
+    window.openWorkLogModal = openWorkLogModal;
+    window.closeWorkLogModal = closeWorkLogModal;
+    window.handleSaveWorkLog = handleSaveWorkLog;
+    window.openQuickAddTaskModal = openQuickAddTaskModal;
+    window.renderModuleHierarchyMap = renderModuleHierarchyMap;
+    window.toggleArchTopologyCollapse = toggleArchTopologyCollapse;
+    window.handleModuleSourceClick = handleModuleSourceClick;
+    window.handleModuleTaskClick = handleModuleTaskClick;
+    window.handleModuleInterviewClick = handleModuleInterviewClick;
+    window.handleModuleTestClick = handleModuleTestClick;
+    window.openCodeViewerModal = openCodeViewerModal;
+    window.closeCodeViewerModal = closeCodeViewerModal;
+    window.copyCurrentViewerCode = copyCurrentViewerCode;
+}
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.renderHomeDashboard = renderHomeDashboard;
+    globalThis.renderTodayTasks = renderTodayTasks;
+    globalThis.renderHomeProjectProgress = renderHomeProjectProgress;
+    globalThis.renderHomeMuduoProgress = renderHomeMuduoProgress;
+    globalThis.renderRecentWorkLogs = renderRecentWorkLogs;
+    globalThis.handleDeleteWorkLog = handleDeleteWorkLog;
+    globalThis.handleClearAllWorkLogs = handleClearAllWorkLogs;
+    globalThis.renderHomeWeeklyMetrics = renderHomeWeeklyMetrics;
+    globalThis.openWorkLogModal = openWorkLogModal;
+    globalThis.closeWorkLogModal = closeWorkLogModal;
+    globalThis.handleSaveWorkLog = handleSaveWorkLog;
+    globalThis.openQuickAddTaskModal = openQuickAddTaskModal;
+    globalThis.renderModuleHierarchyMap = renderModuleHierarchyMap;
+    globalThis.toggleArchTopologyCollapse = toggleArchTopologyCollapse;
+    globalThis.handleModuleSourceClick = handleModuleSourceClick;
+    globalThis.handleModuleTaskClick = handleModuleTaskClick;
+    globalThis.handleModuleInterviewClick = handleModuleInterviewClick;
+    globalThis.handleModuleTestClick = handleModuleTestClick;
+    globalThis.openCodeViewerModal = openCodeViewerModal;
+    globalThis.closeCodeViewerModal = closeCodeViewerModal;
+    globalThis.copyCurrentViewerCode = copyCurrentViewerCode;
+}
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -7455,6 +7493,8 @@ if (typeof module !== 'undefined' && module.exports) {
         renderHomeMuduoProgress,
         renderRecentWorkLogs,
         renderHomeWeeklyMetrics,
+        handleDeleteWorkLog,
+        handleClearAllWorkLogs,
         openWorkLogModal,
         closeWorkLogModal,
         handleSaveWorkLog,
@@ -7468,7 +7508,10 @@ if (typeof module !== 'undefined' && module.exports) {
         handleModuleSourceClick,
         handleModuleTaskClick,
         handleModuleInterviewClick,
-        handleModuleTestClick
+        handleModuleTestClick,
+        openCodeViewerModal,
+        closeCodeViewerModal,
+        copyCurrentViewerCode
     };
 }
 

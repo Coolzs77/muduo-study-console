@@ -248,16 +248,15 @@
                             </span>
                         </div>
                         <div class="flex items-center gap-2 font-serifMono text-xs">
-                            <button onclick="openQuickAddTaskModal()" class="text-sky-700 hover:text-sky-900 font-semibold cursor-pointer">
+                            <button onclick="openAddTaskModal()" class="text-sky-700 hover:text-sky-900 font-semibold cursor-pointer">
                                 + 添加任务
                             </button>
-                            <span class="text-stone-300">|</span>
-                            </div>
+                        </div>
                     </div>
 
                     <!-- 任务列表容器 -->
                     <div id="today-tasks-container" class="space-y-2.5 font-serifMono">
-                        <!-- JS 渲染 UnifiedTask 列表 -->
+                        <!-- JS 渲染真实待办任务列表 -->
                     </div>
                 </div>
 
@@ -275,7 +274,10 @@
                                 + 记工作日志
                             </button>
                             <span class="text-stone-300">|</span>
-                            </div>
+                            <button onclick="handleClearAllWorkLogs()" class="text-stone-400 hover:text-rose-700 transition cursor-pointer" title="清空全部工程日志">
+                                清空
+                            </button>
+                        </div>
                     </div>
 
                     <!-- 最近 5 条工作日志容器 -->

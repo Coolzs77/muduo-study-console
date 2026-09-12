@@ -606,6 +606,9 @@
       // V5.1: 净化与补齐 workLogs
       if (!Array.isArray(merged.workLogs)) {
         merged.workLogs = getDefaultWorkLogs();
+      } else {
+        // 彻底过滤历史残留的伪造 seed 日志
+        merged.workLogs = merged.workLogs.filter(l => l && !String(l.id).startsWith('log-seed-'));
       }
       // V5.1: 净化与补齐 projectProgress
       if (!merged.projectProgress || typeof merged.projectProgress !== 'object') {
