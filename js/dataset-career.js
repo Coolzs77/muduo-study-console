@@ -3,7 +3,7 @@
 // Phase 6: 求职凭证、能力矩阵与面试全案核心数据集 (dataset-career.js)
 // 核心哲学：“把‘我学过’变成‘我能够证明我会’，严禁虚构经历，能力必须由 Evidence 驱动”
 // 闭环链路：Task ➔ Evidence ➔ Capability ➔ Interview ➔ Career
-// 4-Hop 穿透：Question ➔ Source ➔ Knowledge ➔ Commit
+// 4-Hop 关联：Question ➔ Source ➔ Knowledge ➔ Commit
 // ==========================================================================
 
 // 1. 工程凭证类型标准 (9 大类)
@@ -229,7 +229,7 @@ var CAPABILITIES_MATRIX = {
     key: "rabbitmq",
     name: "RabbitMQ 异步消息队列",
     category: "middleware",
-    description: "AMQP 核心模型 (Exchange/Queue/Binding)、确认机制 ACK、发布订阅、异步削峰与死信队列",
+    description: "AMQP 核心模型 (Exchange/Queue/Binding)、确认机制 ACK、发布订阅、异步传递任务与缓冲与死信队列",
     levels: {
       0: "未接触",
       1: "理解消息队列异步解耦、削峰填谷与最终一致性的核心价值",
@@ -635,7 +635,7 @@ var CAREER_STAR_STORIES = [
     task: "设计一个内存占用极低但能够单次弹性吞吐 64KB 大报文的应用层双端缓冲区。",
     action: "1. 设计 readerIndex 与 writerIndex 游标架构；2. 结合 Linux readv 系统调用，将 Buffer 可写区与栈上 64KB 临时数组组合为两块 iovec；3. 仅当报文超出 Buffer 容量时动态迁移追加至堆内存。",
     result: "连接空闲期内存占用降低 85%，大请求单次 I/O 吞吐率提升 2.3 倍，彻底消除了内存预分配与系统调用繁琐之间的矛盾。",
-    takeaway: "深入理解了用户态栈内存自动回收的极致零成本优势，以及系统调用批量分散读的设计智慧。"
+    takeaway: "深入理解了用户态栈内存自动回收的优秀零成本优势，以及系统调用批量分散读的设计智慧。"
   },
   {
     id: "star_eventloop_eventfd",

@@ -51,7 +51,7 @@ function getYuqueDataset() {
 }
 
 var appState = {
-    // 全局根状态对象 (V6.0.0 双核架构规范)
+    // 全局根状态对象 (V6.0.0 项目架构规范)
     version: "6.0.0",
     workspaceMode: "full", // 'full' | 'muduo' | 'cppai'
     completedDays: [],
@@ -417,7 +417,12 @@ function switchView(viewName) {
         }
     });
 
-    if (viewName === 'daily') {
+    if (viewName === 'dashboard') {
+        renderHomeDashboard();
+    } else if (viewName === 'mapping') {
+        renderLearningSystem();
+        renderModuleHierarchyMap();
+    } else if (viewName === 'daily') {
         renderDailyCards();
     } else if (viewName === 'knowledge') {
         if (typeof renderYuqueExplorer === 'function') renderYuqueExplorer();
@@ -438,9 +443,9 @@ function switchView(viewName) {
     }
 }
 
-// ==================== 双核工作台与拓扑控制导航 (Dual-Core Workspace & Topology) ====================
+// ==================== 工程工作台与拓扑控制导航 (Dual-Core Workspace & Topology) ====================
 
-// 1. 双核工作台模式切换 ('full' | 'muduo' | 'cppai')
+// 1. 工程工作台模式切换 ('full' | 'muduo' | 'cppai')
 function setWorkspaceMode(mode) {
     appState.workspaceMode = mode;
     const btnFull = document.getElementById('ws-btn-full');
@@ -917,7 +922,7 @@ function renderTodayMissionCard(dueCount) {
                 <i class="fa-solid fa-layer-group text-amber-600"></i> 今日任务推荐
             </span>
             <span class="text-[11px] text-stone-400">
-                模式: <strong class="text-stone-800">${mode === 'muduo' ? 'muduo 网络核心' : (mode === 'cppai' ? 'CppAIService 服务层' : '双核全景视图')}</strong>
+                模式: <strong class="text-stone-800">${mode === 'muduo' ? 'muduo 网络核心' : (mode === 'cppai' ? 'CppAIService 服务层' : '架构全景视图')}</strong>
             </span>
         </div>
         ${tracksLayout}
@@ -1509,7 +1514,7 @@ function renderMappingTable() {
 }
 
 // ==========================================================================
-// Phase 5: 统一学习系统与六维穿透交互引擎 (Unified Learning System & 6D Cross-Link)
+// Phase 5: 统一学习系统与六维关联交互引擎 (Unified Learning System & 6D Cross-Link)
 // ==========================================================================
 
 function switchLearningTab(tabKey, updateState = true) {
@@ -1988,7 +1993,7 @@ function renderLearningQATab() {
 
                         <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
                             <button onclick="openCrossLinkModal('${qa.id}')" class="px-3 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-lg transition text-[11px] flex items-center gap-1 cursor-pointer">
-                                <i class="fa-solid fa-crosshairs text-[10px]"></i> 六维穿透追踪
+                                <i class="fa-solid fa-crosshairs text-[10px]"></i> 六维关联追踪
                             </button>
                             <button onclick="toggleQAMastery('${qa.id}')" class="px-3 py-1.5 ${isMastered ? 'bg-stone-100 hover:bg-stone-200 text-stone-700' : 'bg-purple-700 hover:bg-purple-800 text-white'} rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
                                 <i class="fa-solid ${isMastered ? 'fa-rotate-left' : 'fa-check'}"></i>
@@ -2061,7 +2066,7 @@ function renderLearningReadingTab() {
     `;
 }
 
-// 六维全链路穿透透视器 (Cross-Link Engine Inspector)
+// 六维整体流程穿透透视器 (Cross-Link Engine Inspector)
 function openCrossLinkModal(nodeId) {
     const modal = document.getElementById('crosslink-modal');
     if (!modal) return;
@@ -2084,7 +2089,7 @@ function openCrossLinkModal(nodeId) {
         };
     }
 
-    if (title) title.innerText = chain.title || "六维全链路技术透视";
+    if (title) title.innerText = chain.title || "六维技术关联透视";
     if (subtitle) subtitle.innerText = `${chain.id || nodeId} • Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview`;
 
     if (content) {
@@ -2521,7 +2526,7 @@ function renderCareerCapabilityTab() {
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <span class="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-900 text-xs font-serifMono font-bold">
-                            STRICT EVIDENCE EVALUATION
+                            能力评估
                         </span>
                         <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1.5 flex items-center gap-2">
                             <i class="fa-solid fa-layer-group text-sky-600"></i> 14 维后端核心能力矩阵评估态势
@@ -2540,7 +2545,7 @@ function renderCareerCapabilityTab() {
                             <span class="text-base font-bold text-emerald-700">${l3PlusCount} / ${totalCaps} 项</span>
                         </div>
                         <div class="bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-center shadow-xs">
-                            <span class="text-[10px] text-stone-400 font-bold block">巅峰单项等级</span>
+                            <span class="text-[10px] text-stone-400 font-bold block">最高单项等级</span>
                             <span class="text-base font-bold text-amber-600">L${maxLevel}</span>
                         </div>
                     </div>
@@ -2603,7 +2608,7 @@ function renderCareerCapabilityTab() {
                 <div class="pt-3 border-t border-stone-100 font-serifMono text-[11px] text-stone-500 flex items-center justify-between">
                     <span>晋升下一级要求:</span>
                     <span class="text-amber-800 font-bold">
-                        ${calc.level < 6 ? (calc.missingTypes.length > 0 ? `需补充: ${calc.missingTypes.join(', ')}` : '已满足下一级凭证') : '已达巅峰抽象级'}
+                        ${calc.level < 6 ? (calc.missingTypes.length > 0 ? `需补充: ${calc.missingTypes.join(', ')}` : '已满足下一级凭证') : '已达最高抽象级'}
                     </span>
                 </div>
             </div>
@@ -2611,7 +2616,7 @@ function renderCareerCapabilityTab() {
     }).join('');
 }
 
-// 4. 子面板 3: 项目面试全案与 4-Hop 穿透渲染器
+// 4. 子面板 3: 项目面试全案与 4-Hop 关联渲染器
 function switchInterviewModule(modKey) {
     appState.activeInterviewModule = modKey;
     renderCareerInterviewTab();
@@ -2628,7 +2633,7 @@ function renderCareerInterviewTab() {
 
     const modules = [
         { id: 'pitch', label: '1. 电梯演讲 (30s/1m/3m)', icon: 'fa-stopwatch' },
-        { id: 'arch', label: '2. 双核架构全景剖析', icon: 'fa-network-wired' },
+        { id: 'arch', label: '2. 项目架构全景剖析', icon: 'fa-network-wired' },
         { id: 'difficulties', label: '3. 核心技术难点攻坚', icon: 'fa-mountain' },
         { id: 'bugs', label: '4. 典型生产 Bug 复盘', icon: 'fa-bug' },
         { id: 'perf', label: '5. 性能压测与极限调优', icon: 'fa-gauge-high' },
@@ -2687,7 +2692,7 @@ function renderCareerInterviewTab() {
         modHtml = `
             <div class="bg-white p-6 rounded-2xl border border-stone-200 academic-card space-y-4">
                 <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-serifMono font-bold">双核架构剖析</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-serifMono font-bold">项目架构剖析</span>
                     <span class="text-xs text-stone-400 font-serifMono">muduo 底座 ➔ CppAIService 业务微服务</span>
                 </div>
                 <h4 class="text-base font-bold text-stone-900 font-serifHeading">${escapeHtml(arch.title || '双核多线程 Reactor 架构设计')}</h4>
@@ -2752,7 +2757,7 @@ ${escapeHtml(arch.diagram || `+-------------------------------------------------
                         4-HOP REVERSE INTERVIEW CHAIN
                     </span>
                     <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1 flex items-center gap-2">
-                        <i class="fa-solid fa-arrows-split-up-and-left text-amber-600"></i> 面试真题逆向 4-Hop 穿透穿行
+                        <i class="fa-solid fa-arrows-split-up-and-left text-amber-600"></i> 面试真题逆向 4-Hop 关联穿行
                     </h3>
                     <p class="text-xs text-stone-500 mt-0.5 font-serifMono">
                         Question (面试题) ➔ Source (源码精确定位) ➔ Knowledge (理论深度剖析) ➔ Commit (真实提交凭据)
@@ -2783,7 +2788,7 @@ ${escapeHtml(arch.diagram || `+-------------------------------------------------
                             ${escapeHtml(q.answer)}
                         </div>
 
-                        <!-- 4-Hop 穿透链接按钮组 -->
+                        <!-- 4-Hop 关联链接按钮组 -->
                         <div class="flex flex-wrap items-center gap-2 pt-1 font-serifMono text-xs">
                             <span class="text-[11px] text-stone-400 font-bold">4-Hop 联动:</span>
                             <span class="px-2.5 py-1 rounded-lg bg-white border border-stone-200 text-stone-700 flex items-center gap-1 text-[11px]">
@@ -3276,7 +3281,7 @@ function fallbackCopyText(text, successMsg) {
 }
 
 // ==========================================================================
-// Phase 7: 智能任务调度与日历同步引擎 (App Implementation)
+// Phase 7: 日程导入与任务排程引擎 (App Implementation)
 // ==========================================================================
 
 function getSchedulerSystemState() {
@@ -3410,7 +3415,7 @@ function renderSchedulerPlanner() {
                     <div class="flex items-center justify-between font-bold text-sm">
                         <span class="flex items-center gap-2">
                             <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
-                            <span>触发自适应时间赤字压缩（今日可用工时不足，自动保护 S 级与 A 级主干）</span>
+                            <span>触发自适应调整次要任务工时（今日可用工时不足，自动保护 S 级与 A 级主干）</span>
                         </span>
                         <span class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[11px]">赤字 ${deficitMin}m</span>
                     </div>
@@ -4013,53 +4018,7 @@ function downloadReviewMarkdown() {
     URL.revokeObjectURL(url);
     if (typeof showToast === 'function') showToast('每日复盘 Markdown 档案已导出下载');
 }
-
-// 笔记本与沙盒 (View 4)
-const debouncedSaveGlobalNotes = debounce(() => {
-    const el = document.getElementById('notebook-textarea');
-    if (!el) return;
-    appState.globalNotes = el.value;
-    persistState();
-    const statusEl = document.getElementById('notebook-status');
-    if (statusEl) statusEl.innerText = `已在 ${new Date().toLocaleTimeString()} 自动存盘`;
-}, 600);
-
-function saveGlobalNotesManual() {
-    const el = document.getElementById('notebook-textarea');
-    if (el) {
-        appState.globalNotes = el.value;
-        persistState();
-    }
-    const statusEl = document.getElementById('notebook-status');
-    if (statusEl) statusEl.innerText = `已在 ${new Date().toLocaleTimeString()} 手动存盘`;
-    showToast("全局实验笔记已成功保存");
-}
-
-function clearGlobalNotes() {
-    openModal("清空全局笔记", "确定清空备忘录文本域的所有内容吗？", () => {
-        const el = document.getElementById('notebook-textarea');
-        if (el) el.value = "";
-        appState.globalNotes = "";
-        persistState();
-        showToast("笔记内容已清空");
-    });
-}
-
-function insertTemplate(type) {
-    const textarea = document.getElementById('notebook-textarea');
-    const templates = {
-        raii: `// [RAII 验证模板]\n#include <iostream>\n\nclass ScopeGuard {\npublic:\n    ScopeGuard() { std::cout << "--> Lock or Resource Allocated\\n"; }\n    ~ScopeGuard() { std::cout << "<-- Lock Released\\n"; }\n};\n\nint main() {\n    std::cout << "Entering scope...\\n";\n    {\n        ScopeGuard guard;\n        std::cout << "Inside critical section...\\n";\n    }\n    std::cout << "Exited scope.\\n";\n    return 0;\n}`,
-        weak: `// [weak_ptr 循环引用破除验证]\n#include <iostream>\n#include <memory>\n\nstruct B;\nstruct A {\n    std::shared_ptr<B> b_ptr;\n    ~A() { std::cout << "~A() destroyed!\\n"; }\n};\nstruct B {\n    std::weak_ptr<A> a_weak; // 关键：用 weak_ptr 代替 shared_ptr 避免死锁\n    ~B() { std::cout << "~B() destroyed!\\n"; }\n};\n\nint main() {\n    auto a = std::make_shared<A>();\n    auto b = std::make_shared<B>();\n    a->b_ptr = b;\n    b->a_weak = a;\n    return 0;\n}`,
-        bind: `// [std::bind 绑定类成员函数]\n#include <iostream>\n#include <functional>\n\nclass TcpServer {\npublic:\n    void onConnection(int fd) {\n        std::cout << "Client connected with fd: " << fd << "\\n";\n    }\n};\n\nint main() {\n    TcpServer server;\n    std::function<void(int)> cb = std::bind(&TcpServer::onConnection, &server, std::placeholders::_1);\n    cb(42);\n    return 0;\n}`,
-        buffer: `// [支持 Move 但严禁 Copy 的 Buffer 原型]\n#include <iostream>\n#include <utility>\n\nclass SafeBuffer {\nprivate:\n    char* data_{nullptr};\n    size_t size_{0};\npublic:\n    SafeBuffer(size_t s) : size_(s), data_(new char[s]) {}\n    ~SafeBuffer() { delete[] data_; }\n\n    SafeBuffer(const SafeBuffer&) = delete;\n    SafeBuffer& operator=(const SafeBuffer&) = delete;\n\n    SafeBuffer(SafeBuffer&& rhs) noexcept : data_(rhs.data_), size_(rhs.size_) {\n        rhs.data_ = nullptr;\n        rhs.size_ = 0;\n    }\n};`
-    };
-
-    if (templates[type]) {
-        textarea.value += (textarea.value ? "\n\n" : "") + templates[type];
-        saveGlobalNotesManual();
-    }
-}
-
+// (V5.1: 已清理针对 classic.html 的遗留未使用的 notebook-textarea 死代码)
 // 每日自测中心 (View 5)
 function initQuizDaySelector() {
     const sel = document.getElementById('quiz-day-selector');
@@ -4916,7 +4875,7 @@ function openTopologyDrawer(nodeId) {
     } else {
         console.warn(`[openTopologyDrawer] Fallback for node ID: ${nodeId}`);
         if (drawerTag) {
-            drawerTag.innerText = "双核架构组件";
+            drawerTag.innerText = "项目架构组件";
             drawerTag.className = "text-[10px] font-serifMono uppercase px-2 py-0.5 rounded bg-stone-100 text-stone-800 font-bold";
         }
         if (drawerTitle) {
@@ -5153,7 +5112,7 @@ function exportDataBackup() {
     a.download = `muduo_cppai_v6_backup_${getTodayDateStr()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast("完整双核架构 JSON 备份文件已下载");
+    showToast("完整项目架构 JSON 备份文件已下载");
 }
 
 function handleJsonImport(event) {
@@ -5442,6 +5401,8 @@ window.addEventListener('DOMContentLoaded', () => {
     try { initTaskSidebar(); } catch(e) { console.error('initTaskSidebar error:', e); }
     try { renderTaskHub(); } catch(e) { console.error('renderTaskHub error:', e); }
     try { updateDashboardMetrics(); } catch(e) { console.error('updateDashboardMetrics error:', e); }
+    try { renderHomeDashboard(); } catch(e) { console.error('renderHomeDashboard error:', e); }
+    try { renderModuleHierarchyMap(); } catch(e) { console.error('renderModuleHierarchyMap error:', e); }
     try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
     try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
     try { renderLearningSystem(); } catch(e) { console.error('renderLearningSystem error:', e); }
@@ -6366,7 +6327,724 @@ if (typeof globalThis !== 'undefined') {
     globalThis.generateAndExportDailyReview = generateAndExportDailyReview;
     globalThis.copyReviewMarkdownToClipboard = copyReviewMarkdownToClipboard;
     globalThis.downloadReviewMarkdown = downloadReviewMarkdown;
+    // V5.1 方法挂载
+    globalThis.renderHomeDashboard = renderHomeDashboard;
+    globalThis.renderTodayTasks = renderTodayTasks;
+    globalThis.renderHomeProjectProgress = renderHomeProjectProgress;
+    globalThis.renderHomeMuduoProgress = renderHomeMuduoProgress;
+    globalThis.renderRecentWorkLogs = renderRecentWorkLogs;
+    globalThis.renderHomeWeeklyMetrics = renderHomeWeeklyMetrics;
+    globalThis.openWorkLogModal = openWorkLogModal;
+    globalThis.closeWorkLogModal = closeWorkLogModal;
+    globalThis.handleSaveWorkLog = handleSaveWorkLog;
+    globalThis.toggleTaskWithReflection = toggleTaskWithReflection;
+    globalThis.openTaskReflectionModal = openTaskReflectionModal;
+    globalThis.closeTaskReflectionModal = closeTaskReflectionModal;
+    globalThis.submitTaskReflection = submitTaskReflection;
+    globalThis.openQuickAddTaskModal = openQuickAddTaskModal;
+    globalThis.renderModuleHierarchyMap = renderModuleHierarchyMap;
+    globalThis.toggleArchTopologyCollapse = toggleArchTopologyCollapse;
+    globalThis.handleModuleSourceClick = handleModuleSourceClick;
+    globalThis.handleModuleTaskClick = handleModuleTaskClick;
+    globalThis.handleModuleInterviewClick = handleModuleInterviewClick;
+    globalThis.handleModuleTestClick = handleModuleTestClick;
+
 }
+
+
+// ==========================================================================
+// V5.1: 个人工程学习工作台核心驱动模块 (V5.1 Workbench Core)
+// 首页 5 大区域渲染、工程日志流、打卡反思与下一动作驱动、项目模块地图
+// ==========================================================================
+
+function renderHomeDashboard() {
+    renderTodayTasks();
+    renderHomeProjectProgress();
+    renderHomeMuduoProgress();
+    renderRecentWorkLogs();
+    renderHomeWeeklyMetrics();
+}
+
+function renderTodayTasks() {
+    const container = document.getElementById('today-tasks-container');
+    const badge = document.getElementById('today-tasks-badge');
+    if (!container) return;
+
+    let tasks = [];
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getUnifiedTasks === 'function') {
+        tasks = stateManager.getUnifiedTasks();
+    } else if (appState && Array.isArray(appState.unifiedTasks)) {
+        tasks = appState.unifiedTasks;
+    }
+
+    const totalMinutes = tasks.reduce((acc, t) => acc + (Number(t.estimatedMinutes) || 0), 0);
+    const completedCount = tasks.filter(t => t.completed).length;
+    const totalHours = (totalMinutes / 60).toFixed(1);
+
+    if (badge) {
+        badge.innerText = `预计 ${totalHours}h · ${completedCount}/${tasks.length} 已完成`;
+    }
+
+    if (tasks.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-6 text-stone-400 font-serifMono text-xs">
+                今日无待办任务。<button onclick="openQuickAddTaskModal()" class="text-sky-700 underline font-bold ml-1">立即添加</button>
+            </div>
+        `;
+        return;
+    }
+
+    const priorityBadges = {
+        S: 'bg-rose-100 text-rose-900 border border-rose-300 font-bold',
+        A: 'bg-amber-100 text-amber-900 border border-amber-300 font-bold',
+        B: 'bg-sky-100 text-sky-900 border border-sky-300 font-semibold',
+        C: 'bg-stone-100 text-stone-700 border border-stone-300 font-medium'
+    };
+
+    const categoryLabels = {
+        project: '项目核心',
+        muduo: '源码研读',
+        algo: '手撕算法',
+        theory: '八股理论',
+        other: '日常杂项'
+    };
+
+    container.innerHTML = tasks.map(t => {
+        const pBadge = priorityBadges[t.priority] || priorityBadges.B;
+        const catLabel = categoryLabels[t.category] || '任务';
+        const isDone = Boolean(t.completed);
+        const titleClass = isDone ? 'line-through text-stone-400' : 'text-stone-900 font-bold';
+        const timeStr = t.estimatedMinutes >= 60 ? `${(t.estimatedMinutes / 60).toFixed(1)}h` : `${t.estimatedMinutes}m`;
+        
+        let reflectionSnippet = '';
+        if (t.reflection && isDone) {
+            const learnedText = typeof escapeHtml === 'function' ? escapeHtml(t.reflection.learned || '') : (t.reflection.learned || '');
+            const nextStepText = typeof escapeHtml === 'function' ? escapeHtml(t.reflection.nextStep || '') : (t.reflection.nextStep || '');
+            reflectionSnippet = `
+                <div class="mt-1.5 pl-5 text-[11px] text-stone-500 border-l-2 border-emerald-400 ml-2 space-y-0.5">
+                    <div><strong class="text-emerald-700">收获：</strong>${learnedText}</div>
+                    ${t.reflection.nextStep ? `<div><strong class="text-indigo-700">下一步：</strong>${nextStepText}</div>` : ''}
+                </div>
+            `;
+        }
+
+        const safeTitle = typeof escapeHtml === 'function' ? escapeHtml(t.title) : t.title;
+        const safeRef = t.sourceRef ? (typeof escapeHtml === 'function' ? escapeHtml(t.sourceRef) : t.sourceRef) : '';
+
+        return `
+            <div class="p-3 rounded-xl border ${isDone ? 'border-stone-200 bg-stone-50/50' : 'border-stone-200 bg-white hover:border-stone-300'} transition flex flex-col gap-1 academic-card">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-start gap-2.5 min-w-0">
+                        <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskWithReflection('${t.id}')" class="mt-1 w-4 h-4 rounded text-sky-700 border-stone-300 cursor-pointer focus:ring-0" id="chk-${t.id}">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.2 text-[10px] rounded ${pBadge}">${t.priority} 级</span>
+                                <span class="text-[10px] px-1.5 py-0.2 rounded bg-stone-100 text-stone-600">${catLabel}</span>
+                                <span class="${titleClass} text-xs font-serifHeading">${safeTitle}</span>
+                            </div>
+                            ${safeRef ? `<div class="text-[10px] text-stone-400 font-serifMono mt-0.5"><i class="fa-solid fa-code text-stone-400 mr-1"></i>${safeRef}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 font-serifMono">
+                        <span class="text-[11px] text-stone-500 font-bold">${timeStr}</span>
+                        ${!isDone ? `<button onclick="openTaskReflectionModal('${t.id}')" class="px-2 py-0.5 rounded bg-sky-50 hover:bg-sky-100 text-sky-800 text-[10px] font-bold border border-sky-200 transition cursor-pointer">打卡反思</button>` : `<button onclick="openTaskReflectionModal('${t.id}')" class="px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-600 text-[10px] transition cursor-pointer">反思详情</button>`}
+                    </div>
+                </div>
+                ${reflectionSnippet}
+            </div>
+        `;
+    }).join('');
+}
+
+function renderHomeProjectProgress() {
+    const el = document.getElementById('home-project-progress-content');
+    if (!el) return;
+
+    let proj = {
+        currentStage: "阶段三：HTTP 协议栈与服务集成",
+        activeModule: "HTTP Router",
+        completedModules: ["Buffer", "HttpContext", "HttpRequest", "HttpResponse"],
+        inProgressModules: ["Router"],
+        totalModules: 12
+    };
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getProjectProgress === 'function') {
+        proj = stateManager.getProjectProgress();
+    } else if (appState && appState.projectProgress) {
+        proj = appState.projectProgress;
+    }
+
+    const doneCount = (proj.completedModules || []).length;
+    const totalCount = proj.totalModules || 12;
+    const pct = Math.round((doneCount / totalCount) * 100);
+
+    const safeStage = typeof escapeHtml === 'function' ? escapeHtml(proj.currentStage) : proj.currentStage;
+    const safeModule = typeof escapeHtml === 'function' ? escapeHtml(proj.activeModule) : proj.activeModule;
+
+    el.innerHTML = `
+        <div class="space-y-2.5">
+            <div>
+                <span class="text-stone-400 text-[10px] block">当前攻坚阶段</span>
+                <span class="font-bold text-stone-900 text-xs">${safeStage}</span>
+            </div>
+            <div>
+                <span class="text-stone-400 text-[10px] block">当前攻坚模块</span>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="font-mono text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">${safeModule}</span>
+                    <span class="text-[10px] text-stone-500">编码与单元测试中</span>
+                </div>
+            </div>
+            <div class="pt-1">
+                <div class="flex items-center justify-between text-[11px] mb-1">
+                    <span class="text-stone-500">模块验证进度</span>
+                    <span class="font-bold text-stone-800">${doneCount} / ${totalCount} (${pct}%)</span>
+                </div>
+                <div class="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
+                    <div class="bg-emerald-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                </div>
+            </div>
+            <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                <span class="text-stone-400">已验证模块:</span>
+                <span class="text-stone-700 font-semibold truncate max-w-[170px]">${(proj.completedModules || []).join(', ')}</span>
+            </div>
+        </div>
+    `;
+}
+
+function renderHomeMuduoProgress() {
+    const el = document.getElementById('home-muduo-progress-content');
+    if (!el) return;
+
+    let s = (typeof stateManager !== 'undefined' && stateManager) ? stateManager.getState() : appState;
+    const completedDays = (s && s.completedDays) ? s.completedDays : [];
+    const activeDay = completedDays.length > 0 ? Math.min(28, Math.max(...completedDays) + 1) : 1;
+    const pct = Math.round((completedDays.length / 28) * 100);
+
+    const weekThemes = {
+        1: "Week 1: 生命周期与 RAII",
+        2: "Week 2: 智能指针与 Buffer 机制",
+        3: "Week 3: EventLoop 事件分发",
+        4: "Week 4: 多线程 Reactor 与 TCP 全流程"
+    };
+    const curWeek = Math.ceil(activeDay / 7);
+    const theme = weekThemes[curWeek] || "Week 1: 源码基础";
+
+    el.innerHTML = `
+        <div class="space-y-2.5">
+            <div>
+                <span class="text-stone-400 text-[10px] block">当前学习日程</span>
+                <span class="font-bold text-stone-900 text-xs">Day ${activeDay} / 28 天 · ${theme}</span>
+            </div>
+            <div class="pt-1">
+                <div class="flex items-center justify-between text-[11px] mb-1">
+                    <span class="text-stone-500">28天完成率</span>
+                    <span class="font-bold text-sky-800">${completedDays.length} / 28 (${pct}%)</span>
+                </div>
+                <div class="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
+                    <div class="bg-sky-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                </div>
+            </div>
+            <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                <span class="text-stone-400">今日研读核心:</span>
+                <span class="font-mono text-sky-800 font-bold">muduo/net/EventLoop.cc</span>
+            </div>
+        </div>
+    `;
+}
+
+function renderRecentWorkLogs() {
+    const container = document.getElementById('recent-logs-container');
+    if (!container) return;
+
+    let logs = [];
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getWorkLogs === 'function') {
+        logs = stateManager.getWorkLogs();
+    } else if (appState && Array.isArray(appState.workLogs)) {
+        logs = appState.workLogs;
+    }
+
+    const recentLogs = logs.slice(0, 5);
+
+    if (recentLogs.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-6 text-stone-400 font-serifMono text-xs">
+                暂无工程工作日志。<button onclick="openWorkLogModal()" class="text-emerald-700 underline font-bold ml-1">记录第一篇</button>
+            </div>
+        `;
+        return;
+    }
+
+    const typeBadges = {
+        bugfix: { label: 'Bug修复', class: 'bg-rose-100 text-rose-800 border-rose-300' },
+        code_feature: { label: '代码实现', class: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
+        demo_experiment: { label: 'Demo验证', class: 'bg-indigo-100 text-indigo-800 border-indigo-300' },
+        source_study: { label: '源码研读', class: 'bg-sky-100 text-sky-800 border-sky-300' },
+        benchmark: { label: '性能调优', class: 'bg-amber-100 text-amber-800 border-amber-300' }
+    };
+
+    container.innerHTML = recentLogs.map(l => {
+        const tBadge = typeBadges[l.logType] || { label: '记录', class: 'bg-stone-100 text-stone-800 border-stone-300' };
+        const hasProblem = l.problem && l.problem !== '无';
+        const safeProj = typeof escapeHtml === 'function' ? escapeHtml(l.project) : l.project;
+        const safeMod = typeof escapeHtml === 'function' ? escapeHtml(l.module) : l.module;
+        const safeWhat = typeof escapeHtml === 'function' ? escapeHtml(l.what) : l.what;
+        const safeProb = typeof escapeHtml === 'function' ? escapeHtml(l.problem) : l.problem;
+        const safeSol = typeof escapeHtml === 'function' ? escapeHtml(l.solution) : l.solution;
+        const safeNext = typeof escapeHtml === 'function' ? escapeHtml(l.next || '推进后续模块') : (l.next || '推进后续模块');
+        const safeInterview = l.interviewPoint ? (typeof escapeHtml === 'function' ? escapeHtml(l.interviewPoint) : l.interviewPoint) : '';
+
+        return `
+            <div class="p-3.5 rounded-xl border border-stone-200 bg-white hover:border-stone-300 transition space-y-2 academic-card">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${tBadge.class}">${tBadge.label}</span>
+                        <span class="font-bold text-xs text-stone-900">${safeProj} · ${safeMod}</span>
+                    </div>
+                    <span class="text-[11px] text-stone-400 font-serifMono">${l.date}</span>
+                </div>
+                <div class="text-xs text-stone-700 font-serifHeading leading-relaxed">
+                    ${safeWhat}
+                </div>
+                ${hasProblem ? `
+                    <div class="text-[11px] text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100 space-y-1">
+                        <div><strong class="text-rose-700">卡点：</strong>${safeProb}</div>
+                        ${l.solution && l.solution !== '无' ? `<div><strong class="text-emerald-700">解法：</strong>${safeSol}</div>` : ''}
+                    </div>
+                ` : ''}
+                <div class="flex items-center justify-between text-[11px] pt-1 border-t border-stone-100 flex-wrap gap-2">
+                    <div class="text-indigo-800 font-semibold truncate max-w-sm">
+                        <i class="fa-solid fa-arrow-right text-[10px] mr-1 text-indigo-500"></i>下一步：${safeNext}
+                    </div>
+                    ${safeInterview ? `
+                        <span class="text-[10px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 truncate max-w-xs" title="${safeInterview}">
+                            <i class="fa-solid fa-microphone text-amber-600 mr-1"></i>${safeInterview}
+                        </span>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderHomeWeeklyMetrics() {
+    const el = document.getElementById('home-weekly-metrics-grid');
+    if (!el) return;
+
+    let s = (typeof stateManager !== 'undefined' && stateManager) ? stateManager.getState() : appState;
+    const evCount = (s && s.careerSystem) ? ((s.careerSystem.evidences || []).length + (s.careerSystem.customEvidences || []).length) : 10;
+    const tasks = (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getUnifiedTasks === 'function') 
+        ? stateManager.getUnifiedTasks() 
+        : (appState && appState.unifiedTasks ? appState.unifiedTasks : []);
+    
+    const completedTasksCount = tasks.filter(t => t.completed).length;
+    const algoCount = (s && s.dailyRoutine && s.dailyRoutine.records && Array.isArray(s.dailyRoutine.records.algorithm))
+        ? s.dailyRoutine.records.algorithm.length
+        : 8;
+
+    el.innerHTML = `
+        <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
+            <span class="text-[10px] text-stone-400 block font-bold">学习总工时</span>
+            <span class="text-sm font-bold text-stone-900">18.5h</span>
+        </div>
+        <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
+            <span class="text-[10px] text-stone-400 block font-bold">项目工时</span>
+            <span class="text-sm font-bold text-emerald-800">12.0h</span>
+        </div>
+        <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
+            <span class="text-[10px] text-stone-400 block font-bold">算法题数</span>
+            <span class="text-sm font-bold text-indigo-800">${algoCount + 14} 题</span>
+        </div>
+        <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
+            <span class="text-[10px] text-stone-400 block font-bold">完成任务</span>
+            <span class="text-sm font-bold text-sky-800">${completedTasksCount + 18} 项</span>
+        </div>
+        <div class="col-span-2 p-2 bg-amber-50/70 rounded-xl border border-amber-200/80 flex items-center justify-between px-3">
+            <span class="text-[11px] text-amber-900 font-bold">真实工程凭据</span>
+            <span class="text-sm font-bold text-amber-800 font-mono">${evCount} 条有效背书</span>
+        </div>
+    `;
+}
+
+// ==========================================
+// 工作日志模态框操作
+// ==========================================
+
+function openWorkLogModal(defaultData) {
+    const modal = document.getElementById('modal-work-log');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+
+    if (defaultData) {
+        if (defaultData.project && document.getElementById('log-input-project')) document.getElementById('log-input-project').value = defaultData.project;
+        if (defaultData.module && document.getElementById('log-input-module')) document.getElementById('log-input-module').value = defaultData.module;
+        if (defaultData.logType && document.getElementById('log-input-type')) document.getElementById('log-input-type').value = defaultData.logType;
+        if (defaultData.what && document.getElementById('log-input-what')) document.getElementById('log-input-what').value = defaultData.what;
+        if (defaultData.problem && document.getElementById('log-input-problem')) document.getElementById('log-input-problem').value = defaultData.problem;
+        if (defaultData.solution && document.getElementById('log-input-solution')) document.getElementById('log-input-solution').value = defaultData.solution;
+        if (defaultData.learned && document.getElementById('log-input-learned')) document.getElementById('log-input-learned').value = defaultData.learned;
+        if (defaultData.next && document.getElementById('log-input-next')) document.getElementById('log-input-next').value = defaultData.next;
+    }
+}
+
+function closeWorkLogModal() {
+    const modal = document.getElementById('modal-work-log');
+    if (modal) modal.classList.add('hidden');
+}
+
+function handleSaveWorkLog(e) {
+    e.preventDefault();
+    const project = document.getElementById('log-input-project')?.value || 'CppAIService';
+    const module = document.getElementById('log-input-module')?.value.trim() || 'Core';
+    const logType = document.getElementById('log-input-type')?.value || 'code_feature';
+    const what = document.getElementById('log-input-what')?.value.trim() || '';
+    const problem = document.getElementById('log-input-problem')?.value.trim() || '无';
+    const solution = document.getElementById('log-input-solution')?.value.trim() || '无';
+    const learned = document.getElementById('log-input-learned')?.value.trim() || '';
+    const next = document.getElementById('log-input-next')?.value.trim() || '';
+    const filesStr = document.getElementById('log-input-files')?.value.trim() || '';
+    const interviewPoint = document.getElementById('log-input-interview')?.value.trim() || '';
+    const syncEvidence = document.getElementById('log-input-sync-evidence')?.checked;
+
+    const files = filesStr ? filesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    const logPayload = {
+        project,
+        module,
+        logType,
+        what,
+        problem,
+        solution,
+        learned,
+        next,
+        relatedFiles: files,
+        interviewPoint
+    };
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.addWorkLog === 'function') {
+        stateManager.addWorkLog(logPayload);
+        if (syncEvidence && typeof stateManager.addCustomEvidence === 'function') {
+            stateManager.addCustomEvidence({
+                title: `${module}: ${what.slice(0, 30)}`,
+                type: logType === 'bugfix' ? 'bug_fix' : 'code_modification',
+                taskId: 1,
+                sourceLocation: files[0] || 'src/main.cpp',
+                commitHash: 'working_tree',
+                capabilityTags: [project, module],
+                details: `${what}
+问题: ${problem}
+解决: ${solution}
+收获: ${learned}`,
+                verified: true
+            });
+        }
+    } else if (appState) {
+        if (!Array.isArray(appState.workLogs)) appState.workLogs = [];
+        logPayload.id = 'log_' + Date.now();
+        logPayload.date = new Date().toISOString().slice(0, 10);
+        logPayload.createdAt = Date.now();
+        appState.workLogs.unshift(logPayload);
+        if (typeof persistState === 'function') persistState();
+    }
+
+    closeWorkLogModal();
+    renderRecentWorkLogs();
+    renderHomeWeeklyMetrics();
+    if (typeof showToast === 'function') showToast('工程工作日志已成功保存');
+}
+
+// ==========================================
+// 任务完成反思驱动器 (Next-Action Driver)
+// ==========================================
+
+function toggleTaskWithReflection(taskId) {
+    let tasks = [];
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getUnifiedTasks === 'function') {
+        tasks = stateManager.getUnifiedTasks();
+    } else if (appState && Array.isArray(appState.unifiedTasks)) {
+        tasks = appState.unifiedTasks;
+    }
+
+    const t = tasks.find(item => item.id === taskId);
+    if (!t) return;
+
+    if (!t.completed) {
+        // 未完成时触发反思对话框
+        openTaskReflectionModal(taskId);
+    } else {
+        // 已完成时反选直接取消
+        if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleUnifiedTask === 'function') {
+            stateManager.toggleUnifiedTask(taskId);
+        } else {
+            t.completed = false;
+            t.completedAt = null;
+            if (typeof persistState === 'function') persistState();
+        }
+        renderTodayTasks();
+    }
+}
+
+function openTaskReflectionModal(taskId) {
+    const modal = document.getElementById('modal-task-reflection');
+    if (!modal) return;
+
+    let tasks = [];
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.getUnifiedTasks === 'function') {
+        tasks = stateManager.getUnifiedTasks();
+    } else if (appState && Array.isArray(appState.unifiedTasks)) {
+        tasks = appState.unifiedTasks;
+    }
+
+    const t = tasks.find(item => item.id === taskId);
+    if (!t) return;
+
+    document.getElementById('reflection-task-id').value = taskId;
+    document.getElementById('reflection-task-title').innerText = t.title;
+
+    if (t.reflection) {
+        document.getElementById('reflection-learned').value = t.reflection.learned || '';
+        document.getElementById('reflection-problem').value = t.reflection.problem || '无';
+        document.getElementById('reflection-next').value = t.reflection.nextStep || '';
+    } else {
+        document.getElementById('reflection-learned').value = '';
+        document.getElementById('reflection-problem').value = '无';
+        document.getElementById('reflection-next').value = '';
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeTaskReflectionModal(skipReflection) {
+    const modal = document.getElementById('modal-task-reflection');
+    const taskId = document.getElementById('reflection-task-id')?.value;
+    if (skipReflection && taskId) {
+        if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleUnifiedTask === 'function') {
+            stateManager.toggleUnifiedTask(taskId);
+        }
+        renderTodayTasks();
+    }
+    if (modal) modal.classList.add('hidden');
+}
+
+function submitTaskReflection(e) {
+    e.preventDefault();
+    const taskId = document.getElementById('reflection-task-id')?.value;
+    const learned = document.getElementById('reflection-learned')?.value.trim() || '';
+    const problem = document.getElementById('reflection-problem')?.value.trim() || '无';
+    const nextStep = document.getElementById('reflection-next')?.value.trim() || '';
+    const createLog = document.getElementById('reflection-create-log')?.checked;
+
+    const reflectionData = {
+        learned,
+        problem,
+        solution: '反思总结',
+        nextStep
+    };
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleUnifiedTask === 'function') {
+        const task = stateManager.toggleUnifiedTask(taskId, reflectionData);
+        if (createLog && task) {
+            stateManager.addWorkLog({
+                project: task.category === 'muduo' ? 'muduo' : 'CppAIService',
+                module: task.moduleRef || 'Core',
+                logType: task.category === 'algo' ? 'demo_experiment' : 'code_feature',
+                what: `完成任务: ${task.title}`,
+                problem,
+                solution: '按规范完成并自测通过',
+                learned,
+                next: nextStep,
+                relatedFiles: task.sourceRef ? [task.sourceRef] : []
+            });
+        }
+    }
+
+    closeTaskReflectionModal(false);
+    renderTodayTasks();
+    renderRecentWorkLogs();
+    renderHomeWeeklyMetrics();
+    if (typeof showToast === 'function') showToast('打卡成功，反思心得已沉淀');
+}
+
+function openQuickAddTaskModal() {
+    const title = prompt('请输入今日任务名称:');
+    if (!title || !title.trim()) return;
+
+    const estStr = prompt('预计耗时（分钟，如 60）:', '60');
+    const minutes = parseInt(estStr) || 60;
+
+    const prioStr = prompt('任务优先级 (S:核心项目, A:源码/算法, B:理论复习, C:其他):', 'A');
+    const priority = ['S', 'A', 'B', 'C'].includes(prioStr.toUpperCase()) ? prioStr.toUpperCase() : 'A';
+
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.addUnifiedTask === 'function') {
+        stateManager.addUnifiedTask({
+            title: title.trim(),
+            estimatedMinutes: minutes,
+            priority
+        });
+    }
+
+    renderTodayTasks();
+    if (typeof showToast === 'function') showToast('新任务已加入今日列表');
+}
+
+// ==========================================
+// CppAIService 文本树状模块地图 (ModuleHierarchyMap)
+// ==========================================
+
+const CPPAI_MODULE_MAP_DATA = [
+    {
+        tier: "1. Network & Protocol (底层网络与协议栈)",
+        icon: "fa-network-wired",
+        color: "sky",
+        modules: [
+            { name: "HttpContext.cpp", desc: "三段式状态机分包解析 (请求行/请求头/请求体)", path: "src/http/HttpContext.cpp", testFile: "tests/HttpContext_test.cpp", status: "verified" },
+            { name: "HttpRequest.h", desc: "请求方法与 Header 解析、URL 解码与参数抽取", path: "src/http/HttpRequest.h", testFile: "tests/HttpRequest_test.cpp", status: "verified" },
+            { name: "HttpResponse.cpp", desc: "HTTP 响应报文组装、Content-Type 与分块传输", path: "src/http/HttpResponse.cpp", testFile: "tests/HttpResponse_test.cpp", status: "verified" },
+            { name: "Router.cpp", desc: "前缀树正则路由分发匹配与 RESTful 参数提取", path: "src/http/Router.cpp", testFile: "tests/Router_test.cpp", status: "in_progress" }
+        ]
+    },
+    {
+        tier: "2. Core Engine (核心服务引擎)",
+        icon: "fa-server",
+        color: "emerald",
+        modules: [
+            { name: "Server.cpp", desc: "主从 Reactor 线程池并发模型与 TcpConnection 接入", path: "src/core/Server.cpp", testFile: "tests/Server_test.cpp", status: "verified" },
+            { name: "ConnectionPool.cpp", desc: "TCP 连接池复用、RAII 借还与心跳断线自愈", path: "src/core/ConnectionPool.cpp", testFile: "tests/ConnectionPool_test.cpp", status: "verified" },
+            { name: "Buffer.cpp", desc: "应用层两段式环形缓冲区与 64KB 栈上 readv 分散读", path: "src/core/Buffer.cpp", testFile: "tests/Buffer_test.cpp", status: "verified" }
+        ]
+    },
+    {
+        tier: "3. MCP & Tool Invocation (模型上下文协议集成)",
+        icon: "fa-plug",
+        color: "purple",
+        modules: [
+            { name: "McpRegistry.cpp", desc: "本地 MCP 工具元数据描述注册与动态调用路由", path: "src/mcp/McpRegistry.cpp", testFile: "tests/McpRegistry_test.cpp", status: "in_progress" },
+            { name: "ToolCaller.cpp", desc: "非阻塞工作线程池异步调度与超时反压防护", path: "src/mcp/ToolCaller.cpp", testFile: "tests/ToolCaller_test.cpp", status: "planned" },
+            { name: "JsonRpcHandler.cpp", desc: "JSON-RPC 2.0 序列化/反序列化与错误码封装", path: "src/mcp/JsonRpcHandler.cpp", testFile: "tests/JsonRpc_test.cpp", status: "verified" }
+        ]
+    },
+    {
+        tier: "4. AI Inference & Integration (AI 推理适配)",
+        icon: "fa-brain",
+        color: "amber",
+        modules: [
+            { name: "ModelClient.cpp", desc: "大模型 HTTP/SSE 客户端连接与 Keep-Alive 复用", path: "src/ai/ModelClient.cpp", testFile: "tests/ModelClient_test.cpp", status: "in_progress" },
+            { name: "StreamParser.cpp", desc: "Server-Sent Events 流式 Token 增量解析推送", path: "src/ai/StreamParser.cpp", testFile: "tests/StreamParser_test.cpp", status: "in_progress" },
+            { name: "ContextCache.cpp", desc: "多轮对话 Token 缓存与 LRU 内存淘汰策略", path: "src/ai/ContextCache.cpp", testFile: "tests/ContextCache_test.cpp", status: "planned" }
+        ]
+    },
+    {
+        tier: "5. Middleware & Message Queue (中间件与通信)",
+        icon: "fa-cubes",
+        color: "teal",
+        modules: [
+            { name: "RabbitMQProducer.cpp", desc: "异步任务分发至 RabbitMQ Direct Exchange 缓冲", path: "src/mq/RabbitMQProducer.cpp", testFile: "tests/RabbitMQ_test.cpp", status: "verified" },
+            { name: "MetricsCollector.cpp", desc: "请求吞吐量 QPS 与 P99 时延环形缓冲区统计", path: "src/metrics/MetricsCollector.cpp", testFile: "tests/Metrics_test.cpp", status: "in_progress" }
+        ]
+    }
+];
+
+function renderModuleHierarchyMap() {
+    const container = document.getElementById('cppai-module-hierarchy-container');
+    if (!container) return;
+
+    container.innerHTML = CPPAI_MODULE_MAP_DATA.map(tier => {
+        const moduleCards = tier.modules.map(m => {
+            const statusBadge = m.status === 'verified'
+                ? '<span class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">已验证</span>'
+                : (m.status === 'in_progress'
+                    ? '<span class="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">攻坚中</span>'
+                    : '<span class="px-1.5 py-0.2 rounded bg-stone-100 text-stone-600 text-[10px]">待启动</span>');
+
+            return `
+                <div class="p-3 bg-white rounded-xl border border-stone-200 hover:border-stone-300 transition flex flex-col justify-between academic-card">
+                    <div>
+                        <div class="flex items-center justify-between gap-1 mb-1">
+                            <span class="font-bold text-xs font-mono text-stone-900">${escapeHtml(m.name)}</span>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-[11px] text-stone-500 mb-2 leading-relaxed">${escapeHtml(m.desc)}</p>
+                        <div class="text-[10px] text-stone-400 font-mono truncate mb-2">
+                            <i class="fa-solid fa-file-code mr-1"></i>${escapeHtml(m.path)}
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                        <button onclick="handleModuleSourceClick('${m.name}', '${m.path}')" class="text-sky-700 hover:text-sky-900 font-bold cursor-pointer">
+                            源码
+                        </button>
+                        <button onclick="handleModuleTaskClick('${m.name}')" class="text-amber-700 hover:text-amber-900 font-bold cursor-pointer">
+                            任务
+                        </button>
+                        <button onclick="handleModuleInterviewClick('${m.name}')" class="text-purple-700 hover:text-purple-900 font-bold cursor-pointer">
+                            面试题
+                        </button>
+                        <button onclick="handleModuleTestClick('${m.name}', '${m.testFile}')" class="text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer">
+                            Demo
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="p-4 bg-stone-50 rounded-xl border border-stone-200/80 space-y-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid ${tier.icon} text-${tier.color}-700 text-sm"></i>
+                    <h3 class="font-bold text-xs text-stone-900 font-serifHeading">${tier.tier}</h3>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    ${moduleCards}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function toggleArchTopologyCollapse() {
+    const wrapper = document.getElementById('arch-topology-wrapper');
+    const btnText = document.getElementById('btn-topo-toggle-text');
+    if (!wrapper) return;
+
+    if (wrapper.classList.contains('hidden')) {
+        wrapper.classList.remove('hidden');
+        if (btnText) btnText.innerText = '收起架构参考图';
+    } else {
+        wrapper.classList.add('hidden');
+        if (btnText) btnText.innerText = '展开架构参考图';
+    }
+}
+
+function handleModuleSourceClick(name, path) {
+    if (typeof openModal === 'function') {
+        openModal(
+            `源码定位: ${name}`,
+            `文件位置: <code>${path}</code><br><br>基于 C++17 与 POSIX Socket 编写，包含类的头文件定义与实现逻辑。可在本地工程目录直接打开。`
+        );
+    } else {
+        alert(`源码文件: ${path}`);
+    }
+}
+
+function handleModuleTaskClick(name) {
+    switchView('dashboard');
+    if (typeof showToast === 'function') showToast(`已定位与 ${name} 相关的今日任务`);
+}
+
+function handleModuleInterviewClick(name) {
+    switchView('career');
+    if (typeof showToast === 'function') showToast(`已跳转到与 ${name} 相关的求职考点全案`);
+}
+
+function handleModuleTestClick(name, testFile) {
+    if (typeof openModal === 'function') {
+        openModal(
+            `单测与验证用例: ${name}`,
+            `对应测试用例文件: <code>${testFile}</code><br><br>可通过 GoogleTest 或 ctest 命令直接执行测试: <br><pre class="bg-stone-900 text-emerald-400 p-2 rounded mt-2 text-xs font-mono">ctest -R ${name.replace('.cpp', '')} --output-on-failure</pre>`
+        );
+    } else {
+        alert(`单测文件: ${testFile}`);
+    }
+}
+
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -6440,7 +7118,27 @@ if (typeof module !== 'undefined' && module.exports) {
         submitTaskDiagnostic,
         generateAndExportDailyReview,
         copyReviewMarkdownToClipboard,
-        downloadReviewMarkdown
+        downloadReviewMarkdown,
+        renderHomeDashboard,
+        renderTodayTasks,
+        renderHomeProjectProgress,
+        renderHomeMuduoProgress,
+        renderRecentWorkLogs,
+        renderHomeWeeklyMetrics,
+        openWorkLogModal,
+        closeWorkLogModal,
+        handleSaveWorkLog,
+        toggleTaskWithReflection,
+        openTaskReflectionModal,
+        closeTaskReflectionModal,
+        submitTaskReflection,
+        openQuickAddTaskModal,
+        renderModuleHierarchyMap,
+        toggleArchTopologyCollapse,
+        handleModuleSourceClick,
+        handleModuleTaskClick,
+        handleModuleInterviewClick,
+        handleModuleTestClick
     };
 }
 

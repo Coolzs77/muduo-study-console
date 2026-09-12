@@ -116,6 +116,119 @@
     };
   }
 
+  // 工具函数：获取默认工程工作日志
+  function getDefaultWorkLogs() {
+    return [
+      {
+        id: "log-seed-1",
+        date: getTodayDateStr(),
+        project: "CppAIService",
+        module: "HTTP Router",
+        logType: "bugfix",
+        what: "排查并修复 Router 正则路由匹配失效缺陷，补全参数抽取单元测试",
+        problem: "部分带有路径参数（如 /api/v1/model/:name）的 URL 命中失败，前缀匹配截断位置偏差。",
+        solution: "重构 Router.cpp 中的参数占位符切分状态机，修正分隔符判断，新增 4 组单元测试验证边界。",
+        learned: "HTTP 路由树前缀匹配必须严格在路径分隔符 '/' 处切分 token，避免子串误匹配。",
+        next: "实现中间件拦截器链 (Middleware Chain) 机制。",
+        relatedFiles: ["src/http/Router.cpp", "tests/Router_test.cpp"],
+        interviewPoint: "能清晰解释 HTTP 路由前缀树匹配原理与路径参数抽取的边界条件处理",
+        createdAt: Date.now() - 3600000 * 2
+      },
+      {
+        id: "log-seed-2",
+        date: "2026-09-11",
+        project: "CppAIService",
+        module: "HttpContext",
+        logType: "code_feature",
+        what: "重构 HttpContext 状态机解析器，实现请求行与请求头分段解析",
+        problem: "非阻塞 socket 读取时容易遇到分包与粘包，半包状态下状态机需要安全保存未决上下文。",
+        solution: "基于 muduo Buffer 的 readIndex/writeIndex 机制，在 HttpContext 中维护状态迁移枚举 (ExpectRequestLine -> ExpectHeaders -> ExpectBody -> GotAll)。",
+        learned: "网络库协议解析不能假定一次 read 读满完整包，状态机必须具备幂等可重入特征。",
+        next: "完成 HttpContext 单元测试并接入 EchoServer 进行压测验证。",
+        relatedFiles: ["src/http/HttpContext.cpp", "src/http/HttpRequest.h"],
+        interviewPoint: "能独立推演非阻塞 I/O 下 HTTP 协议状态机解析与粘包/半包恢复流程",
+        createdAt: Date.now() - 3600000 * 24
+      },
+      {
+        id: "log-seed-3",
+        date: "2026-09-10",
+        project: "muduo",
+        module: "EventLoop",
+        logType: "source_study",
+        what: "精读 EventLoop.cc 与 Channel.cc 源码，梳理事件循环唤醒机制",
+        problem: "在其他线程向 EventLoop 投递任务 (queueInLoop) 时，如何安全唤醒正在 poll 阻塞的事件循环？",
+        solution: "muduo 使用 eventfd (Linux 原生轻量计数器) 创建 wakeupChannel，在 queueInLoop 中写入 8 字节 uint64_t 触发 EPOLLIN 唤醒。",
+        learned: "eventfd 相比 pipe 仅需单 fd，无锁唤醒系统开销更小。",
+        next: "动手编写基于 eventfd 的跨线程任务队列 Demo 进行时延测试。",
+        relatedFiles: ["muduo/net/EventLoop.cc", "muduo/net/Channel.cc"],
+        interviewPoint: "能深入对比 eventfd 与 socketpair/pipe 在 Reactor 跨线程唤醒中的开销差异",
+        createdAt: Date.now() - 3600000 * 48
+      }
+    ];
+  }
+
+  // 工具函数：获取默认统一今日任务
+  function getDefaultUnifiedTasks() {
+    return [
+      {
+        id: "task-today-1",
+        title: "实现 HttpContext 状态机解析与单测",
+        priority: "S",
+        category: "project",
+        estimatedMinutes: 150,
+        moduleRef: "CppAIService::HTTP::HttpContext",
+        sourceRef: "src/http/HttpContext.cpp",
+        completed: false,
+        completedAt: null,
+        reflection: null,
+        source: "system_preset",
+        date: getTodayDateStr()
+      },
+      {
+        id: "task-today-2",
+        title: "研读 muduo EventLoop 事件分发流程",
+        priority: "A",
+        category: "muduo",
+        estimatedMinutes: 60,
+        moduleRef: "muduo::EventLoop",
+        sourceRef: "muduo/net/EventLoop.cc",
+        completed: false,
+        completedAt: null,
+        reflection: null,
+        source: "system_preset",
+        date: getTodayDateStr()
+      },
+      {
+        id: "task-today-3",
+        title: "LeetCode 207: 课程表 (拓扑排序与环检测)",
+        priority: "A",
+        category: "algo",
+        estimatedMinutes: 60,
+        moduleRef: "算法::图论",
+        sourceRef: "tests/algo_toposort_test.cpp",
+        completed: false,
+        completedAt: null,
+        reflection: null,
+        source: "system_preset",
+        date: getTodayDateStr()
+      },
+      {
+        id: "task-today-4",
+        title: "整理 Reactor 与 Proactor 核心对比",
+        priority: "B",
+        category: "theory",
+        estimatedMinutes: 60,
+        moduleRef: "八股::网络模型",
+        sourceRef: "docs/Reactor_vs_Proactor.md",
+        completed: false,
+        completedAt: null,
+        reflection: null,
+        source: "system_preset",
+        date: getTodayDateStr()
+      }
+    ];
+  }
+
   // 构建默认的纯净领域状态原型
   function createDefaultState() {
     return {
@@ -198,6 +311,17 @@
         dailyReviews: {},           // { [date]: { date, totalFocusedMinutes, completedCount, incompleteCount, evidenceCount, markdownReport } }
         activeSchedulerTab: 'planner' // 'planner' | 'calendar' | 'diagnostics' | 'review'
       },
+
+      // ---------- V5.1: 真实工程工作日志与项目模块进度 ----------
+      workLogs: getDefaultWorkLogs(),
+      projectProgress: {
+        currentStage: "阶段三：HTTP 协议栈与服务集成",
+        activeModule: "HTTP Router",
+        completedModules: ["Buffer", "HttpContext", "HttpRequest", "HttpResponse"],
+        inProgressModules: ["Router"],
+        totalModules: 12
+      },
+      unifiedTasks: getDefaultUnifiedTasks(),
 
       // ---------- 运行时与界面交互状态 ----------
       currentView: 'dashboard',
@@ -522,6 +646,25 @@
         if (!merged.schedulerSystem.activeSchedulerTab) {
           merged.schedulerSystem.activeSchedulerTab = 'planner';
         }
+      }
+
+      // V5.1: 净化与补齐 workLogs
+      if (!Array.isArray(merged.workLogs)) {
+        merged.workLogs = getDefaultWorkLogs();
+      }
+      // V5.1: 净化与补齐 projectProgress
+      if (!merged.projectProgress || typeof merged.projectProgress !== 'object') {
+        merged.projectProgress = {
+          currentStage: "阶段三：HTTP 协议栈与服务集成",
+          activeModule: "HTTP Router",
+          completedModules: ["Buffer", "HttpContext", "HttpRequest", "HttpResponse"],
+          inProgressModules: ["Router"],
+          totalModules: 12
+        };
+      }
+      // V5.1: 净化与补齐 unifiedTasks
+      if (!Array.isArray(merged.unifiedTasks) || merged.unifiedTasks.length === 0) {
+        merged.unifiedTasks = getDefaultUnifiedTasks();
       }
 
       if (merged.activeTimer) {
@@ -1304,6 +1447,104 @@
       this.save(true);
       this._notify();
       return reviewRecord;
+    }
+
+    // ==========================================
+    // V5.1 工程工作日志与项目模块操作助手
+    // ==========================================
+    getWorkLogs() {
+      if (!Array.isArray(this._state.workLogs)) {
+        this._state.workLogs = getDefaultWorkLogs();
+      }
+      return this._state.workLogs;
+    }
+
+    addWorkLog(logData) {
+      if (!Array.isArray(this._state.workLogs)) this._state.workLogs = [];
+      const log = Object.assign({
+        id: 'log_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        date: getTodayDateStr(),
+        project: 'CppAIService',
+        module: 'Core',
+        logType: 'code_feature',
+        what: '',
+        problem: '无',
+        solution: '无',
+        learned: '',
+        next: '',
+        relatedFiles: [],
+        interviewPoint: '',
+        createdAt: Date.now()
+      }, logData);
+      this._state.workLogs.unshift(log);
+      this.save(true);
+      this._notify();
+      return log;
+    }
+
+    deleteWorkLog(logId) {
+      if (!Array.isArray(this._state.workLogs)) return;
+      this._state.workLogs = this._state.workLogs.filter(l => l.id !== logId);
+      this.save(true);
+      this._notify();
+    }
+
+    getProjectProgress() {
+      return this._state.projectProgress || {
+        currentStage: "阶段三：HTTP 协议栈与服务集成",
+        activeModule: "HTTP Router",
+        completedModules: ["Buffer", "HttpContext", "HttpRequest", "HttpResponse"],
+        inProgressModules: ["Router"],
+        totalModules: 12
+      };
+    }
+
+    updateProjectProgress(patch) {
+      this._state.projectProgress = Object.assign(this.getProjectProgress(), patch);
+      this.save(true);
+      this._notify();
+      return this._state.projectProgress;
+    }
+
+    getUnifiedTasks() {
+      if (!Array.isArray(this._state.unifiedTasks) || this._state.unifiedTasks.length === 0) {
+        this._state.unifiedTasks = getDefaultUnifiedTasks();
+      }
+      return this._state.unifiedTasks;
+    }
+
+    toggleUnifiedTask(taskId, reflectionData) {
+      const tasks = this.getUnifiedTasks();
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return null;
+      task.completed = !task.completed;
+      task.completedAt = task.completed ? new Date().toISOString() : null;
+      if (reflectionData && typeof reflectionData === 'object') {
+        task.reflection = reflectionData;
+      }
+      this.save(true);
+      this._notify();
+      return task;
+    }
+
+    addUnifiedTask(taskData) {
+      const tasks = this.getUnifiedTasks();
+      const newTask = Object.assign({
+        id: 'task_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        title: '新任务',
+        priority: 'A',
+        category: 'project',
+        estimatedMinutes: 60,
+        completed: false,
+        completedAt: null,
+        reflection: null,
+        source: 'user_manual',
+        date: getTodayDateStr()
+      }, taskData);
+      tasks.push(newTask);
+      this.save(true);
+      this._notify();
+      return newTask;
     }
 
     // 重置系统纯净状态 (保留备份)

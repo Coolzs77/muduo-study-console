@@ -85,14 +85,14 @@
                     项目包含基于 muduo (C++11) 的网络层和基于 C++17 的 AI 应用服务层。网络层实现 epoll 事件循环与应用层 Buffer；服务层实现 HTTP 状态机解析、路由分发、两段式 MCP 协议与 RabbitMQ 异步任务消费。
                 </p>
 
-                <!-- 双核工作台模式切换条 (Dual-Core Workspace Switcher) -->
+                <!-- 工程工作台模式切换条 (Dual-Core Workspace Switcher) -->
                 <div class="mt-4 flex flex-wrap items-center gap-2 font-serifMono text-xs" id="workspace-mode-switcher">
                     <span class="text-stone-500 font-bold flex items-center gap-1.5 shrink-0">
-                        <i class="fa-solid fa-layer-group text-sky-700"></i> 双核工作台：
+                        <i class="fa-solid fa-layer-group text-sky-700"></i> 工程工作台：
                     </span>
                     <button onclick="setWorkspaceMode('full')" id="ws-btn-full" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
                         <i class="fa-solid fa-globe text-sky-400"></i>
-                        <span>双核全景视图</span>
+                        <span>架构全景视图</span>
                     </button>
                     <button onclick="setWorkspaceMode('muduo')" id="ws-btn-muduo" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100 cursor-pointer">
                         <i class="fa-solid fa-server text-sky-700"></i>
@@ -113,71 +113,12 @@
                 </button>
                 <button onclick="scrollToTopology()" class="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold transition flex items-center gap-2 shadow-xs group cursor-pointer" aria-label="直达架构拓扑大图">
                     <i class="fa-solid fa-network-wired text-amber-700 group-hover:scale-110 transition"></i>
-                    <span>双核架构拓扑流程 ➔</span>
+                    <span>项目架构拓扑流程 ➔</span>
                 </button>
             </div>
         </div>
 
-        <!-- 第二行：统计指标卡片 (全宽独立行，7 项维度舒展对齐，永不挤压折行) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3 mt-6 pt-5 border-t border-stone-100 font-serifMono">
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-sky-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-compass text-sky-700 text-xs"></i> muduo任务
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-sky-800 my-1" id="stat-progress-val">0%</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate" id="stat-progress-count">0 / 28 天任务</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-amber-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-robot text-amber-700 text-xs"></i> CppAI专栏
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-amber-700 my-1" id="stat-mastery-val">0 / 17</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate" id="stat-mastery-sub">17 篇核心专栏</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-indigo-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-flask text-indigo-600 text-xs"></i> Demo 跑通
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-indigo-700 my-1" id="stat-demo-val">0 / 28</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">实验工作台</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-teal-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-code-branch text-teal-700 text-xs"></i> 核心模块
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-teal-800 my-1" id="stat-source-val">19 模块</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">8网络 + 11服务</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-amber-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-clock text-amber-600 text-xs"></i> 今日学习
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-amber-700 my-1" id="stat-today-time">0 min</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">专注会话</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-rose-300 transition">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-repeat text-rose-600 text-xs"></i> 间隔复习
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-rose-600 my-1" id="stat-reviews-val">0 项</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">到期待巩固</div>
-            </div>
-
-            <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-amber-400 transition col-span-2 sm:col-span-2 lg:col-span-1">
-                <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-fire text-amber-700 text-xs"></i> 连续学习
-                </div>
-                <div class="text-xl sm:text-2xl font-bold text-amber-800 my-1" id="stat-streak">0 天</div>
-                <div class="text-[11px] text-stone-400 font-semibold truncate">真实日期</div>
-            </div>
-        </div>
-
-        <!-- 第三行：专注学习计时与快捷记时栏 -->
+        <!-- 第三行：专注学习计时<!-- 第三行：专注学习计时与快捷记时栏 -->
         <div class="mt-4 pt-4 border-t border-stone-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs font-serifMono bg-stone-50/60 p-3 rounded-xl border border-stone-200/80">
             <div class="flex items-center gap-3 flex-wrap">
                 <span class="font-bold text-stone-800 flex items-center gap-1.5">
@@ -229,32 +170,32 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <!-- 7大核心学习视图切换导航 -->
         <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-0 font-serifHeading text-xs sm:text-sm flex-1 min-w-0" id="view-tabs" role="tablist" aria-label="主视图导航">
-            <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="学习概览与架构拓扑">
-                <i class="fa-solid fa-chart-pie text-sky-700"></i> 学习概览与架构拓扑
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="工作台">
+                <i class="fa-solid fa-chart-pie text-sky-700"></i> 工作台
             </button>
-            <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="CppAIService 专栏知识库">
-                <i class="fa-solid fa-book-bookmark text-blue-600"></i> CppAIService 知识库
+            <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="CppAIService 项目">
+                <i class="fa-solid fa-diagram-project text-emerald-600"></i> CppAIService 项目
             </button>
-            <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
-                <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
+            <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="muduo 源码路线">
+                <i class="fa-solid fa-calendar-check text-amber-600"></i> muduo 源码路线
             </button>
-            <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="统一学习体系与六维穿透">
-                <i class="fa-solid fa-graduation-cap text-emerald-600"></i> 统一学习体系
+            <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="知识库 (语雀)">
+                <i class="fa-solid fa-book-bookmark text-blue-600"></i> 知识库 (语雀)
             </button>
-            <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="每日自测中心">
-                <i class="fa-solid fa-clipboard-question text-purple-600"></i> 每日自测中心
+            <button onclick="switchView('career')" id="nav-career" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="工程日志与求职">
+                <i class="fa-solid fa-trophy text-yellow-600"></i> 工程日志与求职
             </button>
-            <button onclick="switchView('source')" id="nav-source" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="muduo 源码路线">
-                <i class="fa-solid fa-code-branch text-teal-600"></i> muduo 源码路线
+            <button onclick="switchView('scheduler')" id="nav-scheduler" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="日程同步">
+                <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 日程同步
             </button>
-            <button onclick="switchView('pitfalls')" id="nav-pitfalls" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="C++ 踩坑档案">
-                <i class="fa-solid fa-bug text-rose-600"></i> C++ 踩坑档案
+            <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="代码测验">
+                <i class="fa-solid fa-clipboard-question text-purple-600"></i> 代码测验
             </button>
-            <button onclick="switchView('career')" id="nav-career" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="求职能力与工程凭证">
-                <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力与凭证
+            <button onclick="switchView('source')" id="nav-source" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="源码速查">
+                <i class="fa-solid fa-code-branch text-teal-600"></i> 源码速查
             </button>
-            <button onclick="switchView('scheduler')" id="nav-scheduler" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="智能任务调度与日历同步">
-                <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 智能排程与日历
+            <button onclick="switchView('pitfalls')" id="nav-pitfalls" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="踩坑档案">
+                <i class="fa-solid fa-bug text-rose-600"></i> 踩坑档案
             </button>
         </nav>
 
@@ -268,7 +209,7 @@
         </div>
     </div>
 
-    <!-- 双核工作台主布局 (左侧核心学习工作区 + 右侧任务待办伴侣边栏) -->
+    <!-- 工程工作台主布局 (左侧核心学习工作区 + 右侧任务待办伴侣边栏) -->
     <div class="flex flex-col xl:flex-row items-start gap-6 relative w-full mb-8">
         
         <!-- 左侧/中部：核心学习工作区 (Dashboard, Knowledge, Daily, Mapping, Quiz, Source, Pitfalls) -->
@@ -276,120 +217,213 @@
 
             <!-- ==================== VIEW 1: 仪表盘与架构拓扑 ==================== -->
             <section id="view-dashboard" class="space-y-6">
-        
-        <!-- 今日最高优先级任务卡 (Today's Mission) -->
-        <div id="today-mission-card" class="bg-gradient-to-r from-amber-50 via-white to-sky-50 rounded-2xl p-5 sm:p-6 border border-amber-200/80 academic-card">
-            <!-- 由 JS 动态计算填充 -->
+        <!-- 顶部聚焦状态条 -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 academic-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-serifMono">
+            <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div>
+                    <span class="text-xs text-stone-400 font-bold uppercase">Current Focus</span>
+                    <div class="text-sm font-bold text-stone-900" id="header-focus-title">阶段三：HTTP 协议栈与服务集成</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openWorkLogModal()" class="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-pen-to-square"></i> <span>记工作日志</span>
+                </button>
+                <button onclick="switchView('mapping')" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition cursor-pointer">
+                    <span>项目模块地图 &rarr;</span>
+                </button>
+            </div>
         </div>
 
-        <!-- 28 天日历热力打卡矩阵 -->
+        <!-- 首页 5 大核心区域网格 (左 8 列执行区，右 4 列状态统计区) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- 左侧执行区 (8 列) -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- 区域 1：今日任务 (Today's Tasks) 预计 5.5h -->
+                <div id="home-zone-today-tasks" class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-stone-100">
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
+                                <i class="fa-solid fa-list-check text-sky-800"></i> 今日任务
+                            </h2>
+                            <span id="today-tasks-badge" class="text-xs font-serifMono px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-900 font-bold">
+                                预计 5.5h · 0/4 已完成
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2 font-serifMono text-xs">
+                            <button onclick="openQuickAddTaskModal()" class="text-sky-700 hover:text-sky-900 font-semibold cursor-pointer">
+                                + 添加任务
+                            </button>
+                            <span class="text-stone-300">|</span>
+                            <button onclick="switchView('scheduler')" class="text-stone-500 hover:text-stone-800 cursor-pointer">
+                                日历排程 &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 任务列表容器 -->
+                    <div id="today-tasks-container" class="space-y-2.5 font-serifMono">
+                        <!-- JS 渲染 UnifiedTask 列表 -->
+                    </div>
+                </div>
+
+                <!-- 区域 4：最近工程记录 (Recent Logs) -->
+                <div id="home-zone-recent-logs" class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-stone-100">
+                        <div>
+                            <h2 class="text-base font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
+                                <i class="fa-solid fa-terminal text-emerald-700"></i> 最近工程记录
+                            </h2>
+                            <p class="text-xs text-stone-500 mt-0.5">代码修改、Bug 排查、Demo 实验与技术复盘日志</p>
+                        </div>
+                        <div class="flex items-center gap-2 font-serifMono text-xs">
+                            <button onclick="openWorkLogModal()" class="text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer">
+                                + 记工作日志
+                            </button>
+                            <span class="text-stone-300">|</span>
+                            <button onclick="switchView('career')" class="text-stone-500 hover:text-stone-800 cursor-pointer">
+                                全部凭证 &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 最近 5 条工作日志容器 -->
+                    <div id="recent-logs-container" class="space-y-3 font-serifMono">
+                        <!-- JS 渲染最新 5 条 EngineeringWorkLog -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 右侧状态统计区 (4 列) -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- 区域 2：项目进度 (CppAIService) -->
+                <div id="home-zone-project-progress" class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
+                        <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5 font-serifHeading">
+                            <i class="fa-solid fa-microchip text-amber-700"></i> CppAIService 进度
+                        </h3>
+                        <button onclick="switchView('mapping')" class="text-xs text-amber-700 hover:text-amber-900 font-serifMono">
+                            模块地图 &rarr;
+                        </button>
+                    </div>
+                    <div id="home-project-progress-content" class="space-y-2.5 font-serifMono text-xs text-stone-700">
+                        <!-- JS 渲染项目状态 -->
+                    </div>
+                </div>
+
+                <!-- 区域 3：muduo 学习进度 -->
+                <div id="home-zone-muduo-progress" class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
+                        <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5 font-serifHeading">
+                            <i class="fa-solid fa-code-branch text-sky-700"></i> muduo 源码进度
+                        </h3>
+                        <button onclick="switchView('daily')" class="text-xs text-sky-700 hover:text-sky-900 font-serifMono">
+                            28天路线 &rarr;
+                        </button>
+                    </div>
+                    <div id="home-muduo-progress-content" class="space-y-2.5 font-serifMono text-xs text-stone-700">
+                        <!-- JS 渲染 muduo 进度 -->
+                    </div>
+                </div>
+
+                <!-- 区域 5：本周统计 (核心指标) -->
+                <div id="home-zone-weekly-metrics" class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
+                        <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5 font-serifHeading">
+                            <i class="fa-solid fa-chart-simple text-purple-700"></i> 本周统计
+                        </h3>
+                        <span class="text-[11px] font-serifMono text-stone-400">真实数据</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5 text-center font-serifMono" id="home-weekly-metrics-grid">
+                        <!-- JS 渲染 5 大指标 -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <section id="view-daily" class="hidden space-y-6">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200 academic-card flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex bg-stone-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
+                <button onclick="setWeekFilter(0)" class="week-tab px-3 py-1.5 text-xs font-bold rounded-lg transition text-stone-900 bg-white shadow-xs font-serifMono whitespace-nowrap" data-week="0">全部 (28天)</button>
+                <button onclick="setWeekFilter(1)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="1">W1: 生命周期与RAII</button>
+                <button onclick="setWeekFilter(2)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="2">W2: 智能指针与STL</button>
+                <button onclick="setWeekFilter(3)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="3">W3: 回调与bind系统</button>
+                <button onclick="setWeekFilter(4)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="4">W4: 泛型与源码通读</button>
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="search-input" oninput="applyDailyFilters()" placeholder="搜索 (如: weak_ptr, bind, RAII)..." class="w-full bg-stone-50 border border-stone-200 text-xs sm:text-sm rounded-xl px-3 py-1.5 pl-8 focus:outline-none focus:ring-2 focus:ring-sky-600/30 focus:border-sky-700 font-serifMono transition" aria-label="搜索学习卡片">
+                    <span class="absolute left-2.5 top-2 text-stone-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+                <select id="filter-status-select" onchange="changeFilterStatus(this.value)" class="px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-serifMono font-bold text-stone-700 hover:bg-stone-100 transition whitespace-nowrap focus:outline-none" aria-label="状态筛选">
+                    <option value="all">显示全部</option>
+                    <option value="pending">仅看待学项</option>
+                    <option value="mastered">仅看已攻克</option>
+                    <option value="due_review">仅看今日待复习</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 每日任务卡片列表 -->
+        <div class="space-y-6" id="cards-container">
+            <!-- 由 JS 动态渲染全部 28 天核心卡片 -->
+        </div>
+    </section>
+
+    <!-- ==================== VIEW 3: 统一学习体系与六维关联工程 (Phase 5) ==================== -->
+    <section id="view-mapping" class="hidden space-y-6">
+        <!-- CppAIService 树状项目模块地图 (ModuleHierarchyMap) -->
         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-stone-100">
                 <div>
-                    <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-calendar-days text-amber-700"></i> 28 天学习打卡索引网格
+                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-serifMono mb-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="font-bold">CppAIService</span>
+                        <span class="text-stone-300">•</span>
+                        <span>项目模块层级地图</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
+                        <i class="fa-solid fa-diagram-project text-emerald-700"></i> CppAIService 核心架构与模块地图
                     </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">单元格颜色映射 0~5 阶掌握度等级，点击直接跳转定位任务卡片。</p>
-                </div>
-                <!-- 图例说明 -->
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-serifMono text-stone-600">
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-stone-200 inline-block"></span> 未开始 (0)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> 已阅读 (1)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> 已理解 (2)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Demo跑通 (3)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span> 独立实现 (4)</span>
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-800 inline-block"></span> 源码贯通 (5)</span>
-                </div>
-            </div>
-
-            <!-- 28 天自适应网格 -->
-            <div class="grid grid-cols-4 sm:grid-cols-7 gap-2 sm:gap-2.5" id="calendar-grid">
-                <!-- 由 JavaScript 动态生成 -->
-            </div>
-        </div>
-
-        <!-- 学习时间统计与间隔复习待办双栏 -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- 左栏：学习时间统计卡片与纯轻量 SVG 柱状图 -->
-            <div class="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                            <i class="fa-solid fa-chart-simple text-sky-800"></i> 近 7 天专注投入分布
-                        </h3>
-                        <p class="text-[11px] text-stone-500 mt-0.5">轻量原生矢量可视化，记录真实专注学习曲线。</p>
-                    </div>
-                    <span class="text-xs font-serifMono text-stone-500 bg-stone-100 px-2.5 py-1 rounded-lg">
-                        累计 <span id="stat-total-hours" class="font-bold text-stone-900">0.0</span> 小时
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-4 gap-2 mb-4 text-center font-serifMono">
-                    <div class="bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                        <div class="text-[10px] text-stone-400">今日时间</div>
-                        <div class="text-xs sm:text-sm font-bold text-amber-800" id="stat-card-today">0m</div>
-                    </div>
-                    <div class="bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                        <div class="text-[10px] text-stone-400">本周时间</div>
-                        <div class="text-xs sm:text-sm font-bold text-sky-800" id="stat-card-week">0m</div>
-                    </div>
-                    <div class="bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                        <div class="text-[10px] text-stone-400">日均时间</div>
-                        <div class="text-xs sm:text-sm font-bold text-emerald-800" id="stat-card-avg">0m</div>
-                    </div>
-                    <div class="bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                        <div class="text-[10px] text-stone-400">记录会话</div>
-                        <div class="text-xs sm:text-sm font-bold text-stone-800" id="stat-card-sessions">0次</div>
-                    </div>
-                </div>
-
-                <!-- 纯 SVG 7天柱状图 -->
-                <div class="w-full h-36 bg-stone-50/50 rounded-xl border border-stone-200 p-2" id="study-chart-container">
-                    <!-- 由 JS 动态绘制 -->
-                </div>
-            </div>
-
-            <!-- 右栏：艾宾浩斯间隔复习今日清单 -->
-            <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                            <i class="fa-solid fa-repeat text-rose-600"></i> 今日待复习清单
-                        </h3>
-                        <span id="badge-due-count" class="text-xs font-serifMono font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
-                            0 项到期
-                        </span>
-                    </div>
-                    <p class="text-[11px] text-stone-500 mb-3 leading-relaxed">
-                        基于 [1d ➔ 3d ➔ 7d ➔ 14d ➔ 30d] 记忆衰减阶梯，对已完成自测的内容定期巩固。
+                    <p class="text-xs text-stone-500 mt-1 leading-relaxed">
+                        基于 muduo 底层事件循环打造的 C++ AI 服务框架。点击各模块可快速查看关联源码、学习任务、面试考点与 Demo。
                     </p>
-
-                    <div id="review-due-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        <!-- JS 填充到期复习项 -->
-                    </div>
                 </div>
-
-                <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
-                    <span class="text-[11px] text-stone-400 font-serifMono">按 R 键随时打开复习闪卡</span>
-                    <button onclick="openReviewModal()" class="px-3.5 py-1.5 rounded-xl bg-stone-900 text-stone-100 hover:bg-stone-800 text-xs font-serifMono font-bold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-play"></i> 开启今日复习
+                <div class="flex items-center gap-2 font-serifMono shrink-0">
+                    <button onclick="toggleArchTopologyCollapse()" class="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-network-wired text-sky-700"></i> <span id="btn-topo-toggle-text">展开架构参考图</span>
                     </button>
                 </div>
             </div>
+
+            <!-- 模块树状网格容器 -->
+            <div id="cppai-module-hierarchy-container" class="pt-5 space-y-4 font-serifMono text-xs">
+                <!-- JS 动态渲染 5 大层级树状结构 -->
+            </div>
         </div>
 
-        <!-- 双核全景架构拓扑与交互式工程蓝图工坊 -->
+        <!-- 架构关系参考图 (由原首页降级迁移至此，按需展开) -->
+        <div id="arch-topology-wrapper" class="hidden">
         <div id="topology-card" class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card overflow-hidden">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5 pb-4 border-b border-stone-100">
                 <div>
                     <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-sky-50 border border-sky-200 text-sky-800 text-[11px] font-serifMono uppercase tracking-wider mb-1">
-                        Dual-Core Architecture Topology & Request Flow
+                        Architecture Topology & Request Flow
                     </div>
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-network-wired text-sky-700"></i> 双核架构拓扑与请求处理流程图
+                        <i class="fa-solid fa-network-wired text-sky-700"></i> muduo 与 CppAIService 架构关系与流程图
                     </h2>
                     <p class="text-xs text-stone-500 mt-0.5">
-                        💡 <strong>全量节点可点击交互：</strong>点击 EventLoop、HttpContext、Router、MCPRegistry、RabbitMQ 等任意组件即可呼出源码映射、线程模型与专栏直达。
+                        💡 <strong>节点可交互：</strong>点击 EventLoop、HttpContext、Router、MCPRegistry、RabbitMQ 等任意组件即可呼出源码映射、线程模型与专栏直达。
                     </p>
                 </div>
                 <!-- 拓扑标签切换器 -->
@@ -1058,142 +1092,30 @@
                 </div>
             </div>
         </div>
-
-        <!-- 知识分级与战略剪裁卡片 (A/B/C 三级) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-rose-200 academic-card flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-serifMono font-black px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800">A 级 · 绝对核心</span>
-                        <i class="fa-solid fa-fire text-rose-500"></i>
-                    </div>
-                    <h3 class="font-bold text-stone-900 text-sm font-serif-heading">必须精读、动手写 Demo 验证</h3>
-                    <p class="text-xs text-stone-500 mt-1">muduo 类的骨架机制，遇到任何一处卡壳就完全无法继续通读。</p>
-                    <div class="flex flex-wrap gap-1.5 mt-3 text-[11px] font-serifMono">
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">引用 & const</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">RAII 构造析构</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">深拷贝与自赋值</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">移动语义(move)</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">=delete / =default</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">unique_ptr</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">shared_ptr/weak_ptr</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">vector / map / set</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">Lambda & function</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">std::bind 成员绑定</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">类模板基础 / 虚析构</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">运算符重载 (&lt;&lt; / &lt;)</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-rose-100 text-[11px] text-rose-700 font-serifMono">
-                    共 25 个核心任务
-                </div>
-            </div>
-
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-amber-200 academic-card flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-serifMono font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">B 级 · 概念理解</span>
-                        <i class="fa-solid fa-lightbulb text-amber-500"></i>
-                    </div>
-                    <h3 class="font-bold text-stone-900 text-sm font-serif-heading">理解即可，不必陷入语法深渊</h3>
-                    <p class="text-xs text-stone-500 mt-1">知道为什么有此特性，能看懂源码意图即可，不要死扣复杂八股。</p>
-                    <div class="flex flex-wrap gap-1.5 mt-3 text-[11px] font-serifMono">
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">单继承 & 纯虚函数</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">override / final</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">std::list 双向链表</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">deque (仅作选型对比)</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">static 静态成员</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">namespace 命名空间</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-700">static_cast 显式转换</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-amber-100 text-[11px] text-amber-700 font-serifMono">
-                    只掌握核心意图，节省实操时间
-                </div>
-            </div>
-
-            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 academic-card flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-serifMono font-black px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-600">C 级 · 坚决跳过</span>
-                        <i class="fa-solid fa-ban text-stone-400"></i>
-                    </div>
-                    <h3 class="font-bold text-stone-900 text-sm font-serif-heading">4周内绝对不碰，节省精力</h3>
-                    <p class="text-xs text-stone-500 mt-1">网络库极力避免的过度设计或已被现代 C++ 淘汰的技术。</p>
-                    <div class="flex flex-wrap gap-1.5 mt-3 text-[11px] font-serifMono">
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">多重继承 / 菱形继承</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">RTTI 与 typeid 底层</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">auto_ptr (已废弃)</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">复杂模板元编程 (SFINAE)</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">valarray 数值数组</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">老旧 C++98 宏技巧</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-stone-200 text-[11px] text-stone-500 font-serifMono">
-                    聚焦核心语法，避免偏离主题
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- (view-tasks 已移至右侧常驻/折叠待办边栏 #task-sidebar) -->
-
-
-    <!-- ==================== VIEW 2: 28天任务与实验 ==================== -->
-    <section id="view-daily" class="hidden space-y-6">
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200 academic-card flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div class="flex bg-stone-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
-                <button onclick="setWeekFilter(0)" class="week-tab px-3 py-1.5 text-xs font-bold rounded-lg transition text-stone-900 bg-white shadow-xs font-serifMono whitespace-nowrap" data-week="0">全部 (28天)</button>
-                <button onclick="setWeekFilter(1)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="1">W1: 生命周期与RAII</button>
-                <button onclick="setWeekFilter(2)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="2">W2: 智能指针与STL</button>
-                <button onclick="setWeekFilter(3)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="3">W3: 回调与bind系统</button>
-                <button onclick="setWeekFilter(4)" class="week-tab px-3 py-1.5 text-xs font-medium rounded-lg transition text-stone-600 hover:text-stone-900 font-serifMono whitespace-nowrap" data-week="4">W4: 泛型与源码通读</button>
-            </div>
-
-            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                <div class="relative w-full sm:w-64">
-                    <input type="text" id="search-input" oninput="applyDailyFilters()" placeholder="搜索 (如: weak_ptr, bind, RAII)..." class="w-full bg-stone-50 border border-stone-200 text-xs sm:text-sm rounded-xl px-3 py-1.5 pl-8 focus:outline-none focus:ring-2 focus:ring-sky-600/30 focus:border-sky-700 font-serifMono transition" aria-label="搜索学习卡片">
-                    <span class="absolute left-2.5 top-2 text-stone-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
-                </div>
-                <select id="filter-status-select" onchange="changeFilterStatus(this.value)" class="px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-serifMono font-bold text-stone-700 hover:bg-stone-100 transition whitespace-nowrap focus:outline-none" aria-label="状态筛选">
-                    <option value="all">显示全部</option>
-                    <option value="pending">仅看待学项</option>
-                    <option value="mastered">仅看已攻克</option>
-                    <option value="due_review">仅看今日待复习</option>
-                </select>
-            </div>
         </div>
 
-        <!-- 每日任务卡片列表 -->
-        <div class="space-y-6" id="cards-container">
-            <!-- 由 JS 动态渲染全部 28 天核心卡片 -->
-        </div>
-    </section>
-
-    <!-- ==================== VIEW 3: 统一学习体系与六维穿透工程 (Phase 5) ==================== -->
-    <section id="view-mapping" class="hidden space-y-6">
         <!-- 头部导航与体系介绍 -->
         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-stone-100">
                 <div>
                     <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-serifMono mb-2">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="font-bold">UNIFIED LEARNING SYSTEM</span>
+                        <span class="font-bold"></span>
                         <span class="text-stone-300">•</span>
-                        <span>六维穿透 ➔ 闭环成长</span>
+                        <span>六维关联 ➔ 实践成长</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
-                        <i class="fa-solid fa-graduation-cap text-emerald-700"></i> 统一学习系统与六维穿透工程中心
+                        <i class="fa-solid fa-graduation-cap text-emerald-700"></i> 统一学习系统与知识与实践关联中心
                     </h2>
                     <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
                         消除孤岛：将 C++ 语法、Linux 底层、专业书目、算法手撕、技术八股与通识阅读全面连通。通过
                         <span class="font-semibold text-stone-700 font-serifMono">Learn ➔ Apply ➔ Build ➔ Explain ➔ Review</span> 五步闭环，
-                        实现任何知识点在 <span class="font-semibold text-emerald-800 font-serifMono">Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview</span> 的全链路追溯。
+                        实现任何知识点在 <span class="font-semibold text-emerald-800 font-serifMono">Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview</span> 的关联追溯。
                     </p>
                 </div>
                 <div class="flex items-center gap-2 font-serifMono shrink-0">
                     <button onclick="openCrossLinkModal('cpp_dim_modern')" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
-                        <i class="fa-solid fa-crosshairs"></i> 体验六维穿透透视
+                        <i class="fa-solid fa-crosshairs"></i> 查看六维关联透视
                     </button>
                 </div>
             </div>
@@ -1582,7 +1504,7 @@
                 <div>
                     <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-serifMono mb-2">
                         <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                        <span class="font-bold">CAREER EVIDENCE & CAPABILITY SYSTEM</span>
+                        <span class="font-bold"></span>
                         <span class="text-stone-300">•</span>
                         <span>真实凭证 ➔ 闭环晋级 ➔ 拿捏面试</span>
                     </div>
@@ -1592,7 +1514,7 @@
                     <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
                         把“我学过”转化成“我能够证明我会”。严禁虚构经历，能力等级由真实代码改动、Bug 修复、性能压测等
                         <span class="font-semibold text-stone-700 font-serifMono">9 类工程凭证</span> 驱动判定。
-                        集成 14 维能力矩阵、4-Hop 逆向穿透、全真模拟面试与高分 STAR 履历陈述。
+                        集成 14 维能力矩阵、4-Hop 关联检索、全真模拟面试与高分 STAR 履历陈述。
                     </p>
                 </div>
                 <div class="flex items-center gap-2 font-serifMono shrink-0">
@@ -1646,7 +1568,7 @@
             </div>
         </div>
 
-        <!-- 子面板 3: 项目面试全案与 4-Hop 穿透 (Project Interview) -->
+        <!-- 子面板 3: 项目面试全案与 4-Hop 关联 (Project Interview) -->
         <div id="career-pane-interview" class="space-y-6 hidden">
             <div id="career-interview-nav-container"></div>
             <div class="space-y-6" id="career-interview-content-container">
@@ -1680,7 +1602,7 @@
         </div>
     </section>
 
-    <!-- ==================== VIEW: 智能任务调度与日历同步体系 (Phase 7) ==================== -->
+    <!-- ==================== VIEW: 日程导入与任务排程体系 (Phase 7) ==================== -->
     <section id="view-scheduler" class="hidden space-y-6">
         <!-- 头部导航与核心指引 -->
         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
@@ -1693,12 +1615,12 @@
                         <span>真实日历 ➔ 赤字压缩 ➔ 根因诊断 ➔ 复盘联动</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
-                        <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 智能任务调度与日历同步引擎
+                        <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 日程导入与任务排程引擎
                     </h2>
                     <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
                         深度整合原生 RFC 5545 iCal/ICS 解析器与 Google Tasks，真实计算事件冲突与连续专注块。
-                        实施 <span class="font-semibold text-stone-700 font-serifMono">S(3h)➔A(1h)➔A(1h)➔B(0.5h)➔C</span> 严格优先级流水线。
-                        在时间赤字时自动压缩次要通识并誓死保卫核心主干；未完成强制归因诊断，复盘直接打通求职工程实证记录。
+                        实施 <span class="font-semibold text-stone-700 font-serifMono">S(3h)➔A(1h)➔A(1h)➔B(0.5h)➔C</span> 严格任务优先级分配。
+                        在时间不足时优先保证核心项目任务；未完成强制归因诊断，复盘直接打通求职工程实证记录。
                     </p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 font-serifMono shrink-0">
@@ -1973,7 +1895,7 @@
                 </div>
             </section>
         </aside>
-    </div> <!-- 闭合双核工作台主布局 flex flex-col xl:flex-row -->
+    </div> <!-- 闭合工程工作台主布局 flex flex-col xl:flex-row -->
 
     <!-- 右侧浮动常驻唤出胶囊 (当侧边栏折叠隐藏时显示) -->
     <button id="task-sidebar-fab" onclick="toggleTaskSidebar(true)" class="hidden fixed right-0 top-1/2 -translate-y-1/2 z-30 bg-stone-900/95 hover:bg-stone-800 text-white pl-3 pr-2 py-3 rounded-l-2xl shadow-xl transition flex flex-col items-center gap-1.5 cursor-pointer task-fab font-serifMono border-l border-t border-b border-stone-700">
@@ -2693,7 +2615,7 @@ add_executable(my_server ${SOURCES})</pre>
     </div>
 </div>
 
-<!-- ==================== 六维全链路穿透透视 Modal ==================== -->
+<!-- ==================== 六维整体流程穿透透视 Modal ==================== -->
 <div id="crosslink-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-5" role="dialog" aria-modal="true" aria-label="六维技术穿透透视">
     <div class="relative bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl border border-stone-300 max-h-[90vh] overflow-y-auto flex flex-col justify-between">
         <div>
@@ -2703,7 +2625,7 @@ add_executable(my_server ${SOURCES})</pre>
                         <i class="fa-solid fa-cubes-stacked"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-stone-900 text-base font-serifHeading" id="crosslink-modal-title">六维全链路技术透视</h4>
+                        <h4 class="font-bold text-stone-900 text-base font-serifHeading" id="crosslink-modal-title">六维技术关联透视</h4>
                         <p class="text-xs text-stone-500 font-serifMono" id="crosslink-modal-subtitle">Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview</p>
                     </div>
                 </div>
@@ -2712,7 +2634,7 @@ add_executable(my_server ${SOURCES})</pre>
                 </button>
             </div>
 
-            <!-- 六维穿透卡片流 -->
+            <!-- 六维关联卡片流 -->
             <div class="space-y-3 font-serifMono" id="crosslink-modal-content">
                 <!-- 动态填充 6 个维度卡片 -->
             </div>
@@ -2928,5 +2850,152 @@ add_executable(my_server ${SOURCES})</pre>
     <script src="js/timer.js?v=6.0.0"></script>
     <script src="js/yuque-explorer.js?v=6.0.0"></script>
     <script src="js/app.js?v=6.0.0"></script>
+
+<!-- ==================== V5.1: 工程工作日志模态框 ==================== -->
+<div id="modal-work-log" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-5" role="dialog" aria-modal="true" aria-label="工程工作日志">
+    <div class="relative bg-white rounded-2xl max-w-xl w-full p-5 sm:p-7 shadow-2xl border border-stone-300 max-h-[90vh] overflow-y-auto flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-4 border-b border-stone-200 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-base border border-emerald-200">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-stone-900 text-base font-serifHeading">记录工程工作日志</h4>
+                        <p class="text-xs text-stone-500 font-serifMono">记录真实过程 · 沉淀排错经验 · 积累求职凭据</p>
+                    </div>
+                </div>
+                <button onclick="closeWorkLogModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="form-work-log" onsubmit="handleSaveWorkLog(event)" class="space-y-4 text-xs font-serifMono">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">所属项目 *</label>
+                        <select id="log-input-project" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-emerald-600">
+                            <option value="CppAIService">CppAIService</option>
+                            <option value="muduo">muduo</option>
+                            <option value="LeetCode">LeetCode / 算法</option>
+                            <option value="Linux">Linux 编程</option>
+                            <option value="Other">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">所属模块 *</label>
+                        <input type="text" id="log-input-module" required placeholder="如: HTTP Router" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-emerald-600 font-sans" />
+                    </div>
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">类型 *</label>
+                        <select id="log-input-type" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-emerald-600">
+                            <option value="bugfix">Bug 修复与排障</option>
+                            <option value="code_feature">代码实现 / 特性</option>
+                            <option value="demo_experiment">Demo 验证 / 压测</option>
+                            <option value="source_study">源码剖析 / 研读</option>
+                            <option value="benchmark">性能基准 / 调优</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-stone-700 font-bold mb-1">今天完成了什么 *</label>
+                    <textarea id="log-input-what" rows="2" required placeholder="阐述今天完成的具体工作、代码改动或功能实现..." class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-emerald-600 font-sans"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">遇到什么问题 (卡点/现象)</label>
+                        <textarea id="log-input-problem" rows="2" placeholder="无，或记录遇到的错误/边界情况..." class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-emerald-600 font-sans"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">如何解决 (因果与定位过程)</label>
+                        <textarea id="log-input-solution" rows="2" placeholder="无，或记录分析步骤、代码调整与验证用例..." class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-emerald-600 font-sans"></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">学到了什么 (底层机理/经验)</label>
+                        <input type="text" id="log-input-learned" placeholder="如: 状态机需保持未决上下文以防分包粘包" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-emerald-600 font-sans" />
+                    </div>
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">下一步做什么 *</label>
+                        <input type="text" id="log-input-next" required placeholder="如: 编写 HTTP 路由前缀树测试" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-emerald-600 font-sans" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">涉及代码文件 (逗号隔开)</label>
+                        <input type="text" id="log-input-files" placeholder="如: src/http/Router.cpp, tests/Router_test.cpp" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-emerald-600 font-sans" />
+                    </div>
+                    <div>
+                        <label class="block text-stone-700 font-bold mb-1">面试可复述亮点</label>
+                        <input type="text" id="log-input-interview" placeholder="如: 能解释前缀树路由与路径参数抽取" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-emerald-600 font-sans" />
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="log-input-sync-evidence" class="rounded text-emerald-600" />
+                    <label for="log-input-sync-evidence" class="text-stone-600">同时写入求职真实工程凭证库 (作为能力背书)</label>
+                </div>
+
+                <div class="pt-3 border-t border-stone-200 flex items-center justify-end gap-2">
+                    <button type="button" onclick="closeWorkLogModal()" class="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold transition cursor-pointer">
+                        取消
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold transition cursor-pointer shadow-xs">
+                        保存工作日志
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== V5.1: 任务打卡反思与下一动作驱动 Modal ==================== -->
+<div id="modal-task-reflection" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-5" role="dialog" aria-modal="true" aria-label="任务完成与反思">
+    <div class="relative bg-white rounded-2xl max-w-lg w-full p-5 sm:p-7 shadow-2xl border border-stone-300 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-200 mb-4">
+            <div>
+                <h4 class="font-bold text-stone-900 text-base font-serifHeading">完成任务 · 录入收获与下一步</h4>
+                <p class="text-xs text-stone-500 font-serifMono" id="reflection-task-title">任务标题</p>
+            </div>
+            <button onclick="closeTaskReflectionModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form id="form-task-reflection" onsubmit="submitTaskReflection(event)" class="space-y-3 font-serifMono text-xs">
+            <input type="hidden" id="reflection-task-id" />
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">本次学到了什么 (核心认知) *</label>
+                <textarea id="reflection-learned" rows="2" required placeholder="如: 弄清了 EventLoop wakeupChannel 使用 eventfd 代替 pipe 的轻量优势" class="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-stone-800 focus:outline-none focus:border-sky-600 font-sans"></textarea>
+            </div>
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">遇到了什么卡点/问题 (若无填无)</label>
+                <input type="text" id="reflection-problem" value="无" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-sky-600 font-sans" />
+            </div>
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">下一步动作是什么 (避免打卡即结束) *</label>
+                <input type="text" id="reflection-next" required placeholder="如: 实现非阻塞 Socket 的 setsockopt 选项设置" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:border-sky-600 font-sans" />
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+                <input type="checkbox" id="reflection-create-log" checked class="rounded text-sky-600" />
+                <label for="reflection-create-log" class="text-stone-600">同步生成一条工程工作日志</label>
+            </div>
+            <div class="pt-3 border-t border-stone-200 flex items-center justify-end gap-2">
+                <button type="button" onclick="closeTaskReflectionModal(true)" class="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold transition cursor-pointer">
+                    跳过反思直接打卡
+                </button>
+                <button type="submit" class="px-5 py-2 rounded-xl bg-sky-800 hover:bg-sky-900 text-white font-bold transition cursor-pointer shadow-xs">
+                    完成并记录
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </body>
 </html>

@@ -1,6 +1,6 @@
 // ==========================================================================
 // CppAIService & muduo Dual-Core Engineering OS
-// Phase 7: 智能任务调度与日历同步引擎 (dataset-scheduler.js)
+// Phase 7: 日程导入与任务排程引擎 (dataset-scheduler.js)
 // 核心哲学：“真实读取外部日历与任务，严禁虚构数据；6级流水线优先，赤字弹性压缩；未完成必须归因诊断，复盘打通能力凭证”
 // RFC 5545 iCal/ICS Parser + Google Tasks + Priority Pipeline + Deficit Compressor + Diagnostic Rescheduling
 // ==========================================================================
@@ -539,7 +539,7 @@
     }
   }
 
-  // 6. 时间赤字压缩引擎 (Time Deficit Compression Algorithm)
+  // 6. 调整次要任务工时引擎 (Time Deficit Compression Algorithm)
   class TimeDeficitCompressor {
     /**
      * 当可用时间小于需求时间时，执行严格逐级保底压缩
@@ -674,7 +674,7 @@
       const allocated = allocationResult.allocated;
       const scheduledBlocks = [];
 
-      // 准备任务队列 (按严格优先级流水线)
+      // 准备任务队列 (按严格任务优先级分配)
       const taskQueue = [
         {
           key: 's_core',
@@ -927,7 +927,7 @@
       mdLines.push('');
 
       // 明日高优先级排程
-      mdLines.push(`## 四、次日高优先级流水线建议`);
+      mdLines.push(`## 四、次日高任务优先级分配建议`);
       mdLines.push(`1. **[S级] CppAIService / muduo 核心主干**：坚守晨间 3h 连续黄金专注块。`);
       mdLines.push(`2. **[A级] 算法手撕 Lab**：按计划推进 3 道同构高频手撕题并验证。`);
       if (incompleteTasks.length > 0) {
