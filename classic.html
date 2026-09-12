@@ -147,23 +147,23 @@
             <div>
                 <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-serifMono mb-2.5">
                     <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-                    <span>INDUSTRIAL REACTOR ENGINE</span>
+                    <span>EVENT-DRIVEN NETWORK</span>
                     <span class="text-amber-400">•</span>
-                    <span class="font-bold">面向 muduo 源码攻坚 • V5.0 个人训练系统</span>
+                    <span class="font-bold">面向 muduo 源码学习 • V5.0 学习控制台</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-serif-heading">
                     muduo C++ 个人训练系统 V5
                 </h1>
                 <p class="text-stone-600 text-xs sm:text-sm mt-1.5 max-w-3xl leading-relaxed">
-                    以《C++ Primer Plus 第6版（中文版）》实体排版为精准基准，构建从<strong>学习 ➔ 实验 ➔ 自测 ➔ 掌握 ➔ 复习 ➔ 源码 ➔ 实战</strong>的完整工业级闭环。直击生命周期、RAII、智能指针、STL 容器、Lambda 闭包与 bind 回调，穿透 Reactor 架构！
+                    以《C++ Primer Plus 第6版（中文版）》为参考基准，覆盖概念学习、实验验证、阶段自测、源码对照与实践应用完整流程，梳理核心底层机制与接口规范。
                 </p>
             </div>
 
             <!-- 右侧快捷指引按钮 -->
             <div class="flex items-center gap-2.5 shrink-0 self-start md:self-auto font-serifMono">
-                <button onclick="openEnvGuideModal()" class="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold transition flex items-center gap-2 shadow-xs group cursor-pointer" aria-label="开发环境与企业实战工作流指引">
+                <button onclick="openEnvGuideModal()" class="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold transition flex items-center gap-2 shadow-xs group cursor-pointer" aria-label="Linux 远程开发指引">
                     <i class="fa-solid fa-server text-sky-700 group-hover:scale-110 transition"></i>
-                    <span>企业级开发环境指引</span>
+                    <span>Linux 远程开发指引</span>
                 </button>
             </div>
         </div>
@@ -220,7 +220,7 @@
 
             <div class="bg-stone-50/90 p-3 rounded-xl border border-stone-200/90 text-center flex flex-col justify-between hover:border-amber-400 transition col-span-2 sm:col-span-2 lg:col-span-1">
                 <div class="text-xs text-stone-500 font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-fire text-amber-700 text-xs"></i> 连续攻坚
+                    <i class="fa-solid fa-fire text-amber-700 text-xs"></i> 连续学习
                 </div>
                 <div class="text-xl sm:text-2xl font-bold text-amber-800 my-1" id="stat-streak">0 天</div>
                 <div class="text-[11px] text-stone-400 font-semibold truncate">真实日期</div>
@@ -246,10 +246,10 @@
                 <button onclick="saveActiveSession()" class="px-2.5 py-1 rounded-lg bg-sky-700 hover:bg-sky-800 text-white font-bold transition cursor-pointer flex items-center gap-1">
                     <i class="fa-solid fa-check"></i> <span>归档会话</span>
                 </button>
-                <select id="timer-day" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="关联攻坚Day">
+                <select id="timer-day" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="关联任务Day">
                 </select>
-                <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="攻坚类型">
-                    <option value="coding">代码攻坚</option>
+                <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="任务类型">
+                    <option value="coding">代码编写</option>
                     <option value="reading">书目研读</option>
                     <option value="debug">排错调试</option>
                 </select>
@@ -274,8 +274,8 @@
 
     <!-- 顶部主视图切换导航 (6大核心模块) -->
     <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-3 mb-6 font-serifHeading text-xs sm:text-sm" id="view-tabs" role="tablist" aria-label="主视图导航">
-        <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="攻坚大盘与架构拓扑">
-            <i class="fa-solid fa-chart-pie text-sky-700"></i> 攻坚大盘与架构拓扑
+        <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="学习大盘与架构拓扑">
+            <i class="fa-solid fa-chart-pie text-sky-700"></i> 学习大盘与架构拓扑
         </button>
         <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
             <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
@@ -307,7 +307,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                 <div>
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-calendar-days text-amber-700"></i> 28 天定向攻坚打卡索引网格
+                        <i class="fa-solid fa-calendar-days text-amber-700"></i> 28 天学习打卡索引网格
                     </h2>
                     <p class="text-xs text-stone-500 mt-0.5">单元格颜色映射 0~5 阶掌握度等级，点击直接跳转定位任务卡片。</p>
                 </div>
@@ -414,7 +414,7 @@
                 </div>
                 <div class="flex items-center gap-3 text-xs font-serifMono text-stone-600">
                     <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-50 border border-amber-300 inline-block"></span> C++ 核心机制</span>
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-50 border border-sky-300 inline-block"></span> 事件驱动调度</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-50 border border-sky-300 inline-block"></span> 事件循环调度</span>
                     <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-50 border border-emerald-300 inline-block"></span> 业务连接实体</span>
                 </div>
             </div>
@@ -448,7 +448,7 @@
                         <g transform="translate(15, 50)" class="topo-node" onclick="openTopologyDrawer('step_1')">
                             <rect width="220" height="42" rx="5" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
                             <text x="10" y="18" font-family="'Courier Prime', monospace" font-weight="700" font-size="11.5" fill="#92400e">① const & 引用传参</text>
-                            <text x="10" y="32" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">const T& 零拷贝只读入参规范</text>
+                            <text x="10" y="32" font-family="'Noto Serif SC', serif" font-size="9.5" fill="#78350f">const T& 引用只读入参规范</text>
                         </g>
 
                         <g transform="translate(15, 98)" class="topo-node" onclick="openTopologyDrawer('step_2')">
@@ -495,17 +495,17 @@
                         </g>
                     </g>
 
-                    <!-- 连接跨越：C++ 机制 -> Reactor 调度引擎 -->
+                    <!-- 连接跨越：C++ 机制 -> Reactor 调度组件 -->
                     <path d="M 275 120 L 340 120" stroke="#78716c" stroke-dasharray="3,3" stroke-width="1.2" marker-end="url(#arrow-stone)"/>
                     <path d="M 275 220 C 305 220, 310 270, 340 270" stroke="#78716c" stroke-dasharray="3,3" stroke-width="1.2" marker-end="url(#arrow-stone)"/>
                     <path d="M 275 320 C 310 320, 310 300, 340 300" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
                     <path d="M 275 370 C 310 370, 310 360, 520 360" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow-sky)"/>
                     <path d="M 275 270 C 330 270, 480 270, 740 375" stroke="#059669" stroke-width="1.4" marker-end="url(#arrow-emerald)"/>
 
-                    <!-- === 第二列：Reactor 反应堆驱动调度 (中间层) === -->
+                    <!-- === 第二列：Reactor 事件分发与调度 (中间层) === -->
                     <g transform="translate(345, 20)">
                         <rect width="365" height="440" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
-                        <text x="182" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13.5" fill="#0f172a">muduo 事件分发驱动 (Reactor 引擎)</text>
+                        <text x="182" y="28" text-anchor="middle" font-family="'Noto Serif SC', serif" font-weight="700" font-size="13.5" fill="#0f172a">muduo 事件分发与调度 (Reactor)</text>
                         <line x1="20" y1="38" x2="345" y2="38" stroke="#f1f5f9" stroke-width="1.5"/>
 
                         <g transform="translate(18, 50)" class="topo-node" onclick="openTopologyDrawer('mutexlockguard')">
@@ -517,7 +517,7 @@
                         <g transform="translate(18, 104)" class="topo-node" onclick="openTopologyDrawer('eventloop')">
                             <rect width="329" height="100" rx="6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.5"/>
                             <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#0369a1">EventLoop (One Loop Per Thread)</text>
-                            <text x="12" y="46" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• loop() 驱动循环；eventfd 跨线程安全唤醒</text>
+                            <text x="12" y="46" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• loop() 轮询与回调；eventfd 跨线程安全唤醒</text>
                             <text x="12" y="66" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• queueInLoop(Functor) 异步安全任务队列</text>
                             <text x="12" y="86" font-family="'Noto Serif SC', serif" font-size="10" fill="#0c4a6e">• 独占 unique_ptr&lt;Poller&gt; 负责 I/O 监听</text>
                         </g>
@@ -563,7 +563,7 @@
 
                         <g transform="translate(16, 50)" class="topo-node" onclick="openTopologyDrawer('tcpserver')">
                             <rect width="303" height="116" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
-                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#047857">TcpServer (高层服务器大总管)</text>
+                            <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="13" fill="#047857">TcpServer (TCP 连接管理)</text>
                             <text x="12" y="48" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• map&lt;string, TcpConnectionPtr&gt; conns_</text>
                             <text x="12" y="68" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 管理全服所有活跃客户端连接生命周期</text>
                             <text x="12" y="88" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• std::bind 绑定 newConnection 回调挂入 Acceptor</text>
@@ -574,7 +574,7 @@
                             <rect width="303" height="120" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1.5"/>
                             <text x="12" y="24" font-family="'Courier Prime', monospace" font-weight="700" font-size="12.5" fill="#047857">TcpConnection (客户端长连接核心)</text>
                             <text x="12" y="48" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• shared_ptr&lt;TcpConnection&gt; 共享生存期</text>
-                            <text x="12" y="68" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• enable_shared_from_this 跨线程自保</text>
+                            <text x="12" y="68" font-family="'Courier Prime', monospace" font-size="10" fill="#065f46">• enable_shared_from_this 生命周期管理</text>
                             <text x="12" y="88" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• 拥有独立 inputBuffer_ 与 outputBuffer_</text>
                             <text x="12" y="106" font-family="'Noto Serif SC', serif" font-size="10" fill="#065f46">• std::bind 组装 onMessage / onClose 回调</text>
                         </g>
@@ -627,7 +627,7 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-rose-100 text-[11px] text-rose-700 font-serifMono">
-                    共 25 个不可跳过的硬核核心任务
+                    共 25 个核心必修任务
                 </div>
             </div>
 
@@ -668,11 +668,11 @@
                         <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">auto_ptr (已废弃)</span>
                         <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">复杂模板元编程 (SFINAE)</span>
                         <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">valarray 数值数组</span>
-                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">老旧 C++98 宏黑魔法</span>
+                        <span class="bg-stone-100 px-2 py-0.5 rounded text-stone-400 line-through">老旧 C++98 宏技巧</span>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-stone-200 text-[11px] text-stone-500 font-serifMono">
-                    杜绝偏题，保持最强执行力
+                    聚焦核心语法，避免偏离主题
                 </div>
             </div>
         </div>
@@ -718,11 +718,11 @@
                         <i class="fa-solid fa-table-list text-sky-800"></i> C++ 核心机制 ➔ muduo 源码设计映射全景图
                     </h3>
                     <p class="text-xs text-stone-500 mt-1">
-                        清晰对应每个 C++ 关键语法在 muduo 工业源码中的所在文件、工程设计思想与代表性代码片段。
+                        清晰对应每个 C++ 关键语法在 muduo 源码中的所在文件、工程设计思想与代表性代码片段。
                     </p>
                 </div>
                 <span class="text-xs font-serifMono text-stone-400 bg-white px-3 py-1 rounded-lg border border-stone-200 w-fit">
-                    共 15 项基石映射
+                    共 15 项核心映射
                 </span>
             </div>
 
@@ -756,7 +756,7 @@
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
                         <i class="fa-solid fa-clipboard-question text-purple-700"></i> 每日深度自测中心
                     </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">选择任意 Day 开启 5 维硬核自测；通过自测（得分 ≥ 80%）方可解锁该 Day 的更高掌握度。</p>
+                    <p class="text-xs text-stone-500 mt-0.5">选择任意 Day 开启 5 维结构化自测；通过自测（得分 ≥ 80%）方可解锁该 Day 的更高掌握度。</p>
                 </div>
                 <div class="flex items-center gap-2 font-serifMono">
                     <span class="text-xs text-stone-600">切换自测日:</span>
@@ -806,7 +806,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                 <div>
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-bug text-rose-600"></i> C++ 工业级踩坑事故档案库
+                        <i class="fa-solid fa-bug text-rose-600"></i> C++ 常见问题与避坑档案库
                     </h2>
                     <p class="text-xs text-stone-500 mt-0.5">深入排查内存越界、Double Free、循环引用、悬挂闭包与迭代器失效等 12 大典型灾难。</p>
                 </div>
@@ -862,8 +862,8 @@
 
 <!-- ==================== 抽屉与模态框组件 ==================== -->
 
-<!-- ==================== 1. 企业级 C++ 开发环境与阿里云实战全流程 Modal ==================== -->
-<div id="env-guide-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" role="dialog" aria-modal="true" aria-label="企业级开发环境指引">
+<!-- ==================== 1. Linux C++ 开发环境与远程开发实战全流程 Modal ==================== -->
+<div id="env-guide-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" role="dialog" aria-modal="true" aria-label="Linux 远程开发指引">
     <div class="bg-white rounded-2xl max-w-4xl w-full p-4 sm:p-7 shadow-2xl border border-stone-200 font-serifHeading max-h-[92vh] overflow-y-auto flex flex-col justify-between space-y-4">
         
         <!-- 弹窗顶栏 -->
@@ -874,10 +874,10 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h3 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading">阿里云 Linux 服务器 + VS Code 工业级开发全流程实操手册</h3>
-                        <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-serifMono text-[10px] font-bold">保姆级图解</span>
+                        <h3 class="text-base sm:text-lg font-bold text-stone-900 font-serif-heading">Linux 开发环境实操手册：基于 VS Code Remote-SSH 与云服务器</h3>
+                        <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-serifMono text-[10px] font-bold">环境指南</span>
                     </div>
-                    <p class="text-[11px] text-stone-500 font-serifMono mt-0.5">彻底解密“在 Windows 写代码，如何直接在阿里云 Linux 内核编译、断点调试与内存检测”的工业真相</p>
+                    <p class="text-[11px] text-stone-500 font-serifMono mt-0.5">说明在 Windows 编写代码并在云端 Linux 环境下编译、调试与内存检测的操作方法</p>
                 </div>
             </div>
             <button onclick="closeEnvGuideModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭指引">
@@ -888,19 +888,19 @@
         <!-- 选项卡导航 (5 大核心模块) -->
         <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 border-b border-stone-100 text-xs font-serifMono shrink-0">
             <button id="env-tab-btn-concept" onclick="switchEnvModalTab('concept')" class="px-3 py-1.5 rounded-lg bg-sky-800 text-white font-bold text-xs shadow-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-brain mr-1"></i> 1. 核心认知：代码到底保存在哪？
+                <i class="fa-solid fa-brain mr-1"></i> 1. 核心认知：代码保存位置
             </button>
             <button id="env-tab-btn-steps" onclick="switchEnvModalTab('steps')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-list-check mr-1"></i> 2. 阿里云实战：从零到一 8 步闭环
+                <i class="fa-solid fa-list-check mr-1"></i> 2. 云服务器实战：环境搭建与验证
             </button>
             <button id="env-tab-btn-matrix" onclick="switchEnvModalTab('matrix')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-table-columns mr-1"></i> 3. 运作对照：Windows vs 阿里云底层
+                <i class="fa-solid fa-table-columns mr-1"></i> 3. 运作对照：Windows 与远程 Linux
             </button>
             <button id="env-tab-btn-debug" onclick="switchEnvModalTab('debug')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-bug mr-1"></i> 4. 调试与排错：GDB断点 / ASan内存探针
+                <i class="fa-solid fa-bug mr-1"></i> 4. 调试与排错：GDB断点 / ASan内存检测
             </button>
             <button id="env-tab-btn-cmake" onclick="switchEnvModalTab('cmake')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition shrink-0 cursor-pointer">
-                <i class="fa-solid fa-cubes mr-1"></i> 5. 工程骨架 CMake 与 WSL2 平替
+                <i class="fa-solid fa-cubes mr-1"></i> 5. 工程构建 CMake 与 WSL2 说明
             </button>
         </div>
 
@@ -908,31 +908,31 @@
         <div id="env-pane-concept" class="space-y-4 text-stone-700 text-xs leading-relaxed">
             <div class="bg-amber-50/80 border border-amber-300/80 rounded-xl p-4">
                 <div class="font-bold text-amber-950 font-serifMono text-sm mb-1.5 flex items-center gap-1.5">
-                    <i class="fa-solid fa-lightbulb text-amber-700"></i> 打破初学者的最大误区：“我在 Windows 写的代码，怎么‘发’给阿里云 Linux？”
+                    <i class="fa-solid fa-lightbulb text-amber-700"></i> 开发模式说明：“Windows 编辑与远程 Linux 执行”
                 </div>
                 <p class="text-stone-800 text-xs mb-2 leading-relaxed">
-                    初学者最容易产生的一个心智障碍是：以为要在 Windows 的 D 盘写好 <code>main.cpp</code> ➔ 像发微信附件或者用网盘一样把文件“复制/传输”到阿里云 ➔ 再去阿里云敲命令编译。<strong>大错特错！现代大厂绝不这么干！</strong>
+                    初学远程开发容易产生误区：以为要在本地保存 <code>main.cpp</code>，再通过文件传输复制到远程机器编译。<strong>实际开发中通常采用基于 SSH 协议的远程编辑工作流。</strong>
                 </p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 font-serifMono text-[11px]">
                     <div class="p-3 rounded-lg bg-rose-50 border border-rose-200">
-                        <span class="text-rose-700 font-bold block mb-1">❌ 错误认知（千万别这么想）：</span>
-                        以为代码存在 Windows 硬盘，每改一行都要手动 scp / FTP 上传到 Linux。繁琐易错、断点调试失灵、文件冲突不断。
+                        <span class="text-rose-700 font-bold block mb-1">❌ 低效方式：</span>
+                        代码保存在本地磁盘，每次修改后手动 scp / FTP 上传到 Linux。容易导致版本冲突与断点调试不可用。
                     </div>
                     <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-300">
-                        <span class="text-emerald-800 font-bold block mb-1">✅ 工业界真相（VS Code 客户端/服务端架构）：</span>
-                        <strong>代码从始至终就只保存在阿里云服务器的磁盘上！</strong> 你的 Windows 电脑上的 VS Code，本质上只是一个<strong>超高清投屏显示器与键盘鼠标输入端</strong>！
+                        <span class="text-emerald-800 font-bold block mb-1">✅ 推荐实践（VS Code Remote-SSH 架构）：</span>
+                        <strong>代码直接存放在远程 Linux 服务器的磁盘中。</strong> 本地 VS Code 通过 SSH 建立连接，由远程 VS Code Server 执行文件读写、编译与调试。
                     </div>
                 </div>
             </div>
 
             <div class="bg-stone-50 border border-stone-200 rounded-xl p-4 space-y-3 font-serifMono">
                 <h4 class="font-bold text-stone-900 text-xs font-serifHeading flex items-center gap-1.5">
-                    <i class="fa-solid fa-network-wired text-sky-700"></i> VS Code Remote - SSH 底层是怎么无缝协作的？
+                    <i class="fa-solid fa-network-wired text-sky-700"></i> VS Code Remote - SSH 底层工作原理
                 </h4>
                 <div class="bg-white p-3 rounded-lg border border-stone-200 text-[11px] leading-relaxed space-y-2.5 text-stone-600">
                     <div class="flex items-start gap-2">
                         <span class="w-5 h-5 rounded-full bg-sky-100 text-sky-800 flex items-center justify-center shrink-0 font-bold">1</span>
-                        <div><strong>你在 Windows 上敲字：</strong> 比如敲入 <code>int epfd = epoll_create1(0);</code>，VS Code 只是通过极速加密 SSH 通道把你的按键指令实时发往阿里云。</div>
+                        <div><strong>你在 Windows 上敲字：</strong> 比如敲入 <code>int epfd = epoll_create1(0);</code>，VS Code 通过加密 SSH 连接将编辑操作同步至云服务器。</div>
                     </div>
                     <div class="flex items-start gap-2">
                         <span class="w-5 h-5 rounded-full bg-sky-100 text-sky-800 flex items-center justify-center shrink-0 font-bold">2</span>
@@ -1025,7 +1025,7 @@
                         在左侧点击新建 <code>test_epoll.cpp</code>，贴入代码，按 Ctrl+S。直接在底部终端敲：
                     </p>
                     <pre class="bg-stone-900 text-emerald-400 p-2.5 rounded-lg text-[11px] mt-1.5">g++ -std=c++17 -Wall test_epoll.cpp -o test_epoll && ./test_epoll</pre>
-                    <p class="text-[11px] text-stone-500 font-serifHeading mt-1">代码直接在阿里云的内存和 CPU 中跑起来了！运行结果秒回屏幕！</p>
+                    <p class="text-[11px] text-stone-500 font-serifHeading mt-1">程序在 Linux 环境中执行，输出通过终端显示。</p>
                 </div>
             </div>
         </div>
@@ -1118,10 +1118,10 @@
 
             <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 space-y-2 font-serifMono">
                 <div class="font-bold text-rose-950 font-serifHeading text-xs flex items-center gap-1.5">
-                    <i class="fa-solid fa-shield-halved text-rose-700"></i> 二、工业级内存泄漏与越界检测（AddressSanitizer）
+                    <i class="fa-solid fa-shield-halved text-rose-700"></i> 二、内存泄漏与越界检测（AddressSanitizer）
                 </div>
                 <p class="text-[11.5px] text-stone-700 font-serifHeading">
-                    C++ 最怕悬空指针和野指针。在编译时加上 <code>-fsanitize=address -g</code> 即可激活 GCC 内置的 ASan 内存检测神探：
+                    C++ 最怕悬空指针和野指针。在编译时加上 <code>-fsanitize=address -g</code> 即可激活 GCC 内置的 AddressSanitizer (ASan) 内存检测工具：
                 </p>
                 <pre class="bg-stone-900 text-rose-300 p-2 rounded-lg text-[11px]">g++ -std=c++17 -fsanitize=address -g main.cpp -o main_asan && ./main_asan</pre>
                 <p class="text-[11px] text-stone-600 font-serifHeading">
@@ -1156,7 +1156,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -pthread -g")
 include_directories(include)
 file(GLOB SOURCES "src/*.cpp")
 add_executable(my_server ${SOURCES})</pre>
-                <p class="text-[11px] text-stone-600 font-serifHeading mt-1">在终端执行两行命令即可极速完成编译：</p>
+                <p class="text-[11px] text-stone-600 font-serifHeading mt-1">在终端执行两行命令即可完成编译：</p>
                 <pre class="bg-stone-900 text-amber-300 p-2 rounded-lg text-[11px]">mkdir -p build && cd build && cmake .. && make -j4</pre>
             </div>
 
@@ -1173,9 +1173,9 @@ add_executable(my_server ${SOURCES})</pre>
 
         <!-- 弹窗底栏 -->
         <div class="pt-3 border-t border-stone-100 flex items-center justify-between font-serifMono shrink-0">
-            <span class="text-[11px] text-stone-400">💡 提示：本指引永久内嵌于训练系统右上角，可随时打开查阅</span>
+            <span class="text-[11px] text-stone-400">💡 提示：本指引可通过右上角按钮随时查阅</span>
             <button onclick="closeEnvGuideModal()" class="px-5 py-2 bg-stone-900 hover:bg-stone-800 text-stone-100 text-xs font-bold rounded-xl transition cursor-pointer">
-                明白，立即实操！
+                关闭
             </button>
         </div>
     </div>
@@ -1295,11 +1295,11 @@ add_executable(my_server ${SOURCES})</pre>
             </div>
             <div>
                 <label class="block text-stone-600 font-bold mb-1">正确修复代码</label>
-                <textarea id="np-correct-code" rows="3" placeholder="// 规范工业级写法" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 font-mono-code"></textarea>
+                <textarea id="np-correct-code" rows="3" placeholder="// 规范代码实现" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 font-mono-code"></textarea>
             </div>
             <div>
                 <label class="block text-stone-600 font-bold mb-1">工程结论与铁律</label>
-                <input type="text" id="np-conclusion" placeholder="如: 【工程铁律】遍历连续容器时严禁直接修改容量" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                <input type="text" id="np-conclusion" placeholder="如: 遍历连续容器时单元素删除应更新迭代器" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
             </div>
         </div>
 
@@ -1318,7 +1318,7 @@ add_executable(my_server ${SOURCES})</pre>
     <!-- 单文件离线模式内联脚本 -->
     <script>
 // ==========================================================================
-// muduo C++ 工业实战 28 天全周期攻坚数据集 (DAYS_DATASET)
+// muduo C++ 28 天任务数据集 (DAYS_DATASET)
 // ==========================================================================
 
 var DAYS_DATASET = [
@@ -1331,15 +1331,15 @@ var DAYS_DATASET = [
     "tags": [
       "const 语义",
       "引用别名",
-      "零拷贝入参"
+      "引用传递"
     ],
     "points": [
       "彻底辨析三者区别：<code>const int* p</code>（指向常量的指针）、<code>int* const p</code>（指针自身为常量）、<code>const int* const p</code>（双重不可变）。（参看第7章 7.3.5 P.221～223）",
       "理解引用的物理本质：引用的底层通常是常量指针（<code>T* const</code>），但具有值语法的直观性，绝不存在空引用。（参看第8章 8.2 P.255～258）",
       "<strong>muduo 对照：</strong>为什么源码中参数传递 95% 都是 <code>const T&</code>？（避免深拷贝且从编译器保证入参只读，例如 <code>const Buffer&</code>、<code>const string&</code>）。（参看第8章 8.2.3 P.260～263）"
     ],
-    "code": "// Day 1: 检验三种参数传递机制\n#include <iostream>\n#include <string>\n\nvoid passPointer(const int* p) { /* 无法修改 *p 所指内容 */ }\nvoid passRef(const std::string& r) { /* 零拷贝传递，只读安全 */ }\n\nint main() {\n    int val = 42;\n    const int* p1 = &val; // 指向常量的指针：不可改值\n    int* const p2 = &val; // 常量指针：不可改指向\n    *p2 = 100;            // 合法\n    \n    std::string s = \"muduo network\";\n    passRef(s);\n    std::cout << \"const T& 是 muduo 最基础的入参规范\\n\";\n    return 0;\n}",
-    "muduoMap": "基础接口规范：网络数据包与回调几乎均采用 const T& 零拷贝入参",
+    "code": "// Day 1: 检验三种参数传递机制\n#include <iostream>\n#include <string>\n\nvoid passPointer(const int* p) { /* 无法修改 *p 所指内容 */ }\nvoid passRef(const std::string& r) { /* 传引用，只读安全 */ }\n\nint main() {\n    int val = 42;\n    const int* p1 = &val; // 指向常量的指针：不可改值\n    int* const p2 = &val; // 常量指针：不可改指向\n    *p2 = 100;            // 合法\n    \n    std::string s = \"muduo network\";\n    passRef(s);\n    std::cout << \"const T& 是 muduo 最基础的入参规范\\n\";\n    return 0;\n}",
+    "muduoMap": "基础接口规范：网络数据包与回调几乎均采用 const T& 引用入参",
     "check": "能不假思索说出 const int* 和 int* const 的语义区别与汇编本质。",
     "estimatedMinutes": 90,
     "budget": {
@@ -1354,7 +1354,7 @@ var DAYS_DATASET = [
       "strict": "引用的物理实现通常是常量指针（T* const），但在语义层面是对象别名，不占用独立地址标识符；const T& 是只读借用，并具有绑定临时右值并将其生命周期延长至引用作用域结束的语言特性。"
     },
     "experiment": {
-      "goal": "验证 const T& 零拷贝入参与指向常量的指针约束机理",
+      "goal": "验证 const T& 引用入参与指向常量的指针约束机理",
       "steps": [
         "创建局部变量并分别绑定指向常量的指针与只读引用",
         "尝试修改被 const 保护的内存观测编译报错",
@@ -1389,7 +1389,7 @@ var DAYS_DATASET = [
             "只有 const 引用才能被操作系统内核直接识别"
           ],
           "answer": 1,
-          "explanation": "const T& 兼具零拷贝（传地址）的高性能与只读语义（编译期拦截写操作）的安全性，并能合法绑定临时右值。"
+          "explanation": "const T& 兼具按引用传递（避免拷贝）与只读语义（编译期拦截写操作）的安全性，并能合法绑定临时右值。"
         },
         {
           "id": 3,
@@ -1433,7 +1433,7 @@ var DAYS_DATASET = [
         "muduoMechanism": "小对象寄存器值传递 vs 具备原地状态流转的大对象指针借用"
       },
       "implQuestion": {
-        "prompt": "写一个简单的泛型函数 inspectValue，要求入参以零拷贝且只读安全的方式接收任意类型 T 并打印其大小。",
+        "prompt": "写一个简单的泛型函数 inspectValue，要求入参以只读引用的方式接收任意类型 T 并打印其大小。",
         "referenceSolution": "template<typename T>\nvoid inspectValue(const T& val) {\n    std::cout << \"Size: \" << sizeof(val) << std::endl;\n}",
         "testCase": "inspectValue(std::string(\"muduo\"));"
       }
@@ -1560,12 +1560,12 @@ var DAYS_DATASET = [
     "day": 3,
     "week": 1,
     "tier": "A",
-    "title": "构造函数、析构函数与 RAII 基石",
+    "title": "构造函数、析构函数与 RAII 资源管理",
     "bookRange": "第10章 10.3（P.352～363）+ 10.4 this 指针（P.363～368）",
     "tags": [
       "构造初始化",
       "析构自动化",
-      "RAII基石"
+      "RAII机制"
     ],
     "points": [
       "构造函数与析构函数的声明、定义与执行时机（参看第10章 10.3.1～10.3.4 P.352～356）。",
@@ -1781,7 +1781,7 @@ var DAYS_DATASET = [
       },
       "muduoQuestion": {
         "question": "muduo 在管理网络事件回调和通道生命周期时，如何从架构上杜绝裸指针悬挂问题？",
-        "referenceAnswer": "muduo 采用智能指针与弱引用协同模式：所有 TcpConnection 均由 shared_ptr 托管生命周期；Channel 内部通过 std::weak_ptr<void> tie_ 持有其所属宿主的弱引用。当事件分发触发 handleEvent 时，必须先调用 tie_.lock() 尝试提升，若对象已消亡则直接放弃调用，从根源上消除了回调触发时的野指针崩溃。",
+        "referenceAnswer": "muduo 结合使用 shared_ptr 与 weak_ptr：TcpConnection 由 shared_ptr 管理生命周期；Channel 内部通过 std::weak_ptr<void> tie_ 观察对象存活状态，在事件派发 handleEvent 时先调用 tie_.lock() 尝试提升为 shared_ptr，避免在回调执行期间对象析构引发野指针问题。",
         "muduoMechanism": "Channel::tie_ 弱引用观察者 + lock() 安全提权"
       },
       "implQuestion": {
@@ -1871,7 +1871,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1898,9 +1898,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 5 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 5 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 5 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 5 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 5 的特性。",
@@ -1918,7 +1918,7 @@ var DAYS_DATASET = [
     "tags": [
       "右值引用",
       "std::move",
-      "零拷贝窃取"
+      "所有权转移"
     ],
     "points": [
       "左值与右值的严格界定（可取地址 vs 临时表达式结果，参看第18章 18.1.9 P.801～802）。",
@@ -1926,7 +1926,7 @@ var DAYS_DATASET = [
       "<code>std::move()</code> 的本质<strong>只是强行进行 static_cast&lt;T&amp;&amp;&gt; 转换</strong>，强制触发移动构造函数（参看第18章 18.2.5 P.809～813）。",
       "编写移动构造与移动赋值时将源指针置空（偷取所有权）并标记 <code>noexcept</code>。"
     ],
-    "code": "// Day 6: 移动构造实现资源零拷贝窃取\n#include <utility>\n#include <iostream>\n\nclass MoveBuffer {\nprivate:\n    char* data_{nullptr};\n    size_t size_{0};\npublic:\n    MoveBuffer(size_t s) : size_(s), data_(new char[s]) {}\n    ~MoveBuffer() { delete[] data_; }\n\n    // 移动构造函数\n    MoveBuffer(MoveBuffer&& rhs) noexcept : data_(rhs.data_), size_(rhs.size_) {\n        rhs.data_ = nullptr; // 剥夺原主人的指针，避免其析构时释放\n        rhs.size_ = 0;\n    }\n\n    // 移动赋值运算符\n    MoveBuffer& operator=(MoveBuffer&& rhs) noexcept {\n        if (this != &rhs) {\n            delete[] data_;\n            data_ = rhs.data_;\n            size_ = rhs.size_;\n            rhs.data_ = nullptr;\n            rhs.size_ = 0;\n        }\n        return *this;\n    }\n};",
+    "code": "// Day 6: 移动构造实现资源所有权转移\n#include <utility>\n#include <iostream>\n\nclass MoveBuffer {\nprivate:\n    char* data_{nullptr};\n    size_t size_{0};\npublic:\n    MoveBuffer(size_t s) : size_(s), data_(new char[s]) {}\n    ~MoveBuffer() { delete[] data_; }\n\n    // 移动构造函数\n    MoveBuffer(MoveBuffer&& rhs) noexcept : data_(rhs.data_), size_(rhs.size_) {\n        rhs.data_ = nullptr; // 剥夺原主人的指针，避免其析构时释放\n        rhs.size_ = 0;\n    }\n\n    // 移动赋值运算符\n    MoveBuffer& operator=(MoveBuffer&& rhs) noexcept {\n        if (this != &rhs) {\n            delete[] data_;\n            data_ = rhs.data_;\n            size_ = rhs.size_;\n            rhs.data_ = nullptr;\n            rhs.size_ = 0;\n        }\n        return *this;\n    }\n};",
     "muduoMap": "EventLoop::queueInLoop(Functor cb) 中的 cb = std::move(cb)",
     "check": "能够说出移动构造函数内部为什么要将 rhs.data_ 及时置空。",
     "estimatedMinutes": 90,
@@ -1948,7 +1948,7 @@ var DAYS_DATASET = [
         "使用 std::move 触发移动语义，将源对象的指针重定向",
         "将源对象指针置为 nullptr 保证析构安全"
       ],
-      "expectedOutput": "移动构造执行：零拷贝接管资源！",
+      "expectedOutput": "移动构造执行：接管堆资源成功",
       "watchPoints": "移动后源对象的资源被接管，源对象的 ptr_ 必须安全置为 nullptr，否则其析构将误删已转移资源。",
       "pitfalls": "在移动构造中遗漏 noexcept，导致放入 std::vector 时无法享受移动优化，退化为深拷贝。",
       "buildCommand": "g++ -std=c++17 -Wall -Wextra -pedantic day06.cpp -o day06 && ./day06"
@@ -1962,14 +1962,14 @@ var DAYS_DATASET = [
             "在内存中把源对象的数据块逐字节搬移到新地址",
             "不生成任何内存移动汇编代码，纯粹是无条件的 static_cast<T&&> 强制类型转换为右值引用",
             "自动启动异步后台线程进行深拷贝",
-            "调用操作系统内核提供的零拷贝接口"
+            "调用操作系统内核接口进行内存转移"
           ],
           "answer": 1,
           "explanation": "std::move 本质是一个编译期类型转换模板，它将左值强制转换成右值引用，从而使得编译器在重载决议时能优先匹配到移动构造或移动赋值函数。"
         },
         {
           "id": 2,
-          "question": "在 Day 6 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 6 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1989,7 +1989,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2016,9 +2016,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 6 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 6 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 6 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 6 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 6 的特性。",
@@ -2032,7 +2032,7 @@ var DAYS_DATASET = [
     "week": 1,
     "tier": "A",
     "title": "=default, =delete 与 noncopyable 机制",
-    "bookRange": "第18章 18.3.1～18.3.2（P.813～815）+ 第1周大闭环",
+    "bookRange": "第18章 18.3.1～18.3.2（P.813～815）+ 第1周综合复习",
     "tags": [
       "=delete",
       "noncopyable",
@@ -2042,7 +2042,7 @@ var DAYS_DATASET = [
       "<code>= default</code> 显式要求编译器生成默认特殊成员函数（参看第18章 18.3.1～18.3.2 P.813～815）。",
       "<code>= delete</code> 显式禁用拷贝构造和赋值运算符，编译期直接拦截非法复制（参看第18章 18.3.2 P.814～815）。",
       "<strong>muduo 标志性基类 <code>noncopyable</code>：</strong>TcpConnection、EventLoop、Channel、TcpServer 均继承自 noncopyable，从语法层面阻止关键对象被误拷贝！",
-      "第一周大闭环验收：手写一个支持 Move 却 Delete Copy 的完整 Buffer 模型。"
+      "第一周阶段验收：实现支持移动语义并禁用拷贝的 Buffer 模型。"
     ],
     "code": "// Day 7: muduo noncopyable 典范设计\nclass noncopyable {\npublic:\n    noncopyable(const noncopyable&) = delete;\n    void operator=(const noncopyable&) = delete;\nprotected:\n    noncopyable() = default;\n    ~noncopyable() = default;\n};\n\n// 任何继承 noncopyable 的类均自动禁止拷贝\nclass TcpConnection : private noncopyable {\n    // 绝对安全，外界无法误写 TcpConnection a = b;\n};\n\nint main() {\n    // TcpConnection c1;\n    // TcpConnection c2 = c1; // 编译报错！拷贝构造已被 = delete\n    return 0;\n}",
     "muduoMap": "muduo::noncopyable（整个 muduo 网络库的基础骨干）",
@@ -2087,7 +2087,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 7 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 7 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2107,7 +2107,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2134,9 +2134,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 7 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 7 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 7 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 7 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 7 的特性。",
@@ -2205,7 +2205,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 8 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 8 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2225,7 +2225,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2252,9 +2252,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 8 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 8 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 8 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 8 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 8 的特性。",
@@ -2323,7 +2323,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 9 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 9 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2343,7 +2343,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2370,9 +2370,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 9 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 9 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 9 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 9 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 9 的特性。",
@@ -2441,7 +2441,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 10 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 10 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2461,7 +2461,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2488,9 +2488,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 10 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 10 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 10 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 10 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 10 的特性。",
@@ -2559,7 +2559,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 11 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 11 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2579,7 +2579,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2606,9 +2606,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 11 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 11 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 11 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 11 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 11 的特性。",
@@ -2677,7 +2677,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 12 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 12 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2697,7 +2697,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2724,9 +2724,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 12 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 12 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 12 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 12 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 12 的特性。",
@@ -2795,7 +2795,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 13 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 13 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2815,7 +2815,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2842,9 +2842,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 13 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 13 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 13 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 13 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 13 的特性。",
@@ -2892,7 +2892,7 @@ var DAYS_DATASET = [
         "实现 addConnection、removeConnection 接口",
         "模拟连接关闭时从 map 摘除并验证生命期安全递减"
       ],
-      "expectedOutput": "连接管理器完成添加、查询与析构清理闭环",
+      "expectedOutput": "连接管理器完成添加、查询与析构清理流程",
       "watchPoints": "从 map 中 erase 连接后，若外部还有 Channel 正在执行回调，shared_ptr 保证连接不会立刻析构。",
       "pitfalls": "在遍历 map 过程中直接调用 conns_.erase(it) 未更新迭代器导致死循环或段错误。",
       "buildCommand": "g++ -std=c++17 -Wall -Wextra -pedantic day14.cpp -o day14 && ./day14"
@@ -2913,7 +2913,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 14 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 14 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2933,7 +2933,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2960,9 +2960,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 14 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 14 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 14 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 14 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 14 的特性。",
@@ -3031,7 +3031,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 15 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 15 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3051,7 +3051,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3078,9 +3078,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 15 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 15 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 15 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 15 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 15 的特性。",
@@ -3149,7 +3149,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 16 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 16 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3169,7 +3169,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3196,9 +3196,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 16 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 16 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 16 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 16 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 16 的特性。",
@@ -3263,11 +3263,11 @@ var DAYS_DATASET = [
             "[this] 会导致类中所有的 private 变量变成 public"
           ],
           "answer": 1,
-          "explanation": "[this] 传的是裸指针。在多线程异步事件驱动体系中，当回调排队到工作线程时，原宿主对象若已被销毁，此时再解引用 this 即发生 Use-After-Free 严重崩溃。"
+          "explanation": "[this] 传的是裸指针。在多线程异步事件循环中，当回调排队到工作线程时，原宿主对象若已被销毁，此时再解引用 this 即发生 Use-After-Free 严重崩溃。"
         },
         {
           "id": 2,
-          "question": "在 Day 17 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 17 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3287,7 +3287,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3314,9 +3314,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 17 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 17 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 17 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 17 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 17 的特性。",
@@ -3334,7 +3334,7 @@ var DAYS_DATASET = [
     "tags": [
       "std::function",
       "类型擦除",
-      "回调基石"
+      "回调机制"
     ],
     "points": [
       "模板参数多样性导致的低效与膨胀问题（参看第18章 18.5.1 P.823～825）。",
@@ -3385,7 +3385,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 18 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 18 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3405,7 +3405,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3432,9 +3432,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 18 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 18 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 18 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 18 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 18 的特性。",
@@ -3503,7 +3503,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 19 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 19 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3523,7 +3523,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3550,9 +3550,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 19 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 19 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 19 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 19 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 19 的特性。",
@@ -3620,7 +3620,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 20 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 20 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3640,7 +3640,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3667,9 +3667,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 20 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 20 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 20 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 20 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 20 的特性。",
@@ -3738,7 +3738,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 21 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 21 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3758,7 +3758,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3785,9 +3785,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 21 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 21 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 21 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 21 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 21 的特性。",
@@ -3856,7 +3856,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 22 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 22 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3876,7 +3876,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3903,9 +3903,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 22 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 22 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 22 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 22 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 22 的特性。",
@@ -3973,7 +3973,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 23 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 23 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3993,7 +3993,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -4020,9 +4020,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 23 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 23 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 23 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 23 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 23 的特性。",
@@ -4091,7 +4091,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 24 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 24 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -4111,7 +4111,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -4138,9 +4138,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 24 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 24 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 24 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 24 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 24 的特性。",
@@ -4209,7 +4209,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 25 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 25 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -4229,7 +4229,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -4256,9 +4256,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 25 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 25 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 25 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 25 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 25 的特性。",
@@ -4327,7 +4327,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 26 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 26 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -4347,7 +4347,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -4374,9 +4374,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 26 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 26 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 26 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 26 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 26 的特性。",
@@ -4389,16 +4389,16 @@ var DAYS_DATASET = [
     "day": 27,
     "week": 4,
     "tier": "A",
-    "title": "终极映射日：从 26 个 C++ 关键语法到 muduo 体系总览",
+    "title": "综合映射日：从 26 个 C++ 关键语法到 muduo 体系总览",
     "bookRange": "对照本控制台【语法 ➔ muduo 映射矩阵】",
     "tags": [
       "架构全景",
-      "生命期闭环",
+      "生命周期管理",
       "贯通复盘"
     ],
     "points": [
-      "复盘 26 天全部核心知识点，并在大脑中连点成网。",
-      "<strong>TcpConnection 跨线程销毁生命期链条闭环：</strong>为什么 Channel 需要 <code>weak_ptr tie_</code>？为什么必须用 <code>shared_from_this()</code>？",
+      "复盘前 26 天核心知识点与实现机制。",
+      "<strong>TcpConnection 跨线程销毁与生命周期流转：</strong>为什么 Channel 需要 <code>weak_ptr tie_</code>？为什么必须用 <code>shared_from_this()</code>？",
       "确认自己看到 <code>std::function</code>、<code>std::bind</code>、<code>std::move</code>、<code>=delete</code>、<code>weak_ptr.lock()</code> 时已经如呼吸般自然。"
     ],
     "code": "// Day 27: TcpConnection 在 Channel 上的生命期保护原型\n#include <memory>\n#include <iostream>\n\nclass Channel {\nprivate:\n    std::weak_ptr<void> tie_;\n    bool tied_{false};\npublic:\n    void tie(const std::shared_ptr<void>& obj) {\n        tie_ = obj;\n        tied_ = true;\n    }\n    void handleEventWithGuard() {\n        if (tied_) {\n            // 尝试提升弱指针为强引用 shared_ptr\n            std::shared_ptr<void> guard = tie_.lock();\n            if (guard) {\n                std::cout << \"Object alive, executing callback safely!\\n\";\n            }\n        }\n    }\n};",
@@ -4414,18 +4414,18 @@ var DAYS_DATASET = [
     },
     "rigorousNuance": {
       "quick": "muduo 源码就是把这 26 个语法全部用了一遍。",
-      "strict": "muduo 彻底摒弃了面向对象传统深度继承层次与虚函数泛滥，采用以 std::function/std::bind 为核心的基于对象（Object-based）编程风格，结合 RAII 与 shared_ptr/weak_ptr 构成高并发事件驱动的网络骨架。"
+      "strict": "muduo 避免深层继承层次，采用基于对象（Object-based）风格，使用 std::function/std::bind 组装事件回调，结合 RAII 与 shared_ptr/weak_ptr 管理资源与生命周期。"
     },
     "experiment": {
-      "goal": "终极贯通：从现代 C++ 机制映射总览 muduo Reactor 各层组件协同",
+      "goal": "综合贯通：从现代 C++ 机制映射总览 muduo 各层组件实现",
       "steps": [
         "对照 26 项 C++ 核心语法逐一在 muduo 架构图右侧定位对应实体类",
-        "跟踪一个 TCP 数据包从 Poller 接收、Channel 分发到 Buffer 处理的全链路",
+        "跟踪 TCP 数据包从 Poller 接收、Channel 分发到 Buffer 处理的流程",
         "复盘 Object-based 回调模式在多线程网络中的竞态消除优势"
       ],
-      "expectedOutput": "26 个语法基石全部对齐 muduo 架构拓扑映射！",
-      "watchPoints": "关注生命周期闭环：从 Acceptor 监听新连接到 TcpServer 管理，直至 Channel::tie_ 提权保活全链路。",
-      "pitfalls": "割裂看待各个语法特性，未能理解现代 C++ 是一套互锁的工业级资源与并发安全体系。",
+      "expectedOutput": "26 个核心语法点完成 muduo 架构拓扑映射对齐。",
+      "watchPoints": "关注生命周期管理：从 Acceptor 监听新连接到 TcpServer 管理，直至 Channel::tie_ 提权保活链路。",
+      "pitfalls": "割裂看待语法特性，未结合网络库资源与并发管理完整理解。",
       "buildCommand": "g++ -std=c++17 -Wall -Wextra -pedantic day27.cpp -o day27 && ./day27"
     },
     "quiz": {
@@ -4444,7 +4444,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 27 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 27 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -4464,7 +4464,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -4491,9 +4491,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 27 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 27 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 27 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 27 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 27 的特性。",
@@ -4521,7 +4521,7 @@ var DAYS_DATASET = [
       "3. 打开 <code>muduo/net/EventLoop.h / .cc</code>（观察 loop() 与 queueInLoop 任务队列）",
       "4. 打开 <code>muduo/net/TcpConnection.h / .cc</code>（观察 Buffer 与生命周期管理）",
       "5. 打开 <code>muduo/net/TcpServer.h / .cc</code>（总览所有连接的创建与分发）",
-      "恭喜你，语法迷雾已被驱散，你已经跨入工业级高性能网络编程的殿堂！"
+      "恭喜你，已完成全部 28 天任务，可通读 muduo 核心源码与 CppAIService 实现。"
     ],
     "code": "// 源码阅读启动推荐路线：\n// git clone https://github.com/chenshuo/muduo.git\n// cd muduo/muduo/net\n// 按照顺序逐个点开：\n// Channel.h -> EventLoop.h -> TcpConnection.h -> TcpServer.h",
     "muduoMap": "全库通读：Channel -> Poller -> EventLoop -> TcpConnection -> TcpServer",
@@ -4536,7 +4536,7 @@ var DAYS_DATASET = [
     },
     "rigorousNuance": {
       "quick": "最后一天就是把 muduo 仓库 clone 下来看代码。",
-      "strict": "从 Channel（事件通道）到 Poller（多路复用），经 EventLoop（驱动引擎）与 TcpConnection（长连接管理），配合 Buffer（应用层零碎片缓冲区），构成了工业级高并发 Reactor 网络的完整知识闭环。"
+      "strict": "从 Channel（事件通道）到 Poller（多路复用），经 EventLoop（事件循环）与 TcpConnection（连接管理），配合 Buffer（应用层缓冲区），构成 Reactor 网络数据处理链路。"
     },
     "experiment": {
       "goal": "出征验收：正式克隆并通读 muduo 源码，开启网络工程进阶之路",
@@ -4547,26 +4547,26 @@ var DAYS_DATASET = [
       ],
       "expectedOutput": "muduo 核心网络库源码阅读无障碍，完全通读！",
       "watchPoints": "重点关注 Reactor 模式经典 One Loop Per Thread 线程模型在 muduo 中的落地实现细节。",
-      "pitfalls": "只读代码不做笔记与动手复现，容易遗漏高并发线程切换时的锁粒度与自保细节。",
+      "pitfalls": "未动手调试验证，容易遗漏线程切换时的锁粒度与对象生命周期管理细节。",
       "buildCommand": "g++ -std=c++17 -Wall -Wextra -pedantic day28.cpp -o day28 && ./day28"
     },
     "quiz": {
       "questions": [
         {
           "id": 1,
-          "question": "通读 muduo 源码时，整个 Reactor 网络库的心脏枢纽是哪一个核心类？",
+          "question": "通读 muduo 源码时，整个事件循环的核心调度类是哪一个？",
           "options": [
             "InetAddress（地址转换）",
-            "EventLoop（负责 One Loop Per Thread 驱动循环、I/O 多路复用分发与跨线程安全队列）",
+            "EventLoop（负责 One Loop Per Thread 事件循环、I/O 轮询分发与跨线程任务队列）",
             "LogStream（日志流）",
             "Date（日期格式化）"
           ],
           "answer": 1,
-          "explanation": "EventLoop 是 Reactor 反应堆的核心调度中枢，它独占所在的 I/O 线程，驱动 Poller.poll() 收集活跃事件，并按序安全调度 Channel 和跨线程 Functor 回调。"
+          "explanation": "EventLoop 是事件循环类，运行于其所在的 I/O 线程，调用 Poller.poll() 收集就绪事件，并按序分发 Channel 事件和执行跨线程任务。"
         },
         {
           "id": 2,
-          "question": "在 Day 28 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 28 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -4586,7 +4586,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -4613,9 +4613,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 28 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 28 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 28 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 28 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 28 的特性。",
@@ -4737,7 +4737,7 @@ var SOURCE_ROADMAP = [
     "role": "每个 Channel 对象独占一个特定的 Linux Socket 文件描述符（sockfd），负责向 Poller 注册该 fd 感兴趣的事件（EPOLLIN / EPOLLOUT），并接收 Poller 返回的实际就绪事件，进而分发给预先绑定的事件回调闭包。",
     "members": [
       "const int fd_: 独占管理的单个套接字描述符",
-      "EventLoop* loop_: 所属的 EventLoop 反应堆",
+      "EventLoop* loop_: 所属的 EventLoop 事件循环",
       "int events_: 用户关注的事件掩码 (POLLIN/POLLOUT)",
       "int revents_: Poller 实际返回的就绪事件掩码",
       "std::weak_ptr<void> tie_: 弱引用绑定宿主（通常为 TcpConnection），防止多线程下宿主正在析构时回调触发导致野指针",
@@ -4806,8 +4806,8 @@ var SOURCE_ROADMAP = [
   {
     "id": "eventloop",
     "name": "EventLoop",
-    "layer": "反应堆事件驱动核心中枢",
-    "role": "Reactor 反应堆的心脏，坚决践行'One Loop Per Thread'设计准则。每个线程最多只能拥有一个 EventLoop 实例。它在所在专属线程死循环执行 loop()，调度 Poller::poll 获取活跃通道并逐个执行，同时维护一个线程安全的跨线程异步任务队列。",
+    "layer": "事件循环管理",
+    "role": "One Loop Per Thread 核心实现。每个线程最多拥有一个 EventLoop 实例。它在专属线程中循环执行 loop()，调用 Poller::poll 获取活跃通道并分发回调，同时维护线程安全的跨线程异步任务队列。",
     "members": [
       "bool looping_: 循环运行状态标志",
       "bool quit_: 退出标志（原子布尔）",
@@ -4820,7 +4820,7 @@ var SOURCE_ROADMAP = [
       "mutable MutexLock mutex_: 保护 pendingFunctors_ 队列的轻量级互斥锁"
     ],
     "functions": [
-      "void loop(): 核心驱动循环，连续轮询 poll() 并执行 doPendingFunctors()",
+      "void loop(): 事件主循环，连续轮询 poll() 并执行 doPendingFunctors()",
       "void quit(): 线程安全退出循环请求",
       "void runInLoop(Functor cb): 在当前 I/O 线程同步立即执行，若在跨线程则调用 queueInLoop",
       "void queueInLoop(Functor cb): 将回调 std::move 进 pendingFunctors_ 并在必要时 wakeup()",
@@ -4830,7 +4830,7 @@ var SOURCE_ROADMAP = [
     "cppFeatures": [
       "std::unique_ptr 独占所有权",
       "std::vector 移动追加",
-      "std::move 零拷贝窃取",
+      "std::move 移动语义",
       "RAII 锁守护",
       "std::function 异步闭包",
       "assert 断言防御"
@@ -4850,7 +4850,7 @@ var SOURCE_ROADMAP = [
     "layer": "监听套接字与新建连接接入层",
     "role": "供 TcpServer 内部使用的高层组件，负责服务端监听套接字（listen socket）的创建、bind 绑定、listen 监听，并通过自身的 acceptChannel_ 监听可读事件。当新客户端连接到来时，调用 ::accept4 获取连接套接字并分发 newConnectionCallback 回调给 TcpServer。",
     "members": [
-      "EventLoop* loop_: 所属的主接收反应堆（通常为主线程 baseLoop）",
+      "EventLoop* loop_: 所属的主事件循环（通常为主线程 baseLoop）",
       "Socket acceptSocket_: RAII 方式管理的监听套接字，析构自动 close(fd)",
       "Channel acceptChannel_: 监听 acceptSocket_.fd() 读事件的通道",
       "NewConnectionCallback newConnectionCallback_: 连接建立后上报给 TcpServer 的回调闭包",
@@ -4905,7 +4905,7 @@ var SOURCE_ROADMAP = [
       "void connectEstablished(): 连接确立时挂载 Channel::tie(shared_from_this())"
     ],
     "cppFeatures": [
-      "std::enable_shared_from_this 跨线程自保",
+      "std::enable_shared_from_this 生命周期管理",
       "std::shared_ptr 共享模型",
       "std::unique_ptr 独占套接字",
       "Buffer 应用层缓冲",
@@ -4924,8 +4924,8 @@ var SOURCE_ROADMAP = [
   {
     "id": "tcpserver",
     "name": "TcpServer",
-    "layer": "高层服务器连接拓扑大总管",
-    "role": "面向最终业务开发者的总入口。负责集成 Acceptor（监听新建连接）和 EventLoopThreadPool（多线程反应堆池），并在自身维护的 map<string, TcpConnectionPtr> conns_ 中管理服务器全生命周期的所有存活长连接。使用 std::bind 将自身的 newConnection 与 removeConnection 回调注入底层。",
+    "layer": "TCP 服务端连接管理层",
+    "role": "TCP 服务端管理器。集成 Acceptor（监听连接）和 EventLoopThreadPool（从属事件循环线程池），在 map<string, TcpConnectionPtr> conns_ 中维护所有存活长连接，并通过回调完成连接建立与注销。",
     "members": [
       "EventLoop* loop_: 主 Reactor 循环 (baseLoop，负责接收连接)",
       "const string ipPort_: 服务器绑定的 IP:Port 标识",
@@ -4965,7 +4965,7 @@ var SOURCE_ROADMAP = [
     "id": "buffer",
     "name": "Buffer",
     "layer": "应用层自适应非阻塞 I/O 缓冲器",
-    "role": "解决非阻塞网络 I/O 下数据发送不完全（TCP 协议滑动窗口与内核发送缓冲区满）与粘包分包问题的关键构件。底层基于连续内存 std::vector<char> 构建，利用 prepends (预留头部)、readerIndex (可读游标) 与 writerIndex (可写游标) 消除无谓的内存移动，配合 readv 分散读实现极致零碎片的平滑扩容。",
+    "role": "解决非阻塞网络 I/O 下数据发送不完全（TCP 协议滑动窗口与内核发送缓冲区满）与粘包分包问题的关键构件。底层基于连续内存 std::vector<char> 构建，利用 prepends (预留头部)、readerIndex (可读游标) 与 writerIndex (可写游标) 消除无谓的内存移动，配合 readv 分散读实现减少内存碎片的平滑扩容。",
     "members": [
       "std::vector<char> buffer_: 连续内存存储载体，保证高 CPU Cache 局部性",
       "size_t readerIndex_: 指示当前有效可读数据的起始偏移量",
@@ -4980,7 +4980,7 @@ var SOURCE_ROADMAP = [
       "void retrieve(size_t len): 消耗读取特定长度数据，向前推进 readerIndex_",
       "void append(const char* data, size_t len): 追加新数据到 buffer_，不够时自动扩容",
       "void makeSpace(size_t more): 空间不足时，若已读空间+可写空间足够则原地搬移整理，否则调用 vector::resize 扩容",
-      "ssize_t readFd(int fd, int* savedErrno): 核心技巧：结合栈上临时 64KB 数组借助 ::readv 分散读，兼顾小包不扩容与大包零拷贝动态扩容"
+      "ssize_t readFd(int fd, int* savedErrno): 结合栈上临时 64KB 数组通过 ::readv 分散读，兼顾小包直接写入与大包按需扩容"
     ],
     "cppFeatures": [
       "std::vector<char> 连续内存",
@@ -5004,7 +5004,7 @@ var SOURCE_ROADMAP = [
     "layer": "纳秒/微秒级高精度定时器调度队列",
     "role": "提供线程安全的定时器与心跳超时检测机制。内部借助 Linux 特有的 timerfd 系列系统调用（timerfd_create / timerfd_settime），将定时器超时抽象为一个常规的文件描述符事件，直接纳入 EventLoop 的 Poller 进行统一多路复用监听。基于 std::set<Entry> 自动维持时间戳递增顺序。",
     "members": [
-      "EventLoop* loop_: 所属的 EventLoop 反应堆",
+      "EventLoop* loop_: 所属的 EventLoop 事件循环",
       "const int timerfd_: Linux 内核 timerfd 套接字句柄",
       "Channel timerfdChannel_: 监听 timerfd_ 读事件的专用 Channel",
       "typedef std::pair<Timestamp, Timer*> Entry: 时间戳与定时器裸指针键值对",
@@ -5024,7 +5024,7 @@ var SOURCE_ROADMAP = [
       "std::pair 组合键",
       "timerfd 内核机制",
       "运算符重载 operator< 比较器",
-      "算法 lower_bound 极速二分定位"
+      "算法 lower_bound 二分查找"
     ],
     "relatedDays": [
       13,
@@ -5069,8 +5069,8 @@ var PITFALLS_DATASET = [
     "errorCode": "const std::string& getHostname() {\n    std::string host = \"cluster.internal.lan\";\n    return host; // 危险！返回局部栈变量的引用！\n}\n\nvoid useHost() {\n    const std::string& r = getHostname();\n    // 此时 host 所在的栈帧已被销毁回收\n    std::cout << r << std::endl; // 未定义行为：乱码、内存越界或静默篡改\n}",
     "errorSymptom": "打印出的字符串时而正常时而变成乱码或空串；开启 -O2 优化后直接段错误崩溃（SIGSEGV）；Valgrind 报告 Invalid read of size 8。",
     "errorCause": "局部变量 host 分配在当前函数的调用栈帧（Stack Frame）上。函数返回时该栈帧被弹出，其占用的栈内存被标记为可用；返回的引用变成了悬挂引用，后续任何函数调用都会覆写该内存。",
-    "correctCode": "// 方案1: 直接按值返回，现代 C++ 借助 RVO / NRVO 零拷贝优化，开销等同传引用\nstd::string getHostname() {\n    std::string host = \"cluster.internal.lan\";\n    return host;\n}\n\n// 方案2: 传入外部缓冲区引用\nvoid getHostname(std::string* out) {\n    if (out) *out = \"cluster.internal.lan\";\n}",
-    "conclusion": "【工程铁律】绝不要从函数中返回指向局部非静态变量的指针或引用；按值返回结合编译器的返回值优化（RVO）兼具绝对安全性与零拷贝极致性能！"
+    "correctCode": "// 方案1: 直接按值返回，利用编译器 RVO / NRVO 优化\nstd::string getHostname() {\n    std::string host = \"cluster.internal.lan\";\n    return host;\n}\n\n// 方案2: 传入外部缓冲区引用\nvoid getHostname(std::string* out) {\n    if (out) *out = \"cluster.internal.lan\";\n}",
+    "conclusion": "规范要点：不得从函数中返回指向局部自动变量的指针或引用；按值返回借助编译器返回值优化（RVO）可避免对象拷贝。"
   },
   {
     "id": "p3",
@@ -5084,10 +5084,10 @@ var PITFALLS_DATASET = [
       "tie_"
     ],
     "errorCode": "class Channel {\npublic:\n    TcpConnection* conn_{nullptr}; // 裸指针持有宿主！\n    void onRead() {\n        // 若在事件到来前，外部线程已将 conn_ 析构\n        conn_->handleMessage(); // Use-After-Free 崩溃！\n    }\n};",
-    "errorSymptom": "高并发压测或客户端频繁断开重连时，服务器偶发段错误，核心转储文件（core dump）显示崩溃在已析构对象的虚函数调用或成员访问上。",
+    "errorSymptom": "压力测试下客户端频繁断开连接时偶发未捕获异常，转储文件（core dump）显示纯虚函数调用（pure virtual method called）崩溃。",
     "errorCause": "在多线程网络库中，'客户端关闭连接'与'内核检测到可读事件'在不同线程并发进行。连接对象已被析构归还内存池，但 Channel 的事件尚未从 epoll 队列中消费，裸指针解引用访问了已被回收的内存。",
     "correctCode": "class Channel {\n    std::weak_ptr<void> tie_; // 使用弱引用观察者绑定宿主\n    bool tied_{false};\npublic:\n    void tie(const std::shared_ptr<void>& obj) {\n        tie_ = obj;\n        tied_ = true;\n    }\n    void handleEventWithGuard(Timestamp receiveTime) {\n        if (tied_) {\n            std::shared_ptr<void> guard = tie_.lock(); // 原子尝试提权\n            if (guard) {\n                // 提权成功！此时 guard 强引用保证在执行回调期间对象绝对不会析构！\n                if (readCallback_) readCallback_(receiveTime);\n            }\n            // 提权失败则说明宿主已消亡，静默放弃调用，杜绝崩溃！\n        }\n    }\n};",
-    "conclusion": "【工程铁律】muduo Channel::tie_ 是解决多线程异步回调生命周期竞态的工业级典范：必须用 std::weak_ptr 观察宿主并在执行前调用 lock() 提权保活！"
+    "conclusion": "规范要点：Channel::tie_ 通过 std::weak_ptr 观察宿主生命周期，在执行异步回调前通过 lock() 尝试获取 shared_ptr，避免访问已析构对象。"
   },
   {
     "id": "p4",
@@ -5102,7 +5102,7 @@ var PITFALLS_DATASET = [
     ],
     "errorCode": "struct NodeB;\nstruct NodeA {\n    std::shared_ptr<NodeB> b_;\n    ~NodeA() { std::cout << \"~NodeA\\n\"; }\n};\nstruct NodeB {\n    std::shared_ptr<NodeA> a_; // 危险！双向 shared_ptr\n    ~NodeB() { std::cout << \"~NodeB\\n\"; }\n};\n\nvoid testCycle() {\n    auto a = std::make_shared<NodeA>();\n    auto b = std::make_shared<NodeB>();\n    a->b_ = b;\n    b->a_ = a; // 循环引用形成！两者的 use_count() 均为 2\n} // 作用域结束：两者的引用计数均只能递减到 1，析构函数永不触发，内存永久泄漏！",
     "errorSymptom": "程序长期运行内存持续只增不减（Memory Leak），Valgrind 报告 definitely lost，但代码中没有任何裸 new 未 delete 的迹象。",
-    "errorCause": "两个或多个对象通过 std::shared_ptr 形成了引用闭环环路。任何一方要析构都依赖对方先将引用归零，形成死锁闭环，导致两者的 Control Block 与对象实体均无法被释放。",
+    "errorCause": "两个或多个对象通过 std::shared_ptr 形成了循环引用。任一对象析构均依赖对方引用计数清零，导致控制块与对象内存均无法被释放。",
     "correctCode": "struct NodeB;\nstruct NodeA {\n    std::shared_ptr<NodeB> b_;\n    ~NodeA() { std::cout << \"~NodeA\\n\"; }\n};\nstruct NodeB {\n    std::weak_ptr<NodeA> a_; // 核心改动：将反向引用设为 weak_ptr！\n    ~NodeB() { std::cout << \"~NodeB\\n\"; }\n};\n\nvoid testCycle() {\n    auto a = std::make_shared<NodeA>();\n    auto b = std::make_shared<NodeB>();\n    a->b_ = b;\n    b->a_ = a; // weak_ptr 不增加 a 的 use_count()，a 退出时正常析构，随后带动 b 析构！\n}",
     "conclusion": "【工程铁律】双向关联或父子层次结构中，正向（父指向子）使用 std::shared_ptr 或 unique_ptr，反向（子指向父或观察者）必须使用 std::weak_ptr！"
   },
@@ -5121,7 +5121,7 @@ var PITFALLS_DATASET = [
     "errorSymptom": "系统抛出未捕获的 C++ 运行时异常：std::bad_weak_ptr，由于没有在顶层 try-catch，默认调用 std::terminate() 导致服务端进程挂掉。",
     "errorCause": "直接使用 std::shared_ptr<T>(weak_ptr) 构造函数时，如果 weak_ptr.expired() 为真，标准库强制抛出 std::bad_weak_ptr 异常；若多线程并发时对象已死，必然炸裂。",
     "correctCode": "std::weak_ptr<TcpConnection> wp;\nvoid onEvent() {\n    // 正确规范：必须始终使用 lock() 并进行 nullptr 校验！\n    std::shared_ptr<TcpConnection> sp = wp.lock();\n    if (sp) {\n        // 对象依然存活，安全访问\n        sp->handleRead();\n    } else {\n        // 对象已过期销毁，优雅执行降级或清理逻辑\n        LOG_INFO << \"Connection already expired, ignore event.\";\n    }\n}",
-    "conclusion": "【工程铁律】访问 std::weak_ptr 唯一推荐的工业级标准方式是调用 .lock() 并立刻执行 if (ptr) 判空，绝不使用直接抛异常的构造函数！"
+    "conclusion": "规范要点：访问 std::weak_ptr 应当调用 .lock() 并进行判空检查，避免直接使用可能抛出 std::bad_weak_ptr 的构造函数。"
   },
   {
     "id": "p6",
@@ -5254,7 +5254,7 @@ window.PITFALLS_DATASET = PITFALLS_DATASET;
 
 
 // ==========================================================================
-// muduo C++ 工业实战个人控制台 - 专注计时器高可靠模块 (Timer Engine)
+// muduo C++ 学习控制台 - 专注计时器模块
 // 彻底修复不走字、后台标签页节流时间漂移、脏数据死锁等缺陷
 // ==========================================================================
 
@@ -5312,7 +5312,7 @@ function toggleStudyTimer() {
             updateTimerDisplay();
         }, 1000);
 
-        if (typeof showToast === 'function') showToast("专注计时已启动，保持工业级专注！");
+        if (typeof showToast === 'function') showToast("专注计时已启动，");
     } else {
         // 暂停计时
         timer.running = false;
@@ -5425,7 +5425,7 @@ function logStudyMinutes(mins) {
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
     const typeNames = {
-        coding: '代码攻坚',
+        coding: '代码编写',
         reading: '书目研读',
         debug: '排错调试'
     };
@@ -5437,7 +5437,7 @@ function logStudyMinutes(mins) {
         day: day,
         duration: mins,
         type: type,
-        note: `专注攻坚 Day ${day} (${typeNames[type] || type})`
+        note: `任务 Day ${day} (${typeNames[type] || type})`
     });
 
     if (typeof persistState === 'function') persistState();
@@ -5844,7 +5844,7 @@ function updateDashboardMetrics() {
     document.getElementById('progress-fill').style.width = `${progressPercent}%`;
     const remaining = total - progressCount;
     document.getElementById('progress-bar-text').innerText = 
-        remaining === 0 ? "🏆 全周期攻坚完成！你可以毫无语言阻碍地通读 muduo 源码了！" : `还剩 ${remaining} 天任务正式踏入 muduo 源码大门`;
+        remaining === 0 ? "已完成全部 28 天任务，可通读 muduo 核心源码。" : `还剩 ${remaining} 天任务正式踏入 muduo 源码大门`;
 
     // 学习时间卡片
     document.getElementById('stat-card-today').innerText = `${todayMinutes}m`;
@@ -5965,7 +5965,7 @@ function renderTodayMissionCard(dueCount) {
             </div>
             <div class="flex items-center gap-2.5 shrink-0 self-end sm:self-auto font-serifMono">
                 <button onclick="scrollToDay(${nextDay.day})" class="px-4 py-2 bg-sky-800 hover:bg-sky-900 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-play"></i> 进入攻坚
+                    <i class="fa-solid fa-play"></i> 开始任务
                 </button>
                 <button onclick="openQuizForDay(${nextDay.day})" class="px-3.5 py-2 bg-white border border-stone-300 hover:bg-stone-100 text-purple-700 text-xs font-semibold rounded-xl transition">
                     立即自测
@@ -6239,7 +6239,7 @@ function renderDailyCards() {
 
                 <div class="flex flex-wrap gap-1.5 mb-4">${tagsHtml}</div>
 
-                <!-- 掌握度闭环 5 阶打卡动作条 -->
+                <!-- 掌握度 5 阶段打卡记录 -->
                 <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 mb-4 flex flex-wrap items-center justify-between gap-2">
                     <div class="text-[11px] font-serifMono font-bold text-stone-500">
                         <i class="fa-solid fa-stairs mr-1 text-sky-700"></i>能力阶梯:
@@ -6282,7 +6282,7 @@ function renderDailyCards() {
                         </div>
                         <div class="md:pl-1">
                             <span class="inline-flex items-center gap-1 font-bold text-sky-900 font-serifMono text-[11px] mb-1">
-                                <i class="fa-solid fa-microscope text-sky-700"></i> 工业级严格剖析
+                                <i class="fa-solid fa-microscope text-sky-700"></i> 机制剖析
                             </span>
                             <p class="text-stone-700 text-[11.5px]">${escapeHtml(item.rigorousNuance?.strict || "")}</p>
                         </div>
@@ -6303,7 +6303,7 @@ function renderDailyCards() {
                         </div>
                     </div>
 
-                    <!-- 升级为工业级 Demo 实验工作台 -->
+                    <!-- Demo 实验工作台 -->
                     <div class="lg:col-span-8 bg-stone-50 border border-stone-200 rounded-xl p-3.5 flex flex-col justify-between">
                         <div>
                             <div class="flex items-center justify-between text-[11px] font-bold text-stone-600 mb-2 font-serifMono">
@@ -6730,7 +6730,7 @@ function loadQuizForDay(dayNum) {
         <!-- 模块 4: muduo 源码映射题 -->
         <div class="bg-white p-4 rounded-xl border border-stone-200 space-y-2.5">
             <div class="text-xs font-bold font-serifMono text-stone-500 uppercase tracking-wider">
-                PART 4: muduo 工业级源码映射 (Architecture Mapping)
+                PART 4: muduo 源码映射 (Architecture Mapping)
             </div>
             <p class="text-xs font-bold text-stone-900 font-serifHeading">${escapeHtml(quiz.muduoQuestion.question)}</p>
             <textarea id="quiz-muduo-input" rows="2" placeholder="分析 muduo 网络库中该特性的应用场景与架构价值..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2.5 text-xs font-serifHeading focus:outline-none focus:border-purple-600"></textarea>
@@ -7090,7 +7090,7 @@ function renderPitfallsList() {
                 </div>
                 <div class="border border-emerald-200 rounded-xl p-3 bg-stone-50">
                     <div class="text-[11px] font-bold text-emerald-700 font-serifMono mb-1.5 flex items-center gap-1">
-                        <i class="fa-solid fa-check"></i> 工业级正确解法
+                        <i class="fa-solid fa-check"></i> 标准解法与实现
                     </div>
                     <pre class="m-0 p-0 overflow-x-auto"><code class="language-cpp font-mono-code">${escapeHtml(p.correctCode)}</code></pre>
                 </div>
@@ -7159,22 +7159,22 @@ function submitNewPitfall() {
 
 // 拓扑图点击抽屉 (Topology Drawer)
 const TOPOLOGY_DRAWER_DATA = {
-    step_1: { title: "const & 引用传参", tag: "C++ 8 阶底座", role: "零拷贝入参契约，防止内部深拷贝开销，保障入参只读安全性。", members: ["const T&: 物理常量指针，语义别名", "右值引用绑定延长临时对象生存期"], functions: ["void handle(const Buffer& buf)", "void send(const string& msg)"], relatedDays: [1] },
-    step_2: { title: "类 / 析构自动化 / RAII", tag: "C++ 8 阶底座", role: "将系统资源获取与析构绑定，确定性栈展开杜绝死锁与文件描述符泄漏。", members: ["explicit MutexGuard(Mutex& m)", "~MutexGuard(): 离开作用域自动解锁"], functions: ["Socket::~Socket(): 自动 close(sockfd_)"], relatedDays: [2, 3] },
-    step_3: { title: "移动语义 / =delete", tag: "C++ 8 阶底座", role: "右值引用窃取堆资源指针，消除深拷贝；=delete 从编译期封死拷贝行为。", members: ["T(T&& rhs) noexcept", "noncopyable(const noncopyable&) = delete"], functions: ["std::move(cb): 零拷贝移交回调任务"], relatedDays: [6, 7] },
-    step_4: { title: "智能指针体系", tag: "C++ 8 阶底座", role: "unique_ptr 独占资源、shared_ptr 共享所有权、weak_ptr 观察者解耦防死锁。", members: ["unique_ptr<Poller>", "shared_ptr<TcpConnection>", "weak_ptr<void> tie_"], functions: ["weak_ptr::lock(): 原子提权"], relatedDays: [8, 9, 10] },
-    step_5: { title: "STL 连续与关联容器", tag: "C++ 8 阶底座", role: "vector<char> 承载网络缓冲区 Cache 友好；map<string, TcpConnectionPtr> 管理活跃长连接。", members: ["vector<char> buffer_", "map<string, TcpConnectionPtr> conns_"], functions: ["vector::resize()", "map::find()"], relatedDays: [11, 13] },
-    step_6: { title: "std::function & Lambda", tag: "C++ 8 阶底座", role: "类型擦除包装任意可调用实体，就地捕获闭包，抹平普通函数与成员函数差异。", members: ["std::function<void(Timestamp)>", "[this]() { doWork(); }"], functions: ["invoke()", "operator()()"], relatedDays: [17, 18] },
-    step_7: { title: "std::bind 绑定类成员", tag: "C++ 8 阶底座", role: "消除类成员函数对隐藏 this 指针的调用依赖，将其转化为标准无状态回调。", members: ["std::bind(&TcpServer::newConnection, this, _1, _2)"], functions: ["placeholders::_1 映射形参偏序"], relatedDays: [19, 20] },
-    step_8: { title: "模板基础 / 虚析构", tag: "C++ 8 阶底座", role: "泛型阻塞队列 BlockingQueue；Poller::~Poller() 虚析构防止通过基类 delete 派生类发生泄漏。", members: ["template<typename T> class BlockingQueue", "virtual ~Poller() = default"], functions: ["dynamic dispatch via vtable"], relatedDays: [25, 26] },
-    mutexlockguard: { title: "MutexLockGuard", tag: "Reactor 调度基础", role: "RAII 互斥锁守护类，构造时 lock()，析构时自动 unlock()，杜绝由于分支 return 遗漏解锁造成的永久死锁灾难。", members: ["MutexLock& mutex_: 绑定的互斥锁引用"], functions: ["explicit MutexLockGuard(MutexLock& m)", "~MutexLockGuard()"], relatedDays: [3] },
-    eventloop: { title: "EventLoop", tag: "反应堆心脏", role: "One Loop Per Thread 模式中枢。独占一个专属 I/O 线程，连续调用 Poller::poll 获取就绪事件，并通过 eventfd 跨线程安全唤醒队列。", members: ["unique_ptr<Poller> poller_: 独占的 I/O 多路复用器", "int wakeupFd_: 跨线程唤醒 eventfd 句柄", "vector<Functor> pendingFunctors_: 跨线程投递任务队列", "MutexLock mutex_: 保护任务队列的互斥锁"], functions: ["void loop(): 核心事件分发死循环", "void runInLoop(Functor cb): 同步或投递执行", "void queueInLoop(Functor cb): 移入队列并唤醒", "void wakeup(): 写 8 字节唤醒 epoll_wait"], relatedDays: [6, 8, 18, 21] },
-    poller: { title: "Poller / EPollPoller", tag: "I/O 多路复用", role: "抽象 epoll/poll 操作，调用 epoll_wait 阻塞监听注册的套接字描述符，并将发生事件的 Channel 填入 activeChannels 供 EventLoop 派发。", members: ["EventLoop* ownerLoop_: 所属反应堆", "map<int, Channel*> channels_: 按 fd 映射管理的通道索引", "struct epoll_event events_[]: 内核事件接收缓冲区"], functions: ["virtual ~Poller() = default: 虚析构必须声明", "virtual Timestamp poll(int timeout, ChannelList* activeChannels) = 0", "virtual void updateChannel(Channel* c) = 0", "virtual void removeChannel(Channel* c) = 0"], relatedDays: [8, 13, 26] },
+    step_1: { title: "const & 引用传参", tag: "C++ 基础特性", role: "引用传递入参，避免对象拷贝开销，并保证入参只读安全性。", members: ["const T&: 物理常量指针，语义别名", "右值引用绑定延长临时对象生存期"], functions: ["void handle(const Buffer& buf)", "void send(const string& msg)"], relatedDays: [1] },
+    step_2: { title: "类 / 析构自动化 / RAII", tag: "C++ 基础特性", role: "基于 RAII 将资源生命周期与对象作用域绑定，在离开作用域时释放互斥锁或关闭文件描述符。", members: ["explicit MutexGuard(Mutex& m)", "~MutexGuard(): 离开作用域自动解锁"], functions: ["Socket::~Socket(): 自动 close(sockfd_)"], relatedDays: [2, 3] },
+    step_3: { title: "移动语义 / =delete", tag: "C++ 基础特性", role: "右值引用转移资源所有权以避免深拷贝；=delete 显式禁用拷贝构造函数与赋值操作符。", members: ["T(T&& rhs) noexcept", "noncopyable(const noncopyable&) = delete"], functions: ["std::move(cb): 转移回调函数所有权"], relatedDays: [6, 7] },
+    step_4: { title: "智能指针体系", tag: "C++ 基础特性", role: "unique_ptr 管理独占所有权、shared_ptr 管理共享引用计数、weak_ptr 避免循环引用并作为弱观察指针。", members: ["unique_ptr<Poller>", "shared_ptr<TcpConnection>", "weak_ptr<void> tie_"], functions: ["weak_ptr::lock(): 原子提权"], relatedDays: [8, 9, 10] },
+    step_5: { title: "STL 连续与关联容器", tag: "C++ 基础特性", role: "vector<char> 提供连续内存缓冲区；map 或 unordered_map 用于连接对象的索引与管理。", members: ["vector<char> buffer_", "map<string, TcpConnectionPtr> conns_"], functions: ["vector::resize()", "map::find()"], relatedDays: [11, 13] },
+    step_6: { title: "std::function & Lambda", tag: "C++ 基础特性", role: "使用类型擦除封装可调用实体，配合 Lambda 表达式捕获执行上下文，支持通用回调。", members: ["std::function<void(Timestamp)>", "[this]() { doWork(); }"], functions: ["invoke()", "operator()()"], relatedDays: [17, 18] },
+    step_7: { title: "std::bind 绑定类成员", tag: "C++ 基础特性", role: "将类成员函数与对象实例指针绑定，转化为符合标准签名的回调函数对象。", members: ["std::bind(&TcpServer::newConnection, this, _1, _2)"], functions: ["placeholders::_1 映射形参偏序"], relatedDays: [19, 20] },
+    step_8: { title: "模板基础 / 虚析构", tag: "C++ 基础特性", role: "使用模板定义通用队列类；基类虚析构函数确保通过基类指针销毁派生类对象时正确调用析构。", members: ["template<typename T> class BlockingQueue", "virtual ~Poller() = default"], functions: ["dynamic dispatch via vtable"], relatedDays: [25, 26] },
+    mutexlockguard: { title: "MutexLockGuard", tag: "并发同步", role: "RAII 互斥锁包装类，构造时执行 lock()，析构时自动执行 unlock()，避免分支返回时遗漏解锁。", members: ["MutexLock& mutex_: 绑定的互斥锁引用"], functions: ["explicit MutexLockGuard(MutexLock& m)", "~MutexLockGuard()"], relatedDays: [3] },
+    eventloop: { title: "EventLoop", tag: "事件循环", role: "One Loop Per Thread 核心实现。在独立 I/O 线程中循环调用 Poller::poll 处理就绪事件，并通过 eventfd 实现跨线程任务通知。", members: ["unique_ptr<Poller> poller_: 独占的 I/O 多路复用器", "int wakeupFd_: 跨线程唤醒 eventfd 句柄", "vector<Functor> pendingFunctors_: 跨线程投递任务队列", "MutexLock mutex_: 保护任务队列的互斥锁"], functions: ["void loop(): 核心事件分发死循环", "void runInLoop(Functor cb): 同步或投递执行", "void queueInLoop(Functor cb): 移入队列并唤醒", "void wakeup(): 写 8 字节唤醒 epoll_wait"], relatedDays: [6, 8, 18, 21] },
+    poller: { title: "Poller / EPollPoller", tag: "I/O 多路复用", role: "抽象 epoll/poll 操作，调用 epoll_wait 阻塞监听注册的套接字描述符，并将发生事件的 Channel 填入 activeChannels 供 EventLoop 派发。", members: ["EventLoop* ownerLoop_: 所属事件循环", "map<int, Channel*> channels_: 按 fd 映射管理的通道索引", "struct epoll_event events_[]: 内核事件接收缓冲区"], functions: ["virtual ~Poller() = default: 虚析构必须声明", "virtual Timestamp poll(int timeout, ChannelList* activeChannels) = 0", "virtual void updateChannel(Channel* c) = 0", "virtual void removeChannel(Channel* c) = 0"], relatedDays: [8, 13, 26] },
     channel: { title: "Channel", tag: "通道适配器", role: "独占一个特定的 socket 文件描述符，负责注册该 fd 感兴趣的读写事件，并分发事件回调给对应的业务处理函数。", members: ["const int fd_: 独占套接字句柄", "EventLoop* loop_: 所属事件循环", "int events_: 关心的事件掩码", "int revents_: 实际就绪的事件掩码", "weak_ptr<void> tie_: 弱引用绑定所属宿主防止悬空析构"], functions: ["void tie(const shared_ptr<void>&)", "void enableReading(): events_ |= POLLIN; update()", "void handleEvent(Timestamp receiveTime)"], relatedDays: [1, 10, 18, 19] },
-    handleeventwithguard: { title: "Channel::handleEventWithGuard", tag: "多线程安全自保", role: "事件到来的核心分发防线。先通过 tie_.lock() 原子提权为 shared_ptr；若提权成功保证宿主存活才执行用户回调，从根源消除多线程异步回调中的 Use-After-Free 崩溃。", members: ["std::shared_ptr<void> guard = tie_.lock()", "ReadEventCallback readCallback_", "EventCallback writeCallback_"], functions: ["if (guard) { readCallback_(receiveTime); }"], relatedDays: [10, 18] },
-    tcpserver: { title: "TcpServer", tag: "服务器大总管", role: "统领全服所有长连接生命周期。使用 map<string, TcpConnectionPtr> conns_ 存储长连接，使用 std::bind 将 newConnection 回调挂入 Acceptor。", members: ["unique_ptr<Acceptor> acceptor_: 监听新建连接", "map<string, TcpConnectionPtr> connections_: 存活长连接映射表", "EventLoopThreadPool threadPool_: 反应堆工作线程池"], functions: ["void setThreadNum(int)", "void start()", "void newConnection(int sockfd, const InetAddress&)", "void removeConnection(const TcpConnectionPtr&)"], relatedDays: [9, 13, 14, 19] },
-    tcpconnection: { title: "TcpConnection", tag: "客户端连接实体", role: "代表已建立的 TCP 连接。继承 enable_shared_from_this 跨线程自保；独占 Channel 与 Socket；拥有 inputBuffer_ 与 outputBuffer_ 解决非阻塞网络发包粘包。", members: ["shared_ptr<TcpConnection>", "unique_ptr<Socket> socket_", "unique_ptr<Channel> channel_", "Buffer inputBuffer_, outputBuffer_"], functions: ["void send(const string&)", "void shutdown()", "void handleRead()", "void handleWrite()"], relatedDays: [9, 10, 14, 18, 19] },
-    buffer: { title: "Buffer", tag: "应用层自适应缓冲", role: "连续内存非阻塞应用层缓冲。利用 vector<char> 保证高 CPU Cache 命中；以 prepends / readable / writable 游标消除内存搬移；以 readv 分散读实现零碎片扩容。", members: ["vector<char> buffer_", "size_t readerIndex_, writerIndex_", "static const size_t kCheapPrepend = 8"], functions: ["size_t readableBytes() const", "void retrieve(size_t)", "void append(const char*, size_t)", "ssize_t readFd(int fd, int* savedErrno)"], relatedDays: [2, 6, 11, 23] }
+    handleeventwithguard: { title: "Channel::handleEventWithGuard", tag: "生命周期保护", role: "事件分发处理逻辑。通过 tie_.lock() 尝试获取宿主对象的 shared_ptr，确认对象存活后执行回调，避免析构后野指针访问。", members: ["std::shared_ptr<void> guard = tie_.lock()", "ReadEventCallback readCallback_", "EventCallback writeCallback_"], functions: ["if (guard) { readCallback_(receiveTime); }"], relatedDays: [10, 18] },
+    tcpserver: { title: "TcpServer", tag: "TCP 服务管理", role: "管理 TCP 服务端生命周期与连接集合。通过 Acceptor 接收新连接，分发至 EventLoop 线程并以 map 维护活跃连接。", members: ["unique_ptr<Acceptor> acceptor_: 监听新建连接", "map<string, TcpConnectionPtr> connections_: 存活长连接映射表", "EventLoopThreadPool threadPool_: 事件循环线程池"], functions: ["void setThreadNum(int)", "void start()", "void newConnection(int sockfd, const InetAddress&)", "void removeConnection(const TcpConnectionPtr&)"], relatedDays: [9, 13, 14, 19] },
+    tcpconnection: { title: "TcpConnection", tag: "TCP 连接", role: "代表已建立的 TCP 连接对象。继承 enable_shared_from_this 管理自身生命周期，持有 Channel、Socket 以及输入输出 Buffer。", members: ["shared_ptr<TcpConnection>", "unique_ptr<Socket> socket_", "unique_ptr<Channel> channel_", "Buffer inputBuffer_, outputBuffer_"], functions: ["void send(const string&)", "void shutdown()", "void handleRead()", "void handleWrite()"], relatedDays: [9, 10, 14, 18, 19] },
+    buffer: { title: "Buffer", tag: "应用层缓冲区", role: "应用层缓冲区。基于 vector<char> 连续内存组织，通过 readerIndex 与 writerIndex 游标管理可读写区域，配合 readv 接收套接字数据。", members: ["vector<char> buffer_", "size_t readerIndex_, writerIndex_", "static const size_t kCheapPrepend = 8"], functions: ["size_t readableBytes() const", "void retrieve(size_t)", "void append(const char*, size_t)", "ssize_t readFd(int fd, int* savedErrno)"], relatedDays: [2, 6, 11, 23] }
 };
 
 function openTopologyDrawer(nodeId) {
@@ -7300,7 +7300,7 @@ function openReviewModal(dayNum = null) {
 
         <div id="review-hidden-answer" class="hidden space-y-2.5 pt-2">
             <div class="bg-sky-50 p-3 rounded-xl border border-sky-200 text-xs text-stone-700 leading-relaxed">
-                <strong class="text-sky-900 font-serifMono">工业级严格表述：</strong>
+                <strong class="text-sky-900 font-serifMono">规范表述：</strong>
                 <p class="mt-0.5">${escapeHtml(item.rigorousNuance?.strict || "")}</p>
             </div>
             <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs text-stone-700 leading-relaxed">
@@ -7542,7 +7542,7 @@ function executeImportOverwrite(imported) {
 
 // 导出 Markdown 个人学习档案
 function exportMarkdownReport() {
-    let md = `# 我的 muduo C++ 个人攻坚与训练档案\n\n`;
+    let md = `# 我的 muduo C++ 学习与训练档案\n\n`;
     md += `> **生成时间**: ${new Date().toLocaleString()}  \n`;
     md += `> **系统版本**: muduo C++ 个人训练系统 V5.0  \n\n`;
 
@@ -7551,7 +7551,7 @@ function exportMarkdownReport() {
     let totalMins = 0;
     appState.studySessions.forEach(s => totalMins += (s.duration || 0));
 
-    md += `## 一、攻坚综合总览\n\n`;
+    md += `## 一、学习综合总览\n\n`;
     md += `- **真实连续学习**: ${streak} 天\n`;
     md += `- **累计专注投入**: ${(totalMins / 60).toFixed(1)} 小时 (${totalMins} 分钟)\n`;
     md += `- **完成任务数量**: ${appState.completedDays.length} / 28 天\n\n`;

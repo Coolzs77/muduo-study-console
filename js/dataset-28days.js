@@ -1,5 +1,5 @@
 // ==========================================================================
-// muduo C++ 工业实战 28 天全周期攻坚数据集 (DAYS_DATASET)
+// muduo C++ 28 天任务数据集 (DAYS_DATASET)
 // ==========================================================================
 
 var DAYS_DATASET = [
@@ -12,15 +12,15 @@ var DAYS_DATASET = [
     "tags": [
       "const 语义",
       "引用别名",
-      "零拷贝入参"
+      "引用传递"
     ],
     "points": [
       "彻底辨析三者区别：<code>const int* p</code>（指向常量的指针）、<code>int* const p</code>（指针自身为常量）、<code>const int* const p</code>（双重不可变）。（参看第7章 7.3.5 P.221～223）",
       "理解引用的物理本质：引用的底层通常是常量指针（<code>T* const</code>），但具有值语法的直观性，绝不存在空引用。（参看第8章 8.2 P.255～258）",
       "<strong>muduo 对照：</strong>为什么源码中参数传递 95% 都是 <code>const T&</code>？（避免深拷贝且从编译器保证入参只读，例如 <code>const Buffer&</code>、<code>const string&</code>）。（参看第8章 8.2.3 P.260～263）"
     ],
-    "code": "// Day 1: 检验三种参数传递机制\n#include <iostream>\n#include <string>\n\nvoid passPointer(const int* p) { /* 无法修改 *p 所指内容 */ }\nvoid passRef(const std::string& r) { /* 零拷贝传递，只读安全 */ }\n\nint main() {\n    int val = 42;\n    const int* p1 = &val; // 指向常量的指针：不可改值\n    int* const p2 = &val; // 常量指针：不可改指向\n    *p2 = 100;            // 合法\n    \n    std::string s = \"muduo network\";\n    passRef(s);\n    std::cout << \"const T& 是 muduo 最基础的入参规范\\n\";\n    return 0;\n}",
-    "muduoMap": "基础接口规范：网络数据包与回调几乎均采用 const T& 零拷贝入参",
+    "code": "// Day 1: 检验三种参数传递机制\n#include <iostream>\n#include <string>\n\nvoid passPointer(const int* p) { /* 无法修改 *p 所指内容 */ }\nvoid passRef(const std::string& r) { /* 传引用，只读安全 */ }\n\nint main() {\n    int val = 42;\n    const int* p1 = &val; // 指向常量的指针：不可改值\n    int* const p2 = &val; // 常量指针：不可改指向\n    *p2 = 100;            // 合法\n    \n    std::string s = \"muduo network\";\n    passRef(s);\n    std::cout << \"const T& 是 muduo 最基础的入参规范\\n\";\n    return 0;\n}",
+    "muduoMap": "基础接口规范：网络数据包与回调几乎均采用 const T& 传参避免拷贝",
     "check": "能不假思索说出 const int* 和 int* const 的语义区别与汇编本质。",
     "estimatedMinutes": 90,
     "budget": {
@@ -35,7 +35,7 @@ var DAYS_DATASET = [
       "strict": "引用的物理实现通常是常量指针（T* const），但在语义层面是对象别名，不占用独立地址标识符；const T& 是只读借用，并具有绑定临时右值并将其生命周期延长至引用作用域结束的语言特性。"
     },
     "experiment": {
-      "goal": "验证 const T& 零拷贝入参与指向常量的指针约束机理",
+      "goal": "验证 const T& 引用传递与指向常量的指针约束机理",
       "steps": [
         "创建局部变量并分别绑定指向常量的指针与只读引用",
         "尝试修改被 const 保护的内存观测编译报错",
@@ -70,7 +70,7 @@ var DAYS_DATASET = [
             "只有 const 引用才能被操作系统内核直接识别"
           ],
           "answer": 1,
-          "explanation": "const T& 兼具零拷贝（传地址）的高性能与只读语义（编译期拦截写操作）的安全性，并能合法绑定临时右值。"
+          "explanation": "const T& 兼具按引用传递（避免拷贝）与只读语义（编译期拦截写操作）的安全性，并能合法绑定临时右值。"
         },
         {
           "id": 3,
@@ -114,7 +114,7 @@ var DAYS_DATASET = [
         "muduoMechanism": "小对象寄存器值传递 vs 具备原地状态流转的大对象指针借用"
       },
       "implQuestion": {
-        "prompt": "写一个简单的泛型函数 inspectValue，要求入参以零拷贝且只读安全的方式接收任意类型 T 并打印其大小。",
+        "prompt": "写一个简单的泛型函数 inspectValue，要求入参以只读引用的方式接收任意类型 T 并打印其大小。",
         "referenceSolution": "template<typename T>\nvoid inspectValue(const T& val) {\n    std::cout << \"Size: \" << sizeof(val) << std::endl;\n}",
         "testCase": "inspectValue(std::string(\"muduo\"));"
       }
@@ -241,12 +241,12 @@ var DAYS_DATASET = [
     "day": 3,
     "week": 1,
     "tier": "A",
-    "title": "构造函数、析构函数与 RAII 基石",
+    "title": "构造函数、析构函数与 RAII 资源管理",
     "bookRange": "第10章 10.3（P.352～363）+ 10.4 this 指针（P.363～368）",
     "tags": [
       "构造初始化",
       "析构自动化",
-      "RAII基石"
+      "RAII机制"
     ],
     "points": [
       "构造函数与析构函数的声明、定义与执行时机（参看第10章 10.3.1～10.3.4 P.352～356）。",
@@ -462,7 +462,7 @@ var DAYS_DATASET = [
       },
       "muduoQuestion": {
         "question": "muduo 在管理网络事件回调和通道生命周期时，如何从架构上杜绝裸指针悬挂问题？",
-        "referenceAnswer": "muduo 采用智能指针与弱引用协同模式：所有 TcpConnection 均由 shared_ptr 托管生命周期；Channel 内部通过 std::weak_ptr<void> tie_ 持有其所属宿主的弱引用。当事件分发触发 handleEvent 时，必须先调用 tie_.lock() 尝试提升，若对象已消亡则直接放弃调用，从根源上消除了回调触发时的野指针崩溃。",
+        "referenceAnswer": "muduo 结合使用 shared_ptr 与 weak_ptr：TcpConnection 由 shared_ptr 管理生命周期；Channel 内部通过 std::weak_ptr<void> tie_ 观察对象存活状态，在事件派发 handleEvent 时先调用 tie_.lock() 尝试提升为 shared_ptr，避免在回调执行期间对象析构引发野指针问题。",
         "muduoMechanism": "Channel::tie_ 弱引用观察者 + lock() 安全提权"
       },
       "implQuestion": {
@@ -552,7 +552,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -579,9 +579,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 5 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 5 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 5 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 5 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 5 的特性。",
@@ -599,15 +599,15 @@ var DAYS_DATASET = [
     "tags": [
       "右值引用",
       "std::move",
-      "零拷贝窃取"
+      "所有权转移"
     ],
     "points": [
       "左值与右值的严格界定（可取地址 vs 临时表达式结果，参看第18章 18.1.9 P.801～802）。",
       "右值引用符号 <code>T&&</code> 与移动语义的必要性：避免大块临时数据的深拷贝开销（参看第18章 18.2.1～18.2.2 P.802～808）。",
       "<code>std::move()</code> 的本质<strong>只是强行进行 static_cast&lt;T&amp;&amp;&gt; 转换</strong>，强制触发移动构造函数（参看第18章 18.2.5 P.809～813）。",
-      "编写移动构造与移动赋值时将源指针置空（偷取所有权）并标记 <code>noexcept</code>。"
+      "编写移动构造与移动赋值时将源指针置空（转移所有权）并标记 <code>noexcept</code>。"
     ],
-    "code": "// Day 6: 移动构造实现资源零拷贝窃取\n#include <utility>\n#include <iostream>\n\nclass MoveBuffer {\nprivate:\n    char* data_{nullptr};\n    size_t size_{0};\npublic:\n    MoveBuffer(size_t s) : size_(s), data_(new char[s]) {}\n    ~MoveBuffer() { delete[] data_; }\n\n    // 移动构造函数\n    MoveBuffer(MoveBuffer&& rhs) noexcept : data_(rhs.data_), size_(rhs.size_) {\n        rhs.data_ = nullptr; // 剥夺原主人的指针，避免其析构时释放\n        rhs.size_ = 0;\n    }\n\n    // 移动赋值运算符\n    MoveBuffer& operator=(MoveBuffer&& rhs) noexcept {\n        if (this != &rhs) {\n            delete[] data_;\n            data_ = rhs.data_;\n            size_ = rhs.size_;\n            rhs.data_ = nullptr;\n            rhs.size_ = 0;\n        }\n        return *this;\n    }\n};",
+    "code": "// Day 6: 移动构造实现资源所有权转移\n#include <utility>\n#include <iostream>\n\nclass MoveBuffer {\nprivate:\n    char* data_{nullptr};\n    size_t size_{0};\npublic:\n    MoveBuffer(size_t s) : size_(s), data_(new char[s]) {}\n    ~MoveBuffer() { delete[] data_; }\n\n    // 移动构造函数\n    MoveBuffer(MoveBuffer&& rhs) noexcept : data_(rhs.data_), size_(rhs.size_) {\n        rhs.data_ = nullptr; // 剥夺原主人的指针，避免其析构时释放\n        rhs.size_ = 0;\n    }\n\n    // 移动赋值运算符\n    MoveBuffer& operator=(MoveBuffer&& rhs) noexcept {\n        if (this != &rhs) {\n            delete[] data_;\n            data_ = rhs.data_;\n            size_ = rhs.size_;\n            rhs.data_ = nullptr;\n            rhs.size_ = 0;\n        }\n        return *this;\n    }\n};",
     "muduoMap": "EventLoop::queueInLoop(Functor cb) 中的 cb = std::move(cb)",
     "check": "能够说出移动构造函数内部为什么要将 rhs.data_ 及时置空。",
     "estimatedMinutes": 90,
@@ -629,7 +629,7 @@ var DAYS_DATASET = [
         "使用 std::move 触发移动语义，将源对象的指针重定向",
         "将源对象指针置为 nullptr 保证析构安全"
       ],
-      "expectedOutput": "移动构造执行：零拷贝接管资源！",
+      "expectedOutput": "移动构造执行：接管堆资源成功",
       "watchPoints": "移动后源对象的资源被接管，源对象的 ptr_ 必须安全置为 nullptr，否则其析构将误删已转移资源。",
       "pitfalls": "在移动构造中遗漏 noexcept，导致放入 std::vector 时无法享受移动优化，退化为深拷贝。",
       "buildCommand": "g++ -std=c++17 -Wall -Wextra -pedantic day06.cpp -o day06 && ./day06"
@@ -643,14 +643,14 @@ var DAYS_DATASET = [
             "在内存中把源对象的数据块逐字节搬移到新地址",
             "不生成任何内存移动汇编代码，纯粹是无条件的 static_cast<T&&> 强制类型转换为右值引用",
             "自动启动异步后台线程进行深拷贝",
-            "调用操作系统内核提供的零拷贝接口"
+            "调用操作系统内核接口进行内存转移"
           ],
           "answer": 1,
           "explanation": "std::move 本质是一个编译期类型转换模板，它将左值强制转换成右值引用，从而使得编译器在重载决议时能优先匹配到移动构造或移动赋值函数。"
         },
         {
           "id": 2,
-          "question": "在 Day 6 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 6 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -670,7 +670,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -697,9 +697,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 6 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 6 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 6 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 6 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 6 的特性。",
@@ -713,7 +713,7 @@ var DAYS_DATASET = [
     "week": 1,
     "tier": "A",
     "title": "=default, =delete 与 noncopyable 机制",
-    "bookRange": "第18章 18.3.1～18.3.2（P.813～815）+ 第1周大闭环",
+    "bookRange": "第18章 18.3.1～18.3.2（P.813～815）+ 第1周综合复习",
     "tags": [
       "=delete",
       "noncopyable",
@@ -723,7 +723,7 @@ var DAYS_DATASET = [
       "<code>= default</code> 显式要求编译器生成默认特殊成员函数（参看第18章 18.3.1～18.3.2 P.813～815）。",
       "<code>= delete</code> 显式禁用拷贝构造和赋值运算符，编译期直接拦截非法复制（参看第18章 18.3.2 P.814～815）。",
       "<strong>muduo 标志性基类 <code>noncopyable</code>：</strong>TcpConnection、EventLoop、Channel、TcpServer 均继承自 noncopyable，从语法层面阻止关键对象被误拷贝！",
-      "第一周大闭环验收：手写一个支持 Move 却 Delete Copy 的完整 Buffer 模型。"
+      "第一周阶段验收：实现支持移动语义并禁用拷贝的 Buffer 模型。"
     ],
     "code": "// Day 7: muduo noncopyable 典范设计\nclass noncopyable {\npublic:\n    noncopyable(const noncopyable&) = delete;\n    void operator=(const noncopyable&) = delete;\nprotected:\n    noncopyable() = default;\n    ~noncopyable() = default;\n};\n\n// 任何继承 noncopyable 的类均自动禁止拷贝\nclass TcpConnection : private noncopyable {\n    // 绝对安全，外界无法误写 TcpConnection a = b;\n};\n\nint main() {\n    // TcpConnection c1;\n    // TcpConnection c2 = c1; // 编译报错！拷贝构造已被 = delete\n    return 0;\n}",
     "muduoMap": "muduo::noncopyable（整个 muduo 网络库的基础骨干）",
@@ -768,7 +768,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 7 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 7 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -788,7 +788,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -815,9 +815,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 7 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 7 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 7 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 7 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 7 的特性。",
@@ -886,7 +886,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 8 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 8 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -906,7 +906,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -933,9 +933,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 8 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 8 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 8 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 8 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 8 的特性。",
@@ -1004,7 +1004,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 9 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 9 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1024,7 +1024,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1051,9 +1051,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 9 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 9 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 9 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 9 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 9 的特性。",
@@ -1122,7 +1122,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 10 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 10 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1142,7 +1142,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1169,9 +1169,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 10 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 10 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 10 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 10 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 10 的特性。",
@@ -1240,7 +1240,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 11 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 11 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1260,7 +1260,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1287,9 +1287,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 11 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 11 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 11 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 11 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 11 的特性。",
@@ -1358,7 +1358,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 12 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 12 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1378,7 +1378,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1405,9 +1405,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 12 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 12 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 12 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 12 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 12 的特性。",
@@ -1476,7 +1476,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 13 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 13 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1496,7 +1496,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1523,9 +1523,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 13 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 13 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 13 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 13 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 13 的特性。",
@@ -1573,7 +1573,7 @@ var DAYS_DATASET = [
         "实现 addConnection、removeConnection 接口",
         "模拟连接关闭时从 map 摘除并验证生命期安全递减"
       ],
-      "expectedOutput": "连接管理器完成添加、查询与析构清理闭环",
+      "expectedOutput": "连接管理器完成添加、查询与析构清理流程",
       "watchPoints": "从 map 中 erase 连接后，若外部还有 Channel 正在执行回调，shared_ptr 保证连接不会立刻析构。",
       "pitfalls": "在遍历 map 过程中直接调用 conns_.erase(it) 未更新迭代器导致死循环或段错误。",
       "buildCommand": "g++ -std=c++17 -Wall -Wextra -pedantic day14.cpp -o day14 && ./day14"
@@ -1594,7 +1594,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 14 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 14 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1614,7 +1614,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1641,9 +1641,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 14 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 14 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 14 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 14 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 14 的特性。",
@@ -1712,7 +1712,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 15 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 15 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1732,7 +1732,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1759,9 +1759,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 15 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 15 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 15 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 15 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 15 的特性。",
@@ -1830,7 +1830,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 16 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 16 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1850,7 +1850,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1877,9 +1877,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 16 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 16 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 16 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 16 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 16 的特性。",
@@ -1944,11 +1944,11 @@ var DAYS_DATASET = [
             "[this] 会导致类中所有的 private 变量变成 public"
           ],
           "answer": 1,
-          "explanation": "[this] 传的是裸指针。在多线程异步事件驱动体系中，当回调排队到工作线程时，原宿主对象若已被销毁，此时再解引用 this 即发生 Use-After-Free 严重崩溃。"
+          "explanation": "[this] 传的是裸指针。在多线程异步事件循环中，当回调排队到工作线程时，原宿主对象若已被销毁，此时再解引用 this 即发生 Use-After-Free 严重崩溃。"
         },
         {
           "id": 2,
-          "question": "在 Day 17 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 17 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -1968,7 +1968,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -1995,9 +1995,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 17 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 17 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 17 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 17 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 17 的特性。",
@@ -2015,7 +2015,7 @@ var DAYS_DATASET = [
     "tags": [
       "std::function",
       "类型擦除",
-      "回调基石"
+      "回调机制"
     ],
     "points": [
       "模板参数多样性导致的低效与膨胀问题（参看第18章 18.5.1 P.823～825）。",
@@ -2066,7 +2066,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 18 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 18 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2086,7 +2086,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2113,9 +2113,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 18 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 18 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 18 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 18 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 18 的特性。",
@@ -2184,7 +2184,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 19 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 19 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2204,7 +2204,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2231,9 +2231,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 19 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 19 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 19 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 19 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 19 的特性。",
@@ -2301,7 +2301,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 20 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 20 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2321,7 +2321,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2348,9 +2348,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 20 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 20 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 20 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 20 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 20 的特性。",
@@ -2419,7 +2419,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 21 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 21 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2439,7 +2439,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2466,9 +2466,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 21 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 21 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 21 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 21 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 21 的特性。",
@@ -2537,7 +2537,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 22 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 22 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2557,7 +2557,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2584,9 +2584,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 22 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 22 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 22 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 22 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 22 的特性。",
@@ -2654,7 +2654,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 23 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 23 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2674,7 +2674,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2701,9 +2701,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 23 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 23 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 23 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 23 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 23 的特性。",
@@ -2772,7 +2772,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 24 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 24 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2792,7 +2792,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2819,9 +2819,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 24 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 24 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 24 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 24 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 24 的特性。",
@@ -2890,7 +2890,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 25 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 25 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -2910,7 +2910,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -2937,9 +2937,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 25 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 25 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 25 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 25 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 25 的特性。",
@@ -3008,7 +3008,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 26 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 26 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3028,7 +3028,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3055,9 +3055,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 26 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 26 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 26 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 26 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 26 的特性。",
@@ -3070,21 +3070,21 @@ var DAYS_DATASET = [
     "day": 27,
     "week": 4,
     "tier": "A",
-    "title": "终极映射日：从 26 个 C++ 关键语法到 muduo 体系总览",
+    "title": "综合映射日：从 26 个 C++ 关键语法到 muduo 体系总览",
     "bookRange": "对照本控制台【语法 ➔ muduo 映射矩阵】",
     "tags": [
       "架构全景",
-      "生命期闭环",
+      "生命周期管理",
       "贯通复盘"
     ],
     "points": [
-      "复盘 26 天全部核心知识点，并在大脑中连点成网。",
-      "<strong>TcpConnection 跨线程销毁生命期链条闭环：</strong>为什么 Channel 需要 <code>weak_ptr tie_</code>？为什么必须用 <code>shared_from_this()</code>？",
-      "确认自己看到 <code>std::function</code>、<code>std::bind</code>、<code>std::move</code>、<code>=delete</code>、<code>weak_ptr.lock()</code> 时已经如呼吸般自然。"
+      "复盘前 26 天核心知识点与实现机制。",
+      "<strong>TcpConnection 跨线程销毁与生命周期流转：</strong>为什么 Channel 需要 <code>weak_ptr tie_</code>？为什么必须用 <code>shared_from_this()</code>？",
+      "确认自己熟练掌握 <code>std::function</code>、<code>std::bind</code>、<code>std::move</code>、<code>=delete</code>、<code>weak_ptr.lock()</code> 的使用场景。"
     ],
     "code": "// Day 27: TcpConnection 在 Channel 上的生命期保护原型\n#include <memory>\n#include <iostream>\n\nclass Channel {\nprivate:\n    std::weak_ptr<void> tie_;\n    bool tied_{false};\npublic:\n    void tie(const std::shared_ptr<void>& obj) {\n        tie_ = obj;\n        tied_ = true;\n    }\n    void handleEventWithGuard() {\n        if (tied_) {\n            // 尝试提升弱指针为强引用 shared_ptr\n            std::shared_ptr<void> guard = tie_.lock();\n            if (guard) {\n                std::cout << \"Object alive, executing callback safely!\\n\";\n            }\n        }\n    }\n};",
-    "muduoMap": "Channel::tie_ 与 enable_shared_from_this 绝妙配合",
-    "check": "能清晰向同伴复述一次：为什么多线程网络库中 Channel 回调前要先 weak_ptr::lock()？",
+    "muduoMap": "Channel::tie_ 与 enable_shared_from_this 结合应用",
+    "check": "能清晰复述：为什么多线程网络库中 Channel 回调前要先 weak_ptr::lock()？",
     "estimatedMinutes": 90,
     "budget": {
       "total": 90,
@@ -3094,19 +3094,19 @@ var DAYS_DATASET = [
       "quiz": 15
     },
     "rigorousNuance": {
-      "quick": "muduo 源码就是把这 26 个语法全部用了一遍。",
-      "strict": "muduo 彻底摒弃了面向对象传统深度继承层次与虚函数泛滥，采用以 std::function/std::bind 为核心的基于对象（Object-based）编程风格，结合 RAII 与 shared_ptr/weak_ptr 构成高并发事件驱动的网络骨架。"
+      "quick": "muduo 源码综合应用了前述各项现代 C++ 机制。",
+      "strict": "muduo 避免深层继承层次，采用基于对象（Object-based）风格，使用 std::function/std::bind 组装事件回调，结合 RAII 与 shared_ptr/weak_ptr 管理资源与生命周期。"
     },
     "experiment": {
-      "goal": "终极贯通：从现代 C++ 机制映射总览 muduo Reactor 各层组件协同",
+      "goal": "从 C++ 语法机制映射到 muduo Reactor 各层组件的实现结构",
       "steps": [
-        "对照 26 项 C++ 核心语法逐一在 muduo 架构图右侧定位对应实体类",
-        "跟踪一个 TCP 数据包从 Poller 接收、Channel 分发到 Buffer 处理的全链路",
-        "复盘 Object-based 回调模式在多线程网络中的竞态消除优势"
+        "对照 26 项 C++ 语法机制在 muduo 源码中定位对应实体类",
+        "跟踪 TCP 数据从 Poller 接收、Channel 分发到 Buffer 处理的调用链路",
+        "分析基于对象的回调机制在多线程网络环境下的生命周期保护"
       ],
-      "expectedOutput": "26 个语法基石全部对齐 muduo 架构拓扑映射！",
-      "watchPoints": "关注生命周期闭环：从 Acceptor 监听新连接到 TcpServer 管理，直至 Channel::tie_ 提权保活全链路。",
-      "pitfalls": "割裂看待各个语法特性，未能理解现代 C++ 是一套互锁的工业级资源与并发安全体系。",
+      "expectedOutput": "完成语法机制与 muduo 源码架构的对齐映射",
+      "watchPoints": "关注生命周期管理：从 Acceptor 监听新连接到 TcpServer 管理，直至 Channel::tie_ 提权保活链路。",
+      "pitfalls": "割裂看待语法特性，未结合网络库资源与并发管理完整理解。",
       "buildCommand": "g++ -std=c++17 -Wall -Wextra -pedantic day27.cpp -o day27 && ./day27"
     },
     "quiz": {
@@ -3125,7 +3125,7 @@ var DAYS_DATASET = [
         },
         {
           "id": 2,
-          "question": "在 Day 27 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 27 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3145,7 +3145,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3172,9 +3172,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 27 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 27 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 27 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 27 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 27 的特性。",
@@ -3187,22 +3187,22 @@ var DAYS_DATASET = [
     "day": 28,
     "week": 4,
     "tier": "A",
-    "title": "出征：第一次正式拉取并阅读 muduo 源码",
+    "title": "阅读 muduo 核心源码",
     "bookRange": "GitHub: chenshuo/muduo 或开源镜像",
     "tags": [
-      "源码起航",
-      "通读验收",
-      "大功告成"
+      "源码阅读",
+      "阶段验收",
+      "学习总结"
     ],
     "points": [
-      "今天不要再学任何新语法！你的 C++ 准备工作已经彻底就绪！",
-      "<strong>第一条源码突破航线：</strong>",
+      "完成前序 27 天任务后，开始通读 muduo 核心源码。",
+      "<strong>源码阅读推荐路径：</strong>",
       "1. 打开 <code>muduo/net/Channel.h / .cc</code>（观察事件定义与回调挂载）",
       "2. 打开 <code>muduo/net/Poller.h / EPollPoller.cc</code>（观察 map<int, Channel*> 映射）",
       "3. 打开 <code>muduo/net/EventLoop.h / .cc</code>（观察 loop() 与 queueInLoop 任务队列）",
       "4. 打开 <code>muduo/net/TcpConnection.h / .cc</code>（观察 Buffer 与生命周期管理）",
       "5. 打开 <code>muduo/net/TcpServer.h / .cc</code>（总览所有连接的创建与分发）",
-      "恭喜你，语法迷雾已被驱散，你已经跨入工业级高性能网络编程的殿堂！"
+      "恭喜你，已完成全部 28 天任务，可通读 muduo 核心源码与 CppAIService 实现。"
     ],
     "code": "// 源码阅读启动推荐路线：\n// git clone https://github.com/chenshuo/muduo.git\n// cd muduo/muduo/net\n// 按照顺序逐个点开：\n// Channel.h -> EventLoop.h -> TcpConnection.h -> TcpServer.h",
     "muduoMap": "全库通读：Channel -> Poller -> EventLoop -> TcpConnection -> TcpServer",
@@ -3216,38 +3216,38 @@ var DAYS_DATASET = [
       "quiz": 15
     },
     "rigorousNuance": {
-      "quick": "最后一天就是把 muduo 仓库 clone 下来看代码。",
-      "strict": "从 Channel（事件通道）到 Poller（多路复用），经 EventLoop（驱动引擎）与 TcpConnection（长连接管理），配合 Buffer（应用层零碎片缓冲区），构成了工业级高并发 Reactor 网络的完整知识闭环。"
+      "quick": "完成 28 天任务后阅读 muduo 源码。",
+      "strict": "从 Channel（事件通道）到 Poller（多路复用），经 EventLoop（事件循环）与 TcpConnection（连接管理），配合 Buffer（应用层缓冲区），构成 Reactor 网络数据处理链路。"
     },
     "experiment": {
-      "goal": "出征验收：正式克隆并通读 muduo 源码，开启网络工程进阶之路",
+      "goal": "克隆并通读 muduo 源码，梳理核心类交互关系",
       "steps": [
         "克隆或在线浏览 chenshuo/muduo 仓库 net 核心目录",
         "逐个比对 Channel.h/.cc、EventLoop.h/.cc、TcpServer.h/.cc 代码实现",
-        "验证自身对每一处智能指针、bind、RAII 锁的无障碍阅读能力"
+        "验证自身对智能指针、bind、RAII 锁与回调的使用理解"
       ],
-      "expectedOutput": "muduo 核心网络库源码阅读无障碍，完全通读！",
-      "watchPoints": "重点关注 Reactor 模式经典 One Loop Per Thread 线程模型在 muduo 中的落地实现细节。",
-      "pitfalls": "只读代码不做笔记与动手复现，容易遗漏高并发线程切换时的锁粒度与自保细节。",
+      "expectedOutput": "muduo 核心网络库源码阅读无障碍，完成通读",
+      "watchPoints": "重点关注 One Loop Per Thread 线程模型在 muduo 中的落地实现细节。",
+      "pitfalls": "未动手调试验证，容易遗漏线程切换时的锁粒度与对象生命周期管理细节。",
       "buildCommand": "g++ -std=c++17 -Wall -Wextra -pedantic day28.cpp -o day28 && ./day28"
     },
     "quiz": {
       "questions": [
         {
           "id": 1,
-          "question": "通读 muduo 源码时，整个 Reactor 网络库的心脏枢纽是哪一个核心类？",
+          "question": "通读 muduo 源码时，整个事件循环的核心调度类是哪一个？",
           "options": [
             "InetAddress（地址转换）",
-            "EventLoop（负责 One Loop Per Thread 驱动循环、I/O 多路复用分发与跨线程安全队列）",
+            "EventLoop（负责 One Loop Per Thread 事件循环、I/O 轮询分发与跨线程任务队列）",
             "LogStream（日志流）",
             "Date（日期格式化）"
           ],
           "answer": 1,
-          "explanation": "EventLoop 是 Reactor 反应堆的核心调度中枢，它独占所在的 I/O 线程，驱动 Poller.poll() 收集活跃事件，并按序安全调度 Channel 和跨线程 Functor 回调。"
+          "explanation": "EventLoop 是事件循环类，运行于其所在的 I/O 线程，调用 Poller.poll() 收集就绪事件，并按序分发 Channel 事件和执行跨线程任务。"
         },
         {
           "id": 2,
-          "question": "在 Day 28 涉及的高并发网络编程场景中，关于资源生命周期的核心原则是：",
+          "question": "在 Day 28 涉及的多线程网络编程场景中，关于资源生命周期的原则是：",
           "options": [
             "谁创建谁负责销毁，生命周期必须确定明确",
             "可以随意在任意线程中裸调 delete",
@@ -3267,7 +3267,7 @@ var DAYS_DATASET = [
             "在多线程网络库中滥用深层多重虚继承"
           ],
           "answer": 0,
-          "explanation": "RAII、移动语义、容器管理和明确的生命周期控制是构建高性能低延迟网络服务的根本基石。"
+          "explanation": "RAII、移动语义、容器管理与明确的生命周期控制是构建网络服务的基础支撑。"
         }
       ],
       "codeQuestion": {
@@ -3294,9 +3294,9 @@ var DAYS_DATASET = [
         ]
       },
       "muduoQuestion": {
-        "question": "Day 28 的 C++ 技术点在 muduo 架构中是如何协同支撑高并发 Reactor 模型的？",
-        "referenceAnswer": "该技术点为 muduo 提供了零拷贝入参、生命周期自洽管理、无锁/低锁回调分发或高效内存缓冲的基础设施支撑，使得 muduo 能够在多核 Linux 环境下稳定承载数万并发连接而无需承担传统深度继承的虚表与动态锁开销。",
-        "muduoMechanism": "Day 28 机制在 muduo 架构中的系统级协同应用"
+        "question": "Day 28 的 C\+\+ 技术点在 muduo 架构中是如何应用的？",
+        "referenceAnswer": "该技术点为 muduo 提供了避免多余对象拷贝、对象生命周期安全管理与回调分发的基础支撑，使网络库在多线程环境下支持并发连接处理。",
+        "muduoMechanism": "Day 28 机制在 muduo 架构中的应用"
       },
       "implQuestion": {
         "prompt": "编写一个简易的测试用例验证 Day 28 的特性。",

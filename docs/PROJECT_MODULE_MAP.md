@@ -9,21 +9,21 @@
 
 ```text
 CppAIService
-├── 1. HttpServer Layer (自研高性能 C++ HTTP 框架，基于 muduo Reactor)
+├── 1. HttpServer Layer (基于 muduo 的 C++ HTTP 框架)
 │   ├── [1.1] mod_http_server        HttpServer 核心服务框架与连接分发
 │   ├── [1.2] mod_http_codec         HTTP 报文解析与状态机编解码 (FSM)
-│   ├── [1.3] mod_router             动态正则与哈希双层路由引擎 (Router)
+│   ├── [1.3] mod_router             动态正则与哈希双层路由模块 (Router)
 │   ├── [1.4] mod_session            多租户会话与 Cookie 管理器 (SessionManager)
 │   ├── [1.5] mod_middleware         洋葱模型中间件链与跨域拦截 (Middleware/CORS)
 │   ├── [1.6] mod_ssl                HTTPS / TLS 加密通道封装 (OpenSSL)
 │   └── [1.7] mod_db_pool            MySQL 连接池与事务封装 (DbConnectionPool)
 │
 └── 2. AIApps Layer (ChatServer AI 应用服务平台第二版)
-    ├── [2.1] mod_chat_server        ChatServer 业务调度中枢与多租户隔离
+    ├── [2.1] mod_chat_server        ChatServer 业务调度与会话管理
     ├── [2.2] mod_ai_strategy        多模型策略适配器与工厂 (Strategy + Factory)
     ├── [2.3] mod_mcp_registry       轻量级 MCP 工具注册与两段式推理 (AIToolRegistry)
     ├── [2.4] mod_rag_engine         RAG 检索增强生成与知识库挂载
-    ├── [2.5] mod_mq_manager         RabbitMQ 异步入库与流量削峰 (MQManager)
+    ├── [2.5] mod_mq_manager         RabbitMQ 异步入库与消息缓冲 (MQManager)
     ├── [2.6] mod_onnx_cv            本地 ONNX Runtime 图像识别与 OpenCV 预处理
     └── [2.7] mod_speech_proc        百度智能云 TTS 语音合成与 ASR 预留 (AISpeechProcessor)
 ```
@@ -33,7 +33,7 @@ CppAIService
 ## 一、HttpServer 基础网络层模块详述
 
 ### [1.1] mod_http_server — HttpServer 核心服务框架
-- **Responsibility**：基于 muduo 主从 Reactor 反应堆构建高性能 HTTP 服务器；管理 TCP 连接生命周期、I/O 事件监听分发、请求回调组装。
+- **Responsibility**：基于 muduo 主从 Reactor 模型构建 HTTP 服务器；管理 TCP 连接生命周期、I/O 事件监听分发、请求回调组装。
 - **Files**：
   - `HttpServer/include/http/HttpServer.h`
   - `HttpServer/src/http/HttpServer.cpp`
@@ -79,7 +79,7 @@ CppAIService
 
 ---
 
-### [1.3] mod_router — 动态正则与哈希双层路由引擎
+### [1.3] mod_router — 动态正则与哈希双层路由模块
 - **Responsibility**：提供双层路由查找：精确静态路径使用 `RouteKey(Method, Path)` 哈希表以 $O(1)$ 检索；动态路径基于 `std::regex` 正则匹配与提取 URL 路径参数（如 `/api/user/:id`）。
 - **Files**：
   - `HttpServer/include/router/Router.h`, `HttpServer/src/router/Router.cpp`
@@ -173,7 +173,7 @@ CppAIService
 
 ## 二、AIApps 智能服务平台层模块详述
 
-### [2.1] mod_chat_server — ChatServer 业务中枢与多会话管理
+### [2.1] mod_chat_server — ChatServer 业务处理与多会话管理
 - **Responsibility**：AI 平台核心业务服务；挂载登录、注册、历史记录、模型切换、单用户多会话隔离及图像语音入口。
 - **Files**：
   - `AIApps/ChatServer/include/ChatServer.h`, `AIApps/ChatServer/src/ChatServer.cpp`
@@ -218,12 +218,12 @@ CppAIService
   - `getWeather` (天气查询接口)
   - `getTime` (当前精准时间获取)
 - **Functions**：`void registerTool(const std::string&, ToolFunc)`, `json invoke(const std::string&, const json&)`。
-- **Related Knowledge**：MCP (Model Context Protocol) 核心规范、Function Calling、两段式 Prompt 协议编排。
+- **Related Knowledge**：MCP (Model Context Protocol) 核心规范、Function Calling、两段式 Prompt 协议交互。
 
 ---
 
 ### [2.4] mod_rag_engine — RAG 检索增强生成
-- **Responsibility**：支持挂载百炼知识库（Knowledge ID），实现“文档分块 ➔ 嵌入向量 ➔ 相似度召回 ➔ 注入 Prompt ➔ 溯源回答”的问答全链路。
+- **Responsibility**：支持挂载百炼知识库（Knowledge ID），实现“文档分块 ➔ 嵌入向量 ➔ 相似度召回 ➔ 注入 Prompt ➔ 溯源回答”的问答流程。
 - **Files**：
   - `AIApps/ChatServer/src/AIUtil/AIStrategy.cpp` (`AliyunRAGStrategy`)
   - `AIApps/ChatServer/resource/config.json`
@@ -231,15 +231,15 @@ CppAIService
 
 ---
 
-### [2.5] mod_mq_manager — RabbitMQ 异步入库与流量削峰
-- **Responsibility**：解耦前台高并发对话与后台持久化。聊天信息产生后立即同步更新内存会话、向 RabbitMQ 推送投递消息，由消费者异步批量刷盘写入 MySQL，保护主线程极速响应。
+### [2.5] mod_mq_manager — RabbitMQ 异步入库与消息解耦
+- **Responsibility**：解耦前台会话处理与后台数据库写入。聊天信息产生后向 RabbitMQ 投递消息，由消费者异步写入 MySQL，避免主线程阻塞。
 - **Files**：
   - `AIApps/ChatServer/include/AIUtil/MQManager.h`, `AIApps/ChatServer/src/AIUtil/MQManager.cpp`
 - **Classes**：
   - `MQManager`
 - **Dependencies**：`SimpleAmqpClient`, `librabbitmq`。
 - **Thread Model**：主业务线程投递消息，后台独立工作线程消费写库。
-- **Related Knowledge**：消息队列削峰填谷、异步解耦、AMQP 消息可靠投递、写入持久化保障。
+- **Related Knowledge**：消息队列异步传递任务、AMQP 消息投递、数据异步持久化。
 
 ---
 

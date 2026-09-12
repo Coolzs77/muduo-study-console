@@ -541,8 +541,8 @@ function updateDashboardMetrics() {
     const elProgText = document.getElementById('progress-bar-text');
     if (elProgText) {
         elProgText.innerText = remaining === 0 
-            ? "🏆 全周期攻坚完成！你可以毫无语言阻碍地通读 muduo 源码并驾驭 CppAIService！" 
-            : `还剩 ${remaining} 天任务正式踏入 muduo 源码大门`;
+            ? "已完成全部 28 天任务，可完整阅读 muduo 核心源码与 CppAIService 实现。" 
+            : `还剩 ${remaining} 天任务完成学习计划`;
     }
 
     // 学习时间卡片 (兼容检查)
@@ -653,7 +653,7 @@ function renderTodayMissionCard(dueCount) {
                 <div>
                     <div class="flex items-center justify-between gap-2 mb-2">
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-serifMono font-bold">
-                            <i class="fa-solid fa-server text-sky-600"></i> Track 1 · muduo 网络底座
+                            <i class="fa-solid fa-server text-sky-600"></i> Track 1 · muduo 网络库
                         </span>
                         <span class="text-[11px] font-serifMono text-amber-700 font-bold">
                             <i class="fa-regular fa-clock"></i> ${nextDay.estimatedMinutes} min
@@ -670,7 +670,7 @@ function renderTodayMissionCard(dueCount) {
                     <span class="text-[11px] text-stone-400">状态: <strong class="text-stone-700">${levelNames[nextDayMastery.level] || '未开始'}</strong></span>
                     <div class="flex items-center gap-1.5">
                         <button onclick="scrollToDay(${nextDay.day})" class="px-3 py-1.5 bg-sky-800 hover:bg-sky-900 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1 cursor-pointer">
-                            <i class="fa-solid fa-play text-[10px]"></i> 攻坚任务
+                            <i class="fa-solid fa-play text-[10px]"></i> 开始任务
                         </button>
                         <button onclick="openQuizForDay(${nextDay.day})" class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-900 text-xs font-semibold rounded-lg transition cursor-pointer">
                             自测
@@ -686,8 +686,8 @@ function renderTodayMissionCard(dueCount) {
                     <i class="fa-solid fa-trophy"></i>
                 </div>
                 <div>
-                    <h4 class="text-sm font-bold text-stone-900">🏆 muduo 28 天任务已通关！</h4>
-                    <p class="text-xs text-stone-500">已完整掌握底层 Reactor 与现代 C++ 规范。</p>
+                    <h4 class="text-sm font-bold text-stone-900">muduo 28 天任务已完成</h4>
+                    <p class="text-xs text-stone-500">已完整掌握 Reactor 模式与 C++ 规范实现。</p>
                 </div>
             </div>
         `;
@@ -701,7 +701,7 @@ function renderTodayMissionCard(dueCount) {
                 <div>
                     <div class="flex items-center justify-between gap-2 mb-2">
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-serifMono font-bold">
-                            <i class="fa-solid fa-microchip text-amber-600"></i> Track 2 · CppAIService 平台
+                            <i class="fa-solid fa-microchip text-amber-600"></i> Track 2 · CppAIService 服务层
                         </span>
                         <span class="text-[11px] font-serifMono text-stone-500">
                             ${escapeHtml(nextArticle.category || '核心微服务')}
@@ -711,7 +711,7 @@ function renderTodayMissionCard(dueCount) {
                         ${escapeHtml(nextArticle.title)}
                     </h4>
                     <p class="text-xs text-stone-600 mt-1 line-clamp-2 leading-relaxed">
-                        ${escapeHtml(nextArticle.summary || '深入探究现代 C++17 微服务架构、HTTP 协议编解码、MCP 两段式推理与分布式消息削峰。')}
+                        ${escapeHtml(nextArticle.summary || '涵盖 C++17 服务架构、HTTP 协议编解码、MCP 两段式推理与 RabbitMQ 异步落库。')}
                     </p>
                 </div>
                 <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono">
@@ -734,8 +734,8 @@ function renderTodayMissionCard(dueCount) {
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div>
-                    <h4 class="text-sm font-bold text-stone-900">🎉 CppAIService 专栏已全部精读！</h4>
-                    <p class="text-xs text-stone-500">已完整贯通 AI 服务平台全链路工程实践。</p>
+                    <h4 class="text-sm font-bold text-stone-900">CppAIService 专栏已完成精读</h4>
+                    <p class="text-xs text-stone-500">已完整掌握服务架构与实现方案。</p>
                 </div>
             </div>
         `;
@@ -747,7 +747,7 @@ function renderTodayMissionCard(dueCount) {
         tracksLayout = `
             <div class="space-y-3">
                 <div class="text-xs font-serifMono text-sky-800 font-bold flex items-center gap-1.5">
-                    <i class="fa-solid fa-crosshairs"></i> 当前模式：muduo 底座专项攻坚
+                    <i class="fa-solid fa-crosshairs"></i> 当前模式：muduo 网络核心
                 </div>
                 ${muduoCardHtml}
             </div>
@@ -756,7 +756,7 @@ function renderTodayMissionCard(dueCount) {
         tracksLayout = `
             <div class="space-y-3">
                 <div class="text-xs font-serifMono text-amber-800 font-bold flex items-center gap-1.5">
-                    <i class="fa-solid fa-crosshairs"></i> 当前模式：CppAIService 智能平台专项攻坚
+                    <i class="fa-solid fa-crosshairs"></i> 当前模式：CppAIService 服务层
                 </div>
                 ${cppaiCardHtml}
             </div>
@@ -775,10 +775,10 @@ function renderTodayMissionCard(dueCount) {
         ${reviewAlertHtml}
         <div class="flex items-center justify-between mb-3 font-serifMono text-xs text-stone-500">
             <span class="font-bold flex items-center gap-1.5 text-stone-700">
-                <i class="fa-solid fa-layer-group text-amber-600"></i> 双核今日攻坚推荐 · 双轨并进
+                <i class="fa-solid fa-layer-group text-amber-600"></i> 今日任务推荐
             </span>
             <span class="text-[11px] text-stone-400">
-                模式: <strong class="text-stone-800">${mode === 'muduo' ? 'muduo底座' : (mode === 'cppai' ? 'CppAI平台' : '双核全栈全景')}</strong>
+                模式: <strong class="text-stone-800">${mode === 'muduo' ? 'muduo 网络核心' : (mode === 'cppai' ? 'CppAIService 服务层' : '双核全景视图')}</strong>
             </span>
         </div>
         ${tracksLayout}
@@ -1049,7 +1049,7 @@ function renderDailyCards() {
 
                 <div class="flex flex-wrap gap-1.5 mb-4">${tagsHtml}</div>
 
-                <!-- 掌握度闭环 5 阶打卡动作条 -->
+                <!-- 掌握度 5 阶段打卡记录 -->
                 <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 mb-4 flex flex-wrap items-center justify-between gap-2">
                     <div class="text-[11px] font-serifMono font-bold text-stone-500">
                         <i class="fa-solid fa-stairs mr-1 text-sky-700"></i>能力阶梯:
@@ -1092,7 +1092,7 @@ function renderDailyCards() {
                         </div>
                         <div class="md:pl-1">
                             <span class="inline-flex items-center gap-1 font-bold text-sky-900 font-serifMono text-[11px] mb-1">
-                                <i class="fa-solid fa-microscope text-sky-700"></i> 工业级严格剖析
+                                <i class="fa-solid fa-microscope text-sky-700"></i> 机制剖析
                             </span>
                             <p class="text-stone-700 text-[11.5px]">${escapeHtml(item.rigorousNuance?.strict || "")}</p>
                         </div>
@@ -1113,7 +1113,7 @@ function renderDailyCards() {
                         </div>
                     </div>
 
-                    <!-- 升级为工业级 Demo 实验工作台 -->
+                    <!-- Demo 实验工作台 -->
                     <div class="lg:col-span-8 bg-stone-50 border border-stone-200 rounded-xl p-3.5 flex flex-col justify-between">
                         <div>
                             <div class="flex items-center justify-between text-[11px] font-bold text-stone-600 mb-2 font-serifMono">
@@ -1540,7 +1540,7 @@ function loadQuizForDay(dayNum) {
         <!-- 模块 4: muduo 源码映射题 -->
         <div class="bg-white p-4 rounded-xl border border-stone-200 space-y-2.5">
             <div class="text-xs font-bold font-serifMono text-stone-500 uppercase tracking-wider">
-                PART 4: muduo 工业级源码映射 (Architecture Mapping)
+                PART 4: muduo 源码映射 (Architecture Mapping)
             </div>
             <p class="text-xs font-bold text-stone-900 font-serifHeading">${escapeHtml(quiz.muduoQuestion.question)}</p>
             <textarea id="quiz-muduo-input" rows="2" placeholder="分析 muduo 网络库中该特性的应用场景与架构价值..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2.5 text-xs font-serifHeading focus:outline-none focus:border-purple-600"></textarea>
@@ -1900,7 +1900,7 @@ function renderPitfallsList() {
                 </div>
                 <div class="border border-emerald-200 rounded-xl p-3 bg-stone-50">
                     <div class="text-[11px] font-bold text-emerald-700 font-serifMono mb-1.5 flex items-center gap-1">
-                        <i class="fa-solid fa-check"></i> 工业级正确解法
+                        <i class="fa-solid fa-check"></i> 标准解法与实现
                     </div>
                     <pre class="m-0 p-0 overflow-x-auto"><code class="language-cpp font-mono-code">${escapeHtml(p.correctCode)}</code></pre>
                 </div>
@@ -1969,19 +1969,19 @@ function submitNewPitfall() {
 
 // 拓扑图点击抽屉 (Topology Drawer)
 const TOPOLOGY_DRAWER_DATA = {
-    step_1: { title: "const & 引用传参", tag: "C++ 8 阶底座", role: "零拷贝入参契约，防止内部深拷贝开销，保障入参只读安全性。", members: ["const T&: 物理常量指针，语义别名", "右值引用绑定延长临时对象生存期"], functions: ["void handle(const Buffer& buf)", "void send(const string& msg)"], relatedDays: [1] },
-    step_2: { title: "类 / 析构自动化 / RAII", tag: "C++ 8 阶底座", role: "将系统资源获取与析构绑定，确定性栈展开杜绝死锁与文件描述符泄漏。", members: ["explicit MutexGuard(Mutex& m)", "~MutexGuard(): 离开作用域自动解锁"], functions: ["Socket::~Socket(): 自动 close(sockfd_)"], relatedDays: [2, 3] },
-    step_3: { title: "移动语义 / =delete", tag: "C++ 8 阶底座", role: "右值引用窃取堆资源指针，消除深拷贝；=delete 从编译期封死拷贝行为。", members: ["T(T&& rhs) noexcept", "noncopyable(const noncopyable&) = delete"], functions: ["std::move(cb): 零拷贝移交回调任务"], relatedDays: [6, 7] },
-    step_4: { title: "智能指针体系", tag: "C++ 8 阶底座", role: "unique_ptr 独占资源、shared_ptr 共享所有权、weak_ptr 观察者解耦防死锁。", members: ["unique_ptr<Poller>", "shared_ptr<TcpConnection>", "weak_ptr<void> tie_"], functions: ["weak_ptr::lock(): 原子提权"], relatedDays: [8, 9, 10] },
-    step_5: { title: "STL 连续与关联容器", tag: "C++ 8 阶底座", role: "vector<char> 承载网络缓冲区 Cache 友好；map<string, TcpConnectionPtr> 管理活跃长连接。", members: ["vector<char> buffer_", "map<string, TcpConnectionPtr> conns_"], functions: ["vector::resize()", "map::find()"], relatedDays: [11, 13] },
-    step_6: { title: "std::function & Lambda", tag: "C++ 8 阶底座", role: "类型擦除包装任意可调用实体，就地捕获闭包，抹平普通函数与成员函数差异。", members: ["std::function<void(Timestamp)>", "[this]() { doWork(); }"], functions: ["invoke()", "operator()()"], relatedDays: [17, 18] },
-    step_7: { title: "std::bind 绑定类成员", tag: "C++ 8 阶底座", role: "消除类成员函数对隐藏 this 指针的调用依赖，将其转化为标准无状态回调。", members: ["std::bind(&TcpServer::newConnection, this, _1, _2)"], functions: ["placeholders::_1 映射形参偏序"], relatedDays: [19, 20] },
-    step_8: { title: "模板基础 / 虚析构", tag: "C++ 8 阶底座", role: "泛型阻塞队列 BlockingQueue；Poller::~Poller() 虚析构防止通过基类 delete 派生类发生泄漏。", members: ["template<typename T> class BlockingQueue", "virtual ~Poller() = default"], functions: ["dynamic dispatch via vtable"], relatedDays: [25, 26] },
-    mutexlockguard: { title: "MutexLockGuard", tag: "Reactor 调度基础", role: "RAII 互斥锁守护类，构造时 lock()，析构时自动 unlock()，杜绝由于分支 return 遗漏解锁造成的永久死锁灾难。", members: ["MutexLock& mutex_: 绑定的互斥锁引用"], functions: ["explicit MutexLockGuard(MutexLock& m)", "~MutexLockGuard()"], relatedDays: [3] },
+    step_1: { title: "const & 引用传参", tag: "C++ 基础特性", role: "引用传递入参，避免对象拷贝开销，并保证入参只读安全性。", members: ["const T&: 常量引用，避免拷贝", "右值引用绑定延长临时对象生存期"], functions: ["void handle(const Buffer& buf)", "void send(const string& msg)"], relatedDays: [1] },
+    step_2: { title: "类 / 析构自动化 / RAII", tag: "C++ 基础特性", role: "基于 RAII 将资源生命周期与对象作用域绑定，在离开作用域时释放互斥锁或关闭文件描述符。", members: ["explicit MutexGuard(Mutex& m)", "~MutexGuard(): 离开作用域自动解锁"], functions: ["Socket::~Socket(): 自动 close(sockfd_)"], relatedDays: [2, 3] },
+    step_3: { title: "移动语义 / =delete", tag: "C++ 基础特性", role: "右值引用转移资源所有权以避免深拷贝；=delete 显式禁用拷贝构造函数与赋值操作符。", members: ["T(T&& rhs) noexcept", "noncopyable(const noncopyable&) = delete"], functions: ["std::move(cb): 转移回调函数所有权"], relatedDays: [6, 7] },
+    step_4: { title: "智能指针体系", tag: "C++ 基础特性", role: "unique_ptr 管理独占所有权、shared_ptr 管理共享引用计数、weak_ptr 避免循环引用并作为弱观察指针。", members: ["unique_ptr<Poller>", "shared_ptr<TcpConnection>", "weak_ptr<void> tie_"], functions: ["weak_ptr::lock(): 原子尝试获取 shared_ptr"], relatedDays: [8, 9, 10] },
+    step_5: { title: "STL 连续与关联容器", tag: "C++ 基础特性", role: "vector<char> 提供连续内存缓冲区；map 或 unordered_map 用于连接对象的索引与管理。", members: ["vector<char> buffer_", "map<string, TcpConnectionPtr> conns_"], functions: ["vector::resize()", "map::find()"], relatedDays: [11, 13] },
+    step_6: { title: "std::function & Lambda", tag: "C++ 基础特性", role: "使用类型擦除封装可调用实体，配合 Lambda 表达式捕获执行上下文，支持通用回调。", members: ["std::function<void(Timestamp)>", "[this]() { doWork(); }"], functions: ["invoke()", "operator()()"], relatedDays: [17, 18] },
+    step_7: { title: "std::bind 绑定类成员", tag: "C++ 基础特性", role: "将类成员函数与对象实例指针绑定，转化为符合标准签名的回调函数对象。", members: ["std::bind(&TcpServer::newConnection, this, _1, _2)"], functions: ["placeholders::_1 占位符绑定形参"], relatedDays: [19, 20] },
+    step_8: { title: "模板基础 / 虚析构", tag: "C++ 基础特性", role: "使用模板定义通用队列类；基类虚析构函数确保通过基类指针销毁派生类对象时正确调用析构。", members: ["template<typename T> class BlockingQueue", "virtual ~Poller() = default"], functions: ["虚函数表动态分发"], relatedDays: [25, 26] },
+    mutexlockguard: { title: "MutexLockGuard", tag: "并发同步", role: "RAII 互斥锁包装类，构造时执行 lock()，析构时自动执行 unlock()，避免分支返回时遗漏解锁。", members: ["MutexLock& mutex_: 绑定的互斥锁引用"], functions: ["explicit MutexLockGuard(MutexLock& m)", "~MutexLockGuard()"], relatedDays: [3] },
     callbacks: {
-        title: "Callbacks / 现代 std::function 体系",
-        tag: "解耦机制",
-        role: "muduo 风格回调体系。将网络事件与具体业务彻底解耦，使用 std::function/std::bind 替换繁琐的虚函数多态继承，使 TcpConnection / TcpServer 具备极高通用性与轻量性。",
+        title: "Callbacks 回调机制",
+        tag: "回调接口",
+        role: "基于 std::function 与 std::bind 实现事件回调机制，将网络事件分发与具体业务逻辑解耦，避免虚函数继承开销。",
         members: [
             "typedef std::function<void(const TcpConnectionPtr&)> ConnectionCallback",
             "typedef std::function<void(const TcpConnectionPtr&, Buffer*, Timestamp)> MessageCallback",
@@ -1994,17 +1994,17 @@ const TOPOLOGY_DRAWER_DATA = {
         ],
         relatedDays: [17, 18, 19]
     },
-    eventloop: { title: "EventLoop", tag: "反应堆心脏", role: "One Loop Per Thread 模式中枢。独占一个专属 I/O 线程，连续调用 Poller::poll 获取就绪事件，并通过 eventfd 跨线程安全唤醒队列。", members: ["unique_ptr<Poller> poller_: 独占的 I/O 多路复用器", "int wakeupFd_: 跨线程唤醒 eventfd 句柄", "vector<Functor> pendingFunctors_: 跨线程投递任务队列", "MutexLock mutex_: 保护任务队列的互斥锁"], functions: ["void loop(): 核心事件分发死循环", "void runInLoop(Functor cb): 同步或投递执行", "void queueInLoop(Functor cb): 移入队列并唤醒", "void wakeup(): 写 8 字节唤醒 epoll_wait"], relatedDays: [6, 8, 18, 21] },
-    poller: { title: "Poller / EPollPoller", tag: "I/O 多路复用", role: "抽象 epoll/poll 操作，调用 epoll_wait 阻塞监听注册的套接字描述符，并将发生事件的 Channel 填入 activeChannels 供 EventLoop 派发。", members: ["EventLoop* ownerLoop_: 所属反应堆", "map<int, Channel*> channels_: 按 fd 映射管理的通道索引", "struct epoll_event events_[]: 内核事件接收缓冲区"], functions: ["virtual ~Poller() = default: 虚析构必须声明", "virtual Timestamp poll(int timeout, ChannelList* activeChannels) = 0", "virtual void updateChannel(Channel* c) = 0", "virtual void removeChannel(Channel* c) = 0"], relatedDays: [8, 13, 26] },
-    channel: { title: "Channel", tag: "通道适配器", role: "独占一个特定的 socket 文件描述符，负责注册该 fd 感兴趣的读写事件，并分发事件回调给对应的业务处理函数。", members: ["const int fd_: 独占套接字句柄", "EventLoop* loop_: 所属事件循环", "int events_: 关心的事件掩码", "int revents_: 实际就绪的事件掩码", "weak_ptr<void> tie_: 弱引用绑定所属宿主防止悬空析构"], functions: ["void tie(const shared_ptr<void>&)", "void enableReading(): events_ |= POLLIN; update()", "void handleEvent(Timestamp receiveTime)"], relatedDays: [1, 10, 18, 19] },
-    handleeventwithguard: { title: "Channel::handleEventWithGuard", tag: "多线程安全自保", role: "事件到来的核心分发防线。先通过 tie_.lock() 原子提权为 shared_ptr；若提权成功保证宿主存活才执行用户回调，从根源消除多线程异步回调中的 Use-After-Free 崩溃。", members: ["std::shared_ptr<void> guard = tie_.lock()", "ReadEventCallback readCallback_", "EventCallback writeCallback_"], functions: ["if (guard) { readCallback_(receiveTime); }"], relatedDays: [10, 18] },
-    tcpserver: { title: "TcpServer", tag: "服务器大总管", role: "统领全服所有长连接生命周期。使用 map<string, TcpConnectionPtr> conns_ 存储长连接，使用 std::bind 将 newConnection 回调挂入 Acceptor。", members: ["unique_ptr<Acceptor> acceptor_: 监听新建连接", "map<string, TcpConnectionPtr> connections_: 存活长连接映射表", "EventLoopThreadPool threadPool_: 反应堆工作线程池"], functions: ["void setThreadNum(int)", "void start()", "void newConnection(int sockfd, const InetAddress&)", "void removeConnection(const TcpConnectionPtr&)"], relatedDays: [9, 13, 14, 19] },
-    tcpconnection: { title: "TcpConnection", tag: "客户端连接实体", role: "代表已建立的 TCP 连接。继承 enable_shared_from_this 跨线程自保；独占 Channel 与 Socket；拥有 inputBuffer_ 与 outputBuffer_ 解决非阻塞网络发包粘包。", members: ["shared_ptr<TcpConnection>", "unique_ptr<Socket> socket_", "unique_ptr<Channel> channel_", "Buffer inputBuffer_, outputBuffer_"], functions: ["void send(const string&)", "void shutdown()", "void handleRead()", "void handleWrite()"], relatedDays: [9, 10, 14, 18, 19] },
-    buffer: { title: "Buffer", tag: "应用层自适应缓冲", role: "连续内存非阻塞应用层缓冲。利用 vector<char> 保证高 CPU Cache 命中；以 prepends / readable / writable 游标消除内存搬移；以 readv 分散读实现零碎片扩容。", members: ["vector<char> buffer_", "size_t readerIndex_, writerIndex_", "static const size_t kCheapPrepend = 8"], functions: ["size_t readableBytes() const", "void retrieve(size_t)", "void append(const char*, size_t)", "ssize_t readFd(int fd, int* savedErrno)"], relatedDays: [2, 6, 11, 23] },
-    client: { title: "Client 外部并发客户端", tag: "接入终端", role: "发起并发长连接与 HTTP 请求，接收 SSE 流式事件与大模型生成结果。", members: ["TcpClient / HttpClient 客户端连接句柄"], functions: ["void connect()", "void send(req)", "void onMessage(resp)"], relatedDays: [1, 5, 9] },
-    linux_epoll: { title: "Linux 内核 epoll", tag: "内核 I/O 复用", role: "操作系统底层红黑树维护海量关注文件描述符，双向就绪链表实现 O(1) 事件通知。", members: ["epoll_event 内核事件结构体", "eventpoll 内核数据结构"], functions: ["epoll_create1(EPOLL_CLOEXEC)", "epoll_ctl(epfd, op, fd, event)", "epoll_wait(epfd, events, maxevents, timeout)"], relatedDays: [8, 13, 26] },
-    chatserver: { title: "ChatServer 业务总控中心", tag: "AI 调度中枢", role: "承接 HTTP 网关分发，管理单用户多会话隔离映射树，调度多模型策略与 RabbitMQ 异步写库。", members: ["chatInformation[userId][sessionId]", "sessionsIdsMap[userId]", "MQManager rabbitmq_"], functions: ["void initialize()", "void initChatMessage()", "void packageResp()"], relatedDays: [14, 19, 28] },
-    rag: { title: "RAG 检索增强引擎", tag: "知识库检索", role: "企业知识库切片向量召回，在模型推理前置注入业务文档上下文，彻底杜绝大模型事实性幻觉。", members: ["AliyunRAGStrategy ragStrategy_", "Knowledge_Base_ID 知识库凭据"], functions: ["json buildRequest(messages)", "string parseResponse(json)"], relatedDays: [27, 28] }
+    eventloop: { title: "EventLoop", tag: "事件循环", role: "One Loop Per Thread 核心实现。在独立 I/O 线程中循环调用 Poller::poll 处理就绪事件，并通过 eventfd 实现跨线程任务通知。", members: ["unique_ptr<Poller> poller_: I/O 多路复用器", "int wakeupFd_: 跨线程唤醒 eventfd 句柄", "vector<Functor> pendingFunctors_: 跨线程投递任务队列", "MutexLock mutex_: 保护任务队列的互斥锁"], functions: ["void loop(): 事件循环主逻辑", "void runInLoop(Functor cb): 当前线程直接执行或投递执行", "void queueInLoop(Functor cb): 写入队列并唤醒事件循环", "void wakeup(): 向 wakeupFd 写入 8 字节唤醒 poll"], relatedDays: [6, 8, 18, 21] },
+    poller: { title: "Poller / EPollPoller", tag: "I/O 多路复用", role: "抽象 epoll/poll 操作，调用 epoll_wait 阻塞监听注册的套接字描述符，并将发生事件的 Channel 填入 activeChannels 供 EventLoop 派发。", members: ["EventLoop* ownerLoop_: 所属事件循环", "map<int, Channel*> channels_: 按 fd 映射管理的通道索引", "struct epoll_event events_[]: 内核事件接收缓冲区"], functions: ["virtual ~Poller() = default: 虚析构声明", "virtual Timestamp poll(int timeout, ChannelList* activeChannels) = 0", "virtual void updateChannel(Channel* c) = 0", "virtual void removeChannel(Channel* c) = 0"], relatedDays: [8, 13, 26] },
+    channel: { title: "Channel", tag: "事件通道", role: "封装单个文件描述符及其关心的 I/O 事件，在事件就绪时调用已注册的读写回调函数。", members: ["const int fd_: 绑定的套接字描述符", "EventLoop* loop_: 所属事件循环", "int events_: 关心的事件掩码", "int revents_: 实际就绪的事件掩码", "weak_ptr<void> tie_: 弱引用绑定宿主对象"], functions: ["void tie(const shared_ptr<void>&)", "void enableReading(): events_ |= POLLIN; update()", "void handleEvent(Timestamp receiveTime)"], relatedDays: [1, 10, 18, 19] },
+    handleeventwithguard: { title: "Channel::handleEventWithGuard", tag: "生命周期保护", role: "事件分发处理逻辑。通过 tie_.lock() 尝试获取宿主对象的 shared_ptr，确认对象存活后执行回调，避免析构后野指针访问。", members: ["std::shared_ptr<void> guard = tie_.lock()", "ReadEventCallback readCallback_", "EventCallback writeCallback_"], functions: ["if (guard) { readCallback_(receiveTime); }"], relatedDays: [10, 18] },
+    tcpserver: { title: "TcpServer", tag: "TCP 服务管理", role: "管理 TCP 服务端生命周期与连接集合。通过 Acceptor 接收新连接，分发至 EventLoop 线程并以 map 维护活跃连接。", members: ["unique_ptr<Acceptor> acceptor_: 监听新建连接", "map<string, TcpConnectionPtr> connections_: 连接映射表", "EventLoopThreadPool threadPool_: 事件循环线程池"], functions: ["void setThreadNum(int)", "void start()", "void newConnection(int sockfd, const InetAddress&)", "void removeConnection(const TcpConnectionPtr&)"], relatedDays: [9, 13, 14, 19] },
+    tcpconnection: { title: "TcpConnection", tag: "TCP 连接", role: "代表已建立的 TCP 连接对象。继承 enable_shared_from_this 管理自身生命周期，持有 Channel、Socket 以及输入输出 Buffer。", members: ["shared_ptr<TcpConnection>", "unique_ptr<Socket> socket_", "unique_ptr<Channel> channel_", "Buffer inputBuffer_, outputBuffer_"], functions: ["void send(const string&)", "void shutdown()", "void handleRead()", "void handleWrite()"], relatedDays: [9, 10, 14, 18, 19] },
+    buffer: { title: "Buffer", tag: "应用层缓冲区", role: "应用层缓冲区。基于 vector<char> 连续内存组织，通过 readerIndex 与 writerIndex 游标管理可读写区域，配合 readv 接收套接字数据。", members: ["vector<char> buffer_", "size_t readerIndex_, writerIndex_", "static const size_t kCheapPrepend = 8"], functions: ["size_t readableBytes() const", "void retrieve(size_t)", "void append(const char*, size_t)", "ssize_t readFd(int fd, int* savedErrno)"], relatedDays: [2, 6, 11, 23] },
+    client: { title: "Client 外部客户端", tag: "网络接入", role: "发起 TCP 长连接或 HTTP 请求，接收服务端流式事件或模型响应。", members: ["TcpClient / HttpClient 客户端连接句柄"], functions: ["void connect()", "void send(req)", "void onMessage(resp)"], relatedDays: [1, 5, 9] },
+    linux_epoll: { title: "Linux 内核 epoll", tag: "内核 I/O 复用", role: "Linux 内核 I/O 多路复用机制。以红黑树维护监控文件描述符，以就绪链表返回触发的 I/O 事件。", members: ["epoll_event 内核事件结构体", "eventpoll 内核数据结构"], functions: ["epoll_create1(EPOLL_CLOEXEC)", "epoll_ctl(epfd, op, fd, event)", "epoll_wait(epfd, events, maxevents, timeout)"], relatedDays: [8, 13, 26] },
+    chatserver: { title: "ChatServer 业务服务", tag: "业务调度服务", role: "处理 HTTP 请求分发，维护用户与会话映射，调用模型策略接口并将消息投递至 RabbitMQ 异步写入。", members: ["chatInformation[userId][sessionId]", "sessionsIdsMap[userId]", "MQManager rabbitmq_"], functions: ["void initialize()", "void initChatMessage()", "void packageResp()"], relatedDays: [14, 19, 28] },
+    rag: { title: "RAG 检索增强", tag: "知识检索", role: "知识库文本向量检索。在调用大模型前检索匹配片段并追加至上下文，降低生成偏差。", members: ["AliyunRAGStrategy ragStrategy_", "Knowledge_Base_ID 知识库凭据"], functions: ["json buildRequest(messages)", "string parseResponse(json)"], relatedDays: [27, 28] }
 };
 
 function openTopologyDrawer(nodeId) {
@@ -2044,7 +2044,7 @@ function openTopologyDrawer(nodeId) {
     if (mod) {
         const isMuduo = mod.projectId === 'proj_muduo';
         if (drawerTag) {
-            drawerTag.innerText = `${isMuduo ? 'muduo 网络底座' : 'CppAIService 智能平台'} · ${mod.layer}`;
+            drawerTag.innerText = `${isMuduo ? 'muduo 网络核心' : 'CppAIService 服务层'} · ${mod.layer}`;
             drawerTag.className = isMuduo
                 ? "text-[10px] font-serifMono uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold"
                 : "text-[10px] font-serifMono uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold";
@@ -2279,7 +2279,7 @@ function openTopologyDrawer(nodeId) {
         content.innerHTML = `
             <div class="bg-stone-50 p-3 rounded-xl border border-stone-200">
                 <div class="text-[11px] font-bold font-serifMono text-stone-500 mb-1">系统核心拓扑组件:</div>
-                <p class="text-stone-800 text-xs leading-relaxed">该组件深度集成于双核架构中，协同驱动高性能高并发网络与智能业务流。</p>
+                <p class="text-stone-800 text-xs leading-relaxed">该组件属于系统架构的一部分，负责对应的网络通信或服务调用功能。</p>
             </div>
         `;
     }
@@ -2358,7 +2358,7 @@ function openReviewModal(dayNum = null) {
 
         <div id="review-hidden-answer" class="hidden space-y-2.5 pt-2">
             <div class="bg-sky-50 p-3 rounded-xl border border-sky-200 text-xs text-stone-700 leading-relaxed">
-                <strong class="text-sky-900 font-serifMono">工业级严格表述：</strong>
+                <strong class="text-sky-900 font-serifMono">规范表述：</strong>
                 <p class="mt-0.5">${escapeHtml(item.rigorousNuance?.strict || "")}</p>
             </div>
             <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs text-stone-700 leading-relaxed">
@@ -2639,11 +2639,11 @@ function executeImportOverwrite(imported) {
     showToast("🎉 双核数据已完全覆盖导入！");
 }
 
-// 导出 Markdown 双核个人学习攻坚档案
+// 导出 Markdown 个人学习与实践档案
 function exportMarkdownReport() {
-    let md = `# CppAIService & muduo 双核工程学习与攻坚档案\n\n`;
+    let md = `# CppAIService & muduo 学习与实践档案\n\n`;
     md += `> **生成时间**: ${new Date().toLocaleString()}  \n`;
-    md += `> **系统架构**: CppAIService & muduo Dual-Core Engineering OS (V6.0.0)  \n\n`;
+    md += `> **系统架构**: CppAIService & muduo Console (V6.0.0)  \n\n`;
 
     const streak = calculateRealStreak();
     let totalMins = 0;

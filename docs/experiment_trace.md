@@ -4,7 +4,7 @@
 > **代码仓库**：[Coolzs77/muduo-study-console](https://github.com/Coolzs77/muduo-study-console)  
 > **线上预览**：[https://coolzs77.github.io/muduo-study-console/](https://coolzs77.github.io/muduo-study-console/)  
 > **分支**：`main`（最新部署 Commit: `d25fea9`）  
-> **实验目的**：彻底放弃可能引入编译故障的 Vite/React 重写，回归原本成熟稳健的 7,517 行单体代码（`muduo_4.html`），对其进行高内聚低耦合的纯原生解耦（HTML / CSS / JS 分离），修复专注计时器无法启动缺陷，深度集成 `C++_learning` 双权威书目与 Readest 伴读流，经由微软 Edge 无头浏览器 CDP 进行本地与云端双重严苛回归测试，最终推送到 GitHub Pages 达成生产级稳定运行。
+> **实验目的**：对原 7,517 行单体代码（`muduo_4.html`）进行原生模块解耦（HTML / CSS / JS 分离），修复计时器无法启动的问题，关联 `C++_learning` 书目与 Readest 阅读链接，使用 Edge CDP 进行自动化回归测试，并部署至 GitHub Pages 运行。
 
 ---
 
@@ -15,11 +15,11 @@
 | 模块类别 | 文件相对路径 | 原始状态 | 解耦后行数 / 体积 | 职责与变更说明 |
 | :--- | :--- | :--- | :--- | :--- |
 | **主结构层** | `index.html` | 7,517 行 (单体 HTML) | 1,257 行 / 100 KB | 纯净语义化 HTML5 骨架，剥离所有内联样式与长篇 JS，新增「书卷伴读」导航按钮与多视图容器 |
-| **层叠样式** | `css/style.css` | 内联 `<style>` 标签 | 74 行 / 2.6 KB | 提取纯净 CSS，保留学术衬线体 / 等宽字体定义、现代化平滑滚动条及 SVG 流光动态动画 |
+| **层叠样式** | `css/style.css` | 内联 `<style>` 标签 | 74 行 / 2.6 KB | 提取 CSS，保留字体定义、滚动条及 SVG 动画 |
 | **实战数据集** | `js/dataset-28days.js` | 内联 JS 数组 | 3,313 行 / 206 KB | **100% 字节级无损继承**全部 4 周 28 天任务目标、实体书页码、思考要点、实战代码与自测题目 |
 | **映射与避坑** | `js/dataset-mappings.js`| 内联 JS 数组 | 621 行 / 43 KB | 涵盖 `MAPPING_MATRIX`（15项语法映射）、`SOURCE_ROADMAP`（8大核心类）与 `PITFALLS_DATASET`（12大工业踩坑事故） |
-| **书卷伴读引擎** | `js/books-integration.js`| **[NEW 新增]** | 255 行 / 17 KB | 双权威书目深度集成：陈硕《Linux多线程服务端编程》与《C++ Primer Plus》，物理印刷偏移补正、浏览器直跳与 Readest 桌面端呼起 |
-| **专注计时引擎** | `js/timer.js` | 内联缺陷函数 | 225 行 / 7.6 KB | 独立高可靠计时器：启动强制自愈、真实时间戳差值走字防休眠漂移、Web Audio 音效、番茄钟与会话自动归档 |
+| **书卷伴读模块** | `js/books-integration.js`| **[NEW 新增]** | 255 行 / 17 KB | 书目映射关联：陈硕《Linux多线程服务端编程》与《C++ Primer Plus》，物理印刷偏移补正、浏览器直跳与 Readest 桌面端呼起 |
+| **专注计时模块** | `js/timer.js` | 内联修复 | 225 行 / 7.6 KB | 独立计时器：基于时间戳差值走字、提供 Web Audio 音效、番茄钟与会话自动归档 |
 | **主业务控制器** | `js/app.js` | 内联分散脚本 | 2,245 行 / 114 KB | 包含大盘指标、28天卡片渲染、SVG 架构拓扑抽屉、艾宾浩斯复习模态框、自测中心、源码路线、踩坑库与 LocalStorage 持久化 |
 | **离线单文件兜底** | `classic.html` | 7,517 行 | 7,780 行 / 480 KB | 零构建、零跨域限制的单文件离线完整版本，保留全部修复与新特性，双击即可完全离线运行 |
 | **原文件修复** | `e:\workspace\muduo_4.html` | 7,517 行 (计时缺陷) | 7,517 行 | 同步修复了用户本地原文件中的计时器阻塞缺陷，确保原有工作流完全正常 |
@@ -47,9 +47,9 @@
 
 ---
 
-## 三、双权威书目与 Readest 阅读流深度融合实验
+## 三、书目与 Readest 阅读流联动实验
 
-针对用户在 `E:\workspace\C++_learning` 中的学习参考书，系统在 `js/books-integration.js` 中构建了无缝伴读闭环：
+针对用户在 `E:\workspace\C++_learning` 中的学习参考书，系统在 `js/books-integration.js` 中构建了伴读链接：
 
 ### 3.1 物理印刷页码补正算法
 电子 PDF 的文件绝对页码（Cover/目录等占用前置页）与实体书页脚印刷的正文页码存在固定偏移：
@@ -217,7 +217,7 @@ Timer Ticked: true
 2. **同步主调用栈协议唤起**：
    在用户点击处理函数中，第一步立即创建带有 `readest://` 的动态 `<a>` 标签并同步执行 `.click()`，最大程度保留用户激活态；随后异步执行剪贴板写入，两不耽误；
 3. **环境智能嗅探与「本地阅读助手」双模机制**：
-   - **本地环境（`file:` 或 `localhost`）**：检测到本地运行时，自动通过动态新标签页无缝拉起 Edge 内置 PDF 阅读器并跳转至加权绝对物理页（如陈硕 P.255 -> #page=278）；
+   - **本地环境（`file:` 或 `localhost`）**：检测到本地运行时，通过新标签页打开 Edge 内置 PDF 阅读器并跳转至加权绝对物理页（如陈硕 P.255 -> #page=278）；
    - **公网生产环境（HTTPS）**：检测到运行在 GitHub Pages 上时，自动弹出精心设计的**「本地阅读助手」模态框（#local-reader-modal）**。模态框中提供：
      - 一键呼起本地 Readest 客户端（无跨域限制，且剪贴板已注入书籍章节信息，在客户端中按 Ctrl+G 即可秒达）；
      - 一键复制 Edge 专用原生直跳命令（例如 `start msedge "file:///E:/workspace/C++_learning/..."#page=278`，在 Win+R 中粘贴即可秒开 Edge 并翻至目标页）；
@@ -228,14 +228,14 @@ Timer Ticked: true
 为了彻底根除老旧编译工程对开发和部署的干扰，彻底清理了 GitHub 仓库中残留的所有 React/Vite 遗留文件：
 - 删除 `src/`（20+ 个组件及旧数据文件）、`assets/`、`vite.config.ts`、`tsconfig.json`、`tailwind.config.js`、`postcss.config.js` 等；
 - 将 `package.json` 精简为仅保留静态预览与无编译拷贝脚本（`npm run build` 即运行 `scripts/build_static.cjs`）；
-- 单文件兜底 `classic.html` 与原文件 `muduo_4.html` 亦同步植入了最新的书目映射、阅读模态框与计时引擎。
+- 单文件兜底 `classic.html` 与原文件 `muduo_4.html` 亦同步更新了书目映射、阅读模态框与计时模块。
 
 ### 6.4 实机自动化 CDP 回归验证
 使用 Edge 无头调试端口运行 `scratch/test_jump_and_views.js`：
 - PDF 本地 Edge 原生跳转检测：**PASSED**（成功打开 `...#page=278` 页面目标）；
 - Readest 唤起指令与协议：**PASSED**（成功触发 `readest://`）；
 - 本地阅读助手模态框：**PASSED**（正确显示书名、页码补偿信息及复制命令）；
-- 28天大纲、15项语法映射、8阶源码路线、12大避坑案例与计时器核心引擎：**100% 通过**。
+- 28天大纲、15项语法映射、8阶源码路线、12大避坑案例与计时器模块：**100% 通过**。
 
 ---
 

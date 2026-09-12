@@ -1,6 +1,6 @@
 # DATA_MODEL_PROPOSAL.md — 统一领域数据模型与状态设计提案
 
-> **设计阶段**：PHASE 0 — DOMAIN MODEL PROPOSAL (提前为 P2 奠定统一数据模型基石)  
+> **设计阶段**：PHASE 0 — DOMAIN MODEL PROPOSAL (为 P2 提供统一数据模型设计)  
 > **设计目标**：杜绝各页面散乱读写 LocalStorage，建立高内聚、强类型、稳定 ID、无损迁移的领域对象架构
 
 ---

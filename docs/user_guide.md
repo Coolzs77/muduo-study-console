@@ -35,14 +35,14 @@
 
 ```text
 e:\workspace\muduo-study-console\
-├── index.html                 # 现代化语义主视图 HTML（约 1,240 行）
+├── index.html                 # 主视图 HTML 文件
 ├── classic.html               # 完整单文件离线兜底版（约 7,500 行）
 ├── css/
 │   └── style.css              # 纯净样式表（学术排版、平滑滚动、动态流光）
 ├── js/
 │   ├── dataset-28days.js      # 28 天完整实战大纲、考点、实验代码与自测数据集（3,313 行）
 │   ├── dataset-mappings.js    # 15 项语法-源码映射、8 阶源码大纲与 12 大避坑档案（621 行）
-│   ├── timer.js               # 高可靠专注计时器、防休眠漂移算法与会话自动归档（225 行）
+│   ├── timer.js               # 专注计时器与会话记录模块（225 行）
 │   └── app.js                 # 6 大核心视图路由、大盘指标、SVG 抽屉与持久化主业务（2,230 行）
 ├── docs/
 │   ├── experiment_trace.md    # 详尽的实验排查与无头浏览器 CDP 实机测试档案
@@ -71,7 +71,7 @@ e:\workspace\muduo-study-console\
 - **互动操作**：
   - 蓝图包含了：
     - **左翼**：现代 C++ 8 阶演进阶梯（const& 引用 ➔ RAII 析构 ➔ 移动语义 ➔ 智能指针 ➔ 容器 ➔ 回调 ➔ 模板）；
-    - **中轴**：Reactor 事件驱动调度中枢（EventLoop、Channel、Poller、epoll 等）；
+    - **中轴**：Reactor 事件分发与调度层（EventLoop、Channel、Poller、epoll 等）；
     - **右翼**：业务连接与数据实体（TcpServer、TcpConnection、Buffer 缓冲器）。
   - **点击任意节点**（如 Channel、TcpConnection、Buffer 等），右侧将平滑滑出**交互式架构抽屉**，展示该核心类的头文件路径、成员变量、核心函数调用链及其在 28 天中的重点攻坚日程。
 
@@ -118,4 +118,4 @@ e:\workspace\muduo-study-console\
 系统默认将所有数据（学习打卡天数、星级、今日专注分钟数、每日自测手记、踩坑档案等）自动保存在浏览器的 `localStorage` 中。
 - **导出学习档案**：滑动至网页最底部，点击 <kbd>导出学习档案.md</kbd>，可将您整个 28 天的完整学习历程导出为 Markdown 文档；
 - **导出数据备份**：点击 <kbd>导出 JSON</kbd>，可备份整个系统的底层数据库；
-- **跨设备迁移**：点击 <kbd>导入 JSON</kbd>，选择已备份的文件，进度秒级无缝恢复！
+- **跨设备迁移**：点击 <kbd>导入 JSON</kbd>，选择已备份的文件，进度恢复完成。

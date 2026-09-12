@@ -598,7 +598,7 @@ function renderSourceTraceCard(art) {
                     <div class="flex flex-wrap gap-1">${filesHtml}</div>
                 </div>
                 <div class="bg-white p-2.5 rounded-lg border border-stone-200/80">
-                    <span class="text-stone-400 font-bold block mb-1">核心类 (Classes):</span>
+                    <span class="text-stone-400 font-bold block mb-1">主要类 (Classes):</span>
                     <div class="flex flex-wrap gap-1">${classesHtml || '<span class="text-stone-400">-</span>'}</div>
                 </div>
                 <div class="bg-white p-2.5 rounded-lg border border-stone-200/80">

@@ -36,7 +36,7 @@
 | **specialized-codebase-archaeologist** | 多会话代码漂移审计、老代码与文档不一致检测、死代码/残留配置定位 | 审计历史代码、排查多阶段提交冲突、比对语雀文档与实际代码 | P0, P1, P3, P8 |
 | **testing-reality-checker** | 停止幻想式通过、基于铁证(Evidence)验收、默认“NEEDS WORK”审查 | 阶段验收门禁(Gate)、功能端到端运行检验、生产就绪审核 | P0, P2, P6, P8, Gate |
 | **engineering-software-architect** | 领域模型设计、分层解耦、系统扩展性架构设计 | 统一数据模型设计、全站导航与关系拓扑设计 | P0, P2, P9 |
-| **engineering-backend-architect** | C++ 后端高并发架构、线程模型、网络模型、存储与消息队列架构 | 剖析 CppAIService 底层网络/并发/异步机制 | P3, P8 |
+| **engineering-backend-architect** | C++ 后端网络架构、线程模型、存储与消息队列 | 剖析 CppAIService 底层网络与线程模型 | P3, P8 |
 | **engineering-frontend-developer** | 响应式 UI、Tailwind CSS、数据响应式绑定、无刷新交互 | 控制台视图重构、交互拓扑蓝图、组件化重构 | P1, P3, P4, P9 |
 | **product-manager** | 用户需求转化、价值主线梳理、功能优先级排列（S/A/B/C） | 规划求职看板、Today Mission 优先级梳理 | P0, P4, P9 |
 | **project-manager-senior** | 任务细化排期、规避死锁进程、严格遵循交付范围 | 8 周冲刺路线制定、每日计划调度 | P0, P4, P7 |
@@ -47,9 +47,9 @@
 | **engineering-ai-engineer** | LLM 提示词工程、策略模式多模型调用、RAG 向量检索评估 | 深入 CppAIService 的 AIStrategy 与 RAG 模块 | P3, P5 |
 | **specialized-mcp-builder** | Model Context Protocol 工具注册、两段式推理与协议设计 | 剖析并增强 CppAIService AIToolRegistry | P3, P5 |
 | **engineering-devops-automator** | GitHub Actions CI/CD、自动化静态检查、自动化发布部署 | 同步部署 GitHub Pages、自动化集成流水线 | P8 |
-| **engineering-database-optimizer** | MySQL 架构优化、连接池管理、高并发写入缓冲与索引调优 | 审计 CppAIService DbConnectionPool 与 MQ 写入 | P3, P8 |
+| **engineering-database-optimizer** | MySQL 架构优化、连接池管理、写入缓冲与索引调优 | 审计 CppAIService DbConnectionPool 与 MQ 写入 | P3, P8 |
 | **security-ai-generated-code-auditor** | AI 生成代码审计、硬编码密钥排查、XSS/HTML 注入漏洞挖掘 | 前端富文本渲染安全排查、API Key 暴露审计 | P8 |
-| **security-appsec-engineer** | 全链路安全防护、敏感信息隔离、安全通信 (SSL/TLS) 审查 | 检查 LocalStorage 敏感存储、CORS 与 SSL 模块 | P8 |
+| **security-appsec-engineer** | 安全防护、敏感信息隔离、通信安全 (SSL/TLS) 审查 | 检查 LocalStorage 敏感存储、CORS 与 SSL 模块 | P8 |
 | **engineering-git-workflow-master** | Git 分支策略、Conventional Commits、无损迁移与版本回滚 | 阶段提交标准把控、Git 变更记录沉淀 | 全阶段 (P0-P9) |
 | **specialized-developer-advocate** | 技术影响力沉淀、工程叙事提炼、STAR 面试表达转化 | Evidence 导出为简历 Bullet、面试真题复盘 | P6, P9 |
 
@@ -69,10 +69,10 @@ e:\workspace\muduo-study-console
 ├── css/
 │   └── style.css              # 2.6KB 自定义样式表 (学术纸质风格微调、动画等)
 ├── js/
-│   ├── app.js                 # 113KB 核心应用逻辑 (2237 行, 状态管理/事件绑定/渲染引擎)
+│   ├── app.js                 # 113KB 应用逻辑 (2237 行, 状态管理/事件绑定/视图渲染)
 │   ├── dataset-28days.js      # 206KB (28天 muduo 攻坚完整任务集、书本章节、测验题与实验代码)
 │   ├── dataset-mappings.js    # 43KB (语法到 muduo 映射矩阵、8大核心源码管线、C++踩坑集)
-│   └── timer.js               # 7.6KB (专注计时器核心引擎、Web Audio API 提示音)
+│   └── timer.js               # 7.6KB (专注计时器逻辑、Web Audio API 提示音)
 ├── docs/
 │   ├── experiment_trace.md    # 实验执行轨迹文档
 │   ├── test_report.md         # 测试验收报告
@@ -115,9 +115,9 @@ e:\workspace\muduo-study-console
 
 ### 3.4 模块处置策略（保留 / 合并 / 扩展）
 - **完整保留（只做加法）**：
-  - 28 天任务全部保留，作为底座的“C++ 基础与 muduo 网络基石”。
+  - 28 天任务全部保留，作为“C++ 基础与 muduo 网络学习内容”。
   - 语法映射矩阵与源码管线保留，成为未来“网络基础设施”分层的知识锚点。
-  - 专注计时器与打卡系统保留，无缝升级为支持任务类型（IT、CppAIService、算法、阅读）的新调度器。
+  - 专注计时器与打卡系统保留，升级为支持任务类型（IT、CppAIService、算法、阅读）的计时调度。
 - **扩展升级（加法）**：
   - 引入 CppAIService 架构蓝图与源码透视（作为主一级模块）。
   - 引入程序员 Carl 语雀知识库检索阅读器。

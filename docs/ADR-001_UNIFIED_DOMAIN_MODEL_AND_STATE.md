@@ -10,7 +10,7 @@
 ## 1. 背景与问题描述 (Context & Problem Statement)
 
 在经历 P0（项目全景考古与技术栈映射）与 P1（语雀 17 篇知识库完全离线沉淀）后，控制台已拥有极其扎实的双核心工程知识财富：
-1. **底层通信基石 (`proj_muduo`)**：基于 C++11 的 28 天任务推进、实验手记、自测记录、8 阶源码研读路线、20 条避坑档案（历史存储于 `localStorage('muduo_v5_data')`）；
+1. **底层通信模块 (`proj_muduo`)**：基于 C++11 的 28 天任务推进、实验手记、自测记录、8 阶源码研读路线、20 条避坑档案（历史存储于 `localStorage('muduo_v5_data')`）；
 2. **上层 AI 微服务平台 (`proj_cppai`)**：基于现代 C++17 的 17 篇专栏、62 张高清架构大图、6 阶掌握度评级、收藏与最近阅读记录（历史存储于 `localStorage('cppai_knowledge_*')`）。
 
 然而，原系统存在以下明显的架构痛点：
@@ -26,7 +26,7 @@
 2. **容灾保底机制（Defense-in-depth）**：在执行任何破坏性可能的数据结构升级前，必须实现全量自动冷备份。
 3. **强类型与稳定 ID（Entity Dictionary）**：建立全站统一的标准 ID（如 `proj_muduo`, `mod_net_eventloop`, `know_mcp_twostage`, `pitfall_epoll_et_starvation`），杜绝数字下标和临时字符串。
 4. **统一导出与导入规范（Domain Schema JSON）**：提供符合标准双核架构的导出备份，并具备向下兼容旧版 V4/V5 的自适应导入能力。
-5. **高性能读写（Debounced Persistence）**：高频打分与输入时避免反复同步阻塞序列化，采用 500ms 防抖存盘。
+5. **写入防抖（Debounced Persistence）**：高频输入时避免反复同步阻塞序列化，采用 500ms 防抖存盘。
 
 ---
 
@@ -45,7 +45,7 @@
   - 继承 LocalStorage 同步无阻塞特性，零外部 npm 依赖；
   - 引入 `SchemaMigrationV6`，迁移前强制执行冷备份至 `localStorage('muduo_v5_backup_before_v6')`；
   - 双向镜像回写：新状态不仅存入 `muduo_v6_data`，同时同步镜像回写至 `muduo_v5_data` 和 `cppai_knowledge_*`，保证在旧标签页打开或回滚时 100% 向下兼容；
-  - 建立了完整的双核项目元数据：2 个核心项目、19 个核心模块、8 个跨端知识核心节点、生产级真实事故词典。
+  - 建立了双核项目元数据：2 个项目、19 个模块、8 个跨端知识节点、常见运行时错误词典。
 
 ---
 
@@ -55,7 +55,7 @@
 
 定义了规范实体集合：
 - **`DOMAIN_PROJECTS`**:
-  - `proj_muduo`: L0~L2 高并发底座 (C++11, Reactor, epoll, EventLoop, Buffer)
+  - `proj_muduo`: L0~L2 网络层基础 (C++11, Reactor, epoll, EventLoop, Buffer)
   - `proj_cppai`: L3~L5 AI 分布式平台 (C++17, MCP 协议, 多策略模型, RabbitMQ, ONNX, MySQL 连接池)
 - **`DOMAIN_MODULES` (19 个标准模块)**:
   - muduo 侧：`mod_net_eventloop`, `mod_net_channel`, `mod_net_poller`, `mod_net_tcpconnection`, `mod_net_buffer`, `mod_net_tcpserver`, `mod_base_threadpool`, `mod_base_logging`
@@ -63,7 +63,7 @@
 - **`DOMAIN_KNOWLEDGE_NODES`**:
   - 标准化跨项目知识点（如 `know_reactor_eventfd`, `know_mcp_twostage`, `know_mq_async_decouple`），携带模块、重要性、高频面试考点与陷阱。
 - **`DOMAIN_PITFALLS_CATALOG`**:
-  - 包含 muduo 与现代 C++17 真实生产级故障排查，具备现象、根因、规避铁律。
+  - 包含 muduo 与 C++17 调试案例，具备现象、根因与规避方法。
 
 ### 4.2 状态管理与数据迁移 (`js/state-manager.js`)
 
@@ -77,7 +77,7 @@ flowchart TD
     F --> G[补齐双核拓扑与默认避坑词典]
     G --> H[原子落盘 muduo_v6_data]
     H --> I[双向镜像回写 V5 与 CppAI 旧键]
-    C --> J[发布状态更新，驱动 UI 渲染]
+    C --> J[发布状态更新，触发 UI 渲染]
     I --> J
 ```
 

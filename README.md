@@ -1,58 +1,57 @@
-# muduo C++ 工业实战个人控制台 (Muduo Study Console)
+# CppAIService & muduo 源码学习控制台 (Muduo Study Console)
 
-> 🌊 **基于 Google Antigravity 打造的高性能现代化 C++ 网络库学习与工程控制台**  
-> 深度融合陈硕《Linux 多线程服务端编程：使用 muduo C++ 网络库》与《C++ Primer Plus》伴读系统，支持 **Readest 桌面阅读器协议直调** 与 **浏览器原版 PDF 精准页码直跳**。
-
----
-
-## 🌟 核心工程重构特性 (V5.2 TS 现代化重构版)
-
-- ⚡ **现代化技术栈**：采用 `Vite 6 + React 18 + TypeScript + Tailwind CSS` 深度解耦，告别单体 7500 行杂乱 HTML，实现严苛的类型安全。
-- 📖 **书卷伴读系统 (Reading Companion)**：
-  - **精准页码直跳 (`#page=xxx`)**：点击任一攻坚日或章节，直接在浏览器新标签页中打开对应 PDF 并精准滚动至该物理页。
-  - **Readest 软件深度联动**：一键复制精准章节与页码锚点，并通过 `readest://` 唤起本地 Readest 客户端。
-  - **双书对照体系**：融合陈硕 12 大核心专题与 C++ Primer Plus 第 18 章（C++11/14 新标准核心）考点。
-- ⏱️ **工业级深度专注计时器**：
-  - 支持专注倒计时/顺计时、暂停、重置与归档打卡。
-  - 自动分类记录：`代码实战攻坚`、`书目研读(Readest)`、`故障排查/调试`。
-- 🗺️ **核心 Reactor 架构交互拓扑**：
-  - SVG 动态流光拓扑图，点击即时透视 `EventLoop`、`Channel`、`EpollPoller`、`TcpConnection` 与 `Buffer` 的线程归属与并发戒律。
-- 🛡️ **大厂高频避坑指南与自测题库**：
-  - 覆盖 SIGPIPE 崩溃、析构竞争、shared_from_this 陷阱等典型生产事故。
-  - 28 天每日自测与掌握度星级评估（艾宾浩斯强化曲线）。
-- 🚀 **自动化 CI/CD 持续部署**：
-  - 配置 GitHub Actions 自动化工作流，推送即自动构建并发布至 GitHub Pages。
+个人 C++ 网络编程与服务架构学习控制台。系统整合 muduo (C++11) 网络库机制与 CppAIService (C++17) 服务架构，提供章节伴读、架构拓扑映射、避坑指南、学习计时与自测题库。
 
 ---
 
-## 🛠️ 本地运行与开发
+## 功能模块
+
+- **技术栈**：基于原生 JavaScript / CSS 与 HTML 构建，提供单文件离线运行（`classic.html`）与模块化开发支持。
+- **书卷伴读系统**：
+  - **页码跳转 (`#page=xxx`)**：支持点击章节在浏览器新标签页打开对应 PDF 并定位物理页码。
+  - **Readest 联动**：支持复制章节与页码锚点，并通过 `readest://` 协议唤起本地 Readest 客户端。
+  - **对照体系**：涵盖《Linux 多线程服务端编程：使用 muduo C++ 网络库》专题与《C++ Primer Plus》第 18 章 C++11 特性。
+- **专注计时模块**：
+  - 提供倒计时与顺计时、暂停、重置与学习记录保存功能。
+  - 任务分类：代码编写、文档研读(Readest)、问题调试。
+- **架构拓扑映射**：
+  - 提供交互式 SVG 拓扑图，展示 `EventLoop`、`Channel`、`EpollPoller`、`TcpConnection`、`Buffer` 的调用流程与线程归属。
+  - 提供 CppAIService 服务链路拓扑（网关、线程池、协议解析、推理服务、异步消息队列）。
+- **避坑要点与题库**：
+  - 收录 SIGPIPE 处理、对象析构生命周期、shared_from_this 等常见陷阱与调试规范。
+  - 提供 28 天知识点自测与掌握度记录。
+
+---
+
+## 本地运行与开发
 
 ```bash
-# 1. 克隆代码
+# 1. 克隆代码仓库
 git clone https://github.com/Coolzs77/muduo-study-console.git
 cd muduo-study-console
 
 # 2. 安装依赖
 npm install
 
-# 3. 启动本地极速开发热重载服务器
+# 3. 启动本地开发服务器
 npm run dev
 
-# 4. 生产环境打包构建
+# 4. 构建静态资源
 npm run build
 ```
 
 ---
 
-## 📖 参考书目说明
+## 参考书目与工程目录
 
-本系统默认关联存放于 `e:/workspace/C++_learning/` 目录下的两本经典电子书：
+系统默认关联存放于 `e:/workspace/C++_learning/` 目录下的资料：
 1. **《Linux 多线程服务端编程：使用 muduo C++ 网络库》**（陈硕著）
 2. **《C++ Primer Plus：中文版（第6版）》**（Stephen Prata 著）
 
 ---
 
-## 🔗 在线访问与单体回退
+## 在线访问与单文件版本
 
-- **GitHub Pages 在线访问**：[https://coolzs77.github.io/muduo-study-console/](https://coolzs77.github.io/muduo-study-console/)
-- **单体极简回退版**：[classic.html](./classic.html) (保留了修复后的单文件免构建版，方便无 Node 环境时离线双击运行)。
+- **在线地址**：[https://coolzs77.github.io/muduo-study-console/](https://coolzs77.github.io/muduo-study-console/)
+- **单文件版本**：[classic.html](./classic.html)（无需 Node.js 构建，可直接在浏览器中打开）。
+

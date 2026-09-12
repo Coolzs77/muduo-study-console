@@ -1,6 +1,6 @@
 // ==========================================================================
-// muduo C++ 工业实战个人控制台 - 专注计时器高可靠模块 (Timer Engine)
-// 彻底修复不走字、后台标签页节流时间漂移、脏数据死锁等缺陷
+// muduo C++ 学习控制台 - 专注计时器模块
+// 时间戳差值计时与状态管理
 // ==========================================================================
 
 let _timerIntervalHandle = null;
@@ -52,12 +52,12 @@ function toggleStudyTimer() {
 
         if (_timerIntervalHandle) clearInterval(_timerIntervalHandle);
         _timerIntervalHandle = setInterval(() => {
-            // 使用时间戳差值计算，彻底消除系统休眠或标签页后台时的秒数漂移
+            // 使用时间戳差值计算，消除系统休眠或标签页后台时的秒数漂移
             timer.seconds = Math.floor((Date.now() - _timerStartTimestamp) / 1000);
             updateTimerDisplay();
         }, 1000);
 
-        if (typeof showToast === 'function') showToast("专注计时已启动，保持工业级专注！");
+        if (typeof showToast === 'function') showToast("专注计时已启动");
     } else {
         // 暂停计时
         timer.running = false;
@@ -170,7 +170,7 @@ function logStudyMinutes(mins) {
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
     const typeNames = {
-        coding: '代码攻坚',
+        coding: '代码编写',
         reading: '书目研读',
         debug: '排错调试'
     };
@@ -182,7 +182,7 @@ function logStudyMinutes(mins) {
         day: day,
         duration: mins,
         type: type,
-        note: `专注攻坚 Day ${day} (${typeNames[type] || type})`
+        note: `任务 Day ${day} (${typeNames[type] || type})`
     });
 
     if (typeof persistState === 'function') persistState();
