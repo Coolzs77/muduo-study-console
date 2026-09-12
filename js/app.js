@@ -400,7 +400,7 @@ function switchView(viewName) {
     }
 
     appState.currentView = viewName;
-    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
+    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'learning', 'quiz', 'source', 'pitfalls'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -420,8 +420,9 @@ function switchView(viewName) {
     if (viewName === 'dashboard') {
         renderHomeDashboard();
     } else if (viewName === 'mapping') {
-        renderLearningSystem();
         renderModuleHierarchyMap();
+    } else if (viewName === 'learning') {
+        renderLearningSystem();
     } else if (viewName === 'daily') {
         renderDailyCards();
     } else if (viewName === 'knowledge') {
@@ -1523,6 +1524,12 @@ function renderMappingTable() {
 // ==========================================================================
 
 function switchLearningTab(tabKey, updateState = true) {
+    if (typeof appState !== 'undefined' && appState && appState.currentView && appState.currentView !== 'learning') {
+        const secLearning = document.getElementById('view-learning');
+        if (secLearning && secLearning.classList.contains('hidden')) {
+            if (typeof switchView === 'function') switchView('learning');
+        }
+    }
     if (!appState.learningSystem) {
         appState.learningSystem = {
             algoReviewQueue: {},
@@ -1843,6 +1850,22 @@ function renderLearningAlgoTab() {
 
     const categories = ['全部', '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
 
+    // 代码随想录 12 大分类元数据 (用于分类全览图)
+    const algoCategoriesMeta = [
+        { name: '数组', icon: 'fa-table-cells', desc: '二分/双指针/滑动窗口' },
+        { name: '链表', icon: 'fa-link', desc: '虚拟头/环检测/双指针' },
+        { name: '哈希表', icon: 'fa-hashtag', desc: '频次统计/两数之和/去重' },
+        { name: '字符串', icon: 'fa-quote-left', desc: '双指针/KMP前缀表' },
+        { name: '双指针法', icon: 'fa-arrows-left-right-to-line', desc: '对撞/快慢指针' },
+        { name: '栈与队列', icon: 'fa-layer-group', desc: '单调栈/逆波兰/滑动窗口' },
+        { name: '二叉树', icon: 'fa-tree', desc: '递归/迭代/层序/BST' },
+        { name: '回溯算法', icon: 'fa-route', desc: '组合/分割/排列/棋盘' },
+        { name: '贪心算法', icon: 'fa-hand-holding-dollar', desc: '局部最优/区间调度' },
+        { name: '动态规划', icon: 'fa-chess-board', desc: '背包/打家劫舍/子序列' },
+        { name: '单调栈', icon: 'fa-chart-simple', desc: '下一个更大元素/接雨水' },
+        { name: '图论', icon: 'fa-circle-nodes', desc: '深搜/广搜/并查集/最短路' }
+    ];
+
     // 过滤
     const filtered = catalog.filter(p => {
         const matchCat = currentAlgoCategory === '全部' || p.category === currentAlgoCategory;
@@ -1857,7 +1880,61 @@ function renderLearningAlgoTab() {
     const completedCount = catalog.filter(p => !!completedMap[p.num]).length;
     const completeRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-    // 分类按钮
+    // 12 大分类全览全景图卡片 HTML (实时响应 completedMap 的改变)
+    const overviewCardsHtml = algoCategoriesMeta.map(c => {
+        const catProbs = catalog.filter(p => p.category === c.name);
+        const catTotal = catProbs.length;
+        const catDone = catProbs.filter(p => !!completedMap[p.num]).length;
+        const pct = catTotal > 0 ? Math.round((catDone / catTotal) * 100) : 0;
+        const isAllDone = (catDone === catTotal && catTotal > 0);
+        const isSelected = (currentAlgoCategory === c.name);
+
+        let borderBgClass = 'bg-stone-50/70 border-stone-200 hover:border-stone-400 hover:bg-stone-100/60';
+        if (isSelected) {
+            borderBgClass = 'ring-2 ring-indigo-600 bg-indigo-50/60 border-indigo-400 shadow-sm';
+        } else if (isAllDone) {
+            borderBgClass = 'bg-emerald-50/40 border-emerald-300 hover:border-emerald-400';
+        } else if (catDone > 0) {
+            borderBgClass = 'bg-indigo-50/25 border-indigo-200 hover:border-indigo-300';
+        }
+
+        let badgeHtml = '';
+        if (isAllDone) {
+            badgeHtml = '<span class="text-[10px] font-serifMono font-bold px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-900 shrink-0">✓ 通关</span>';
+        } else if (catDone > 0) {
+            badgeHtml = `<span class="text-[10px] font-serifMono font-bold px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-800 shrink-0">${pct}%</span>`;
+        } else {
+            badgeHtml = '<span class="text-[10px] font-serifMono font-medium px-1.5 py-0.2 rounded bg-stone-200 text-stone-600 shrink-0">未做</span>';
+        }
+
+        const barColor = isAllDone ? 'bg-emerald-500' : (catDone > 0 ? 'bg-indigo-600' : 'bg-transparent');
+
+        return `
+            <div onclick="setAlgoCategoryFilter('${c.name}')" class="p-2.5 sm:p-3 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none ${borderBgClass}" title="点击下钻筛选「${c.name}」(${catDone}/${catTotal}题)">
+                <div>
+                    <div class="flex items-center justify-between gap-1 mb-1">
+                        <span class="inline-flex items-center gap-1.5 font-bold text-xs font-serifHeading ${isAllDone ? 'text-emerald-900' : (isSelected ? 'text-indigo-900' : 'text-stone-800')}">
+                            <i class="fa-solid ${c.icon} ${isAllDone ? 'text-emerald-600' : (isSelected ? 'text-indigo-600' : 'text-stone-500')} text-[11px]"></i>
+                            <span>${c.name}</span>
+                        </span>
+                        ${badgeHtml}
+                    </div>
+                    <div class="text-[9px] text-stone-400 truncate mb-2 font-serifMono">${c.desc}</div>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between text-[10px] font-serifMono text-stone-500 mb-1">
+                        <span>进度</span>
+                        <span class="font-bold ${isAllDone ? 'text-emerald-700' : (catDone > 0 ? 'text-indigo-700' : 'text-stone-600')}">${catDone} / ${catTotal}</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-300 ${barColor}" style="width: ${pct}%;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // 分类筛选按钮
     const catButtonsHtml = categories.map(cat => {
         const catTotal = cat === '全部' ? totalCount : catalog.filter(p => p.category === cat).length;
         const catDone = cat === '全部' ? completedCount : catalog.filter(p => p.category === cat && !!completedMap[p.num]).length;
@@ -1979,6 +2056,26 @@ function renderLearningAlgoTab() {
             </div>
         </div>
 
+        <!-- 代码随想录 12 大算法分类全览全景图 (Category Overview Map) -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 academic-card">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-stone-100 font-serifMono">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-cubes-stacked text-indigo-700"></i>
+                    <span class="font-bold text-stone-900 text-xs sm:text-sm font-serifHeading">代码随想录 12 大算法体系全览图</span>
+                    <span class="text-[10px] text-stone-400 font-normal">（点击分类卡片可下钻筛选，勾选完成题目即时动态更新）</span>
+                </div>
+                <div class="flex items-center gap-2 text-[11px]">
+                    <button onclick="setAlgoCategoryFilter('全部')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${currentAlgoCategory === '全部' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700'}">
+                        全部 179 题 (${completedCount}/${totalCount})
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3" id="algo-category-overview-grid">
+                ${overviewCardsHtml}
+            </div>
+        </div>
+
         <!-- 分类与搜索过滤条 -->
         <div class="bg-white p-4 rounded-2xl border border-stone-200 academic-card space-y-3">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -2019,6 +2116,8 @@ function toggleAlgoCompletedStatus(algoNum) {
         if (typeof persistState === 'function') persistState();
     }
     renderLearningAlgoTab();
+    if (typeof renderHomeWeeklyMetrics === 'function') renderHomeWeeklyMetrics();
+    if (typeof renderTodayTasks === 'function') renderTodayTasks();
     if (typeof showToast === 'function') showToast(`题目 #${algoNum} 状态已更新`);
 }
 
@@ -5832,9 +5931,14 @@ function renderTaskHub() {
                 <div class="mt-2.5 p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-200 text-xs font-serifMono text-indigo-950 flex flex-col gap-2">
                     <div class="flex items-center justify-between">
                         <span>今日已记录算法：<strong>${algoList.length} / 3 题</strong></span>
-                        <button onclick="openAlgorithmModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition flex items-center gap-1 cursor-pointer">
-                            <i class="fa-solid fa-plus text-[10px]"></i> 记录手撕题
-                        </button>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="switchView('learning'); switchLearningTab('algo');" class="px-2.5 py-1 bg-white border border-indigo-300 hover:bg-indigo-100 text-indigo-900 rounded font-bold transition cursor-pointer flex items-center gap-1">
+                                <span>直达手撕 Lab</span> <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                            </button>
+                            <button onclick="openAlgorithmModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition flex items-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-plus text-[10px]"></i> 记录手撕题
+                            </button>
+                        </div>
                     </div>
                     ${algoBadges ? `<div class="flex flex-wrap gap-1.5 pt-1">${algoBadges}</div>` : '<div class="text-[11px] text-stone-400">今日暂无手撕记录，点击右侧记录添加题目。</div>'}
                 </div>
@@ -5847,8 +5951,25 @@ function renderTaskHub() {
             extraContent = `
                 <div class="mt-2.5 p-2 rounded-lg bg-sky-50/70 border border-sky-200 text-xs font-serifMono text-sky-950 flex items-center justify-between">
                     <span>当前阅读进度：<strong>P.${curPage}</strong> (今日目标: +10页)</span>
-                    <button onclick="openBooksModal('${task.bookKey}')" class="px-2.5 py-1 bg-white border border-sky-300 hover:bg-sky-100 text-sky-900 rounded font-bold transition cursor-pointer">
-                        更新页码
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="switchView('learning'); switchLearningTab('books');" class="px-2.5 py-1 bg-white border border-sky-300 hover:bg-sky-100 text-sky-900 rounded font-bold transition cursor-pointer flex items-center gap-1">
+                            <span>直达书目伴读</span> <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                        </button>
+                        <button onclick="openBooksModal('${task.bookKey}')" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-700 text-white rounded font-bold transition cursor-pointer">
+                            更新页码
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // B 级考点自测专属：直达自测中心
+        if (task.id === 'task_b_quiz' || task.category === 'quiz') {
+            extraContent = `
+                <div class="mt-2.5 p-2 rounded-lg bg-purple-50/70 border border-purple-200 text-xs font-serifMono text-purple-950 flex items-center justify-between">
+                    <span>项目代码驱动八股、muduo 考点与阶段自测</span>
+                    <button onclick="switchView('quiz')" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs">
+                        <span>直达自测中心</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </button>
                 </div>
             `;
@@ -5882,7 +6003,7 @@ function renderTaskHub() {
                 <div class="mt-2.5 p-2 rounded-lg bg-stone-100 border border-stone-200 text-xs font-serifMono text-stone-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <span class="text-[11px] text-stone-600 truncate max-w-md">${cNote ? '手记: ' + escapeHtml(cNote) : '暂无岗位调研手记，定期关注招聘要求'}</span>
                     <div class="flex items-center gap-1.5 shrink-0">
-                        <a href="https://www.nowcoder.com/jobs" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-stone-900 hover:bg-stone-800 text-white rounded font-bold transition">
+                        <a href="https://www.nowcoder.com/job/center" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-stone-900 hover:bg-stone-800 text-white rounded font-bold transition">
                             访问牛客
                         </a>
                         <button onclick="openCareerModal()" class="px-2.5 py-1 bg-white border border-stone-300 hover:bg-stone-200 text-stone-700 rounded font-bold transition cursor-pointer">
@@ -6711,12 +6832,32 @@ function renderTodayTasks() {
         const safeTitle = typeof escapeHtml === 'function' ? escapeHtml(t.title) : t.title;
         const safeSubtitle = t.subtitle ? (typeof escapeHtml === 'function' ? escapeHtml(t.subtitle) : t.subtitle) : '';
 
+        let directLinkBtn = '';
+        if (t.id === 'task_s_project' || t.category === 'project') {
+            directLinkBtn = `<button onclick="switchView('knowledge')" class="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达语雀专栏研读"><span>直达专栏</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
+        } else if (t.id === 'task_a_algo' || t.category === 'algorithm') {
+            directLinkBtn = `<button onclick="switchView('learning'); switchLearningTab('algo');" class="px-2 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达手撕算法 Lab"><span>直达手撕 Lab</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
+        } else if (t.id === 'task_a_linux_book' || t.id === 'task_a_bird_linux' || t.category === 'book') {
+            directLinkBtn = `<button onclick="switchView('learning'); switchLearningTab('books');" class="px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达专业书目伴读"><span>直达书目伴读</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
+        } else if (t.id === 'task_b_quiz' || t.category === 'quiz') {
+            directLinkBtn = `<button onclick="switchView('quiz')" class="px-2 py-0.5 rounded bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达面试题库与自测"><span>直达自测中心</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
+        } else if (t.id === 'task_c_reading' || t.category === 'reading') {
+            directLinkBtn = `<button onclick="switchView('learning'); switchLearningTab('reading');" class="px-2 py-0.5 rounded bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达通识阅读三部曲"><span>直达通识阅读</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
+        } else if (t.id === 'task_c_career' || t.category === 'career') {
+            directLinkBtn = `<a href="https://www.nowcoder.com/job/center" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 rounded bg-stone-900 hover:bg-stone-800 text-white text-[10px] font-bold font-serifMono flex items-center gap-1 transition shadow-2xs" title="直达牛客求职专区"><span>直达牛客 ↗</span></a>`;
+        } else if (t.targetLink && t.targetLink.startsWith('view-')) {
+            const vName = t.targetLink.replace('view-', '');
+            directLinkBtn = `<button onclick="switchView('${vName}')" class="px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] font-bold font-serifMono transition"><span>直达目标</span></button>`;
+        } else {
+            directLinkBtn = `<button onclick="switchView('learning')" class="px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] font-bold font-serifMono transition"><span>直达关联</span></button>`;
+        }
+
         return `
             <div class="p-3 rounded-xl border ${isDone ? 'border-stone-200 bg-stone-50/60' : 'border-stone-200 bg-white hover:border-stone-300'} transition flex flex-col gap-1 academic-card">
                 <div class="flex items-start justify-between gap-3">
-                    <div class="flex items-start gap-2.5 min-w-0">
-                        <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskCompleted('${t.id}')" class="mt-1 w-4 h-4 rounded text-sky-700 border-stone-300 cursor-pointer focus:ring-0" id="chk-${t.id}">
-                        <div class="min-w-0">
+                    <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                        <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskCompleted('${t.id}')" class="mt-1 w-4 h-4 rounded text-sky-700 border-stone-300 cursor-pointer focus:ring-0 shrink-0" id="chk-${t.id}">
+                        <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <span class="px-1.5 py-0.2 text-[10px] rounded ${pBadge}">${t.priority} 级</span>
                                 <span class="text-[10px] px-1.5 py-0.2 rounded bg-stone-100 text-stone-600">${catLabel}</span>
@@ -6726,6 +6867,7 @@ function renderTodayTasks() {
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0 font-serifMono">
+                        ${directLinkBtn}
                         <span class="text-[11px] text-stone-500 font-bold">${timeStr}</span>
                         ${t.isCustom ? `
                             <button onclick="deleteCustomTask('${t.id}')" class="text-stone-300 hover:text-rose-600 transition p-0.5 cursor-pointer" title="删除该待办">

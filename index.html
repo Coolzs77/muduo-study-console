@@ -176,6 +176,9 @@
             <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="CppAIService 项目">
                 <i class="fa-solid fa-diagram-project text-emerald-600"></i> CppAIService 项目
             </button>
+            <button onclick="switchView('learning')" id="nav-learning" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="统一学习系统与关联中心">
+                <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 统一学习系统
+            </button>
             <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="muduo 源码路线">
                 <i class="fa-solid fa-calendar-check text-amber-600"></i> muduo 源码路线
             </button>
@@ -1110,6 +1113,23 @@
         </div>
         </div>
 
+        <!-- 六维联动与统一学习系统快捷进入条 -->
+        <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 rounded-2xl p-5 border border-emerald-200 academic-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-serifMono font-bold mb-1">
+                    <i class="fa-solid fa-link text-emerald-700"></i> 六维联动 ➔ 底层体系
+                </div>
+                <h3 class="text-sm font-bold text-stone-900 font-serifHeading">探索 C++ 8维核心语法、Linux 9维底座与代码随想录算法手撕？</h3>
+                <p class="text-xs text-stone-600 mt-0.5">进入统一学习系统，查看 C++ 15项映射、陈硕书目伴读、179 道手撕算法 Lab 与项目真实八股。</p>
+            </div>
+            <button onclick="switchView('learning')" class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold font-serifMono transition flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer">
+                <span>进入统一学习系统</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- ==================== VIEW 3.5: 统一学习系统与知识与实践关联中心 (单独列出) ==================== -->
+    <section id="view-learning" class="hidden space-y-6">
         <!-- 头部导航与体系介绍 -->
         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-stone-100">
@@ -2304,7 +2324,7 @@ add_executable(my_server ${SOURCES})</pre>
         <div class="space-y-3 font-serifMono text-xs">
             <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 text-stone-600 flex items-center justify-between">
                 <span>直达牛客求职专区：</span>
-                <a href="https://www.nowcoder.com/jobs" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-stone-900 hover:bg-stone-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                <a href="https://www.nowcoder.com/job/center" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-stone-900 hover:bg-stone-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5">
                     <span>访问牛客网</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                 </a>
             </div>

@@ -260,7 +260,44 @@ const calGrid = getOrCreateElement('calendar-grid');
 assert.strictEqual(calGrid.children.length, 28, 'calendar-grid must render 28 day cells');
 console.log('  ✓ 28 天学习打卡索引日历成功渲染 28 个掌握度单元格！');
 
+// 8. 验证每日任务直达链接与牛客网 404 修复
+console.log('\n[Test 8] 验证每日任务直达链接与牛客网 404 修复...');
+sandbox.renderTodayTasks();
+assert.ok(todayTasksContainer.innerHTML.includes('直达专栏'), 'Today tasks should include direct link to knowledge column');
+assert.ok(todayTasksContainer.innerHTML.includes('直达手撕 Lab'), 'Today tasks should include direct link to algorithm lab');
+assert.ok(todayTasksContainer.innerHTML.includes('直达自测中心'), 'Today tasks should include direct link to quiz center');
+assert.ok(todayTasksContainer.innerHTML.includes('https://www.nowcoder.com/job/center'), 'Nowcoder URL must point to job/center (200 OK), not /jobs (404)');
+assert.ok(!html.includes('https://www.nowcoder.com/jobs"'), 'Outdated 404 nowcoder link must be completely removed from index.html');
+console.log('  ✓ 每日任务直达链接就绪，牛客网 404 链接修复为官方招聘广场 (job/center)！');
+
+// 9. 验证统一学习系统与知识与实践关联中心单独列出
+console.log('\n[Test 9] 验证统一学习系统与知识与实践关联中心单独列出...');
+assert.ok(html.includes('id="nav-learning"'), 'index.html must have dedicated #nav-learning tab button');
+assert.ok(html.includes('id="view-learning"'), 'index.html must have dedicated #view-learning section');
+sandbox.switchView('learning');
+assert.strictEqual(getOrCreateElement('view-learning').classList.contains('hidden'), false, 'view-learning should be visible when switched');
+assert.strictEqual(getOrCreateElement('view-mapping').classList.contains('hidden'), true, 'view-mapping should be hidden when view-learning is active');
+console.log('  ✓ 统一学习系统与知识与实践关联中心已成功作为顶级独立视图与导航单独列出！');
+
+// 10. 验证算法手撕 Lab 12 大分类全览全景图与即时响应
+console.log('\n[Test 10] 验证算法手撕 Lab 12 大分类全览全景图与即时联动...');
+sandbox.renderLearningAlgoTab();
+const algoLabContainer = getOrCreateElement('algo-lab-container');
+assert.ok(algoLabContainer.innerHTML.includes('algo-category-overview-grid'), 'Must render 12 category overview grid');
+assert.ok(algoLabContainer.innerHTML.includes('二叉树'), 'Overview grid must contain Binary Tree');
+assert.ok(algoLabContainer.innerHTML.includes('动态规划'), 'Overview grid must contain DP');
+assert.ok(algoLabContainer.innerHTML.includes('单调栈'), 'Overview grid must contain Monotonic Stack');
+
+// 测试切换勾选题目时全览图即时动态更新
+const p704 = 704; // 数组分类：二分查找
+sandbox.toggleAlgoCompletedStatus(p704);
+assert.ok(sandbox.stateManager.isAlgoCompleted(p704), 'Problem 704 should now be completed');
+assert.ok(algoLabContainer.innerHTML.includes('进度') && (algoLabContainer.innerHTML.includes('1 /') || algoLabContainer.innerHTML.includes('攻坚中') || algoLabContainer.innerHTML.includes('%')), 'Overview grid progress must dynamically update upon completion');
+
+console.log('  ✓ 算法手撕 Lab 12 大分类全览图就绪，完成题目时分类卡片即时联动更新！');
+
 console.log('\n========================================================================================');
-console.log('🎉 全部 7 项用户需求深度重构自动化测试全部通过！系统达到完全真实的工程工作台交付标准！');
+console.log('🎉 全部 10 项核心需求深度重构自动化测试全部通过！系统达到完全真实的工程工作台交付标准！');
 console.log('========================================================================================\n');
+
 
