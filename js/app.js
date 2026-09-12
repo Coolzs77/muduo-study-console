@@ -400,7 +400,7 @@ function switchView(viewName) {
     }
 
     appState.currentView = viewName;
-    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls', 'career', 'scheduler'];
+    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -430,8 +430,12 @@ function switchView(viewName) {
         renderLearningSystem();
     } else if (viewName === 'quiz') {
         const sel = document.getElementById('quiz-day-selector');
-        const d = sel ? parseInt(sel.value) || 1 : 1;
-        loadQuizForDay(d);
+        const val = sel ? sel.value : '1';
+        if (typeof val === 'string' && val.startsWith('qa_')) {
+            loadInterviewQA(val);
+        } else {
+            loadQuizForDay(parseInt(val) || 1);
+        }
     } else if (viewName === 'source') {
         renderSourceRoadmap();
     } else if (viewName === 'pitfalls') {
@@ -935,6 +939,7 @@ function renderCalendarGrid() {
     const grid = document.getElementById('calendar-grid');
     if (!grid) return;
     grid.innerHTML = '';
+    if (grid.children && Array.isArray(grid.children)) grid.children.length = 0;
 
     const colors = {
         0: 'bg-white border-stone-200 text-stone-700 hover:border-sky-500 hover:bg-sky-50/20',
@@ -1815,117 +1820,210 @@ function renderLearningBooksTab() {
     `;
 }
 
-// 4. 算法手撕 Lab 渲染器 (每日 3 题与二刷)
+// ==========================================================================
+// 4. 算法手撕 Lab 渲染器 (对齐代码随想录 12 大分类，直达力扣，支持完成标记)
+// ==========================================================================
+
+let currentAlgoCategory = '全部';
+let algoSearchKeyword = '';
+
 function renderLearningAlgoTab() {
     const container = document.getElementById('algo-lab-container');
     if (!container) return;
     const catalog = (typeof ALGORITHM_LAB_CATALOG !== 'undefined') ? ALGORITHM_LAB_CATALOG : [];
-    const queue = (appState.learningSystem && appState.learningSystem.algoReviewQueue) || {};
+    
+    // 获取已完成题目集合
+    let completedMap = {};
+    if (typeof stateManager !== 'undefined' && stateManager && stateManager.getState) {
+        const st = stateManager.getState();
+        completedMap = (st.learningSystem && st.learningSystem.completedAlgos) || {};
+    } else if (appState && appState.learningSystem) {
+        completedMap = appState.learningSystem.completedAlgos || {};
+    }
 
-    let masteredCount = 0;
-    let dueCount = 0;
-    catalog.forEach(p => {
-        const st = queue[p.num] || p.reviewStatus || 'due';
-        if (st === 'mastered') masteredCount++;
-        else dueCount++;
+    const categories = ['全部', '数组', '链表', '哈希表', '字符串', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
+
+    // 过滤
+    const filtered = catalog.filter(p => {
+        const matchCat = currentAlgoCategory === '全部' || p.category === currentAlgoCategory;
+        const matchKw = !algoSearchKeyword || 
+            p.title.toLowerCase().includes(algoSearchKeyword.toLowerCase()) || 
+            String(p.num).includes(algoSearchKeyword) || 
+            (p.pattern && p.pattern.toLowerCase().includes(algoSearchKeyword.toLowerCase()));
+        return matchCat && matchKw;
     });
+
+    const totalCount = catalog.length;
+    const completedCount = catalog.filter(p => !!completedMap[p.num]).length;
+    const completeRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+    // 分类按钮
+    const catButtonsHtml = categories.map(cat => {
+        const catTotal = cat === '全部' ? totalCount : catalog.filter(p => p.category === cat).length;
+        const catDone = cat === '全部' ? completedCount : catalog.filter(p => p.category === cat && !!completedMap[p.num]).length;
+        const isActive = cat === currentAlgoCategory;
+
+        return `
+            <button onclick="setAlgoCategoryFilter('${cat}')" class="px-3 py-1.5 rounded-xl text-xs font-serifMono font-bold transition whitespace-nowrap cursor-pointer ${isActive ? 'bg-stone-900 text-white shadow-xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700'}">
+                ${cat} <span class="text-[10px] opacity-75 font-normal">(${catDone}/${catTotal})</span>
+            </button>
+        `;
+    }).join('');
+
+    // 题目卡片列表
+    const cardsHtml = filtered.map(p => {
+        const isDone = !!completedMap[p.num];
+        const diffColor = p.difficulty === 'Easy' 
+            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+            : (p.difficulty === 'Medium' ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-rose-50 text-rose-800 border-rose-200');
+
+        return `
+            <div class="bg-white rounded-2xl p-5 border ${isDone ? 'border-emerald-300 bg-emerald-50/10' : 'border-stone-200'} academic-card flex flex-col justify-between hover:shadow-md transition">
+                <div>
+                    <!-- 顶栏：题号 + 难度 + 分类 + 力扣直达 + 完成勾选 -->
+                    <div class="flex items-center justify-between gap-2 mb-2.5 flex-wrap">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2 py-0.5 rounded-md bg-stone-900 text-white text-xs font-serifMono font-bold">
+                                #${p.num}
+                            </span>
+                            <span class="text-xs font-serifMono px-2 py-0.5 rounded border font-bold ${diffColor}">
+                                ${escapeHtml(p.difficulty)}
+                            </span>
+                            <span class="text-xs font-serifMono px-2 py-0.5 rounded bg-indigo-50 text-indigo-800 border border-indigo-200 font-semibold">
+                                ${escapeHtml(p.category)}
+                            </span>
+                            <a href="${p.leetcodeUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-serifMono font-bold flex items-center gap-1 transition shadow-2xs" title="打开力扣官方题解">
+                                <span>力扣</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                            </a>
+                        </div>
+                        <!-- 完成标记勾选框 -->
+                        <label class="flex items-center gap-1.5 cursor-pointer font-serifMono text-xs select-none">
+                            <input type="checkbox" onchange="toggleAlgoCompletedStatus(${p.num})" ${isDone ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                            <span class="font-bold ${isDone ? 'text-emerald-700' : 'text-stone-400'}">
+                                ${isDone ? '✓ 已完成' : '○ 未完成'}
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- 题目标题 -->
+                    <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-2">
+                        <a href="${p.leetcodeUrl}" target="_blank" class="hover:text-amber-800 transition">
+                            ${escapeHtml(p.title)}
+                        </a>
+                    </h4>
+
+                    <!-- 核心套路 -->
+                    <div class="text-xs text-stone-700 font-serifHeading mb-2.5 bg-stone-50 p-2.5 rounded-xl border border-stone-100">
+                        <span class="font-bold text-stone-900 font-serifMono text-[11px] block mb-0.5">
+                            <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i>核心套路与不变量：
+                        </span>
+                        ${escapeHtml(p.pattern || '暂无套路描述')}
+                    </div>
+
+                    <!-- 复杂度 -->
+                    <div class="flex items-center gap-3 text-[11px] font-serifMono text-stone-500 mb-2.5 bg-stone-50/70 p-2 rounded-lg border border-stone-200/60">
+                        <span><strong class="text-stone-700">时间:</strong> ${escapeHtml(p.timeComp || 'O(n)')}</span>
+                        <span>•</span>
+                        <span><strong class="text-stone-700">空间:</strong> ${escapeHtml(p.spaceComp || 'O(1)')}</span>
+                        <span>•</span>
+                        <span><strong>分类:</strong> ${escapeHtml(p.topic || p.category)}</span>
+                    </div>
+
+                    <!-- 易错陷阱 -->
+                    ${p.mistakes ? `
+                        <div class="p-2.5 bg-rose-50/60 rounded-xl border border-rose-200/80 text-xs text-rose-950 font-serifHeading mb-2">
+                            <span class="font-bold font-serifMono text-[11px] text-rose-800 block mb-0.5">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i>经典易错点：
+                            </span>
+                            <p class="text-[11px] leading-relaxed text-stone-700">${escapeHtml(p.mistakes)}</p>
+                        </div>
+                    ` : ''}
+
+                    <!-- 工程同构 -->
+                    ${p.projectLink ? `
+                        <div class="p-2.5 bg-sky-50/60 rounded-xl border border-sky-200/80 text-xs text-sky-950 font-serifHeading">
+                            <span class="font-bold font-serifMono text-[11px] text-sky-800 block mb-0.5">
+                                <i class="fa-solid fa-code-branch mr-1"></i>项目工程映射：
+                            </span>
+                            <p class="text-[11px] leading-relaxed text-stone-700">${escapeHtml(p.projectLink)}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
 
     container.innerHTML = `
         <!-- 顶部指标栏 -->
-        <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <div class="text-xs font-serifMono font-bold text-indigo-700 uppercase tracking-wider mb-1">
-                    Algorithm Hand-Coding Laboratory
+                    LeetCode Hand-Coding Laboratory · 代码随想录 12 大体系
                 </div>
                 <h3 class="text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                    <i class="fa-solid fa-code-compare text-indigo-700"></i> 服务端高频算法手撕库 (每日 3 道 · 闭环二刷)
+                    <i class="fa-solid fa-laptop-code text-indigo-700"></i> 手撕算法 Lab (题单参照代码随想录 · 力扣官方直达)
                 </h3>
-                <p class="text-xs text-stone-500 mt-0.5">严格杜绝死记硬背，全部题目均与 muduo 及 CppAIService 架构模式深度同构映射。</p>
+                <p class="text-xs text-stone-500 mt-0.5">
+                    涵盖数组、链表、哈希表、字符串、双指针、栈队列、二叉树、回溯、贪心、动态规划、单调栈、图论。支持状态标记与力扣直连。
+                </p>
             </div>
             <div class="flex items-center gap-3 font-serifMono text-xs shrink-0">
-                <div class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-center">
-                    <div class="text-[10px] text-emerald-600">已二刷掌握</div>
-                    <div class="text-base font-bold">${masteredCount} 题</div>
+                <div class="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-center">
+                    <div class="text-[10px] text-emerald-600">已攻克手撕</div>
+                    <div class="text-base font-bold">${completedCount} / ${totalCount} 题</div>
                 </div>
-                <div class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-center">
-                    <div class="text-[10px] text-amber-600">待复习巩固</div>
-                    <div class="text-base font-bold">${dueCount} 题</div>
+                <div class="px-4 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-800 text-center">
+                    <div class="text-[10px] text-indigo-600">完成率</div>
+                    <div class="text-base font-bold">${completeRate}%</div>
                 </div>
             </div>
         </div>
 
-        <!-- 算法题卡片列表 -->
+        <!-- 分类与搜索过滤条 -->
+        <div class="bg-white p-4 rounded-2xl border border-stone-200 academic-card space-y-3">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-1.5 overflow-x-auto w-full pb-1 sm:pb-0">
+                    ${catButtonsHtml}
+                </div>
+            </div>
+            <div class="relative w-full">
+                <input type="text" value="${escapeHtml(algoSearchKeyword)}" oninput="handleAlgoSearch(this.value)" placeholder="搜索题号、题目名称或核心套路 (如: 146, LRU, 二分, 滑动窗口)..." class="w-full bg-stone-50 border border-stone-200 text-xs sm:text-sm rounded-xl px-3 py-2 pl-9 focus:outline-none focus:ring-2 focus:ring-indigo-600/30 focus:border-indigo-700 font-serifMono transition">
+                <span class="absolute left-3 top-2.5 text-stone-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+            </div>
+        </div>
+
+        <!-- 题目列表 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            ${catalog.map(p => {
-                const status = queue[p.num] || p.reviewStatus || 'due';
-                const isMastered = status === 'mastered';
-                return `
-                    <div class="bg-white rounded-2xl p-5 border ${isMastered ? 'border-emerald-200/90' : 'border-amber-200/90'} academic-card flex flex-col justify-between hover:shadow-md transition">
-                        <div>
-                            <div class="flex items-center justify-between gap-2 mb-2">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="px-2.5 py-0.5 rounded-md bg-stone-900 text-white text-xs font-serifMono font-bold">
-                                        #${p.num}
-                                    </span>
-                                    <span class="text-xs font-serifMono px-2 py-0.5 rounded ${p.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'} font-bold">
-                                        ${escapeHtml(p.difficulty)}
-                                    </span>
-                                    <span class="text-xs font-serifMono text-stone-500">
-                                        ${escapeHtml(p.topic)}
-                                    </span>
-                                </div>
-                                <span class="text-[11px] font-serifMono px-2 py-0.5 rounded-full ${isMastered ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} font-bold">
-                                    ${isMastered ? '✓ 已掌握' : '⏳ 待二刷'}
-                                </span>
-                            </div>
-
-                            <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-1.5">
-                                ${escapeHtml(p.title)}
-                            </h4>
-
-                            <div class="text-xs text-stone-600 font-serifHeading mb-2">
-                                <span class="font-bold text-stone-800 font-serifMono text-[11px]">核心套路：</span>
-                                ${escapeHtml(p.pattern)}
-                            </div>
-
-                            <div class="flex items-center gap-3 text-[11px] font-serifMono text-stone-500 mb-3 bg-stone-50 p-2 rounded-lg border border-stone-200/60">
-                                <span><strong class="text-stone-700">时间:</strong> ${escapeHtml(p.timeComp)}</span>
-                                <span>•</span>
-                                <span><strong class="text-stone-700">空间:</strong> ${escapeHtml(p.spaceComp)}</span>
-                                <span>•</span>
-                                <span class="text-emerald-700 font-bold">✓ 独立完成</span>
-                            </div>
-
-                            <div class="p-2.5 bg-rose-50/60 rounded-lg border border-rose-200/80 text-xs text-rose-950 font-serifHeading mb-3">
-                                <span class="font-bold font-serifMono text-[11px] text-rose-800 block mb-0.5">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> 易错点与经典陷阱：
-                                </span>
-                                <p class="text-[11px] leading-relaxed text-stone-700">${escapeHtml(p.mistakes)}</p>
-                            </div>
-
-                            <div class="p-2.5 bg-sky-50/60 rounded-lg border border-sky-200/80 text-xs text-sky-950 font-serifHeading mb-4">
-                                <span class="font-bold font-serifMono text-[11px] text-sky-800 block mb-0.5">
-                                    <i class="fa-solid fa-link"></i> 项目工程同构：
-                                </span>
-                                <p class="text-[11px] leading-relaxed text-stone-700">${escapeHtml(p.projectLink)}</p>
-                            </div>
-                        </div>
-
-                        <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
-                            <span class="text-stone-400 text-[11px]">口述总结就绪</span>
-                            <button onclick="toggleAlgoReview(${p.num})" class="px-3 py-1.5 ${isMastered ? 'bg-stone-100 hover:bg-stone-200 text-stone-700' : 'bg-emerald-700 hover:bg-emerald-800 text-white'} rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
-                                <i class="fa-solid ${isMastered ? 'fa-rotate-left' : 'fa-check'}"></i>
-                                <span>${isMastered ? '设为待二刷' : '标记已二刷掌握'}</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('')}
+            ${cardsHtml || '<div class="col-span-2 text-center py-10 text-stone-400 font-serifMono text-xs">未找到符合条件的题目</div>'}
         </div>
     `;
 }
 
-// 5. 项目代码驱动八股自测渲染器
+function setAlgoCategoryFilter(cat) {
+    currentAlgoCategory = cat;
+    renderLearningAlgoTab();
+}
+
+function handleAlgoSearch(kw) {
+    algoSearchKeyword = kw;
+    renderLearningAlgoTab();
+}
+
+function toggleAlgoCompletedStatus(algoNum) {
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleAlgoCompleted === 'function') {
+        stateManager.toggleAlgoCompleted(algoNum);
+    } else {
+        if (!appState.learningSystem) appState.learningSystem = {};
+        if (!appState.learningSystem.completedAlgos) appState.learningSystem.completedAlgos = {};
+        appState.learningSystem.completedAlgos[algoNum] = !appState.learningSystem.completedAlgos[algoNum];
+        if (typeof persistState === 'function') persistState();
+    }
+    renderLearningAlgoTab();
+    if (typeof showToast === 'function') showToast(`题目 #${algoNum} 状态已更新`);
+}
+
+
 function renderLearningQATab() {
     const container = document.getElementById('project-qa-container');
     if (!container) return;
@@ -4024,12 +4122,39 @@ function initQuizDaySelector() {
     const sel = document.getElementById('quiz-day-selector');
     if (!sel) return;
     sel.innerHTML = '';
+
+    // 1. muduo 28 天源码自测分组
+    const grpDays = document.createElement('optgroup');
+    grpDays.label = "muduo 28 天核心源码自测 (Day 01 ~ 28)";
     DAYS_DATASET.forEach(item => {
         const opt = document.createElement('option');
         opt.value = item.day;
         opt.innerText = `Day ${item.day < 10 ? '0' + item.day : item.day}: ${item.title}`;
-        sel.appendChild(opt);
+        grpDays.appendChild(opt);
     });
+    sel.appendChild(grpDays);
+
+    // 2. CppAIService 15 大模块技术面试题分组
+    const grpQA = document.createElement('optgroup');
+    grpQA.label = "CppAIService 核心工程面试题 (15 大模块)";
+    const qaList = (typeof PROJECT_QA_CATALOG !== 'undefined') ? PROJECT_QA_CATALOG : [];
+    qaList.forEach(qa => {
+        const opt = document.createElement('option');
+        opt.value = qa.id;
+        opt.innerText = `[${qa.module || qa.category}] ${qa.question.slice(0, 26)}...`;
+        grpQA.appendChild(opt);
+    });
+    sel.appendChild(grpQA);
+
+    // 绑定 change 事件处理
+    sel.onchange = function() {
+        const val = this.value;
+        if (typeof val === 'string' && val.startsWith('qa_')) {
+            loadInterviewQA(val);
+        } else {
+            loadQuizForDay(parseInt(val) || 1);
+        }
+    };
 
     // 填充专注计时器关联 Day 选择器
     const timerDaySel = document.getElementById('timer-day');
@@ -4043,6 +4168,107 @@ function initQuizDaySelector() {
         });
     }
 }
+
+// 加载并渲染 CppAIService 核心面试题与考点
+function loadInterviewQA(qaId) {
+    const container = document.getElementById('quiz-runner-container');
+    if (!container) return;
+    const qaList = (typeof PROJECT_QA_CATALOG !== 'undefined') ? PROJECT_QA_CATALOG : [];
+    const qa = qaList.find(q => q.id === qaId) || qaList[0];
+    if (!qa) return;
+
+    const mastery = (appState.learningSystem && appState.learningSystem.qaMastery) || {};
+    const isMastered = !!mastery[qa.id];
+
+    container.innerHTML = `
+        <div class="bg-purple-50/80 p-5 rounded-2xl border border-purple-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 rounded bg-purple-900 text-white text-xs font-mono font-bold">${escapeHtml(qa.module || 'CppAIService')}</span>
+                    <span class="text-xs font-serifMono text-purple-900 font-bold">${escapeHtml(qa.category || '核心考点')}</span>
+                </div>
+                <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1">
+                    ${escapeHtml(qa.question)}
+                </h3>
+                <p class="text-xs text-stone-500 font-serifMono mt-1">
+                    源码定位: <code>${escapeHtml(qa.sourceFile || 'src/core')} ${escapeHtml(qa.sourceLine || '')}</code>
+                </p>
+            </div>
+            <div class="shrink-0 font-serifMono text-xs">
+                <button onclick="toggleQAMastery('${qa.id}')" class="px-3.5 py-1.5 ${isMastered ? 'bg-emerald-700 text-white' : 'bg-white border border-purple-300 text-purple-900'} rounded-xl font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid ${isMastered ? 'fa-check' : 'fa-graduation-cap'}"></i>
+                    <span>${isMastered ? '已攻克掌握' : '标记已掌握'}</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 考点标准回答 -->
+        <div class="bg-white p-5 rounded-2xl border border-stone-200 space-y-3 academic-card">
+            <div class="flex items-center justify-between">
+                <span class="font-bold text-xs font-serifMono text-stone-800 uppercase tracking-wider">
+                    <i class="fa-solid fa-award text-amber-600 mr-1"></i> 考官期待的标准回答结构 (Engineering Best-Practice)
+                </span>
+                <button onclick="copyCurrentInterviewAnswer('${qa.id}')" class="text-xs text-sky-700 hover:text-sky-900 font-serifMono cursor-pointer">
+                    <i class="fa-solid fa-copy"></i> 复制回答
+                </button>
+            </div>
+            <div class="p-4 bg-stone-50 rounded-xl border border-stone-200/80 text-xs text-stone-800 font-serifHeading leading-relaxed whitespace-pre-line">
+                ${escapeHtml(qa.answer)}
+            </div>
+        </div>
+
+        <!-- 连环追问与陷阱 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${qa.followUp ? `
+                <div class="bg-white p-4 rounded-xl border border-amber-200/90 bg-amber-50/20 space-y-2 academic-card">
+                    <div class="font-bold text-xs font-serifMono text-amber-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-question text-amber-600"></i> 面试官连环追问 (Follow-up)
+                    </div>
+                    <p class="text-xs text-stone-700 leading-relaxed font-serifHeading">${escapeHtml(qa.followUp)}</p>
+                </div>
+            ` : ''}
+
+            ${qa.trap ? `
+                <div class="bg-white p-4 rounded-xl border border-rose-200/90 bg-rose-50/20 space-y-2 academic-card">
+                    <div class="font-bold text-xs font-serifMono text-rose-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> 致命陷阱与避坑指南 (Traps)
+                    </div>
+                    <p class="text-xs text-stone-700 leading-relaxed font-serifHeading">${escapeHtml(qa.trap)}</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+function toggleQAMastery(qaId) {
+    if (!appState.learningSystem) appState.learningSystem = {};
+    if (!appState.learningSystem.qaMastery) appState.learningSystem.qaMastery = {};
+    appState.learningSystem.qaMastery[qaId] = !appState.learningSystem.qaMastery[qaId];
+    if (typeof persistState === 'function') persistState();
+    loadInterviewQA(qaId);
+    if (typeof showToast === 'function') showToast('面试考点掌握状态已更新');
+    return appState.learningSystem.qaMastery[qaId];
+}
+
+function copyTextToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        if (typeof showToast === 'function') showToast('内容已复制到剪贴板');
+    }).catch(() => {
+        alert('复制失败');
+    });
+}
+
+function copyCurrentInterviewAnswer(qaId) {
+    const qaList = (typeof PROJECT_QA_CATALOG !== 'undefined') ? PROJECT_QA_CATALOG : [];
+    const qa = qaList.find(q => q.id === qaId);
+    if (!qa) return;
+    navigator.clipboard.writeText(qa.answer).then(() => {
+        if (typeof showToast === 'function') showToast('标准回答已复制到剪贴板！');
+    }).catch(() => {
+        alert('复制失败');
+    });
+}
+
 
 function openQuizForDay(dayNum) {
     switchView('quiz');
@@ -6363,6 +6589,7 @@ function renderHomeDashboard() {
     renderHomeMuduoProgress();
     renderRecentWorkLogs();
     renderHomeWeeklyMetrics();
+    renderCalendarGrid();
 }
 
 function renderTodayTasks() {
@@ -6567,8 +6794,9 @@ function renderRecentWorkLogs() {
 
     if (recentLogs.length === 0) {
         container.innerHTML = `
-            <div class="text-center py-6 text-stone-400 font-serifMono text-xs">
-                暂无工程工作日志。<button onclick="openWorkLogModal()" class="text-emerald-700 underline font-bold ml-1">记录第一篇</button>
+            <div class="p-6 text-center text-stone-400 font-serifMono text-xs border border-dashed border-stone-200 rounded-xl bg-stone-50/50">
+                当前暂无工程记录。<br>
+                <span class="text-stone-500 mt-1 inline-block">在实际编写代码、排查 Bug 或进行实验后，点击上方「+ 记工作日志」即可沉淀你的第一条工程实据。</span>
             </div>
         `;
         return;
@@ -7013,36 +7241,138 @@ function toggleArchTopologyCollapse() {
     }
 }
 
-function handleModuleSourceClick(name, path) {
-    if (typeof openModal === 'function') {
-        openModal(
-            `源码定位: ${name}`,
-            `文件位置: <code>${path}</code><br><br>基于 C++17 与 POSIX Socket 编写，包含类的头文件定义与实现逻辑。可在本地工程目录直接打开。`
-        );
-    } else {
-        alert(`源码文件: ${path}`);
+// ==========================================
+// CppAIService 模块交互：真实源码与 Demo 查看器、语雀专栏跳转、面试考点跳转
+// ==========================================
+
+const MODULE_TO_YUQUE_MAP = {
+    'HttpContext.cpp': 'yq_06',
+    'HttpRequest.h': 'yq_06',
+    'HttpRequest.cpp': 'yq_06',
+    'HttpResponse.cpp': 'yq_06',
+    'Router.cpp': 'yq_07',
+    'Server.cpp': 'yq_05',
+    'HttpServer.cpp': 'yq_05',
+    'ConnectionPool.cpp': 'yq_10',
+    'Buffer.cpp': 'yq_12',
+    'McpRegistry.cpp': 'yq_17',
+    'ToolCaller.cpp': 'yq_17',
+    'JsonRpcHandler.cpp': 'yq_17',
+    'ModelClient.cpp': 'yq_16',
+    'StreamParser.cpp': 'yq_16',
+    'ContextCache.cpp': 'yq_08',
+    'RabbitMQProducer.cpp': 'yq_17',
+    'MetricsCollector.cpp': 'yq_12'
+};
+
+const MODULE_TO_QA_MAP = {
+    'HttpContext.cpp': 'qa_fsm_http_parser',
+    'HttpRequest.h': 'qa_http_request_parsing',
+    'HttpResponse.cpp': 'qa_http_response_keepalive',
+    'Router.cpp': 'qa_router_radix_tree',
+    'Server.cpp': 'qa_reactor_eventfd',
+    'HttpServer.cpp': 'qa_reactor_eventfd',
+    'ConnectionPool.cpp': 'qa_connection_pool_raii',
+    'Buffer.cpp': 'qa_buffer_readv',
+    'McpRegistry.cpp': 'qa_mcp_twostage',
+    'ToolCaller.cpp': 'qa_tool_caller_async',
+    'JsonRpcHandler.cpp': 'qa_json_rpc_spec',
+    'ModelClient.cpp': 'qa_model_client_sse',
+    'StreamParser.cpp': 'qa_stream_parser_pipeline',
+    'ContextCache.cpp': 'qa_context_cache_lru',
+    'RabbitMQProducer.cpp': 'qa_rabbitmq_decouple',
+    'MetricsCollector.cpp': 'qa_metrics_ring_buffer'
+};
+
+let currentViewerCode = '';
+
+function openCodeViewerModal(info) {
+    const modal = document.getElementById('modal-code-viewer');
+    if (!modal) {
+        alert(info.code || info.path);
+        return;
     }
+
+    const titleEl = document.getElementById('code-viewer-title');
+    const pathEl = document.getElementById('code-viewer-path');
+    const badgeEl = document.getElementById('code-viewer-badge');
+    const preEl = document.getElementById('code-viewer-pre');
+
+    if (titleEl) titleEl.innerText = info.title || '代码查看器';
+    if (pathEl) pathEl.innerText = info.path || '';
+    if (badgeEl) badgeEl.innerText = info.badge || '真实源码';
+    
+    currentViewerCode = info.code || '';
+    if (preEl) {
+        preEl.innerText = currentViewerCode;
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeCodeViewerModal() {
+    const modal = document.getElementById('modal-code-viewer');
+    if (modal) modal.classList.add('hidden');
+}
+
+function copyCurrentViewerCode() {
+    if (!currentViewerCode) return;
+    navigator.clipboard.writeText(currentViewerCode).then(() => {
+        if (typeof showToast === 'function') showToast('代码已成功复制到剪贴板！');
+    }).catch(() => {
+        alert('复制失败，请手动选择复制');
+    });
+}
+
+function handleModuleSourceClick(name, path) {
+    const map = (typeof CPPAI_SOURCES_MAP !== 'undefined') ? CPPAI_SOURCES_MAP : {};
+    const code = map[path] || map[name] || `// 文件位置: ${path}
+// 未在内置数据集中找到该文件，请确认本地工程存在。`;
+
+    openCodeViewerModal({
+        title: name,
+        path: path,
+        badge: 'C++ 源码',
+        code: code
+    });
 }
 
 function handleModuleTaskClick(name) {
-    switchView('dashboard');
-    if (typeof showToast === 'function') showToast(`已定位与 ${name} 相关的今日任务`);
+    const artId = MODULE_TO_YUQUE_MAP[name] || 'yq_06';
+    if (typeof selectYuqueArticle === 'function') {
+        selectYuqueArticle(artId);
+    }
+    switchView('knowledge');
+    if (typeof showToast === 'function') showToast(`已跳转至与 ${name} 对应的语雀研读章节`);
 }
 
 function handleModuleInterviewClick(name) {
-    switchView('career');
-    if (typeof showToast === 'function') showToast(`已跳转到与 ${name} 相关的求职考点全案`);
+    const qaId = MODULE_TO_QA_MAP[name] || 'qa_fsm_http_parser';
+    switchView('quiz');
+    const sel = document.getElementById('quiz-day-selector');
+    if (sel) sel.value = qaId;
+    loadInterviewQA(qaId);
+    if (typeof showToast === 'function') showToast(`已加载 ${name} 核心技术面试考点与解析`);
 }
 
 function handleModuleTestClick(name, testFile) {
-    if (typeof openModal === 'function') {
-        openModal(
-            `单测与验证用例: ${name}`,
-            `对应测试用例文件: <code>${testFile}</code><br><br>可通过 GoogleTest 或 ctest 命令直接执行测试: <br><pre class="bg-stone-900 text-emerald-400 p-2 rounded mt-2 text-xs font-mono">ctest -R ${name.replace('.cpp', '')} --output-on-failure</pre>`
-        );
-    } else {
-        alert(`单测文件: ${testFile}`);
-    }
+    const map = (typeof CPPAI_SOURCES_MAP !== 'undefined') ? CPPAI_SOURCES_MAP : {};
+    const code = map[testFile] || map[name] || `// 单元测试与 Demo 验证用例: ${testFile}
+// 编译运行命令:
+// ctest -R ${name.replace('.cpp', '')} --output-on-failure
+
+#include <gtest/gtest.h>
+
+TEST(${name.replace('.cpp', '')}Test, BasicAssertion) {
+    EXPECT_TRUE(true);
+}`;
+
+    openCodeViewerModal({
+        title: `${name} 验证用例与 Demo`,
+        path: testFile,
+        badge: '测试与 Demo',
+        code: code
+    });
 }
 
 

@@ -216,7 +216,7 @@ console.log(`✓ 专业书目伴读体系与动态配额调配交互验证通过
 console.log('[Test 6] 验证算法手撕 Lab (6 道典型工程同构题) 与二刷追踪...');
 const algoCatalog = context.ALGORITHM_LAB_CATALOG;
 assert.ok(Array.isArray(algoCatalog), 'ALGORITHM_LAB_CATALOG must be an array');
-assert.strictEqual(algoCatalog.length, 6, 'Should have 6 infra-linked algorithm problems');
+assert.ok(algoCatalog.length >= 6, 'Should have at least 6 infra-linked algorithm problems');
 
 const p146 = algoCatalog.find(p => p.num === 146);
 assert.ok(p146, 'Problem 146 (LRU) must exist');
@@ -237,7 +237,7 @@ console.log(`✓ 算法手撕 Lab 结构与二刷状态交互闭环验证通过�
 console.log('[Test 7] 验证项目源码逆向八股自测中心 (eventfd, Buffer readv, FSM, 2-Stage MCP)...');
 const qaCatalog = context.PROJECT_QA_CATALOG;
 assert.ok(Array.isArray(qaCatalog), 'PROJECT_QA_CATALOG must be an array');
-assert.strictEqual(qaCatalog.length, 4, 'Should have 4 deep real-code questions');
+assert.ok(qaCatalog.length >= 4, 'Should have at least 4 deep real-code questions');
 
 const eventfdQA = qaCatalog.find(q => q.id === 'qa_reactor_eventfd');
 assert.ok(eventfdQA, 'eventfd question must exist');

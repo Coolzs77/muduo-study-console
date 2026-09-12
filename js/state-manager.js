@@ -118,53 +118,7 @@
 
   // 工具函数：获取默认工程工作日志
   function getDefaultWorkLogs() {
-    return [
-      {
-        id: "log-seed-1",
-        date: getTodayDateStr(),
-        project: "CppAIService",
-        module: "HTTP Router",
-        logType: "bugfix",
-        what: "排查并修复 Router 正则路由匹配失效缺陷，补全参数抽取单元测试",
-        problem: "部分带有路径参数（如 /api/v1/model/:name）的 URL 命中失败，前缀匹配截断位置偏差。",
-        solution: "重构 Router.cpp 中的参数占位符切分状态机，修正分隔符判断，新增 4 组单元测试验证边界。",
-        learned: "HTTP 路由树前缀匹配必须严格在路径分隔符 '/' 处切分 token，避免子串误匹配。",
-        next: "实现中间件拦截器链 (Middleware Chain) 机制。",
-        relatedFiles: ["src/http/Router.cpp", "tests/Router_test.cpp"],
-        interviewPoint: "能清晰解释 HTTP 路由前缀树匹配原理与路径参数抽取的边界条件处理",
-        createdAt: Date.now() - 3600000 * 2
-      },
-      {
-        id: "log-seed-2",
-        date: "2026-09-11",
-        project: "CppAIService",
-        module: "HttpContext",
-        logType: "code_feature",
-        what: "重构 HttpContext 状态机解析器，实现请求行与请求头分段解析",
-        problem: "非阻塞 socket 读取时容易遇到分包与粘包，半包状态下状态机需要安全保存未决上下文。",
-        solution: "基于 muduo Buffer 的 readIndex/writeIndex 机制，在 HttpContext 中维护状态迁移枚举 (ExpectRequestLine -> ExpectHeaders -> ExpectBody -> GotAll)。",
-        learned: "网络库协议解析不能假定一次 read 读满完整包，状态机必须具备幂等可重入特征。",
-        next: "完成 HttpContext 单元测试并接入 EchoServer 进行压测验证。",
-        relatedFiles: ["src/http/HttpContext.cpp", "src/http/HttpRequest.h"],
-        interviewPoint: "能独立推演非阻塞 I/O 下 HTTP 协议状态机解析与粘包/半包恢复流程",
-        createdAt: Date.now() - 3600000 * 24
-      },
-      {
-        id: "log-seed-3",
-        date: "2026-09-10",
-        project: "muduo",
-        module: "EventLoop",
-        logType: "source_study",
-        what: "精读 EventLoop.cc 与 Channel.cc 源码，梳理事件循环唤醒机制",
-        problem: "在其他线程向 EventLoop 投递任务 (queueInLoop) 时，如何安全唤醒正在 poll 阻塞的事件循环？",
-        solution: "muduo 使用 eventfd (Linux 原生轻量计数器) 创建 wakeupChannel，在 queueInLoop 中写入 8 字节 uint64_t 触发 EPOLLIN 唤醒。",
-        learned: "eventfd 相比 pipe 仅需单 fd，无锁唤醒系统开销更小。",
-        next: "动手编写基于 eventfd 的跨线程任务队列 Demo 进行时延测试。",
-        relatedFiles: ["muduo/net/EventLoop.cc", "muduo/net/Channel.cc"],
-        interviewPoint: "能深入对比 eventfd 与 socketpair/pipe 在 Reactor 跨线程唤醒中的开销差异",
-        createdAt: Date.now() - 3600000 * 48
-      }
-    ];
+    return [];
   }
 
   // 工具函数：获取默认统一今日任务
@@ -273,6 +227,7 @@
       learningSystem: {
         algoReviewQueue: {}, // { [num]: 'due' | 'mastered' }
         qaMastery: {},       // { [qaId]: boolean }
+        completedAlgos: {},  // { [num]: boolean }
         bookDynamicGoals: {
           linuxServer: 10,
           birdLinux: 10
@@ -1447,6 +1402,27 @@
       this.save(true);
       this._notify();
       return reviewRecord;
+    }
+
+    // 算法手撕题完成状态助手
+    toggleAlgoCompleted(algoNum) {
+      if (!this._state.learningSystem) this._state.learningSystem = {};
+      if (!this._state.learningSystem.completedAlgos) this._state.learningSystem.completedAlgos = {};
+      const cur = !!this._state.learningSystem.completedAlgos[algoNum];
+      this._state.learningSystem.completedAlgos[algoNum] = !cur;
+      this.save();
+      this._notify();
+      return !cur;
+    }
+
+    isAlgoCompleted(algoNum) {
+      if (!this._state.learningSystem || !this._state.learningSystem.completedAlgos) return false;
+      return !!this._state.learningSystem.completedAlgos[algoNum];
+    }
+
+    getCompletedAlgosCount() {
+      if (!this._state.learningSystem || !this._state.learningSystem.completedAlgos) return 0;
+      return Object.values(this._state.learningSystem.completedAlgos).filter(Boolean).length;
     }
 
     // ==========================================

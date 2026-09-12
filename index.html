@@ -182,14 +182,8 @@
             <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="知识库 (语雀)">
                 <i class="fa-solid fa-book-bookmark text-blue-600"></i> 知识库 (语雀)
             </button>
-            <button onclick="switchView('career')" id="nav-career" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="工程日志与求职">
-                <i class="fa-solid fa-trophy text-yellow-600"></i> 工程日志与求职
-            </button>
-            <button onclick="switchView('scheduler')" id="nav-scheduler" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="日程同步">
-                <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 日程同步
-            </button>
-            <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="代码测验">
-                <i class="fa-solid fa-clipboard-question text-purple-600"></i> 代码测验
+            <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="面试题库与自测">
+                <i class="fa-solid fa-clipboard-question text-purple-600"></i> 面试题库与自测
             </button>
             <button onclick="switchView('source')" id="nav-source" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="源码速查">
                 <i class="fa-solid fa-code-branch text-teal-600"></i> 源码速查
@@ -258,10 +252,7 @@
                                 + 添加任务
                             </button>
                             <span class="text-stone-300">|</span>
-                            <button onclick="switchView('scheduler')" class="text-stone-500 hover:text-stone-800 cursor-pointer">
-                                日历排程 &rarr;
-                            </button>
-                        </div>
+                            </div>
                     </div>
 
                     <!-- 任务列表容器 -->
@@ -284,10 +275,7 @@
                                 + 记工作日志
                             </button>
                             <span class="text-stone-300">|</span>
-                            <button onclick="switchView('career')" class="text-stone-500 hover:text-stone-800 cursor-pointer">
-                                全部凭证 &rarr;
-                            </button>
-                        </div>
+                            </div>
                     </div>
 
                     <!-- 最近 5 条工作日志容器 -->
@@ -347,6 +335,32 @@
             </div>
 
         </div>
+            <!-- 28 天学习打卡索引日历 (Calendar Heatmap) -->
+        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
+                        <i class="fa-solid fa-calendar-days text-amber-700"></i> 28 天学习打卡索引日历
+                    </h2>
+                    <p class="text-xs text-stone-500 mt-0.5">单元格颜色映射 0~5 阶掌握度等级，点击直接跳转定位任务卡片并记录掌握状态。</p>
+                </div>
+                <!-- 图例说明 -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-serifMono text-stone-600">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-stone-200 inline-block"></span> 未开始 (0)</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> 已阅读 (1)</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> 已理解 (2)</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Demo跑通 (3)</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span> 独立实现 (4)</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-800 inline-block"></span> 源码贯通 (5)</span>
+                </div>
+            </div>
+
+            <!-- 28 天自适应网格 -->
+            <div class="grid grid-cols-4 sm:grid-cols-7 gap-2 sm:gap-2.5" id="calendar-grid">
+                <!-- 由 JavaScript 动态生成 -->
+            </div>
+        </div>
+
     </section>
 
     <section id="view-daily" class="hidden space-y-6">
@@ -1230,7 +1244,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-stone-100">
                 <div>
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-clipboard-question text-purple-700"></i> 每日深度自测中心
+                        <i class="fa-solid fa-clipboard-question text-purple-700"></i> 面试题库与深度自测中心
                     </h2>
                     <p class="text-xs text-stone-500 mt-0.5">选择任意 Day 开启自测；通过自测（得分 ≥ 80%）可更新该 Day 的掌握状态。</p>
                 </div>
@@ -1497,296 +1511,10 @@
     </section>
 
     <!-- ==================== VIEW: 求职能力与工程凭证体系 ==================== -->
-    <section id="view-career" class="hidden space-y-6">
-        <!-- 头部导航与体系介绍 -->
-        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-stone-100">
-                <div>
-                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-serifMono mb-2">
-                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                        <span class="font-bold"></span>
-                        <span class="text-stone-300">•</span>
-                        <span>真实凭证 ➔ 闭环晋级 ➔ 拿捏面试</span>
-                    </div>
-                    <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
-                        <i class="fa-solid fa-trophy text-yellow-600"></i> 求职能力矩阵与真实工程凭证中心
-                    </h2>
-                    <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
-                        把“我学过”转化成“我能够证明我会”。严禁虚构经历，能力等级由真实代码改动、Bug 修复、性能压测等
-                        <span class="font-semibold text-stone-700 font-serifMono">9 类工程凭证</span> 驱动判定。
-                        集成 14 维能力矩阵、4-Hop 关联检索、全真模拟面试与高分 STAR 履历陈述。
-                    </p>
-                </div>
-                <div class="flex items-center gap-2 font-serifMono shrink-0">
-                    <button onclick="openNewEvidenceModal()" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
-                        <i class="fa-solid fa-plus"></i> 录入工程凭证
-                    </button>
-                </div>
-            </div>
-
-            <!-- 5 大子体系切换标签导航 -->
-            <div class="flex items-center gap-2 overflow-x-auto pt-4 pb-1 font-serifMono text-xs" id="career-subtabs-nav">
-                <button onclick="switchCareerTab('evidence')" id="career-tab-btn-evidence" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
-                    <i class="fa-solid fa-certificate text-emerald-400"></i> 1. 工程凭证库
-                </button>
-                <button onclick="switchCareerTab('capability')" id="career-tab-btn-capability" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-layer-group text-sky-600"></i> 2. 14维能力矩阵
-                </button>
-                <button onclick="switchCareerTab('interview')" id="career-tab-btn-interview" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-diagram-project text-amber-600"></i> 3. 项目面试全案 (4-Hop)
-                </button>
-                <button onclick="switchCareerTab('mock')" id="career-tab-btn-mock" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-microphone text-purple-600"></i> 4. 模拟面试大厅
-                </button>
-                <button onclick="switchCareerTab('star')" id="career-tab-btn-star" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-file-lines text-rose-600"></i> 5. STAR 故事与简历
-                </button>
-            </div>
-        </div>
-
-        <!-- 子面板 1: 工程凭证库 (Evidence Hub) -->
-        <div id="career-pane-evidence" class="space-y-6">
-            <div id="career-evidence-stats-container"></div>
-            <div class="flex items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-stone-200">
-                <div class="flex items-center gap-2 overflow-x-auto text-xs font-serifMono" id="evidence-type-filter-bar">
-                    <!-- 过滤按钮 -->
-                </div>
-                <div class="text-xs text-stone-500 font-serifMono shrink-0" id="evidence-count-badge">
-                    共 0 条工程凭证
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="career-evidence-grid">
-                <!-- 动态填充凭证卡片 -->
-            </div>
-        </div>
-
-        <!-- 子面板 2: 14维能力矩阵 (Capability Matrix) -->
-        <div id="career-pane-capability" class="space-y-6 hidden">
-            <div id="career-capability-summary-container"></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="career-capability-grid">
-                <!-- 动态填充 14 维能力卡片 -->
-            </div>
-        </div>
-
-        <!-- 子面板 3: 项目面试全案与 4-Hop 关联 (Project Interview) -->
-        <div id="career-pane-interview" class="space-y-6 hidden">
-            <div id="career-interview-nav-container"></div>
-            <div class="space-y-6" id="career-interview-content-container">
-                <!-- 动态填充 7 大全案 + 4-Hop 逆向题目 -->
-            </div>
-        </div>
-
-        <!-- 子面板 4: 模拟面试竞技场 (Mock Arena) -->
-        <div id="career-pane-mock" class="space-y-6 hidden">
-            <div id="career-mock-arena-container">
-                <!-- 动态填充模拟面试交互区 -->
-            </div>
-            <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
-                <h3 class="text-sm font-bold text-stone-900 font-serifHeading mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-purple-600"></i> 面试实战与评分历史
-                </h3>
-                <div class="overflow-x-auto" id="career-mock-history-container">
-                    <!-- 历史记录 -->
-                </div>
-            </div>
-        </div>
-
-        <!-- 子面板 5: STAR 面试故事与量化简历 (STAR & Resume) -->
-        <div id="career-pane-star" class="space-y-6 hidden">
-            <div id="career-star-stories-container" class="space-y-5">
-                <!-- STAR 故事 -->
-            </div>
-            <div id="career-resume-bullets-container" class="space-y-5">
-                <!-- 简历 Bullet Points -->
-            </div>
-        </div>
-    </section>
+    
 
     <!-- ==================== VIEW: 日程导入与任务排程体系 (Phase 7) ==================== -->
-    <section id="view-scheduler" class="hidden space-y-6">
-        <!-- 头部导航与核心指引 -->
-        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-stone-100">
-                <div>
-                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-xs font-serifMono mb-2">
-                        <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
-                        <span class="font-bold">PERSONAL SCHEDULER & RFC 5545 CALENDAR SYNC</span>
-                        <span class="text-stone-300">•</span>
-                        <span>真实日历 ➔ 赤字压缩 ➔ 根因诊断 ➔ 复盘联动</span>
-                    </div>
-                    <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
-                        <i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> 日程导入与任务排程引擎
-                    </h2>
-                    <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
-                        深度整合原生 RFC 5545 iCal/ICS 解析器与 Google Tasks，真实计算事件冲突与连续专注块。
-                        实施 <span class="font-semibold text-stone-700 font-serifMono">S(3h)➔A(1h)➔A(1h)➔B(0.5h)➔C</span> 严格任务优先级分配。
-                        在时间不足时优先保证核心项目任务；未完成强制归因诊断，复盘直接打通求职工程实证记录。
-                    </p>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 font-serifMono shrink-0">
-                    <button onclick="openCalendarImportModal()" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" id="btn-open-calendar-import">
-                        <i class="fa-solid fa-file-import"></i> 导入日历/待办
-                    </button>
-                    <button onclick="runSmartScheduleCalculation()" class="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" id="btn-recalculate-schedule">
-                        <i class="fa-solid fa-calculator"></i> 重新计算排程
-                    </button>
-                    <button onclick="generateAndExportDailyReview()" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" id="btn-generate-daily-review">
-                        <i class="fa-solid fa-clipboard-check"></i> 生成今日复盘
-                    </button>
-                </div>
-            </div>
-
-            <!-- 4 大子体系切换标签导航 -->
-            <div class="flex items-center gap-2 overflow-x-auto pt-4 pb-1 font-serifMono text-xs" id="scheduler-subtabs-nav">
-                <button onclick="switchSchedulerTab('planner')" id="scheduler-tab-btn-planner" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
-                    <i class="fa-solid fa-timeline text-cyan-400"></i> 1. 今日智能时间轴与心流块
-                </button>
-                <button onclick="switchSchedulerTab('calendar')" id="scheduler-tab-btn-calendar" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-calendar-days text-sky-600"></i> 2. 外部日历冲突与空闲矩阵
-                </button>
-                <button onclick="switchSchedulerTab('diagnostics')" id="scheduler-tab-btn-diagnostics" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-stethoscope text-amber-600"></i> 3. 任务未完成工程根因诊断
-                </button>
-                <button onclick="switchSchedulerTab('review')" id="scheduler-tab-btn-review" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-file-contract text-emerald-600"></i> 4. 每日工程复盘与成长报表
-                </button>
-            </div>
-        </div>
-
-        <!-- 子面板 1: 今日智能时间轴与心流块 (Planner) -->
-        <div id="scheduler-pane-planner" class="space-y-6">
-            <!-- 核心指标摘要网格 -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="scheduler-stats-container">
-                <!-- 由 JS 填充：需求工时、实际可用工时、赤字压缩状态、编排心流块数 -->
-            </div>
-
-            <!-- 时间赤字警示与逐级压缩明细条 -->
-            <div id="scheduler-deficit-alert-container"></div>
-
-            <!-- 时间轴日程卡片流水线 -->
-            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-                <div class="flex items-center justify-between pb-4 mb-4 border-b border-stone-100">
-                    <div>
-                        <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                            <i class="fa-solid fa-bars-staggered text-cyan-600"></i>
-                            <span>今日心流编排队列 (上下文切换最小化)</span>
-                        </h3>
-                        <p class="text-xs text-stone-500 mt-0.5">深层连续工作块优先，任务间嵌入 10m 认知缓冲，杜绝任务碎片化交织。</p>
-                    </div>
-                    <span class="text-xs font-serifMono text-stone-400" id="scheduler-current-date-label"></span>
-                </div>
-                <div class="space-y-3" id="scheduler-timeline-grid">
-                    <!-- 动态填充时间轴卡片 -->
-                </div>
-            </div>
-        </div>
-
-        <!-- 子面板 2: 外部日历冲突与空闲矩阵 (Calendar & Tasks) -->
-        <div id="scheduler-pane-calendar" class="space-y-6 hidden">
-            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 mb-4 border-b border-stone-100">
-                    <div>
-                        <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-check text-sky-600"></i>
-                            <span>已同步外部日历源与事件状态</span>
-                        </h3>
-                        <p class="text-xs text-stone-500 mt-0.5">真实解析 RFC 5545 VEVENT，包含全天、时区与重复规则。</p>
-                    </div>
-                    <div id="calendar-source-badge" class="font-serifMono text-xs"></div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                    <!-- 左列：外部事件冲突与占用区间 -->
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-stone-700 font-serifHeading flex items-center gap-1.5">
-                            <i class="fa-solid fa-user-clock text-rose-500"></i> 外部繁忙日程区间 (Busy Intervals)
-                        </h4>
-                        <div class="space-y-2 max-h-96 overflow-y-auto pr-1" id="calendar-busy-list">
-                            <!-- 动态填充 -->
-                        </div>
-                    </div>
-                    <!-- 右列：计算所得空闲专注块 -->
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-stone-700 font-serifHeading flex items-center gap-1.5">
-                            <i class="fa-solid fa-bolt text-emerald-600"></i> 可用连续空闲专注块 (Free Focus Windows)
-                        </h4>
-                        <div class="space-y-2 max-h-96 overflow-y-auto pr-1" id="calendar-free-slots-list">
-                            <!-- 动态填充 -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Google Tasks 同步状态卡 -->
-            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-                <div class="flex items-center justify-between pb-3 mb-3 border-b border-stone-100">
-                    <h3 class="text-sm font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-indigo-600"></i> Google Tasks / 外部待办导入清单
-                    </h3>
-                    <span class="text-xs font-serifMono text-stone-400" id="google-tasks-count-badge">共 0 条</span>
-                </div>
-                <div class="space-y-2" id="google-tasks-container">
-                    <!-- 动态填充任务 -->
-                </div>
-            </div>
-        </div>
-
-        <!-- 子面板 3: 任务未完成工程根因诊断 (Diagnostics) -->
-        <div id="scheduler-pane-diagnostics" class="space-y-6 hidden">
-            <!-- 未完成任务诊断工作台 -->
-            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-                <div class="pb-4 mb-4 border-b border-stone-100">
-                    <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                        <i class="fa-solid fa-stethoscope text-amber-600"></i>
-                        <span>今日未完成任务技术归因 (严禁盲目顺延，必须追查根因)</span>
-                    </h3>
-                    <p class="text-xs text-stone-500 mt-0.5">
-                        按 5 大工程归因标准进行定性分析。根据深层卡点或工时低估，自适应输出拆分、前置学习补齐或延后对策。
-                    </p>
-                </div>
-                <div class="space-y-3" id="scheduler-incomplete-tasks-list">
-                    <!-- 动态填充今日未完成任务与诊断按钮 -->
-                </div>
-            </div>
-
-            <!-- 历史诊断与调优记录 -->
-            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-                <h3 class="text-sm font-bold text-stone-900 font-serifHeading mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-book-medical text-stone-700"></i> 历史工程根因诊断与对策档案
-                </h3>
-                <div class="space-y-3" id="scheduler-diagnostics-history-container">
-                    <!-- 动态填充诊断历史记录卡片 -->
-                </div>
-            </div>
-        </div>
-
-        <!-- 子面板 4: 每日工程复盘与成长报表 (Review) -->
-        <div id="scheduler-pane-review" class="space-y-6 hidden">
-            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 mb-4 border-b border-stone-100">
-                    <div>
-                        <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                            <i class="fa-solid fa-file-contract text-emerald-600"></i>
-                            <span>今日工程复盘报表 (自动联动求职真实工程实证)</span>
-                        </h3>
-                        <p class="text-xs text-stone-500 mt-0.5">工时统计、未完成归因、今日产出 Evidence 与能力雷达增量全景报表。</p>
-                    </div>
-                    <div class="flex items-center gap-2 font-serifMono text-xs">
-                        <button onclick="copyReviewMarkdownToClipboard()" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold transition flex items-center gap-1 cursor-pointer" id="btn-copy-review-md">
-                            <i class="fa-solid fa-copy"></i> 复制 Markdown
-                        </button>
-                        <button onclick="downloadReviewMarkdown()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition flex items-center gap-1 shadow-xs cursor-pointer" id="btn-download-review-md">
-                            <i class="fa-solid fa-download"></i> 导出 .md
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 报表预览容器 -->
-                <div class="p-4 sm:p-6 bg-stone-50 rounded-xl border border-stone-200/80 font-serifMono text-xs text-stone-800 leading-relaxed whitespace-pre-wrap select-text" id="scheduler-review-content">
-                    <!-- 由 JS 填充每日复盘 Markdown -->
-                </div>
-            </div>
-        </div>
-    </section>
+    
         </main>
 
         <!-- 移动端遮罩层 (在小于 xl 屏幕抽屉打开时显示) -->
@@ -2728,66 +2456,7 @@ add_executable(my_server ${SOURCES})</pre>
     </div>
 </div>
 
-<!-- ==================== Phase 7: 外部日历与待办导入模态框 ==================== -->
-<div id="calendar-import-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-label="外部日历与待办导入">
-    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl border border-stone-200 max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
-            <h4 class="font-bold text-stone-900 text-base font-serifHeading flex items-center gap-2">
-                <i class="fa-solid fa-calendar-plus text-cyan-600"></i>
-                <span>真实导入 Google Calendar / Tasks (.ics & JSON)</span>
-            </h4>
-            <button onclick="closeCalendarImportModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
 
-        <div class="space-y-4 font-serifMono text-xs">
-            <!-- 导入源选项 -->
-            <div class="flex items-center gap-2 border-b border-stone-200 pb-2">
-                <button type="button" onclick="setCalendarImportTab('file')" id="cal-import-tab-file" class="px-3 py-1.5 rounded-lg bg-stone-900 text-white font-bold cursor-pointer">
-                    <i class="fa-solid fa-file-arrow-up mr-1"></i> 1. 上传 .ics 文件
-                </button>
-                <button type="button" onclick="setCalendarImportTab('text')" id="cal-import-tab-text" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold cursor-pointer">
-                    <i class="fa-solid fa-paste mr-1"></i> 2. 粘贴 ICS 文本
-                </button>
-                <button type="button" onclick="setCalendarImportTab('tasks')" id="cal-import-tab-tasks" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold cursor-pointer">
-                    <i class="fa-solid fa-list-check mr-1"></i> 3. Google Tasks 导入
-                </button>
-            </div>
-
-            <!-- 子表单 1: 文件上传 -->
-            <div id="cal-import-pane-file" class="space-y-3">
-                <p class="text-stone-600">选择您从 Google Calendar 或 Outlook 导出的标准 RFC 5545 <code>.ics</code> 文件：</p>
-                <input type="file" id="ics-file-input" accept=".ics,text/calendar" class="w-full bg-stone-50 border border-stone-300 rounded-xl p-3 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer" />
-                <p class="text-[11px] text-stone-400">💡 原生客户端解析，无需任何外部服务器中转，零数据泄露风险。</p>
-            </div>
-
-            <!-- 子表单 2: 文本粘贴 -->
-            <div id="cal-import-pane-text" class="space-y-3 hidden">
-                <label class="block text-stone-700 font-bold">直接粘贴 iCalendar (RFC 5545) 格式内容：</label>
-                <textarea id="ics-paste-input" rows="6" placeholder="BEGIN:VCALENDAR&#10;VERSION:2.0&#10;BEGIN:VEVENT&#10;SUMMARY:团队周会&#10;DTSTART:20260912T140000&#10;DTEND:20260912T153000&#10;END:VEVENT&#10;END:VCALENDAR" class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-cyan-500 font-mono-code text-[11px]"></textarea>
-            </div>
-
-            <!-- 子表单 3: Google Tasks 导入 -->
-            <div id="cal-import-pane-tasks" class="space-y-3 hidden">
-                <label class="block text-stone-700 font-bold">粘贴 Google Tasks 导出 JSON 或 Markdown 待办：</label>
-                <textarea id="tasks-paste-input" rows="6" placeholder='[&#10;  { "title": "完善 CppAIService HTTP 状态机解析", "due": "2026-09-12" },&#10;  { "title": "刷 3 道高频链表手撕题", "due": "2026-09-12" }&#10;]' class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:outline-none focus:border-cyan-500 font-mono-code text-[11px]"></textarea>
-            </div>
-
-            <!-- 目标日期选择 -->
-            <div>
-                <label class="block text-stone-700 font-bold mb-1">匹配目标日期 (默认今日)</label>
-                <input type="date" id="calendar-target-date" class="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800" />
-            </div>
-
-            <div class="pt-3 border-t border-stone-200 flex items-center justify-end gap-2">
-                <button type="button" onclick="closeCalendarImportModal()" class="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold transition cursor-pointer">取消</button>
-                <button type="button" onclick="submitCalendarImport()" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold transition cursor-pointer shadow-xs">
-                    解析并载入排程
-                </button>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- ==================== Phase 7: 任务未完成工程根因诊断模态框 ==================== -->
@@ -2843,6 +2512,7 @@ add_executable(my_server ${SOURCES})</pre>
     <script src="js/dataset-yuque.js?v=6.0.0"></script>
     <script src="js/dataset-domain.js?v=6.0.0"></script>
     <script src="js/dataset-tasks.js?v=6.0.0"></script>
+    <script src="js/dataset-cppai-sources.js?v=5.2.0"></script>
     <script src="js/dataset-learning.js?v=6.0.0"></script>
     <script src="js/dataset-career.js?v=6.0.0"></script>
     <script src="js/dataset-scheduler.js?v=7.0.0"></script>
@@ -2994,6 +2664,38 @@ add_executable(my_server ${SOURCES})</pre>
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+
+<!-- ==================== CppAIService 真实代码与 Demo 查看器 (最高悬浮层 z-[9999]) ==================== -->
+<div id="modal-code-viewer" class="fixed inset-0 z-[9999] bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-2 sm:p-4" role="dialog" aria-modal="true" aria-label="代码查看器">
+    <div class="bg-stone-900 border border-stone-700 text-stone-200 rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-mono text-xs">
+        <!-- 弹窗顶栏 -->
+        <div class="px-4 py-3 bg-stone-950 border-b border-stone-800 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+                <div class="ml-2 flex items-center gap-2 truncate">
+                    <span id="code-viewer-title" class="font-bold text-white text-sm">HttpContext.cpp</span>
+                    <span id="code-viewer-path" class="text-[11px] text-stone-400 bg-stone-800 px-2 py-0.5 rounded">src/http/HttpContext.cpp</span>
+                    <span id="code-viewer-badge" class="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-1.5 py-0.2 rounded font-bold">真实源码</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="copyCurrentViewerCode()" class="px-3 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-xs font-serifMono transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-copy"></i> 复制代码
+                </button>
+                <button onclick="closeCodeViewerModal()" class="w-7 h-7 rounded-lg bg-stone-800 hover:bg-rose-900/80 hover:text-white text-stone-400 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 代码展示区 -->
+        <div class="flex-1 overflow-auto p-4 bg-stone-900/95 font-mono text-[12px] leading-relaxed select-text">
+            <pre class="m-0"><code id="code-viewer-pre" class="language-cpp font-mono text-emerald-300"></code></pre>
+        </div>
     </div>
 </div>
 
