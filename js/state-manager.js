@@ -156,6 +156,17 @@
       // ---------- Phase 4: 双轨统一今日任务调度系统 ----------
       dailyRoutine: createDefaultDailyRoutine(),
 
+      // ---------- Phase 5: 统一学习系统 (Unified Learning System) ----------
+      learningSystem: {
+        algoReviewQueue: {}, // { [num]: 'due' | 'mastered' }
+        qaMastery: {},       // { [qaId]: boolean }
+        bookDynamicGoals: {
+          linuxServer: 10,
+          birdLinux: 10
+        },
+        activeTab: 'cpp'
+      },
+
       // ---------- 运行时与界面交互状态 ----------
       currentView: 'dashboard',
       weekFilter: 0,
@@ -381,6 +392,29 @@
         }
       }
 
+      // P5: 净化与补齐 learningSystem
+      if (!merged.learningSystem || typeof merged.learningSystem !== 'object') {
+        merged.learningSystem = {
+          algoReviewQueue: {},
+          qaMastery: {},
+          bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+          activeTab: 'cpp'
+        };
+      } else {
+        if (!merged.learningSystem.algoReviewQueue || typeof merged.learningSystem.algoReviewQueue !== 'object') {
+          merged.learningSystem.algoReviewQueue = {};
+        }
+        if (!merged.learningSystem.qaMastery || typeof merged.learningSystem.qaMastery !== 'object') {
+          merged.learningSystem.qaMastery = {};
+        }
+        if (!merged.learningSystem.bookDynamicGoals || typeof merged.learningSystem.bookDynamicGoals !== 'object') {
+          merged.learningSystem.bookDynamicGoals = { linuxServer: 10, birdLinux: 10 };
+        }
+        if (!merged.learningSystem.activeTab) {
+          merged.learningSystem.activeTab = 'cpp';
+        }
+      }
+
       if (merged.activeTimer) {
         merged.activeTimer.running = false;
         merged.activeTimer.timerId = null;
@@ -527,7 +561,8 @@
           knowledgeMastery: state.knowledgeMastery,
           knowledgeFavorites: state.knowledgeFavorites,
           knowledgeRecent: state.knowledgeRecent,
-          dailyRoutine: state.dailyRoutine
+          dailyRoutine: state.dailyRoutine,
+          learningSystem: state.learningSystem
         });
         safeSetItem(STORAGE_KEYS.V5_DATA, v5Payload);
 
@@ -573,7 +608,8 @@
           masteredArticlesCount: Object.values(state.knowledgeMastery || {}).filter(lvl => lvl >= 3).length,
           studySessionsCount: (state.studySessions || []).length,
           pitfallsCount: (state.pitfalls || []).length,
-          dailyRoutineCompletedCount: (state.dailyRoutine?.tasks || []).filter(t => t.completed).length
+          dailyRoutineCompletedCount: (state.dailyRoutine?.tasks || []).filter(t => t.completed).length,
+          learningAlgoReviewedCount: Object.values(state.learningSystem?.algoReviewQueue || {}).filter(v => v === 'mastered').length
         },
         payload: {
           completedDays: state.completedDays || [],
@@ -590,7 +626,13 @@
           knowledgeFavorites: state.knowledgeFavorites || [],
           knowledgeRecent: state.knowledgeRecent || [],
           projectsProgress: state.projectsProgress || {},
-          dailyRoutine: state.dailyRoutine || createDefaultDailyRoutine()
+          dailyRoutine: state.dailyRoutine || createDefaultDailyRoutine(),
+          learningSystem: state.learningSystem || {
+            algoReviewQueue: {},
+            qaMastery: {},
+            bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+            activeTab: 'cpp'
+          }
         }
       };
     }
@@ -642,6 +684,16 @@
           this._state.dailyRoutine = JSON.parse(JSON.stringify(payload.dailyRoutine));
         } else {
           this._state.dailyRoutine = createDefaultDailyRoutine();
+        }
+        if (payload.learningSystem && typeof payload.learningSystem === 'object') {
+          this._state.learningSystem = JSON.parse(JSON.stringify(payload.learningSystem));
+        } else {
+          this._state.learningSystem = {
+            algoReviewQueue: {},
+            qaMastery: {},
+            bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+            activeTab: 'cpp'
+          };
         }
       } else {
         // 合并策略 (merge)
@@ -785,11 +837,109 @@
             });
           }
         }
+
+        // 12. 合并 Phase 5 统一学习系统数据 (learningSystem)
+        if (payload.learningSystem && typeof payload.learningSystem === 'object') {
+          if (!this._state.learningSystem) {
+            this._state.learningSystem = {
+              algoReviewQueue: {},
+              qaMastery: {},
+              bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+              activeTab: 'cpp'
+            };
+          }
+          const curLS = this._state.learningSystem;
+          const incLS = payload.learningSystem;
+          if (incLS.algoReviewQueue && typeof incLS.algoReviewQueue === 'object') {
+            curLS.algoReviewQueue = Object.assign(curLS.algoReviewQueue || {}, incLS.algoReviewQueue);
+          }
+          if (incLS.qaMastery && typeof incLS.qaMastery === 'object') {
+            curLS.qaMastery = Object.assign(curLS.qaMastery || {}, incLS.qaMastery);
+          }
+          if (incLS.bookDynamicGoals && typeof incLS.bookDynamicGoals === 'object') {
+            curLS.bookDynamicGoals = Object.assign(curLS.bookDynamicGoals || {}, incLS.bookDynamicGoals);
+          }
+        }
       }
 
       this.save(true);
       this._notify();
       return this._state;
+    }
+
+    // Phase 5 学习系统专用操作助手
+    setLearningTab(tabKey) {
+      if (!this._state.learningSystem) {
+        this._state.learningSystem = {
+          algoReviewQueue: {},
+          qaMastery: {},
+          bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+          activeTab: 'cpp'
+        };
+      }
+      this._state.learningSystem.activeTab = tabKey;
+      this.save();
+      this._notify();
+    }
+
+    toggleAlgoReview(problemNum) {
+      if (!this._state.learningSystem) {
+        this._state.learningSystem = {
+          algoReviewQueue: {},
+          qaMastery: {},
+          bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+          activeTab: 'algo'
+        };
+      }
+      if (!this._state.learningSystem.algoReviewQueue) {
+        this._state.learningSystem.algoReviewQueue = {};
+      }
+      const q = this._state.learningSystem.algoReviewQueue;
+      const current = q[problemNum] || 'due';
+      q[problemNum] = current === 'mastered' ? 'due' : 'mastered';
+      this.save(true);
+      this._notify();
+      return q[problemNum];
+    }
+
+    adjustBookDailyGoal(bookKey, delta) {
+      if (!this._state.learningSystem) {
+        this._state.learningSystem = {
+          algoReviewQueue: {},
+          qaMastery: {},
+          bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+          activeTab: 'books'
+        };
+      }
+      if (!this._state.learningSystem.bookDynamicGoals) {
+        this._state.learningSystem.bookDynamicGoals = { linuxServer: 10, birdLinux: 10 };
+      }
+      const goals = this._state.learningSystem.bookDynamicGoals;
+      const cur = goals[bookKey] || 10;
+      const next = Math.max(5, Math.min(30, cur + delta));
+      goals[bookKey] = next;
+      this.save(true);
+      this._notify();
+      return next;
+    }
+
+    toggleQAMastery(qaId) {
+      if (!this._state.learningSystem) {
+        this._state.learningSystem = {
+          algoReviewQueue: {},
+          qaMastery: {},
+          bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+          activeTab: 'qa'
+        };
+      }
+      if (!this._state.learningSystem.qaMastery) {
+        this._state.learningSystem.qaMastery = {};
+      }
+      const m = this._state.learningSystem.qaMastery;
+      m[qaId] = !m[qaId];
+      this.save(true);
+      this._notify();
+      return m[qaId];
     }
 
     // 重置系统纯净状态 (保留备份)

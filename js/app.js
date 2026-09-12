@@ -403,7 +403,7 @@ function switchView(viewName) {
     } else if (viewName === 'knowledge') {
         if (typeof renderYuqueExplorer === 'function') renderYuqueExplorer();
     } else if (viewName === 'mapping') {
-        renderMappingTable();
+        renderLearningSystem();
     } else if (viewName === 'quiz') {
         const sel = document.getElementById('quiz-day-selector');
         const d = sel ? parseInt(sel.value) || 1 : 1;
@@ -1483,6 +1483,717 @@ function renderMappingTable() {
         `;
         tbody.appendChild(tr);
     });
+}
+
+// ==========================================================================
+// Phase 5: 统一学习系统与六维穿透交互引擎 (Unified Learning System & 6D Cross-Link)
+// ==========================================================================
+
+function switchLearningTab(tabKey, updateState = true) {
+    if (!appState.learningSystem) {
+        appState.learningSystem = {
+            algoReviewQueue: {},
+            qaMastery: {},
+            bookDynamicGoals: { linuxServer: 10, birdLinux: 10 },
+            activeTab: 'cpp'
+        };
+    }
+    if (updateState) {
+        appState.learningSystem.activeTab = tabKey;
+        if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.save === 'function') {
+            stateManager.save();
+        } else {
+            persistState();
+        }
+    }
+
+    const tabs = ['cpp', 'linux', 'books', 'algo', 'qa', 'reading'];
+    tabs.forEach(t => {
+        const btn = document.getElementById(`learn-tab-btn-${t}`);
+        const panel = document.getElementById(`learn-panel-${t}`);
+        if (!panel) return;
+
+        if (t === tabKey) {
+            panel.classList.remove('hidden');
+            if (btn) {
+                btn.className = "px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer";
+            }
+        } else {
+            panel.classList.add('hidden');
+            if (btn) {
+                btn.className = "px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer";
+            }
+        }
+    });
+
+    // 触发子视图动态渲染
+    if (tabKey === 'cpp') {
+        renderLearningCppTab();
+    } else if (tabKey === 'linux') {
+        renderLearningLinuxTab();
+    } else if (tabKey === 'books') {
+        renderLearningBooksTab();
+    } else if (tabKey === 'algo') {
+        renderLearningAlgoTab();
+    } else if (tabKey === 'qa') {
+        renderLearningQATab();
+    } else if (tabKey === 'reading') {
+        renderLearningReadingTab();
+    }
+}
+
+function renderLearningSystem() {
+    const activeTab = (appState.learningSystem && appState.learningSystem.activeTab) || 'cpp';
+    renderMappingTable(); // 保证 mapping-table-body 始终填充
+    switchLearningTab(activeTab, false);
+}
+
+// 1. C++ 8维核心体系渲染器
+function renderLearningCppTab() {
+    const container = document.getElementById('cpp-dimensions-container');
+    if (!container) return;
+    const system = (typeof CPP_KNOWLEDGE_SYSTEM !== 'undefined') ? CPP_KNOWLEDGE_SYSTEM : [];
+    
+    container.innerHTML = system.map(dim => {
+        const loop = dim.learnLoop || {};
+        return `
+            <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col justify-between hover:border-sky-300 transition" id="card-${escapeHtml(dim.id)}">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-2.5">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2.5 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 text-xs font-bold font-serifMono">
+                                ${escapeHtml(dim.dimension)}
+                            </span>
+                            <span class="text-xs font-serifMono text-stone-500 font-medium">
+                                <i class="fa-solid fa-cube text-sky-600"></i> ${escapeHtml(dim.moduleName)}
+                            </span>
+                        </div>
+                        <span class="text-[11px] font-serifMono px-2 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 shrink-0">
+                            Day ${dim.taskDay}
+                        </span>
+                    </div>
+
+                    <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-1.5">
+                        ${escapeHtml(dim.title)}
+                    </h4>
+
+                    <p class="text-xs text-stone-600 leading-relaxed font-serifHeading mb-3">
+                        ${escapeHtml(dim.coreConcept)}
+                    </p>
+
+                    <!-- 5 步闭环状态 -->
+                    <div class="bg-stone-50/80 p-3 rounded-xl border border-stone-200/80 space-y-1.5 text-xs font-serifMono mb-3">
+                        <div class="text-[11px] text-stone-500 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
+                            <span><i class="fa-solid fa-arrows-spin text-emerald-600"></i> 闭环学习流 (5-Step Loop)</span>
+                            <span class="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">贯通</span>
+                        </div>
+                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-sky-800">Learn:</span> ${escapeHtml(loop.learn || '')}</div>
+                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-emerald-800">Apply:</span> ${escapeHtml(loop.apply || '')}</div>
+                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-amber-800">Build:</span> ${escapeHtml(loop.build || '')}</div>
+                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-purple-800">Explain:</span> ${escapeHtml(loop.explain || '')}</div>
+                        <div class="text-stone-700 text-[11px]"><span class="font-bold text-rose-800">Review:</span> ${escapeHtml(loop.review || '')}</div>
+                    </div>
+
+                    <!-- 面试考点小视窗 -->
+                    <div class="p-2.5 rounded-lg bg-amber-50/60 border border-amber-200/80 text-xs font-serifHeading text-amber-950 mb-3">
+                        <div class="font-bold font-serifMono text-[11px] text-amber-800 mb-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-question"></i> 面试真题考点：
+                        </div>
+                        <p class="text-[11px] text-stone-700 leading-relaxed">${escapeHtml(dim.interviewPoint)}</p>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
+                    <span class="text-stone-400 text-[11px] truncate" title="${dim.sourceFile}:${dim.sourceLine}">
+                        <i class="fa-regular fa-file-code text-stone-500"></i> ${escapeHtml(dim.sourceFile)}
+                    </span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="scrollToDay(${dim.taskDay})" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-lg transition text-[11px] cursor-pointer" title="查看对应任务">
+                            Day ${dim.taskDay}
+                        </button>
+                        <button onclick="openCrossLinkModal('${dim.id}')" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition text-[11px] flex items-center gap-1 shadow-xs cursor-pointer">
+                            <i class="fa-solid fa-crosshairs text-[10px]"></i> 六维透视
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    renderMappingTable();
+}
+
+// 2. Linux 9维底座体系渲染器
+function renderLearningLinuxTab() {
+    const container = document.getElementById('linux-dimensions-container');
+    if (!container) return;
+    const list = (typeof LINUX_SYSTEM_KNOWLEDGE !== 'undefined') ? LINUX_SYSTEM_KNOWLEDGE : [];
+
+    container.innerHTML = list.map(item => `
+        <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col justify-between hover:border-emerald-300 transition" id="card-${escapeHtml(item.id)}">
+            <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold font-serifMono">
+                        ${escapeHtml(item.dimension)}
+                    </span>
+                    <span class="text-[11px] font-serifMono text-stone-400">
+                        Linux Syscall
+                    </span>
+                </div>
+
+                <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-2">
+                    ${escapeHtml(item.title)}
+                </h4>
+
+                <div class="p-2 bg-stone-900 text-emerald-400 font-serifMono text-[11px] rounded-lg mb-2.5 overflow-x-auto">
+                    <code>${escapeHtml(item.syscallOrCmd)}</code>
+                </div>
+
+                <div class="text-xs text-stone-700 mb-2 leading-relaxed font-serifHeading">
+                    <span class="font-bold text-stone-900 font-serifMono text-[11px]">实战场景：</span>
+                    ${escapeHtml(item.projectScene)}
+                </div>
+
+                <div class="p-2.5 bg-stone-50 rounded-lg border border-stone-200 text-xs mb-3 font-serifHeading">
+                    <span class="font-bold text-amber-800 font-serifMono text-[11px] block mb-0.5">
+                        <i class="fa-solid fa-clipboard-question"></i> 面试高频深度：
+                    </span>
+                    <p class="text-[11px] text-stone-600 leading-relaxed">${escapeHtml(item.interviewPoint)}</p>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
+                <span class="text-[11px] text-stone-500 truncate" title="${escapeHtml(item.sourceLink)}">
+                    <i class="fa-solid fa-link text-stone-400"></i> ${escapeHtml(item.sourceLink)}
+                </span>
+                <button onclick="openCrossLinkModal('${item.id}')" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition text-[11px] flex items-center gap-1 shadow-xs cursor-pointer shrink-0">
+                    <i class="fa-solid fa-crosshairs text-[10px]"></i> 六维透视
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 3. 专业书目伴读伴学体系渲染器
+function renderLearningBooksTab() {
+    const container = document.getElementById('books-companion-container');
+    if (!container) return;
+    const books = (typeof BOOKS_COMPANION_DATA !== 'undefined') ? BOOKS_COMPANION_DATA : {};
+    const serverBook = books.linuxServerBook || {};
+    const birdBook = books.birdLinuxBook || {};
+
+    const goals = (appState.learningSystem && appState.learningSystem.bookDynamicGoals) || { linuxServer: 10, birdLinux: 10 };
+    const curServerGoal = goals.linuxServer || 10;
+    const curBirdGoal = goals.birdLinux || 10;
+
+    container.innerHTML = `
+        <!-- 书目 1: Linux多线程服务端编程 -->
+        <div class="bg-white rounded-2xl p-6 border border-stone-200 academic-card">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-stone-200 mb-5">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-900 text-xs font-serifMono mb-1.5">
+                        <i class="fa-solid fa-book-bookmark text-amber-700"></i> 经典网络编程圣经
+                    </div>
+                    <h3 class="text-base font-bold text-stone-900 font-serifHeading">${escapeHtml(serverBook.name || '《Linux多线程服务端编程》')}</h3>
+                    <p class="text-xs text-stone-500 font-serifMono mt-0.5">作者: ${escapeHtml(serverBook.author || '陈硕')} • 原则: 紧跟 muduo 源码</p>
+                </div>
+
+                <!-- 动态调控器 -->
+                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex items-center gap-3 font-serifMono text-xs shrink-0">
+                    <div>
+                        <div class="text-[10px] text-stone-400 font-bold uppercase">每日动态目标</div>
+                        <div class="text-sm font-bold text-amber-800" id="book-goal-display-server">${curServerGoal} 页/天</div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="adjustBookDailyGoal('linuxServer', -1)" class="w-7 h-7 rounded-lg bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 flex items-center justify-center font-bold cursor-pointer" title="降低 1 页 (释放精力给源码攻坚)">-</button>
+                        <button onclick="adjustBookDailyGoal('linuxServer', 1)" class="w-7 h-7 rounded-lg bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 flex items-center justify-center font-bold cursor-pointer" title="增加 1 页">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 动态微调规则警示卡 -->
+            <div class="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs text-amber-950 font-serifHeading mb-5 flex items-start gap-2.5">
+                <i class="fa-solid fa-sliders text-amber-700 mt-0.5 text-sm"></i>
+                <div>
+                    <span class="font-bold font-serifMono">弹性调配机制：</span>
+                    ${escapeHtml(serverBook.dynamicAdjustRule || '基准 10 页/天。当今日处于 S 级项目核心模块攻坚期，系统自动支持动态微调至 5 页，将富余精力倾斜给真实源码与压测验证，绝不机械教条。')}
+                </div>
+            </div>
+
+            <!-- 重点章节与项目映射卡片流 -->
+            <div class="space-y-3 font-serifHeading">
+                ${(serverBook.chapters || []).map(ch => `
+                    <div class="p-4 rounded-xl bg-stone-50/60 border border-stone-200/70 hover:bg-stone-50 transition">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 mb-1.5">
+                            <h4 class="text-xs sm:text-sm font-bold text-stone-900">
+                                第 ${ch.chapterNum} 章：${escapeHtml(ch.title)}
+                                <span class="text-stone-400 font-serifMono text-xs font-normal">(${escapeHtml(ch.pageRange)} 页)</span>
+                            </h4>
+                            <span class="text-[11px] font-serifMono px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 w-fit">
+                                ${escapeHtml(ch.mappedProjectConcept)}
+                            </span>
+                        </div>
+                        <p class="text-xs text-stone-600 leading-relaxed">${escapeHtml(ch.coreTakeaway)}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <!-- 书目 2: 鸟哥的 Linux 私房菜 -->
+        <div class="bg-white rounded-2xl p-6 border border-stone-200 academic-card">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-stone-200 mb-5">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-serifMono mb-1.5">
+                        <i class="fa-solid fa-terminal text-emerald-700"></i> 实战运维与 Bash 进阶
+                    </div>
+                    <h3 class="text-base font-bold text-stone-900 font-serifHeading">${escapeHtml(birdBook.name || '《鸟哥的 Linux 私房菜》')}</h3>
+                    <p class="text-xs text-stone-500 font-serifMono mt-0.5">作者: ${escapeHtml(birdBook.author || '鸟哥')} • ${escapeHtml(birdBook.startPoint || '从 Bash 开始')}</p>
+                </div>
+
+                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex items-center gap-3 font-serifMono text-xs shrink-0">
+                    <div>
+                        <div class="text-[10px] text-stone-400 font-bold uppercase">每日阅读目标</div>
+                        <div class="text-sm font-bold text-emerald-800" id="book-goal-display-bird">${curBirdGoal} 页/天</div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="adjustBookDailyGoal('birdLinux', -1)" class="w-7 h-7 rounded-lg bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 flex items-center justify-center font-bold cursor-pointer">-</button>
+                        <button onclick="adjustBookDailyGoal('birdLinux', 1)" class="w-7 h-7 rounded-lg bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 flex items-center justify-center font-bold cursor-pointer">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 章节与高频命令 -->
+            <div class="space-y-4">
+                ${(birdBook.chapters || []).map(ch => `
+                    <div class="p-4 rounded-xl bg-stone-50/60 border border-stone-200/70 hover:bg-stone-50 transition">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 mb-2">
+                            <h4 class="text-xs sm:text-sm font-bold text-stone-900 font-serifHeading">
+                                第 ${ch.chapterNum} 章：${escapeHtml(ch.title)}
+                                <span class="text-stone-400 font-serifMono text-xs font-normal">(${escapeHtml(ch.pageRange)} 页)</span>
+                            </h4>
+                            <span class="text-[11px] font-serifMono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 w-fit">
+                                ${escapeHtml(ch.mappedProjectConcept)}
+                            </span>
+                        </div>
+                        <div class="mb-2 p-2.5 bg-stone-900 text-emerald-400 font-serifMono text-xs rounded-lg overflow-x-auto whitespace-pre">${escapeHtml(ch.practicalCommands || '')}</div>
+                        <div class="text-xs text-stone-600 font-serifHeading">
+                            <span class="font-bold text-stone-800 font-serifMono text-[11px]">工程落地：</span>
+                            ${escapeHtml(ch.projectIntegration)}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// 4. 算法手撕 Lab 渲染器 (每日 3 题与二刷)
+function renderLearningAlgoTab() {
+    const container = document.getElementById('algo-lab-container');
+    if (!container) return;
+    const catalog = (typeof ALGORITHM_LAB_CATALOG !== 'undefined') ? ALGORITHM_LAB_CATALOG : [];
+    const queue = (appState.learningSystem && appState.learningSystem.algoReviewQueue) || {};
+
+    let masteredCount = 0;
+    let dueCount = 0;
+    catalog.forEach(p => {
+        const st = queue[p.num] || p.reviewStatus || 'due';
+        if (st === 'mastered') masteredCount++;
+        else dueCount++;
+    });
+
+    container.innerHTML = `
+        <!-- 顶部指标栏 -->
+        <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <div class="text-xs font-serifMono font-bold text-indigo-700 uppercase tracking-wider mb-1">
+                    Algorithm Hand-Coding Laboratory
+                </div>
+                <h3 class="text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
+                    <i class="fa-solid fa-code-compare text-indigo-700"></i> 服务端高频算法手撕库 (每日 3 道 · 闭环二刷)
+                </h3>
+                <p class="text-xs text-stone-500 mt-0.5">严格杜绝死记硬背，全部题目均与 muduo 及 CppAIService 架构模式深度同构映射。</p>
+            </div>
+            <div class="flex items-center gap-3 font-serifMono text-xs shrink-0">
+                <div class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-center">
+                    <div class="text-[10px] text-emerald-600">已二刷掌握</div>
+                    <div class="text-base font-bold">${masteredCount} 题</div>
+                </div>
+                <div class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-center">
+                    <div class="text-[10px] text-amber-600">待复习巩固</div>
+                    <div class="text-base font-bold">${dueCount} 题</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 算法题卡片列表 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${catalog.map(p => {
+                const status = queue[p.num] || p.reviewStatus || 'due';
+                const isMastered = status === 'mastered';
+                return `
+                    <div class="bg-white rounded-2xl p-5 border ${isMastered ? 'border-emerald-200/90' : 'border-amber-200/90'} academic-card flex flex-col justify-between hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="px-2.5 py-0.5 rounded-md bg-stone-900 text-white text-xs font-serifMono font-bold">
+                                        #${p.num}
+                                    </span>
+                                    <span class="text-xs font-serifMono px-2 py-0.5 rounded ${p.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'} font-bold">
+                                        ${escapeHtml(p.difficulty)}
+                                    </span>
+                                    <span class="text-xs font-serifMono text-stone-500">
+                                        ${escapeHtml(p.topic)}
+                                    </span>
+                                </div>
+                                <span class="text-[11px] font-serifMono px-2 py-0.5 rounded-full ${isMastered ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} font-bold">
+                                    ${isMastered ? '✓ 已掌握' : '⏳ 待二刷'}
+                                </span>
+                            </div>
+
+                            <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-1.5">
+                                ${escapeHtml(p.title)}
+                            </h4>
+
+                            <div class="text-xs text-stone-600 font-serifHeading mb-2">
+                                <span class="font-bold text-stone-800 font-serifMono text-[11px]">核心套路：</span>
+                                ${escapeHtml(p.pattern)}
+                            </div>
+
+                            <div class="flex items-center gap-3 text-[11px] font-serifMono text-stone-500 mb-3 bg-stone-50 p-2 rounded-lg border border-stone-200/60">
+                                <span><strong class="text-stone-700">时间:</strong> ${escapeHtml(p.timeComp)}</span>
+                                <span>•</span>
+                                <span><strong class="text-stone-700">空间:</strong> ${escapeHtml(p.spaceComp)}</span>
+                                <span>•</span>
+                                <span class="text-emerald-700 font-bold">✓ 独立完成</span>
+                            </div>
+
+                            <div class="p-2.5 bg-rose-50/60 rounded-lg border border-rose-200/80 text-xs text-rose-950 font-serifHeading mb-3">
+                                <span class="font-bold font-serifMono text-[11px] text-rose-800 block mb-0.5">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> 易错点与经典陷阱：
+                                </span>
+                                <p class="text-[11px] leading-relaxed text-stone-700">${escapeHtml(p.mistakes)}</p>
+                            </div>
+
+                            <div class="p-2.5 bg-sky-50/60 rounded-lg border border-sky-200/80 text-xs text-sky-950 font-serifHeading mb-4">
+                                <span class="font-bold font-serifMono text-[11px] text-sky-800 block mb-0.5">
+                                    <i class="fa-solid fa-link"></i> 项目工程同构：
+                                </span>
+                                <p class="text-[11px] leading-relaxed text-stone-700">${escapeHtml(p.projectLink)}</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
+                            <span class="text-stone-400 text-[11px]">口述总结就绪</span>
+                            <button onclick="toggleAlgoReview(${p.num})" class="px-3 py-1.5 ${isMastered ? 'bg-stone-100 hover:bg-stone-200 text-stone-700' : 'bg-emerald-700 hover:bg-emerald-800 text-white'} rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+                                <i class="fa-solid ${isMastered ? 'fa-rotate-left' : 'fa-check'}"></i>
+                                <span>${isMastered ? '设为待二刷' : '标记已二刷掌握'}</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+// 5. 项目代码驱动八股自测渲染器
+function renderLearningQATab() {
+    const container = document.getElementById('project-qa-container');
+    if (!container) return;
+    const list = (typeof PROJECT_QA_CATALOG !== 'undefined') ? PROJECT_QA_CATALOG : [];
+    const mastery = (appState.learningSystem && appState.learningSystem.qaMastery) || {};
+
+    container.innerHTML = `
+        <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <div class="text-xs font-serifMono font-bold text-purple-700 uppercase tracking-wider mb-1">
+                    Project-Derived Technical Interview
+                </div>
+                <h3 class="text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-purple-700"></i> 项目源码逆向八股自测中心 (每日 30min)
+                </h3>
+                <p class="text-xs text-stone-500 mt-0.5">杜绝脱离实际背诵，所有八股问题均来自 muduo 底座与 CppAIService 真实实现。</p>
+            </div>
+            <div class="text-xs font-serifMono text-stone-500 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 shrink-0">
+                收录核心真题: <strong class="text-purple-800">${list.length}</strong> 道
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            ${list.map(qa => {
+                const isMastered = !!mastery[qa.id];
+                return `
+                    <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card hover:border-purple-300 transition" id="qa-${escapeHtml(qa.id)}">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-stone-100 mb-3">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="px-2.5 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200 text-xs font-serifMono font-bold">
+                                    ${escapeHtml(qa.category)}
+                                </span>
+                                <span class="text-xs font-serifMono text-stone-500">
+                                    <i class="fa-regular fa-file-code text-stone-400"></i> ${escapeHtml(qa.sourceFile)} (${escapeHtml(qa.sourceLine)})
+                                </span>
+                            </div>
+                            <span class="text-[11px] font-serifMono px-2.5 py-0.5 rounded-full ${isMastered ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-600'} font-bold w-fit">
+                                ${isMastered ? '✓ 已牢记' : '待巩固'}
+                            </span>
+                        </div>
+
+                        <h4 class="text-sm sm:text-base font-bold text-stone-900 font-serifHeading mb-3">
+                            ${escapeHtml(qa.question)}
+                        </h4>
+
+                        <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs font-serifHeading text-stone-700 leading-relaxed mb-3 whitespace-pre-line">
+                            <strong class="font-serifMono text-stone-900 block mb-1 text-[11px]">标准工程解答：</strong>
+                            ${escapeHtml(qa.answer)}
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                            <div class="p-3 bg-sky-50/70 border border-sky-200/80 rounded-xl text-xs font-serifHeading">
+                                <span class="font-bold text-sky-900 font-serifMono text-[11px] block mb-0.5">
+                                    <i class="fa-solid fa-comments"></i> 考官连环追问 (Follow-up)：
+                                </span>
+                                <p class="text-[11px] text-stone-700 leading-relaxed">${escapeHtml(qa.followUp)}</p>
+                            </div>
+                            <div class="p-3 bg-rose-50/70 border border-rose-200/80 rounded-xl text-xs font-serifHeading">
+                                <span class="font-bold text-rose-900 font-serifMono text-[11px] block mb-0.5">
+                                    <i class="fa-solid fa-skull-crossbones"></i> 经典陷阱与踩坑防范 (Trap)：
+                                </span>
+                                <p class="text-[11px] text-stone-700 leading-relaxed">${escapeHtml(qa.trap)}</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
+                            <button onclick="openCrossLinkModal('${qa.id}')" class="px-3 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-lg transition text-[11px] flex items-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-crosshairs text-[10px]"></i> 六维穿透追踪
+                            </button>
+                            <button onclick="toggleQAMastery('${qa.id}')" class="px-3 py-1.5 ${isMastered ? 'bg-stone-100 hover:bg-stone-200 text-stone-700' : 'bg-purple-700 hover:bg-purple-800 text-white'} rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+                                <i class="fa-solid ${isMastered ? 'fa-rotate-left' : 'fa-check'}"></i>
+                                <span>${isMastered ? '标记复习中' : '标记已掌握'}</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+// 6. 通识阅读三部曲渲染器
+function renderLearningReadingTab() {
+    const container = document.getElementById('general-reading-container');
+    if (!container) return;
+    const list = (typeof GENERAL_READING_CATALOG !== 'undefined') ? GENERAL_READING_CATALOG : [];
+
+    container.innerHTML = `
+        <div class="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl text-xs text-amber-950 font-serifHeading flex items-start gap-3">
+            <i class="fa-solid fa-shield-halved text-amber-700 mt-0.5 text-base shrink-0"></i>
+            <div>
+                <span class="font-bold font-serifMono">Secondary Task (次要任务) 原则保护：</span>
+                通识阅读旨在开拓思维模型（非暴力沟通提升协作、金融学理解商业成本与ROI、博弈论建立分布式一致性思维）。
+                <strong>严格安排于早晨沉淀、午间休整或睡前复盘，绝不抢占白天的 C++ 核心项目攻坚工时。</strong>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            ${list.map(book => `
+                <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col justify-between hover:border-amber-300 transition">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-md bg-stone-100 text-stone-700 border border-stone-200 text-xs font-bold font-serifMono">
+                                ${escapeHtml(book.timeOfDay)}
+                            </span>
+                            <span class="text-[11px] font-serifMono text-amber-700 font-bold">
+                                ${book.targetPagesDaily} 页/天
+                            </span>
+                        </div>
+
+                        <h4 class="text-base font-bold text-stone-900 font-serifHeading mb-1">
+                            ${escapeHtml(book.title)}
+                        </h4>
+                        <p class="text-xs text-stone-500 font-serifMono mb-3">作者: ${escapeHtml(book.author)}</p>
+
+                        <div class="bg-stone-50 p-2.5 rounded-xl border border-stone-200/80 mb-3">
+                            <span class="text-[11px] font-bold font-serifMono text-stone-500 block mb-1">四维支柱：</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${(book.corePillars || []).map(pil => `
+                                    <span class="px-2 py-0.5 bg-white border border-stone-200 rounded text-[11px] font-serifMono text-stone-700">${escapeHtml(pil)}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-stone-600 font-serifHeading leading-relaxed">
+                            <span class="font-bold font-serifMono text-amber-800 text-[11px] block mb-0.5">工程与协作映射：</span>
+                            ${escapeHtml(book.engineeringReflection)}
+                        </div>
+                    </div>
+
+                    <div class="pt-3 mt-4 border-t border-stone-100 flex items-center justify-between font-serifMono text-xs text-stone-400">
+                        <span>次要任务</span>
+                        <span class="text-emerald-700 font-bold">非抢占式</span>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// 六维全链路穿透透视器 (Cross-Link Engine Inspector)
+function openCrossLinkModal(nodeId) {
+    const modal = document.getElementById('crosslink-modal');
+    if (!modal) return;
+    const content = document.getElementById('crosslink-modal-content');
+    const title = document.getElementById('crosslink-modal-title');
+    const subtitle = document.getElementById('crosslink-modal-subtitle');
+
+    let chain = null;
+    if (typeof buildCrossLinkChain === 'function') {
+        chain = buildCrossLinkChain(nodeId);
+    } else {
+        chain = {
+            title: "核心技术原理穿透",
+            knowledge: { concept: "核心机制与设计思想", dimension: "C++ / Linux" },
+            project: { moduleId: "mod_net_eventloop", moduleName: "双核协同架构", architecture: "EventLoop" },
+            source: { file: "muduo/net/EventLoop.cc", line: "L1-L100" },
+            task: { day: 1, title: "28天攻坚主干", type: "任务体系" },
+            evidence: { type: "单元测试与基准", verification: "通过" },
+            interview: { point: "技术难点与考点", trap: "生产避坑" }
+        };
+    }
+
+    if (title) title.innerText = chain.title || "六维全链路技术透视";
+    if (subtitle) subtitle.innerText = `${chain.id || nodeId} • Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview`;
+
+    if (content) {
+        content.innerHTML = `
+            <!-- 1. Knowledge (理论) -->
+            <div class="p-3.5 rounded-xl bg-sky-50/70 border border-sky-200">
+                <div class="flex items-center justify-between text-xs font-bold text-sky-900 mb-1">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-brain text-sky-700"></i> 1. 理论维 (Knowledge)</span>
+                    <span class="text-[11px] px-1.5 py-0.2 rounded bg-sky-100 border border-sky-300">${escapeHtml(chain.knowledge.dimension || '')}</span>
+                </div>
+                <p class="text-xs text-stone-700 font-serifHeading leading-relaxed">${escapeHtml(chain.knowledge.concept || '')}</p>
+            </div>
+
+            <!-- 2. Project (架构) -->
+            <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                <div class="flex items-center justify-between text-xs font-bold text-amber-900 mb-1">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-sitemap text-amber-700"></i> 2. 架构维 (Project)</span>
+                    <span class="text-[11px] px-1.5 py-0.2 rounded bg-amber-100 border border-amber-300">${escapeHtml(chain.project.moduleId || '')}</span>
+                </div>
+                <p class="text-xs text-stone-700 font-serifHeading leading-relaxed">${escapeHtml(chain.project.moduleName || '')} • ${escapeHtml(chain.project.architecture || '')}</p>
+            </div>
+
+            <!-- 3. Source (源码) -->
+            <div class="p-3.5 rounded-xl bg-stone-100 border border-stone-300">
+                <div class="flex items-center justify-between text-xs font-bold text-stone-900 mb-1">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-code text-stone-700"></i> 3. 源码维 (Source)</span>
+                    <span class="text-[11px] px-1.5 py-0.2 rounded bg-stone-200">${escapeHtml(chain.source.line || '')}</span>
+                </div>
+                <p class="text-xs text-stone-800 font-serifMono leading-relaxed">${escapeHtml(chain.source.file || '')}</p>
+            </div>
+
+            <!-- 4. Task (任务) -->
+            <div class="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200">
+                <div class="flex items-center justify-between text-xs font-bold text-indigo-900 mb-1">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-calendar-check text-indigo-700"></i> 4. 任务维 (Task)</span>
+                    <span class="text-[11px] px-1.5 py-0.2 rounded bg-indigo-100 border border-indigo-300">Day ${chain.task.day}</span>
+                </div>
+                <p class="text-xs text-stone-700 font-serifHeading leading-relaxed">${escapeHtml(chain.task.title || '')} (${escapeHtml(chain.task.type || '')})</p>
+            </div>
+
+            <!-- 5. Evidence (凭证) -->
+            <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                <div class="flex items-center justify-between text-xs font-bold text-emerald-900 mb-1">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-certificate text-emerald-700"></i> 5. 凭证维 (Evidence)</span>
+                    <span class="text-[11px] px-1.5 py-0.2 rounded bg-emerald-100 border border-emerald-300">已就绪</span>
+                </div>
+                <p class="text-xs text-stone-700 font-serifHeading leading-relaxed">${escapeHtml(chain.evidence.type || '')}: ${escapeHtml(chain.evidence.verification || '')}</p>
+            </div>
+
+            <!-- 6. Interview (面试) -->
+            <div class="p-3.5 rounded-xl bg-purple-50/70 border border-purple-200">
+                <div class="flex items-center justify-between text-xs font-bold text-purple-900 mb-1">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-user-tie text-purple-700"></i> 6. 面试维 (Interview)</span>
+                    <span class="text-[11px] px-1.5 py-0.2 rounded bg-purple-100 border border-purple-300">真题考查</span>
+                </div>
+                <p class="text-xs text-stone-700 font-serifHeading leading-relaxed mb-1">${escapeHtml(chain.interview.point || '')}</p>
+                <div class="text-[11px] text-rose-800 font-serifHeading">防坑要点: ${escapeHtml(chain.interview.trap || '')}</div>
+            </div>
+        `;
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeCrossLinkModal() {
+    const modal = document.getElementById('crosslink-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+// 交互操作助手函数
+function toggleAlgoReview(problemNum) {
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleAlgoReview === 'function') {
+        const res = stateManager.toggleAlgoReview(problemNum);
+        renderLearningAlgoTab();
+        if (typeof showToast === 'function') {
+            showToast(res === 'mastered' ? `算法 #${problemNum} 已标记二刷掌握` : `算法 #${problemNum} 已设为待复习`);
+        }
+        return res;
+    }
+    if (!appState.learningSystem) appState.learningSystem = {};
+    if (!appState.learningSystem.algoReviewQueue) appState.learningSystem.algoReviewQueue = {};
+    const cur = appState.learningSystem.algoReviewQueue[problemNum] || 'due';
+    const next = cur === 'mastered' ? 'due' : 'mastered';
+    appState.learningSystem.algoReviewQueue[problemNum] = next;
+    persistState();
+    renderLearningAlgoTab();
+    if (typeof showToast === 'function') {
+        showToast(next === 'mastered' ? `算法 #${problemNum} 已标记二刷掌握` : `算法 #${problemNum} 已设为待复习`);
+    }
+    return next;
+}
+
+function adjustBookDailyGoal(bookKey, delta) {
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.adjustBookDailyGoal === 'function') {
+        const res = stateManager.adjustBookDailyGoal(bookKey, delta);
+        renderLearningBooksTab();
+        if (typeof showToast === 'function') {
+            showToast(`书目目标调整为: ${res} 页/天`);
+        }
+        return res;
+    }
+    if (!appState.learningSystem) appState.learningSystem = {};
+    if (!appState.learningSystem.bookDynamicGoals) appState.learningSystem.bookDynamicGoals = { linuxServer: 10, birdLinux: 10 };
+    const cur = appState.learningSystem.bookDynamicGoals[bookKey] || 10;
+    const next = Math.max(5, Math.min(30, cur + delta));
+    appState.learningSystem.bookDynamicGoals[bookKey] = next;
+    persistState();
+    renderLearningBooksTab();
+    if (typeof showToast === 'function') {
+        showToast(`书目目标调整为: ${next} 页/天`);
+    }
+    return next;
+}
+
+function toggleQAMastery(qaId) {
+    if (typeof stateManager !== 'undefined' && stateManager && typeof stateManager.toggleQAMastery === 'function') {
+        const res = stateManager.toggleQAMastery(qaId);
+        renderLearningQATab();
+        if (typeof showToast === 'function') {
+            showToast(res ? `八股考点已标记掌握` : `八股考点设为待巩固`);
+        }
+        return res;
+    }
+    if (!appState.learningSystem) appState.learningSystem = {};
+    if (!appState.learningSystem.qaMastery) appState.learningSystem.qaMastery = {};
+    appState.learningSystem.qaMastery[qaId] = !appState.learningSystem.qaMastery[qaId];
+    persistState();
+    renderLearningQATab();
+    if (typeof showToast === 'function') {
+        showToast(appState.learningSystem.qaMastery[qaId] ? `八股考点已标记掌握` : `八股考点设为待巩固`);
+    }
+    return appState.learningSystem.qaMastery[qaId];
 }
 
 // 笔记本与沙盒 (View 4)
@@ -2915,6 +3626,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try { updateDashboardMetrics(); } catch(e) { console.error('updateDashboardMetrics error:', e); }
     try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
     try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
+    try { renderLearningSystem(); } catch(e) { console.error('renderLearningSystem error:', e); }
     try { if (typeof loadYuqueState === 'function') loadYuqueState(); } catch(e) { console.error('loadYuqueState error:', e); }
 
     // 绑定笔记本自动存盘
@@ -3689,6 +4401,21 @@ if (typeof window !== 'undefined') {
     window.closeAddTaskModal = closeAddTaskModal;
     window.saveCustomTask = saveCustomTask;
     window.deleteCustomTask = deleteCustomTask;
+
+    // Phase 5 方法挂载
+    window.switchLearningTab = switchLearningTab;
+    window.renderLearningSystem = renderLearningSystem;
+    window.renderLearningCppTab = renderLearningCppTab;
+    window.renderLearningLinuxTab = renderLearningLinuxTab;
+    window.renderLearningBooksTab = renderLearningBooksTab;
+    window.renderLearningAlgoTab = renderLearningAlgoTab;
+    window.renderLearningQATab = renderLearningQATab;
+    window.renderLearningReadingTab = renderLearningReadingTab;
+    window.openCrossLinkModal = openCrossLinkModal;
+    window.closeCrossLinkModal = closeCrossLinkModal;
+    window.toggleAlgoReview = toggleAlgoReview;
+    window.adjustBookDailyGoal = adjustBookDailyGoal;
+    window.toggleQAMastery = toggleQAMastery;
 }
 
 if (typeof globalThis !== 'undefined') {
@@ -3719,6 +4446,21 @@ if (typeof globalThis !== 'undefined') {
     globalThis.closeAddTaskModal = closeAddTaskModal;
     globalThis.saveCustomTask = saveCustomTask;
     globalThis.deleteCustomTask = deleteCustomTask;
+
+    // Phase 5 方法挂载
+    globalThis.switchLearningTab = switchLearningTab;
+    globalThis.renderLearningSystem = renderLearningSystem;
+    globalThis.renderLearningCppTab = renderLearningCppTab;
+    globalThis.renderLearningLinuxTab = renderLearningLinuxTab;
+    globalThis.renderLearningBooksTab = renderLearningBooksTab;
+    globalThis.renderLearningAlgoTab = renderLearningAlgoTab;
+    globalThis.renderLearningQATab = renderLearningQATab;
+    globalThis.renderLearningReadingTab = renderLearningReadingTab;
+    globalThis.openCrossLinkModal = openCrossLinkModal;
+    globalThis.closeCrossLinkModal = closeCrossLinkModal;
+    globalThis.toggleAlgoReview = toggleAlgoReview;
+    globalThis.adjustBookDailyGoal = adjustBookDailyGoal;
+    globalThis.toggleQAMastery = toggleQAMastery;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -3741,7 +4483,20 @@ if (typeof module !== 'undefined' && module.exports) {
         saveBooksProgress,
         saveCareerNotes,
         saveCustomTask,
-        deleteCustomTask
+        deleteCustomTask,
+        switchLearningTab,
+        renderLearningSystem,
+        renderLearningCppTab,
+        renderLearningLinuxTab,
+        renderLearningBooksTab,
+        renderLearningAlgoTab,
+        renderLearningQATab,
+        renderLearningReadingTab,
+        openCrossLinkModal,
+        closeCrossLinkModal,
+        toggleAlgoReview,
+        adjustBookDailyGoal,
+        toggleQAMastery
     };
 }
 

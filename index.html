@@ -238,8 +238,8 @@
             <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="28天任务与实验">
                 <i class="fa-solid fa-calendar-check text-amber-600"></i> 28天任务与实验
             </button>
-            <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="语法 ➔ muduo 映射矩阵">
-                <i class="fa-solid fa-sitemap text-emerald-600"></i> 语法 ➔ muduo 映射矩阵
+            <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="统一学习体系与六维穿透">
+                <i class="fa-solid fa-graduation-cap text-emerald-600"></i> 统一学习体系 (P5)
             </button>
             <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="每日自测中心">
                 <i class="fa-solid fa-clipboard-question text-purple-600"></i> 每日自测中心
@@ -1164,39 +1164,132 @@
         </div>
     </section>
 
-    <!-- ==================== VIEW 3: 语法与源码映射矩阵 ==================== -->
+    <!-- ==================== VIEW 3: 统一学习体系与六维穿透工程 (Phase 5) ==================== -->
     <section id="view-mapping" class="hidden space-y-6">
-        <div class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
-            <div class="p-5 sm:p-6 bg-stone-50/80 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <!-- 头部导航与体系介绍 -->
+        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-stone-100">
                 <div>
-                    <h3 class="font-bold text-stone-900 text-base flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-table-list text-sky-800"></i> C++ 核心机制 ➔ muduo 源码设计映射全景图
-                    </h3>
-                    <p class="text-xs text-stone-500 mt-1">
-                        对应 C++ 关键语法在 muduo 源码中的所在文件、设计思想与代表性代码片段。
+                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-serifMono mb-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="font-bold">UNIFIED LEARNING SYSTEM</span>
+                        <span class="text-stone-300">•</span>
+                        <span>六维穿透 ➔ 闭环成长</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
+                        <i class="fa-solid fa-graduation-cap text-emerald-700"></i> 统一学习系统与六维穿透工程中心
+                    </h2>
+                    <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
+                        消除孤岛：将 C++ 语法、Linux 底层、专业书目、算法手撕、技术八股与通识阅读全面连通。通过
+                        <span class="font-semibold text-stone-700 font-serifMono">Learn ➔ Apply ➔ Build ➔ Explain ➔ Review</span> 五步闭环，
+                        实现任何知识点在 <span class="font-semibold text-emerald-800 font-serifMono">Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview</span> 的全链路追溯。
                     </p>
                 </div>
-                <span class="text-xs font-serifMono text-stone-400 bg-white px-3 py-1 rounded-lg border border-stone-200 w-fit">
-                    共 15 项核心映射
-                </span>
+                <div class="flex items-center gap-2 font-serifMono shrink-0">
+                    <button onclick="openCrossLinkModal('cpp_dim_modern')" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                        <i class="fa-solid fa-crosshairs"></i> 体验六维穿透透视
+                    </button>
+                </div>
             </div>
 
-            <!-- 响应式表格 -->
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="bg-stone-100 text-stone-700 font-bold border-b border-stone-200 font-serifMono">
-                            <th class="p-3.5 w-36 sm:w-44">C++ 语法特性</th>
-                            <th class="p-3.5 w-48 sm:w-60">muduo 源码典型位置</th>
-                            <th class="p-3.5 min-w-[260px]">设计思想与“为什么这么写”</th>
-                            <th class="p-3.5 w-64 sm:w-72">代表性代码片段</th>
-                            <th class="p-3.5 w-24 text-center">对应任务</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-stone-100 font-normal text-stone-600 font-serifHeading" id="mapping-table-body">
-                        <!-- 由 JS 动态填充表格 -->
-                    </tbody>
-                </table>
+            <!-- 6 大子体系切换标签导航 -->
+            <div class="flex items-center gap-2 overflow-x-auto pt-4 pb-1 font-serifMono text-xs" id="learning-subtabs-nav">
+                <button onclick="switchLearningTab('cpp')" id="learn-tab-btn-cpp" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-code text-sky-400"></i> 1. C++ 8维核心
+                </button>
+                <button onclick="switchLearningTab('linux')" id="learn-tab-btn-linux" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-terminal text-emerald-600"></i> 2. Linux 9维底座
+                </button>
+                <button onclick="switchLearningTab('books')" id="learn-tab-btn-books" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-book-open text-amber-600"></i> 3. 专业书目伴读
+                </button>
+                <button onclick="switchLearningTab('algo')" id="learn-tab-btn-algo" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-code-compare text-indigo-600"></i> 4. 算法手撕 Lab
+                </button>
+                <button onclick="switchLearningTab('qa')" id="learn-tab-btn-qa" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-circle-question text-purple-600"></i> 5. 项目代码八股
+                </button>
+                <button onclick="switchLearningTab('reading')" id="learn-tab-btn-reading" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
+                    <i class="fa-solid fa-compass text-rose-600"></i> 6. 通识阅读三部曲
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. C++ 8维核心体系面板 -->
+        <div id="learn-panel-cpp" class="space-y-6">
+            <!-- 8维卡片流 -->
+            <div id="cpp-dimensions-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 由 JS 动态渲染 8 大维度卡片 -->
+            </div>
+
+            <!-- 保留经典：C++ 核心机制 ➔ muduo 源码设计映射全景图 (保证 15 映射与 DOM 100% 兼容) -->
+            <div class="bg-white rounded-2xl border border-stone-200 academic-card overflow-hidden">
+                <div class="p-5 sm:p-6 bg-stone-50/80 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                        <h3 class="font-bold text-stone-900 text-base flex items-center gap-2 font-serifHeading">
+                            <i class="fa-solid fa-table-list text-sky-800"></i> C++ 核心机制 ➔ muduo 源码设计映射全景图
+                        </h3>
+                        <p class="text-xs text-stone-500 mt-1">
+                            对应 C++ 关键语法在 muduo 源码中的所在文件、设计思想与代表性代码片段。
+                        </p>
+                    </div>
+                    <span class="text-xs font-serifMono text-stone-400 bg-white px-3 py-1 rounded-lg border border-stone-200 w-fit">
+                        共 15 项核心映射
+                    </span>
+                </div>
+
+                <!-- 响应式表格 -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-stone-100 text-stone-700 font-bold border-b border-stone-200 font-serifMono">
+                                <th class="p-3.5 w-36 sm:w-44">C++ 语法特性</th>
+                                <th class="p-3.5 w-48 sm:w-60">muduo 源码典型位置</th>
+                                <th class="p-3.5 min-w-[260px]">设计思想与“为什么这么写”</th>
+                                <th class="p-3.5 w-64 sm:w-72">代表性代码片段</th>
+                                <th class="p-3.5 w-24 text-center">对应任务</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-100 font-normal text-stone-600 font-serifHeading" id="mapping-table-body">
+                            <!-- 由 JS 动态填充表格 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Linux 9维底层体系面板 -->
+        <div id="learn-panel-linux" class="hidden space-y-6">
+            <div id="linux-dimensions-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 由 JS 动态渲染 9 大维度卡片 -->
+            </div>
+        </div>
+
+        <!-- 3. 专业书目伴读面板 -->
+        <div id="learn-panel-books" class="hidden space-y-6">
+            <div id="books-companion-container" class="space-y-6">
+                <!-- 由 JS 动态渲染两大经典书目章节、调控器与实践命令 -->
+            </div>
+        </div>
+
+        <!-- 4. 算法手撕 Lab 面板 -->
+        <div id="learn-panel-algo" class="hidden space-y-6">
+            <div id="algo-lab-container" class="space-y-6">
+                <!-- 由 JS 动态渲染算法题目、复杂度、二刷状态与模式解析 -->
+            </div>
+        </div>
+
+        <!-- 5. 项目代码驱动八股自测面板 -->
+        <div id="learn-panel-qa" class="hidden space-y-6">
+            <div id="project-qa-container" class="space-y-6">
+                <!-- 由 JS 动态渲染项目八股与防踩坑解析 -->
+            </div>
+        </div>
+
+        <!-- 6. 通识阅读三部曲面板 -->
+        <div id="learn-panel-reading" class="hidden space-y-6">
+            <div id="general-reading-container" class="space-y-6">
+                <!-- 由 JS 动态渲染通识三部曲与工程思维映射 -->
             </div>
         </div>
     </section>
@@ -2302,12 +2395,46 @@ add_executable(my_server ${SOURCES})</pre>
     </div>
 </div>
 
+<!-- ==================== 六维全链路穿透透视 Modal ==================== -->
+<div id="crosslink-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-5" role="dialog" aria-modal="true" aria-label="六维技术穿透透视">
+    <div class="relative bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl border border-stone-300 max-h-[90vh] overflow-y-auto flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-4 border-b border-stone-200 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-base border border-emerald-200">
+                        <i class="fa-solid fa-cubes-stacked"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-stone-900 text-base font-serifHeading" id="crosslink-modal-title">六维全链路技术透视</h4>
+                        <p class="text-xs text-stone-500 font-serifMono" id="crosslink-modal-subtitle">Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview</p>
+                    </div>
+                </div>
+                <button onclick="closeCrossLinkModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- 六维穿透卡片流 -->
+            <div class="space-y-3 font-serifMono" id="crosslink-modal-content">
+                <!-- 动态填充 6 个维度卡片 -->
+            </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-stone-200 flex justify-end">
+            <button onclick="closeCrossLinkModal()" class="px-5 py-2 bg-stone-900 hover:bg-stone-800 text-stone-100 text-xs font-bold rounded-xl transition cursor-pointer">
+                关闭透视
+            </button>
+        </div>
+    </div>
+</div>
+
     <!-- 模块化外部脚本加载（无打包依赖，原生静态秒开） -->
     <script src="js/dataset-28days.js?v=5.4.1"></script>
     <script src="js/dataset-mappings.js?v=5.4.1"></script>
     <script src="js/dataset-yuque.js?v=6.0.0"></script>
     <script src="js/dataset-domain.js?v=6.0.0"></script>
     <script src="js/dataset-tasks.js?v=6.0.0"></script>
+    <script src="js/dataset-learning.js?v=6.0.0"></script>
     <script src="js/state-manager.js?v=6.0.0"></script>
     <script src="js/timer.js?v=6.0.0"></script>
     <script src="js/yuque-explorer.js?v=6.0.0"></script>
