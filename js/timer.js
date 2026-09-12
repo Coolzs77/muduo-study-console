@@ -5,6 +5,11 @@
 
 let _timerIntervalHandle = null;
 let _timerStartTimestamp = 0;
+let _currentLinkedTask = null;
+
+function getCurrentLinkedTask() {
+    return _currentLinkedTask;
+}
 
 /**
  * 计时器初始化自愈（杜绝 localStorage 脏数据导致已处于 running 假象）
@@ -156,33 +161,100 @@ function quickAddMinutes(mins) {
 }
 
 /**
+ * 一键将特定日常任务带入专注计时器
+ */
+function startTimerForTask(taskId, taskTitle, category = 'coding', targetMinutes = 30) {
+    if (typeof window !== 'undefined' && (!window.appState || !window.appState.activeTimer)) {
+        initStudyTimer();
+    }
+
+    _currentLinkedTask = { id: taskId, title: taskTitle, category: category };
+
+    const typeMapping = {
+        project: 'coding',
+        algorithm: 'algorithm',
+        book: 'reading',
+        reading: 'reading',
+        quiz: 'quiz',
+        career: 'career',
+        debug: 'debug'
+    };
+    const mappedType = typeMapping[category] || category;
+
+    // 同步 timer-type 下拉框
+    if (typeof document !== 'undefined') {
+        const typeSelect = document.getElementById('timer-type');
+        if (typeSelect) {
+            let optExists = Array.from(typeSelect.options || []).some(o => o.value === mappedType);
+            if (!optExists) {
+                const opt = document.createElement('option');
+                opt.value = mappedType;
+                const labels = {
+                    coding: '代码攻坚',
+                    algorithm: '手撕算法',
+                    reading: '书目研读',
+                    quiz: '考点自测',
+                    career: '求职调研'
+                };
+                opt.text = labels[mappedType] || mappedType;
+                typeSelect.appendChild(opt);
+            }
+            typeSelect.value = mappedType;
+        }
+
+        // 平滑滚动至页面顶部的专注计时器
+        if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    const timer = (typeof window !== 'undefined' ? window.appState?.activeTimer : null) || (typeof globalThis !== 'undefined' ? globalThis.appState?.activeTimer : null);
+    if (timer && !timer.running) {
+        toggleStudyTimer();
+    }
+
+    if (typeof showToast === 'function') {
+        showToast(`已将任务「${taskTitle}」带入专注计时`);
+    }
+}
+
+/**
  * 核心入库与大盘指标刷新
  */
 function logStudyMinutes(mins) {
-    if (!window.appState) return;
-    if (!Array.isArray(window.appState.studySessions)) {
-        window.appState.studySessions = [];
+    const stateObj = (typeof window !== 'undefined' ? window.appState : null) || (typeof globalThis !== 'undefined' ? globalThis.appState : null);
+    if (!stateObj) return;
+    if (!Array.isArray(stateObj.studySessions)) {
+        stateObj.studySessions = [];
     }
 
-    const type = document.getElementById('timer-type')?.value || 'coding';
-    const day = parseInt(document.getElementById('timer-day')?.value || '1');
+    const type = (typeof document !== 'undefined' && document.getElementById('timer-type')?.value) || 'coding';
+    const day = parseInt((typeof document !== 'undefined' && document.getElementById('timer-day')?.value) || '1');
     const now = new Date();
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
     const typeNames = {
-        coding: '代码编写',
+        coding: '代码攻坚',
+        algorithm: '手撕算法',
         reading: '书目研读',
+        quiz: '考点自测',
+        career: '求职调研',
         debug: '排错调试'
     };
 
-    window.appState.studySessions.push({
+    let sessionNote = `任务 Day ${day} (${typeNames[type] || type})`;
+    if (_currentLinkedTask) {
+        sessionNote = `${_currentLinkedTask.title} (${typeNames[type] || type})`;
+    }
+
+    stateObj.studySessions.push({
         id: Date.now(),
         date: typeof getTodayDateStr === 'function' ? getTodayDateStr() : now.toISOString().slice(0, 10),
         time: timeStr,
         day: day,
         duration: mins,
         type: type,
-        note: `任务 Day ${day} (${typeNames[type] || type})`
+        note: sessionNote
     });
 
     if (typeof persistState === 'function') persistState();
@@ -213,3 +285,25 @@ function playChimeSound() {
         // 忽略音频限制
     }
 }
+
+if (typeof window !== 'undefined') {
+    window.getCurrentLinkedTask = getCurrentLinkedTask;
+}
+if (typeof globalThis !== 'undefined') {
+    globalThis.getCurrentLinkedTask = getCurrentLinkedTask;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initStudyTimer,
+        toggleStudyTimer,
+        resetStudyTimer,
+        updateTimerDisplay,
+        saveActiveSession,
+        quickAddMinutes,
+        startTimerForTask,
+        getCurrentLinkedTask,
+        logStudyMinutes
+    };
+}
+

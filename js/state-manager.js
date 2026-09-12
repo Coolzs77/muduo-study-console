@@ -66,6 +66,56 @@
     return [];
   }
 
+  // 工具函数：获取默认任务列表
+  function getDefaultDailyTasks() {
+    if (typeof TaskDomain !== 'undefined' && typeof TaskDomain.createFreshDailyTasks === 'function') {
+      return TaskDomain.createFreshDailyTasks();
+    }
+    if (typeof window !== 'undefined' && window.TaskDomain && typeof window.TaskDomain.createFreshDailyTasks === 'function') {
+      return window.TaskDomain.createFreshDailyTasks();
+    }
+    if (typeof global !== 'undefined' && global.TaskDomain && typeof global.TaskDomain.createFreshDailyTasks === 'function') {
+      return global.TaskDomain.createFreshDailyTasks();
+    }
+    try {
+      if (typeof require === 'function') {
+        const td = require('./dataset-tasks.js');
+        if (td && typeof td.createFreshDailyTasks === 'function') return td.createFreshDailyTasks();
+      }
+    } catch (e) {}
+    return [];
+  }
+
+  // 工具函数：获取今日标准日期字符串 (YYYY-MM-DD)
+  function getTodayDateStr() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  // 工具函数：创建默认每日日程状态
+  function createDefaultDailyRoutine() {
+    return {
+      date: getTodayDateStr(),
+      mode: 'normal', // 'normal' | 'compact'
+      tasks: getDefaultDailyTasks(),
+      records: {
+        algorithm: [],
+        books: {
+          linuxServer: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+          birdLinux: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+          nonviolentComm: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+          financeZero: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+          gameTheory: { currentPage: 0, targetPagesPerDay: 10, notes: "" }
+        },
+        careerNotes: ""
+      },
+      history: {}
+    };
+  }
+
   // 构建默认的纯净领域状态原型
   function createDefaultState() {
     return {
@@ -102,6 +152,9 @@
           totalArticles: 17
         }
       },
+
+      // ---------- Phase 4: 双轨统一今日任务调度系统 ----------
+      dailyRoutine: createDefaultDailyRoutine(),
 
       // ---------- 运行时与界面交互状态 ----------
       currentView: 'dashboard',
@@ -301,6 +354,33 @@
           proj_cppai: { activeArticle: "01_http_overview", currentTrack: "l3_protocol", totalArticles: 17 }
         };
       }
+      // P4: 净化与补齐 dailyRoutine
+      if (!merged.dailyRoutine || typeof merged.dailyRoutine !== 'object') {
+        merged.dailyRoutine = createDefaultDailyRoutine();
+      } else {
+        if (!merged.dailyRoutine.date) merged.dailyRoutine.date = getTodayDateStr();
+        if (!merged.dailyRoutine.mode) merged.dailyRoutine.mode = 'normal';
+        if (!Array.isArray(merged.dailyRoutine.tasks) || merged.dailyRoutine.tasks.length === 0) {
+          merged.dailyRoutine.tasks = getDefaultDailyTasks();
+        }
+        if (!merged.dailyRoutine.records || typeof merged.dailyRoutine.records !== 'object') {
+          merged.dailyRoutine.records = {
+            algorithm: [],
+            books: {
+              linuxServer: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+              birdLinux: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+              nonviolentComm: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+              financeZero: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+              gameTheory: { currentPage: 0, targetPagesPerDay: 10, notes: "" }
+            },
+            careerNotes: ""
+          };
+        }
+        if (!merged.dailyRoutine.history || typeof merged.dailyRoutine.history !== 'object') {
+          merged.dailyRoutine.history = {};
+        }
+      }
+
       if (merged.activeTimer) {
         merged.activeTimer.running = false;
         merged.activeTimer.timerId = null;
@@ -326,6 +406,10 @@
 
       // 执行无损迁移
       this._state = SchemaMigrationV6.execute(initialState || this._state);
+
+      // 跨自然日自愈与历史归档检测
+      this._checkDateRollover();
+
       this._isInitialized = true;
 
       // 全局挂载与通知
@@ -335,6 +419,39 @@
 
       this._notify();
       return this._state;
+    }
+
+    // 跨自然日检测与历史归档 (Date Rollover)
+    _checkDateRollover() {
+      if (!this._state || !this._state.dailyRoutine) return;
+      const today = getTodayDateStr();
+      const routine = this._state.dailyRoutine;
+      if (routine.date && routine.date !== today) {
+        const prevDate = routine.date;
+        if (!routine.history) routine.history = {};
+        
+        let progress = { total: 0, activeTotal: 0, completed: 0, rate: 0, completedMinutes: 0 };
+        if (typeof TaskDomain !== 'undefined' && typeof TaskDomain.calculateRoutineProgress === 'function') {
+          progress = TaskDomain.calculateRoutineProgress(routine.tasks, routine.mode);
+        }
+        routine.history[prevDate] = {
+          total: progress.total,
+          activeTotal: progress.activeTotal,
+          completed: progress.completed,
+          rate: progress.rate,
+          completedMinutes: progress.completedMinutes,
+          mode: routine.mode
+        };
+
+        // 保留未完成的自定义任务
+        const uncompletedCustomTasks = (routine.tasks || []).filter(t => t.isCustom && !t.completed);
+        
+        // 重新生成今日默认任务并拼接未完成自定义任务
+        const freshTasks = getDefaultDailyTasks();
+        routine.tasks = [...freshTasks, ...uncompletedCustomTasks];
+        routine.date = today;
+        StateManagerClass._writeDirect(this._state);
+      }
     }
 
     // 获取当前状态只读引用/工作副本
@@ -409,7 +526,8 @@
           globalNotes: state.globalNotes,
           knowledgeMastery: state.knowledgeMastery,
           knowledgeFavorites: state.knowledgeFavorites,
-          knowledgeRecent: state.knowledgeRecent
+          knowledgeRecent: state.knowledgeRecent,
+          dailyRoutine: state.dailyRoutine
         });
         safeSetItem(STORAGE_KEYS.V5_DATA, v5Payload);
 
@@ -454,7 +572,8 @@
           completedDaysCount: (state.completedDays || []).length,
           masteredArticlesCount: Object.values(state.knowledgeMastery || {}).filter(lvl => lvl >= 3).length,
           studySessionsCount: (state.studySessions || []).length,
-          pitfallsCount: (state.pitfalls || []).length
+          pitfallsCount: (state.pitfalls || []).length,
+          dailyRoutineCompletedCount: (state.dailyRoutine?.tasks || []).filter(t => t.completed).length
         },
         payload: {
           completedDays: state.completedDays || [],
@@ -470,19 +589,29 @@
           knowledgeMastery: state.knowledgeMastery || {},
           knowledgeFavorites: state.knowledgeFavorites || [],
           knowledgeRecent: state.knowledgeRecent || [],
-          projectsProgress: state.projectsProgress || {}
+          projectsProgress: state.projectsProgress || {},
+          dailyRoutine: state.dailyRoutine || createDefaultDailyRoutine()
         }
       };
     }
 
     // 导入 JSON (支持 V4/V5/V6 格式自适应与 合并/覆盖 策略)
     importJson(data, strategy = 'merge') {
-      if (!data || typeof data !== 'object') {
+      let parsed = data;
+      if (typeof data === 'string') {
+        try {
+          parsed = JSON.parse(data);
+        } catch (e) {
+          throw new Error("非法数据格式：传入字符串非有效 JSON");
+        }
+      }
+
+      if (!parsed || typeof parsed !== 'object') {
         throw new Error("非法数据格式：传入数据非有效对象");
       }
 
       // 提取实际 payload
-      const payload = data.payload ? data.payload : data;
+      const payload = parsed.payload ? parsed.payload : parsed;
 
       // 严格校验是否有核心字段
       const hasMuduo = Array.isArray(payload.completedDays) || (payload.mastery && typeof payload.mastery === 'object');
@@ -508,6 +637,11 @@
         this._state.knowledgeRecent = Array.isArray(payload.knowledgeRecent) ? [...payload.knowledgeRecent] : [];
         if (payload.projectsProgress) {
           this._state.projectsProgress = Object.assign({}, payload.projectsProgress);
+        }
+        if (payload.dailyRoutine && typeof payload.dailyRoutine === 'object') {
+          this._state.dailyRoutine = JSON.parse(JSON.stringify(payload.dailyRoutine));
+        } else {
+          this._state.dailyRoutine = createDefaultDailyRoutine();
         }
       } else {
         // 合并策略 (merge)
@@ -590,6 +724,66 @@
         // 10. 合并拓展进度
         if (payload.projectsProgress && typeof payload.projectsProgress === 'object') {
           this._state.projectsProgress = Object.assign(this._state.projectsProgress || {}, payload.projectsProgress);
+        }
+
+        // 11. 合并 Phase 4 日常任务调度数据 (dailyRoutine)
+        if (payload.dailyRoutine && typeof payload.dailyRoutine === 'object') {
+          if (!this._state.dailyRoutine) {
+            this._state.dailyRoutine = createDefaultDailyRoutine();
+          }
+          const curRoutine = this._state.dailyRoutine;
+          const incRoutine = payload.dailyRoutine;
+
+          // 合并历史流水
+          if (incRoutine.history && typeof incRoutine.history === 'object') {
+            curRoutine.history = Object.assign(curRoutine.history || {}, incRoutine.history);
+          }
+
+          // 合并记录 records
+          if (incRoutine.records && typeof incRoutine.records === 'object') {
+            if (!curRoutine.records) curRoutine.records = {};
+            // 合并算法题目记录
+            if (Array.isArray(incRoutine.records.algorithm)) {
+              if (!Array.isArray(curRoutine.records.algorithm)) curRoutine.records.algorithm = [];
+              const existAlgoIds = new Set(curRoutine.records.algorithm.map(a => a.id));
+              incRoutine.records.algorithm.forEach(a => {
+                if (!existAlgoIds.has(a.id)) curRoutine.records.algorithm.push(a);
+              });
+            }
+            // 合并书目进度 (取较大当前页码)
+            if (incRoutine.records.books && typeof incRoutine.records.books === 'object') {
+              if (!curRoutine.records.books) curRoutine.records.books = {};
+              Object.keys(incRoutine.records.books).forEach(bKey => {
+                const curBook = curRoutine.records.books[bKey] || { currentPage: 0 };
+                const incBook = incRoutine.records.books[bKey] || { currentPage: 0 };
+                if ((incBook.currentPage || 0) >= (curBook.currentPage || 0)) {
+                  curRoutine.records.books[bKey] = Object.assign({}, curBook, incBook);
+                }
+              });
+            }
+            // 合并求职随笔
+            if (incRoutine.records.careerNotes && !curRoutine.records.careerNotes) {
+              curRoutine.records.careerNotes = incRoutine.records.careerNotes;
+            }
+          }
+
+          // 同日任务合并已完成标记与自定义任务
+          if (incRoutine.date === curRoutine.date && Array.isArray(incRoutine.tasks)) {
+            const incCompletedIds = new Set(incRoutine.tasks.filter(t => t.completed).map(t => t.id));
+            (curRoutine.tasks || []).forEach(t => {
+              if (incCompletedIds.has(t.id)) {
+                t.completed = true;
+                if (!t.completedAt) t.completedAt = new Date().toISOString();
+              }
+            });
+            // 补充自定义任务
+            const curTaskIds = new Set((curRoutine.tasks || []).map(t => t.id));
+            incRoutine.tasks.filter(t => t.isCustom).forEach(ct => {
+              if (!curTaskIds.has(ct.id)) {
+                curRoutine.tasks.push(ct);
+              }
+            });
+          }
         }
       }
 

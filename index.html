@@ -199,8 +199,11 @@
                 <select id="timer-day" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="关联学习日程">
                 </select>
                 <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="任务类型">
-                    <option value="coding">代码编写</option>
+                    <option value="coding">代码攻坚</option>
+                    <option value="algorithm">手撕算法</option>
                     <option value="reading">书目研读</option>
+                    <option value="quiz">考点自测</option>
+                    <option value="career">求职调研</option>
                     <option value="debug">排错调试</option>
                 </select>
             </div>
@@ -222,10 +225,14 @@
         </div>
     </header>
 
-    <!-- 顶部主视图切换导航 (6大核心模块) -->
+    <!-- 顶部主视图切换导航 (8大核心模块) -->
     <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-3 mb-6 font-serifHeading text-xs sm:text-sm" id="view-tabs" role="tablist" aria-label="主视图导航">
         <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="学习概览与架构拓扑">
             <i class="fa-solid fa-chart-pie text-sky-700"></i> 学习概览与架构拓扑
+        </button>
+        <button onclick="switchView('tasks')" id="nav-tasks" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="今日任务调度中心">
+            <i class="fa-solid fa-list-check text-indigo-600"></i> 今日任务调度
+            <span id="badge-nav-tasks" class="hidden text-[10px] font-serifMono font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900">0</span>
         </button>
         <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="CppAIService 专栏知识库">
             <i class="fa-solid fa-book-bookmark text-blue-600"></i> CppAIService 知识库
@@ -1109,6 +1116,110 @@
         </div>
     </section>
 
+    <!-- ==================== VIEW: 今日任务调度中心 (Tasks) ==================== -->
+    <section id="view-tasks" class="hidden space-y-6">
+        <!-- 任务中心顶栏状态与模式切换卡片 -->
+        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 academic-card">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-5 border-b border-stone-100">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-serifMono mb-1.5">
+                        <i class="fa-solid fa-calendar-check text-indigo-600"></i>
+                        <span id="task-hub-date-str">今日日程</span>
+                        <span class="text-stone-300">•</span>
+                        <span>Google Tasks 映射</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-stone-900 font-serif-heading flex items-center gap-2">
+                        <span>双轨统一今日任务调度中心</span>
+                    </h2>
+                    <p class="text-stone-600 text-xs sm:text-sm mt-1 max-w-3xl leading-relaxed">
+                        基于 S/A/B/C 优先级构建主线，对齐 IT 攻坚 (3h)、算法手撕 (1.5h)、专业书目 (1h)、八股自测 (0.5h) 与通识就业日程，支持动态工时降级保护与一键专注计时联动。
+                    </p>
+                </div>
+
+                <!-- 模式切换控制器与添加任务 -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 font-serifMono">
+                    <!-- 动态降级模式切换 -->
+                    <div class="flex items-center p-1 bg-stone-100 rounded-xl border border-stone-200 text-xs">
+                        <button onclick="setRoutineMode('normal')" id="btn-mode-normal" class="px-3 py-1.5 rounded-lg font-bold bg-white text-stone-900 shadow-xs transition cursor-pointer flex items-center gap-1.5" title="标准全量模式 (7.0h)">
+                            <i class="fa-solid fa-compass text-sky-700"></i>
+                            <span>标准全量 (7.0h)</span>
+                        </button>
+                        <button onclick="setRoutineMode('compact')" id="btn-mode-compact" class="px-3 py-1.5 rounded-lg font-semibold text-stone-600 hover:text-stone-900 transition cursor-pointer flex items-center gap-1.5" title="紧凑保底模式 (5.5h，免除B/C级任务，主攻S/A主干)">
+                            <i class="fa-solid fa-shield-halved text-amber-700"></i>
+                            <span>紧凑保底 (5.5h)</span>
+                        </button>
+                    </div>
+
+                    <button onclick="openAddTaskModal()" class="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                        <i class="fa-solid fa-plus text-sky-400"></i> 新增任务
+                    </button>
+                </div>
+            </div>
+
+            <!-- 动态降级提示条 (仅在 compact 模式时显示) -->
+            <div id="compact-mode-alert" class="hidden mt-4 p-3.5 bg-amber-50/90 border border-amber-200 rounded-xl flex items-center justify-between text-xs font-serifMono">
+                <div class="flex items-center gap-2 text-amber-900">
+                    <i class="fa-solid fa-shield-cat text-amber-700 text-base"></i>
+                    <span><strong>紧凑保底模式已生效：</strong>仅保留 S 级项目攻坚与 A 级算法/底层书目，B 级与 C 级任务已置为今日免除，不计入断签惩罚。</span>
+                </div>
+                <button onclick="setRoutineMode('normal')" class="text-amber-800 hover:text-amber-950 underline font-bold ml-2 shrink-0 cursor-pointer">切回全量</button>
+            </div>
+
+            <!-- 今日指标概览卡片行 -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-stone-100 font-serifMono text-center">
+                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200/80">
+                    <div class="text-xs text-stone-500 font-bold">任务完成数</div>
+                    <div class="text-xl sm:text-2xl font-bold text-stone-900 my-1" id="hub-stat-completed">0 / 7</div>
+                    <div class="text-[11px] text-stone-400 font-semibold truncate" id="hub-stat-completed-desc">已完成 / 今日任务</div>
+                </div>
+                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200/80">
+                    <div class="text-xs text-stone-500 font-bold">今日完成率</div>
+                    <div class="text-xl sm:text-2xl font-bold text-indigo-700 my-1" id="hub-stat-rate">0%</div>
+                    <div class="text-[11px] text-stone-400 font-semibold truncate">基于当前模式</div>
+                </div>
+                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200/80">
+                    <div class="text-xs text-stone-500 font-bold">预计总工时</div>
+                    <div class="text-xl sm:text-2xl font-bold text-sky-800 my-1" id="hub-stat-total-mins">420 min</div>
+                    <div class="text-[11px] text-stone-400 font-semibold truncate" id="hub-stat-hours-desc">约 7.0 小时</div>
+                </div>
+                <div class="bg-stone-50 p-3 rounded-xl border border-stone-200/80">
+                    <div class="text-xs text-stone-500 font-bold">剩余预估工时</div>
+                    <div class="text-xl sm:text-2xl font-bold text-amber-700 my-1" id="hub-stat-remain-mins">420 min</div>
+                    <div class="text-[11px] text-stone-400 font-semibold truncate">今日待投入</div>
+                </div>
+            </div>
+
+            <!-- 今日任务完成进度大条 -->
+            <div class="mt-4 pt-3 border-t border-stone-100">
+                <div class="flex items-center justify-between text-xs text-stone-500 font-serifMono mb-1.5">
+                    <span>今日任务推进流水线</span>
+                    <span id="hub-progress-text" class="text-indigo-700 font-bold">0% 完成</span>
+                </div>
+                <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden border border-stone-200/80">
+                    <div id="hub-progress-fill" class="h-full bg-gradient-to-r from-sky-600 via-indigo-600 to-emerald-600 transition-all duration-500 rounded-full" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 任务清单渲染容器 (由 JS 动态分为 S / A / B / C 模块) -->
+        <div id="task-hub-list-container" class="space-y-6">
+            <!-- 动态渲染 S / A / B / C 卡片组 -->
+        </div>
+
+        <!-- 过去 7 天打卡完成历史看板 -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 academic-card">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm sm:text-base font-bold text-stone-900 font-serif-heading flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-sky-700"></i> 近 7 天任务执行历史
+                </h3>
+                <span class="text-xs font-serifMono text-stone-500">自动按日留存快照</span>
+            </div>
+            <div id="task-history-strip" class="grid grid-cols-2 sm:grid-cols-7 gap-2.5 pt-2">
+                <!-- 动态填充 7 天状态快照 -->
+            </div>
+        </div>
+    </section>
+
     <!-- ==================== VIEW 2: 28天任务与实验 ==================== -->
     <section id="view-daily" class="hidden space-y-6">
         <div class="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200 academic-card flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -1926,6 +2037,219 @@ add_executable(my_server ${SOURCES})</pre>
     </div>
 </div>
 
+<!-- ==================== 算法手撕记录 Modal ==================== -->
+<div id="algorithm-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="算法手撕记录">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-stone-200" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-200 mb-4">
+            <h4 class="font-bold text-stone-900 text-sm sm:text-base font-serifHeading flex items-center gap-2">
+                <i class="fa-solid fa-laptop-code text-indigo-600"></i>
+                <span>记录手撕算法题</span>
+            </h4>
+            <button onclick="closeAlgorithmModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 font-serifMono text-xs">
+            <div class="grid grid-cols-3 gap-2">
+                <div class="col-span-1">
+                    <label class="block text-stone-600 font-bold mb-1">题号</label>
+                    <input type="text" id="algo-num" placeholder="如: 206" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-stone-600 font-bold mb-1">题名</label>
+                    <input type="text" id="algo-title" placeholder="如: 反转链表" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">算法标签</label>
+                    <select id="algo-topic" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                        <option value="链表">链表</option>
+                        <option value="数组/双指针">数组/双指针</option>
+                        <option value="滑动窗口">滑动窗口</option>
+                        <option value="哈希表">哈希表</option>
+                        <option value="二叉树">二叉树</option>
+                        <option value="动态规划">动态规划</option>
+                        <option value="回溯算法">回溯算法</option>
+                        <option value="栈与队列">栈与队列</option>
+                        <option value="图论">图论</option>
+                        <option value="贪心算法">贪心算法</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">时间复杂度</label>
+                    <input type="text" id="algo-time-comp" placeholder="O(n)" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">空间复杂度</label>
+                    <input type="text" id="algo-space-comp" placeholder="O(1)" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-stone-600 font-bold mb-1">解题手记与推导要点</label>
+                <textarea id="algo-note" rows="3" placeholder="记录边界条件、指针转移逻辑、错题复盘要点..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 font-mono-code"></textarea>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+                <input type="checkbox" id="algo-passed" checked class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-stone-300">
+                <label for="algo-passed" class="text-stone-700 font-semibold cursor-pointer">独立实现并验证通过</label>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-3 border-t border-stone-100 flex justify-end gap-2 font-serifMono">
+            <button onclick="closeAlgorithmModal()" class="px-4 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl hover:bg-stone-200 transition">取消</button>
+            <button onclick="saveAlgorithmProblem()" class="px-4 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-xl hover:bg-indigo-700 transition shadow-xs">保存记录</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 书目阅读进度 Modal ==================== -->
+<div id="books-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="书目阅读进度追踪">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-stone-200" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-200 mb-4">
+            <h4 class="font-bold text-stone-900 text-sm sm:text-base font-serifHeading flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-sky-700"></i>
+                <span>书目研读进度记录</span>
+            </h4>
+            <button onclick="closeBooksModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 font-serifMono text-xs">
+            <div>
+                <label class="block text-stone-600 font-bold mb-1">选择书目</label>
+                <select id="book-select-key" onchange="onBookSelectChange(this.value)" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 font-semibold text-stone-800">
+                    <option value="linuxServer">《Linux多线程服务端编程：使用muduo C++网络库》(陈硕)</option>
+                    <option value="birdLinux">《鸟哥的Linux私房菜：基础学习篇》(从 bash 开始)</option>
+                    <option value="nonviolentComm">《非暴力沟通》(马歇尔·卢森堡)</option>
+                    <option value="financeZero">《从零开始学习金融学》</option>
+                    <option value="gameTheory">《图解博弈论》</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">当前累计阅读页码 (P.)</label>
+                    <input type="number" id="book-current-page" min="0" placeholder="如: 45" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">今日阅读页数 (+页)</label>
+                    <input type="number" id="book-today-pages" min="1" value="10" placeholder="10" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-stone-600 font-bold mb-1">研读要点与核心收获</label>
+                <textarea id="book-notes" rows="3" placeholder="记录书目核心观点、技术细节或对应到项目的实现逻辑..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 font-mono-code"></textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-3 border-t border-stone-100 flex justify-end gap-2 font-serifMono">
+            <button onclick="closeBooksModal()" class="px-4 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl hover:bg-stone-200 transition">取消</button>
+            <button onclick="saveBooksProgress()" class="px-4 py-1.5 bg-sky-700 text-white text-xs font-semibold rounded-xl hover:bg-sky-800 transition shadow-xs">保存进度</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 新建自定义任务 Modal ==================== -->
+<div id="add-task-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="新建自定义任务">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-stone-200" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-200 mb-4">
+            <h4 class="font-bold text-stone-900 text-sm sm:text-base font-serifHeading flex items-center gap-2">
+                <i class="fa-solid fa-calendar-plus text-amber-600"></i>
+                <span>新建今日任务</span>
+            </h4>
+            <button onclick="closeAddTaskModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 font-serifMono text-xs">
+            <div>
+                <label class="block text-stone-600 font-bold mb-1">任务名称</label>
+                <input type="text" id="new-task-title" placeholder="如: 梳理 HTTP 状态机单元测试" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">优先级</label>
+                    <select id="new-task-priority" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                        <option value="S">S 级 · 核心攻坚</option>
+                        <option value="A" selected>A 级 · 主干底座</option>
+                        <option value="B">B 级 · 知识巩固</option>
+                        <option value="C">C 级 · 通识拓展</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">预计耗时 (分钟)</label>
+                    <input type="number" id="new-task-mins" value="30" min="5" step="5" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-stone-600 font-bold mb-1">任务分类</label>
+                <select id="new-task-category" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
+                    <option value="project">项目攻坚</option>
+                    <option value="algorithm">手撕算法</option>
+                    <option value="book">专业书目</option>
+                    <option value="quiz">考点自测</option>
+                    <option value="reading">通识阅读</option>
+                    <option value="career">求职行情</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-stone-600 font-bold mb-1">任务目标说明</label>
+                <textarea id="new-task-desc" rows="2" placeholder="简述该任务完成的验收标准或产出..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2"></textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-3 border-t border-stone-100 flex justify-end gap-2 font-serifMono">
+            <button onclick="closeAddTaskModal()" class="px-4 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl hover:bg-stone-200 transition">取消</button>
+            <button onclick="saveCustomTask()" class="px-4 py-1.5 bg-stone-900 text-white text-xs font-semibold rounded-xl hover:bg-stone-800 transition shadow-xs">添加任务</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 牛客求职调研手记 Modal ==================== -->
+<div id="career-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="牛客求职调研手记">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-stone-200" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-200 mb-4">
+            <h4 class="font-bold text-stone-900 text-sm sm:text-base font-serifHeading flex items-center gap-2">
+                <i class="fa-solid fa-briefcase text-stone-700"></i>
+                <span>牛客求职与行情调研</span>
+            </h4>
+            <button onclick="closeCareerModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 font-serifMono text-xs">
+            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 text-stone-600 flex items-center justify-between">
+                <span>直达牛客求职专区：</span>
+                <a href="https://www.nowcoder.com/jobs" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-stone-900 hover:bg-stone-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                    <span>访问牛客网</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </a>
+            </div>
+
+            <div>
+                <label class="block text-stone-600 font-bold mb-1">岗位动态与面试情报手记</label>
+                <textarea id="career-notes-input" rows="4" placeholder="记录当前秋招/春招招聘hc、重点企业技术要求、高频面试题方向或投递进度..." class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2 font-mono-code"></textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-3 border-t border-stone-100 flex justify-end gap-2 font-serifMono">
+            <button onclick="closeCareerModal()" class="px-4 py-1.5 bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl hover:bg-stone-200 transition">取消</button>
+            <button onclick="saveCareerNotes()" class="px-4 py-1.5 bg-stone-900 text-white text-xs font-semibold rounded-xl hover:bg-stone-800 transition shadow-xs">保存手记</button>
+        </div>
+    </div>
+</div>
+
 <!-- ==================== 语雀专栏高清架构大图灯箱预览 Modal ==================== -->
 <div id="yuque-image-modal" class="fixed inset-0 z-50 bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-6" onclick="closeYuqueImageModal()" role="dialog" aria-modal="true" aria-label="架构大图预览">
     <div class="relative bg-white rounded-2xl max-w-5xl w-full p-4 sm:p-6 shadow-2xl border border-stone-300 max-h-[95vh] flex flex-col justify-between" onclick="event.stopPropagation()">
@@ -1954,8 +2278,9 @@ add_executable(my_server ${SOURCES})</pre>
     <script src="js/dataset-mappings.js?v=5.4.1"></script>
     <script src="js/dataset-yuque.js?v=6.0.0"></script>
     <script src="js/dataset-domain.js?v=6.0.0"></script>
+    <script src="js/dataset-tasks.js?v=6.0.0"></script>
     <script src="js/state-manager.js?v=6.0.0"></script>
-    <script src="js/timer.js?v=5.4.1"></script>
+    <script src="js/timer.js?v=6.0.0"></script>
     <script src="js/yuque-explorer.js?v=6.0.0"></script>
     <script src="js/app.js?v=6.0.0"></script>
 </body>

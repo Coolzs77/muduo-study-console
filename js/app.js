@@ -71,6 +71,7 @@ var appState = {
         proj_muduo: { activeDay: 1, currentTrack: "l0_foundation", totalDays: 28 },
         proj_cppai: { activeArticle: "01_http_overview", currentTrack: "l3_protocol", totalArticles: 17 }
     },
+    dailyRoutine: null,
     currentView: 'dashboard',
     weekFilter: 0,
     filterStatus: 'all', // 'all', 'pending', 'mastered', 'due_review'
@@ -319,7 +320,7 @@ function calculateRealStreak() {
 // 视图切换
 function switchView(viewName) {
     appState.currentView = viewName;
-    const views = ['dashboard', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
+    const views = ['dashboard', 'tasks', 'knowledge', 'daily', 'mapping', 'quiz', 'source', 'pitfalls'];
     views.forEach(v => {
         const sec = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-${v}`);
@@ -336,7 +337,9 @@ function switchView(viewName) {
         }
     });
 
-    if (viewName === 'daily') {
+    if (viewName === 'tasks') {
+        renderTaskHub();
+    } else if (viewName === 'daily') {
         renderDailyCards();
     } else if (viewName === 'knowledge') {
         if (typeof renderYuqueExplorer === 'function') renderYuqueExplorer();
@@ -563,6 +566,22 @@ function updateDashboardMetrics() {
     if (elCardAvg) elCardAvg.innerText = `${avgMins}m`;
 
     // 渲染子模块
+    // 更新今日任务导航待办角标
+    const elBadgeTasks = document.getElementById('badge-nav-tasks');
+    if (elBadgeTasks && appState.dailyRoutine && Array.isArray(appState.dailyRoutine.tasks)) {
+        let prog = null;
+        if (typeof TaskDomain !== 'undefined' && typeof TaskDomain.calculateRoutineProgress === 'function') {
+            prog = TaskDomain.calculateRoutineProgress(appState.dailyRoutine.tasks, appState.dailyRoutine.mode);
+        }
+        const pendingCount = prog ? (prog.activeTotal - prog.completed) : 0;
+        if (pendingCount > 0) {
+            elBadgeTasks.innerText = pendingCount;
+            elBadgeTasks.classList.remove('hidden');
+        } else {
+            elBadgeTasks.classList.add('hidden');
+        }
+    }
+
     renderTodayMissionCard(dueReviewCount);
     renderCalendarGrid();
     renderStudyChart();
@@ -771,6 +790,33 @@ function renderTodayMissionCard(dueCount) {
         `;
     }
 
+    // Phase 4: 今日日常任务调度速览条
+    let dailyRoutineQuickHtml = '';
+    if (appState.dailyRoutine && Array.isArray(appState.dailyRoutine.tasks)) {
+        let prog = { activeTotal: 7, completed: 0, rate: 0, remainingMinutes: 390 };
+        if (typeof TaskDomain !== 'undefined' && typeof TaskDomain.calculateRoutineProgress === 'function') {
+            prog = TaskDomain.calculateRoutineProgress(appState.dailyRoutine.tasks, appState.dailyRoutine.mode);
+        }
+        dailyRoutineQuickHtml = `
+            <div class="mt-4 pt-3.5 border-t border-amber-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-serifMono">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-list-check"></i>
+                    </span>
+                    <div>
+                        <span class="text-stone-700 font-bold">今日日常任务：</span>
+                        <span class="text-indigo-800 font-bold">${prog.completed} / ${prog.activeTotal} 项完成 (${prog.rate}%)</span>
+                        <span class="text-stone-300 mx-1">•</span>
+                        <span class="text-stone-500">剩余工时预估 ${prog.remainingMinutes} min</span>
+                    </div>
+                </div>
+                <button onclick="switchView('tasks')" class="px-3 py-1.5 bg-white border border-stone-300 hover:bg-stone-100 text-stone-800 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0">
+                    <span>任务调度中心</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </button>
+            </div>
+        `;
+    }
+
     container.innerHTML = `
         ${reviewAlertHtml}
         <div class="flex items-center justify-between mb-3 font-serifMono text-xs text-stone-500">
@@ -782,6 +828,7 @@ function renderTodayMissionCard(dueCount) {
             </span>
         </div>
         ${tracksLayout}
+        ${dailyRoutineQuickHtml}
     `;
 }
 
@@ -2840,6 +2887,700 @@ function switchEnvModalTab(tabId) {
     });
 }
 
+// ==================== Phase 4: 双轨统一今日任务调度中心控制器 ====================
+
+// 确保日常任务状态初始化自愈
+function ensureDailyRoutineInitialized() {
+    if (!appState.dailyRoutine || typeof appState.dailyRoutine !== 'object') {
+        if (typeof StateManager !== 'undefined' && StateManager.getState()?.dailyRoutine) {
+            appState.dailyRoutine = StateManager.getState().dailyRoutine;
+        } else if (typeof TaskDomain !== 'undefined' && typeof TaskDomain.createFreshDailyTasks === 'function') {
+            appState.dailyRoutine = {
+                date: getTodayDateStr(),
+                mode: 'normal',
+                tasks: TaskDomain.createFreshDailyTasks(),
+                records: {
+                    algorithm: [],
+                    books: {
+                        linuxServer: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+                        birdLinux: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+                        nonviolentComm: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+                        financeZero: { currentPage: 0, targetPagesPerDay: 10, notes: "" },
+                        gameTheory: { currentPage: 0, targetPagesPerDay: 10, notes: "" }
+                    },
+                    careerNotes: ""
+                },
+                history: {}
+            };
+        }
+    }
+    return appState.dailyRoutine;
+}
+
+// 核心渲染函数：渲染任务调度中心
+function renderTaskHub() {
+    const routine = ensureDailyRoutineInitialized();
+    if (!routine) return;
+
+    const mode = routine.mode || 'normal';
+
+    // 1. 日期显示
+    const daysOfWeek = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const now = new Date();
+    const dateStr = `${routine.date || getTodayDateStr()} · ${daysOfWeek[now.getDay()]}`;
+    const elDate = document.getElementById('task-hub-date-str');
+    if (elDate) elDate.innerText = `今日日程 · ${dateStr}`;
+
+    // 2. 模式切换按钮样式更新
+    const btnNormal = document.getElementById('btn-mode-normal');
+    const btnCompact = document.getElementById('btn-mode-compact');
+    const alertCompact = document.getElementById('compact-mode-alert');
+
+    if (btnNormal) {
+        btnNormal.className = mode === 'normal'
+            ? 'px-3 py-1.5 rounded-lg font-bold bg-white text-stone-900 shadow-xs transition cursor-pointer flex items-center gap-1.5'
+            : 'px-3 py-1.5 rounded-lg font-semibold text-stone-600 hover:text-stone-900 transition cursor-pointer flex items-center gap-1.5';
+    }
+    if (btnCompact) {
+        btnCompact.className = mode === 'compact'
+            ? 'px-3 py-1.5 rounded-lg font-bold bg-amber-600 text-white shadow-xs transition cursor-pointer flex items-center gap-1.5'
+            : 'px-3 py-1.5 rounded-lg font-semibold text-stone-600 hover:text-stone-900 transition cursor-pointer flex items-center gap-1.5';
+    }
+    if (alertCompact) {
+        if (mode === 'compact') alertCompact.classList.remove('hidden');
+        else alertCompact.classList.add('hidden');
+    }
+
+    // 3. 计算进度与工时指标
+    let prog = { total: 7, activeTotal: 7, completed: 0, rate: 0, activeMinutes: 390, remainingMinutes: 390, completedMinutes: 0 };
+    if (typeof TaskDomain !== 'undefined' && typeof TaskDomain.calculateRoutineProgress === 'function') {
+        prog = TaskDomain.calculateRoutineProgress(routine.tasks, mode);
+    }
+
+    // 4. 更新大盘卡片指标
+    const elCompleted = document.getElementById('hub-stat-completed');
+    if (elCompleted) elCompleted.innerText = `${prog.completed} / ${prog.activeTotal}`;
+
+    const elRate = document.getElementById('hub-stat-rate');
+    if (elRate) elRate.innerText = `${prog.rate}%`;
+
+    const elTotalMins = document.getElementById('hub-stat-total-mins');
+    if (elTotalMins) elTotalMins.innerText = `${prog.activeMinutes} min`;
+
+    const elHoursDesc = document.getElementById('hub-stat-hours-desc');
+    if (elHoursDesc) elHoursDesc.innerText = `约 ${(prog.activeMinutes / 60).toFixed(1)} 小时`;
+
+    const elRemainMins = document.getElementById('hub-stat-remain-mins');
+    if (elRemainMins) elRemainMins.innerText = `${prog.remainingMinutes} min`;
+
+    const elProgText = document.getElementById('hub-progress-text');
+    if (elProgText) elProgText.innerText = `${prog.rate}% 完成 (${prog.completed}/${prog.activeTotal} 项)`;
+
+    const elProgFill = document.getElementById('hub-progress-fill');
+    if (elProgFill) elProgFill.style.width = `${prog.rate}%`;
+
+    // 5. 渲染任务列表 (S / A / B / C 分组)
+    const listContainer = document.getElementById('task-hub-list-container');
+    if (!listContainer) return;
+
+    const filteredTasks = typeof TaskDomain !== 'undefined' 
+        ? TaskDomain.filterTasksByMode(routine.tasks, mode) 
+        : routine.tasks;
+
+    // 动态获取当前推荐
+    const yqList = getYuqueDataset();
+    let nextArticle = yqList.find(art => ((appState.knowledgeMastery && (appState.knowledgeMastery[art.id] || appState.knowledgeMastery[art.slug])) || 0) < 3) || yqList[0];
+    let nextDay = DAYS_DATASET.find(item => !appState.mastery[item.day] || appState.mastery[item.day].level < 5) || DAYS_DATASET[0];
+
+    const records = routine.records || {};
+    const algoList = records.algorithm || [];
+    const books = records.books || {};
+
+    let html = '';
+
+    // 按优先级分组提取
+    const sTasks = filteredTasks.filter(t => t.priority === 'S');
+    const aTasks = filteredTasks.filter(t => t.priority === 'A');
+    const bTasks = filteredTasks.filter(t => t.priority === 'B');
+    const cTasks = filteredTasks.filter(t => t.priority === 'C');
+    const customTasks = filteredTasks.filter(t => t.isCustom);
+
+    // 渲染通用卡片辅助函数
+    function renderTaskItemHtml(task) {
+        const isDone = !!task.completed;
+        const isSusp = !!task.isSuspended;
+        const timeLabel = task.estimatedMinutes ? `${task.estimatedMinutes} min` : '';
+
+        let badgePriority = '';
+        if (task.priority === 'S') badgePriority = '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 font-bold text-[10px]">S 级·核心攻坚</span>';
+        else if (task.priority === 'A') badgePriority = '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px]">A 级·主干底座</span>';
+        else if (task.priority === 'B') badgePriority = '<span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-300 font-bold text-[10px]">B 级·知识巩固</span>';
+        else badgePriority = '<span class="px-2 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-300 font-bold text-[10px]">C 级·通识拓展</span>';
+
+        let suspensionBadge = isSusp 
+            ? '<span class="px-2 py-0.5 rounded bg-stone-200 text-stone-600 text-[10px] font-bold">今日紧凑模式免除</span>' 
+            : '';
+
+        let extraContent = '';
+
+        // S 级专属：显示当前推荐
+        if (task.id === 'task_s_project') {
+            extraContent = `
+                <div class="mt-2.5 p-2.5 rounded-lg bg-rose-50/80 border border-rose-200 text-xs font-serifMono text-rose-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
+                        <span><strong>当前推荐主线：</strong>${nextArticle ? '专栏《' + escapeHtml(nextArticle.title) + '》' : 'Day ' + nextDay.day + ' ' + escapeHtml(nextDay.title)}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="openYuqueArticle('${nextArticle?.slug || nextArticle?.id || ''}')" class="px-2.5 py-1 bg-white border border-rose-300 hover:bg-rose-100 text-rose-900 rounded font-bold transition cursor-pointer">
+                            研读专栏
+                        </button>
+                        <button onclick="switchTopologyTab('cppai'); scrollToTopology();" class="px-2.5 py-1 bg-white border border-stone-300 hover:bg-stone-100 text-stone-700 rounded font-semibold transition cursor-pointer">
+                            查看架构
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // A 级算法专属：显示今日手撕进度与题目列表
+        if (task.id === 'task_a_algo') {
+            const algoBadges = algoList.map(a => `
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-900 text-[11px] font-mono">
+                    <strong>#${escapeHtml(String(a.problemNumber))}</strong> ${escapeHtml(a.title)} (${escapeHtml(a.timeComplexity || 'O(n)')})
+                </span>
+            `).join('');
+
+            extraContent = `
+                <div class="mt-2.5 p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-200 text-xs font-serifMono text-indigo-950 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span>今日已记录算法：<strong>${algoList.length} / 3 题</strong></span>
+                        <button onclick="openAlgorithmModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-plus text-[10px]"></i> 记录手撕题
+                        </button>
+                    </div>
+                    ${algoBadges ? `<div class="flex flex-wrap gap-1.5 pt-1">${algoBadges}</div>` : '<div class="text-[11px] text-stone-400">今日暂无手撕记录，点击右侧记录添加题目。</div>'}
+                </div>
+            `;
+        }
+
+        // A 级书目专属：显示页码与更新按钮
+        if (task.bookKey && books[task.bookKey]) {
+            const curPage = books[task.bookKey].currentPage || 0;
+            extraContent = `
+                <div class="mt-2.5 p-2 rounded-lg bg-sky-50/70 border border-sky-200 text-xs font-serifMono text-sky-950 flex items-center justify-between">
+                    <span>当前阅读进度：<strong>P.${curPage}</strong> (今日目标: +10页)</span>
+                    <button onclick="openBooksModal('${task.bookKey}')" class="px-2.5 py-1 bg-white border border-sky-300 hover:bg-sky-100 text-sky-900 rounded font-bold transition cursor-pointer">
+                        更新页码
+                    </button>
+                </div>
+            `;
+        }
+
+        // C 级阅读专属：三部曲阅读概览
+        if (task.id === 'task_c_reading') {
+            const p1 = books.nonviolentComm?.currentPage || 0;
+            const p2 = books.financeZero?.currentPage || 0;
+            const p3 = books.gameTheory?.currentPage || 0;
+            extraContent = `
+                <div class="mt-2.5 p-2 rounded-lg bg-teal-50/70 border border-teal-200 text-xs font-serifMono text-teal-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <div class="text-[11px] text-stone-600 space-x-2">
+                        <span>沟通: P.${p1}</span>
+                        <span>•</span>
+                        <span>金融: P.${p2}</span>
+                        <span>•</span>
+                        <span>博弈论: P.${p3}</span>
+                    </div>
+                    <button onclick="openBooksModal('nonviolentComm')" class="px-2.5 py-1 bg-white border border-teal-300 hover:bg-teal-100 text-teal-900 rounded font-bold transition cursor-pointer">
+                        记录阅读
+                    </button>
+                </div>
+            `;
+        }
+
+        // C 级求职专属：牛客网与调研随笔
+        if (task.id === 'task_c_career') {
+            const cNote = records.careerNotes || '';
+            extraContent = `
+                <div class="mt-2.5 p-2 rounded-lg bg-stone-100 border border-stone-200 text-xs font-serifMono text-stone-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <span class="text-[11px] text-stone-600 truncate max-w-md">${cNote ? '手记: ' + escapeHtml(cNote) : '暂无岗位调研手记，定期关注招聘要求'}</span>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="https://www.nowcoder.com/jobs" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-stone-900 hover:bg-stone-800 text-white rounded font-bold transition">
+                            访问牛客
+                        </a>
+                        <button onclick="openCareerModal()" class="px-2.5 py-1 bg-white border border-stone-300 hover:bg-stone-200 text-stone-700 rounded font-bold transition cursor-pointer">
+                            调研手记
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 自定义任务专属：删除按钮
+        let deleteBtn = '';
+        if (task.isCustom) {
+            deleteBtn = `
+                <button onclick="deleteCustomTask('${task.id}')" class="text-stone-400 hover:text-rose-600 transition text-xs p-1" title="删除任务">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            `;
+        }
+
+        const cardBorder = isDone 
+            ? 'border-emerald-300 bg-emerald-50/20' 
+            : (isSusp ? 'border-stone-200 bg-stone-50/50 opacity-60' : 'border-stone-200 bg-white');
+
+        return `
+            <div class="p-4 rounded-xl border ${cardBorder} transition hover:border-stone-400 shadow-xs">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox" onchange="toggleTaskCompleted('${task.id}')" ${isDone ? 'checked' : ''} ${isSusp ? 'disabled' : ''} class="mt-1 w-4 h-4 rounded text-sky-700 focus:ring-sky-600 cursor-pointer">
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                ${badgePriority}
+                                ${suspensionBadge}
+                                <span class="text-xs font-bold ${isDone ? 'line-through text-stone-400' : 'text-stone-900'}">${escapeHtml(task.title)}</span>
+                            </div>
+                            <p class="text-[11px] text-stone-500 mt-1 leading-relaxed ${isDone ? 'line-through text-stone-400' : ''}">
+                                ${escapeHtml(task.subtitle || task.description || '')}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 shrink-0 font-serifMono">
+                        <span class="text-[11px] text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            <i class="fa-regular fa-clock"></i> ${timeLabel}
+                        </span>
+                        <button onclick="startTimerForTask('${task.id}', '${escapeHtml(task.title)}', '${task.category || 'coding'}', ${task.estimatedMinutes || 30})" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-lg transition flex items-center gap-1 cursor-pointer" title="一键带入专注计时器">
+                            <i class="fa-solid fa-stopwatch text-amber-600"></i>
+                            <span class="hidden sm:inline">计时</span>
+                        </button>
+                        ${deleteBtn}
+                    </div>
+                </div>
+                ${extraContent}
+            </div>
+        `;
+    }
+
+    // 组装整个列表
+    let sHtml = sTasks.map(renderTaskItemHtml).join('');
+    let aHtml = aTasks.map(renderTaskItemHtml).join('');
+    let bHtml = bTasks.map(renderTaskItemHtml).join('');
+    let cHtml = cTasks.map(renderTaskItemHtml).join('');
+    let customHtml = customTasks.map(renderTaskItemHtml).join('');
+
+    html = `
+        <!-- S 级任务 -->
+        <div class="space-y-2">
+            <div class="flex items-center justify-between">
+                <div class="text-xs font-serifMono font-bold text-rose-800 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block"></span> S 级 · 项目核心攻坚 (3.0h)
+                </div>
+                <span class="text-[11px] font-serifMono text-stone-400">第一优先级 · 始终必保</span>
+            </div>
+            <div class="space-y-2.5">${sHtml || '<div class="text-xs text-stone-400 p-3 bg-stone-50 rounded-xl">无 S 级任务</div>'}</div>
+        </div>
+
+        <!-- A 级任务 -->
+        <div class="space-y-2">
+            <div class="flex items-center justify-between">
+                <div class="text-xs font-serifMono font-bold text-amber-900 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block"></span> A 级 · 主干算法与底座 (2.5h)
+                </div>
+                <span class="text-[11px] font-serifMono text-stone-400">算法 3 题 + Linux 服务端书目研读</span>
+            </div>
+            <div class="space-y-2.5">${aHtml || '<div class="text-xs text-stone-400 p-3 bg-stone-50 rounded-xl">无 A 级任务</div>'}</div>
+        </div>
+
+        <!-- B 级任务 -->
+        <div class="space-y-2">
+            <div class="flex items-center justify-between">
+                <div class="text-xs font-serifMono font-bold text-sky-800 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-600 inline-block"></span> B 级 · 知识巩固与自测 (0.5h)
+                </div>
+                <span class="text-[11px] font-serifMono text-stone-400">考点八股自测 · 紧凑模式可免除</span>
+            </div>
+            <div class="space-y-2.5">${bHtml || '<div class="text-xs text-stone-400 p-3 bg-stone-50 rounded-xl">无 B 级任务</div>'}</div>
+        </div>
+
+        <!-- C 级任务 -->
+        <div class="space-y-2">
+            <div class="flex items-center justify-between">
+                <div class="text-xs font-serifMono font-bold text-stone-700 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-stone-600 inline-block"></span> C 级 · 通识拓展与就业 (1.0h)
+                </div>
+                <span class="text-[11px] font-serifMono text-stone-400">通识阅读 + 牛客行情 · 紧凑模式可免除</span>
+            </div>
+            <div class="space-y-2.5">${cHtml || '<div class="text-xs text-stone-400 p-3 bg-stone-50 rounded-xl">无 C 级任务</div>'}</div>
+        </div>
+    `;
+
+    if (customHtml) {
+        html += `
+            <div class="space-y-2">
+                <div class="text-xs font-serifMono font-bold text-indigo-900 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 inline-block"></span> 自定义任务
+                </div>
+                <div class="space-y-2.5">${customHtml}</div>
+            </div>
+        `;
+    }
+
+    listContainer.innerHTML = html;
+
+    // 6. 渲染过去 7 天历史快照
+    renderTaskHistoryStrip();
+}
+
+// 过去 7 天历史卡片渲染
+function renderTaskHistoryStrip() {
+    const strip = document.getElementById('task-history-strip');
+    if (!strip) return;
+
+    const routine = ensureDailyRoutineInitialized();
+    const history = routine?.history || {};
+    const todayStr = getTodayDateStr();
+
+    // 计算过去 7 天日期列表
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        days.push(`${yyyy}-${mm}-${dd}`);
+    }
+
+    const html = days.map(dStr => {
+        const isToday = dStr === todayStr;
+        let rate = 0;
+        let completed = 0;
+        let total = 7;
+        let mode = 'normal';
+
+        if (isToday) {
+            const prog = typeof TaskDomain !== 'undefined' ? TaskDomain.calculateRoutineProgress(routine.tasks, routine.mode) : null;
+            rate = prog ? prog.rate : 0;
+            completed = prog ? prog.completed : 0;
+            total = prog ? prog.activeTotal : 7;
+            mode = routine.mode;
+        } else if (history[dStr]) {
+            rate = history[dStr].rate || 0;
+            completed = history[dStr].completed || 0;
+            total = history[dStr].activeTotal || history[dStr].total || 7;
+            mode = history[dStr].mode || 'normal';
+        }
+
+        let rateColor = 'bg-stone-50 border-stone-200 text-stone-700';
+        if (rate >= 80) rateColor = 'bg-emerald-50 border-emerald-300 text-emerald-900';
+        else if (rate >= 50) rateColor = 'bg-amber-50 border-amber-300 text-amber-900';
+        else if (rate > 0) rateColor = 'bg-sky-50 border-sky-300 text-sky-900';
+
+        return `
+            <div class="p-2.5 rounded-xl border ${rateColor} font-serifMono text-center flex flex-col justify-between">
+                <div class="text-[10px] text-stone-500 font-bold flex items-center justify-center gap-1">
+                    ${isToday ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 今日' : dStr.slice(5)}
+                </div>
+                <div class="text-base font-bold my-1">${rate}%</div>
+                <div class="text-[10px] text-stone-400 truncate">${completed}/${total} 项 (${mode === 'compact' ? '紧凑' : '全量'})</div>
+            </div>
+        `;
+    }).join('');
+
+    strip.innerHTML = html;
+}
+
+// 切换任务完成状态
+function toggleTaskCompleted(taskId) {
+    const routine = ensureDailyRoutineInitialized();
+    if (!routine) return;
+
+    const task = (routine.tasks || []).find(t => t.id === taskId);
+    if (!task) return;
+
+    task.completed = !task.completed;
+    task.completedAt = task.completed ? new Date().toISOString() : null;
+
+    persistState();
+    renderTaskHub();
+    updateDashboardMetrics();
+
+    if (typeof showToast === 'function') {
+        showToast(task.completed ? `已完成任务「${task.title}」` : `已取消任务「${task.title}」完成状态`, task.completed);
+    }
+}
+
+// 切换日常模式 (normal / compact)
+function setRoutineMode(mode) {
+    const routine = ensureDailyRoutineInitialized();
+    if (!routine) return;
+
+    routine.mode = mode;
+    persistState();
+    renderTaskHub();
+    updateDashboardMetrics();
+
+    if (typeof showToast === 'function') {
+        showToast(mode === 'compact' ? '已切换至紧凑保底模式 (3.5h 聚焦主干)' : '已切换至标准全量模式 (6.5h)');
+    }
+}
+
+// 算法记录弹窗
+function openAlgorithmModal() {
+    document.getElementById('algorithm-modal')?.classList.remove('hidden');
+    const numInput = document.getElementById('algo-num');
+    if (numInput) numInput.focus();
+}
+
+function closeAlgorithmModal() {
+    document.getElementById('algorithm-modal')?.classList.add('hidden');
+}
+
+function saveAlgorithmProblem() {
+    const routine = ensureDailyRoutineInitialized();
+    if (!routine) return;
+
+    const num = document.getElementById('algo-num')?.value.trim();
+    const title = document.getElementById('algo-title')?.value.trim();
+    const topic = document.getElementById('algo-topic')?.value || '其他';
+    const timeComp = document.getElementById('algo-time-comp')?.value.trim() || 'O(n)';
+    const spaceComp = document.getElementById('algo-space-comp')?.value.trim() || 'O(1)';
+    const passed = document.getElementById('algo-passed')?.checked ?? true;
+    const note = document.getElementById('algo-note')?.value.trim() || '';
+
+    if (!title) {
+        if (typeof showToast === 'function') showToast('请填写算法题名称', false);
+        return;
+    }
+
+    if (!routine.records) routine.records = {};
+    if (!Array.isArray(routine.records.algorithm)) routine.records.algorithm = [];
+
+    const newRecord = {
+        id: Date.now(),
+        problemNumber: num || `${routine.records.algorithm.length + 1}`,
+        title: title,
+        topic: topic,
+        timeComplexity: timeComp,
+        spaceComplexity: spaceComp,
+        passed: passed,
+        note: note,
+        date: getTodayDateStr()
+    };
+
+    routine.records.algorithm.push(newRecord);
+
+    // 若今日已手撕满 3 题，自动将 A 级算法任务标记完成
+    if (routine.records.algorithm.length >= 3) {
+        const algoTask = (routine.tasks || []).find(t => t.id === 'task_a_algo');
+        if (algoTask && !algoTask.completed) {
+            algoTask.completed = true;
+            algoTask.completedAt = new Date().toISOString();
+        }
+    }
+
+    // 清空表单
+    const numEl = document.getElementById('algo-num');
+    if (numEl) numEl.value = '';
+    const titleEl = document.getElementById('algo-title');
+    if (titleEl) titleEl.value = '';
+    const noteEl = document.getElementById('algo-note');
+    if (noteEl) noteEl.value = '';
+
+    persistState();
+    closeAlgorithmModal();
+    renderTaskHub();
+    updateDashboardMetrics();
+
+    if (typeof showToast === 'function') {
+        showToast(`算法「#${newRecord.problemNumber} ${title}」已记录！今日已完成 ${routine.records.algorithm.length} 题`);
+    }
+}
+
+// 书目进度弹窗
+function openBooksModal(bookKey = 'linuxServer') {
+    const routine = ensureDailyRoutineInitialized();
+    const books = routine?.records?.books || {};
+
+    const sel = document.getElementById('book-select-key');
+    if (sel) sel.value = bookKey;
+
+    onBookSelectChange(bookKey);
+    document.getElementById('books-modal')?.classList.remove('hidden');
+}
+
+function closeBooksModal() {
+    document.getElementById('books-modal')?.classList.add('hidden');
+}
+
+function onBookSelectChange(bookKey) {
+    const routine = ensureDailyRoutineInitialized();
+    const books = routine?.records?.books || {};
+    const curBook = books[bookKey] || { currentPage: 0, notes: "" };
+
+    const curPageEl = document.getElementById('book-current-page');
+    if (curPageEl) curPageEl.value = curBook.currentPage || 0;
+
+    const noteEl = document.getElementById('book-notes');
+    if (noteEl) noteEl.value = curBook.notes || '';
+}
+
+function saveBooksProgress() {
+    const routine = ensureDailyRoutineInitialized();
+    if (!routine) return;
+
+    const bookKey = document.getElementById('book-select-key')?.value || 'linuxServer';
+    const curPage = parseInt(document.getElementById('book-current-page')?.value || '0');
+    const todayPages = parseInt(document.getElementById('book-today-pages')?.value || '10');
+    const note = document.getElementById('book-notes')?.value.trim() || '';
+
+    if (!routine.records) routine.records = {};
+    if (!routine.records.books) routine.records.books = {};
+
+    const basePage = Math.max(curPage, routine.records.books[bookKey]?.currentPage || 0);
+    const newPage = basePage + (todayPages > 0 ? todayPages : 0);
+    routine.records.books[bookKey] = {
+        currentPage: newPage,
+        targetPagesPerDay: 10,
+        notes: note,
+        lastUpdated: new Date().toISOString()
+    };
+
+    // 自动勾选对应任务
+    if (bookKey === 'linuxServer') {
+        const bTask = (routine.tasks || []).find(t => t.id === 'task_a_linux_book');
+        if (bTask) { bTask.completed = true; bTask.completedAt = new Date().toISOString(); }
+    } else if (bookKey === 'birdLinux') {
+        const bTask = (routine.tasks || []).find(t => t.id === 'task_a_bird_linux');
+        if (bTask) { bTask.completed = true; bTask.completedAt = new Date().toISOString(); }
+    } else if (['nonviolentComm', 'financeZero', 'gameTheory'].includes(bookKey)) {
+        const rTask = (routine.tasks || []).find(t => t.id === 'task_c_reading');
+        if (rTask) { rTask.completed = true; rTask.completedAt = new Date().toISOString(); }
+    }
+
+    persistState();
+    closeBooksModal();
+    renderTaskHub();
+    updateDashboardMetrics();
+
+    if (typeof showToast === 'function') {
+        showToast(`书目进度已更新至 P.${newPage}！已自动标记任务完成`);
+    }
+}
+
+// 牛客求职调研弹窗
+function openCareerModal() {
+    const routine = ensureDailyRoutineInitialized();
+    const notesEl = document.getElementById('career-notes-input');
+    if (notesEl && routine?.records) {
+        notesEl.value = routine.records.careerNotes || '';
+    }
+    document.getElementById('career-modal')?.classList.remove('hidden');
+}
+
+function closeCareerModal() {
+    document.getElementById('career-modal')?.classList.add('hidden');
+}
+
+function saveCareerNotes() {
+    const routine = ensureDailyRoutineInitialized();
+    if (!routine) return;
+
+    const note = document.getElementById('career-notes-input')?.value.trim() || '';
+    if (!routine.records) routine.records = {};
+    routine.records.careerNotes = note;
+
+    if (note) {
+        const cTask = (routine.tasks || []).find(t => t.id === 'task_c_career');
+        if (cTask) { cTask.completed = true; cTask.completedAt = new Date().toISOString(); }
+    }
+
+    persistState();
+    closeCareerModal();
+    renderTaskHub();
+    updateDashboardMetrics();
+
+    if (typeof showToast === 'function') {
+        showToast('求职调研手记已保存');
+    }
+}
+
+// 新建自定义任务
+function openAddTaskModal() {
+    document.getElementById('add-task-modal')?.classList.remove('hidden');
+    document.getElementById('new-task-title')?.focus();
+}
+
+function closeAddTaskModal() {
+    document.getElementById('add-task-modal')?.classList.add('hidden');
+}
+
+function saveCustomTask() {
+    const routine = ensureDailyRoutineInitialized();
+    if (!routine) return;
+
+    const title = document.getElementById('new-task-title')?.value.trim();
+    const priority = document.getElementById('new-task-priority')?.value || 'A';
+    const mins = parseInt(document.getElementById('new-task-mins')?.value || '30');
+    const category = document.getElementById('new-task-category')?.value || 'project';
+    const desc = document.getElementById('new-task-desc')?.value.trim() || '';
+
+    if (!title) {
+        if (typeof showToast === 'function') showToast('请填写任务名称', false);
+        return;
+    }
+
+    const newTask = {
+        id: `task_custom_${Date.now()}`,
+        priority: priority,
+        category: category,
+        title: title,
+        subtitle: `预计 ${mins} min · ${desc || '自定义待办事项'}`,
+        estimatedMinutes: mins,
+        recurring: false,
+        actionType: 'custom',
+        description: desc,
+        completed: false,
+        completedAt: null,
+        isCustom: true
+    };
+
+    if (!Array.isArray(routine.tasks)) routine.tasks = [];
+    routine.tasks.push(newTask);
+
+    const titleEl = document.getElementById('new-task-title');
+    if (titleEl) titleEl.value = '';
+    const descEl = document.getElementById('new-task-desc');
+    if (descEl) descEl.value = '';
+
+    persistState();
+    closeAddTaskModal();
+    renderTaskHub();
+    updateDashboardMetrics();
+
+    if (typeof showToast === 'function') {
+        showToast(`已添加自定义任务「${title}」`);
+    }
+}
+
+// 删除自定义任务
+function deleteCustomTask(taskId) {
+    const routine = ensureDailyRoutineInitialized();
+    if (!routine) return;
+
+    routine.tasks = (routine.tasks || []).filter(t => t.id !== taskId);
+
+    persistState();
+    renderTaskHub();
+    updateDashboardMetrics();
+
+    if (typeof showToast === 'function') {
+        showToast('已删除自定义任务');
+    }
+}
+
 // 全局方法挂载 (用于 HTML onclick 与跨模块调用)
 if (typeof window !== 'undefined') {
     window.setWorkspaceMode = setWorkspaceMode;
@@ -2851,6 +3592,25 @@ if (typeof window !== 'undefined') {
     window.openEnvGuideModal = openEnvGuideModal;
     window.closeEnvGuideModal = closeEnvGuideModal;
     window.switchEnvModalTab = switchEnvModalTab;
+
+    // Phase 4 方法挂载
+    window.renderTaskHub = renderTaskHub;
+    window.toggleTaskCompleted = toggleTaskCompleted;
+    window.setRoutineMode = setRoutineMode;
+    window.openAlgorithmModal = openAlgorithmModal;
+    window.closeAlgorithmModal = closeAlgorithmModal;
+    window.saveAlgorithmProblem = saveAlgorithmProblem;
+    window.openBooksModal = openBooksModal;
+    window.closeBooksModal = closeBooksModal;
+    window.onBookSelectChange = onBookSelectChange;
+    window.saveBooksProgress = saveBooksProgress;
+    window.openCareerModal = openCareerModal;
+    window.closeCareerModal = closeCareerModal;
+    window.saveCareerNotes = saveCareerNotes;
+    window.openAddTaskModal = openAddTaskModal;
+    window.closeAddTaskModal = closeAddTaskModal;
+    window.saveCustomTask = saveCustomTask;
+    window.deleteCustomTask = deleteCustomTask;
 }
 
 if (typeof globalThis !== 'undefined') {
@@ -2860,6 +3620,25 @@ if (typeof globalThis !== 'undefined') {
     globalThis.openYuqueArticle = openYuqueArticle;
     globalThis.openTopologyDrawer = openTopologyDrawer;
     globalThis.closeTopologyDrawer = closeTopologyDrawer;
+
+    // Phase 4 方法挂载
+    globalThis.renderTaskHub = renderTaskHub;
+    globalThis.toggleTaskCompleted = toggleTaskCompleted;
+    globalThis.setRoutineMode = setRoutineMode;
+    globalThis.openAlgorithmModal = openAlgorithmModal;
+    globalThis.closeAlgorithmModal = closeAlgorithmModal;
+    globalThis.saveAlgorithmProblem = saveAlgorithmProblem;
+    globalThis.openBooksModal = openBooksModal;
+    globalThis.closeBooksModal = closeBooksModal;
+    globalThis.onBookSelectChange = onBookSelectChange;
+    globalThis.saveBooksProgress = saveBooksProgress;
+    globalThis.openCareerModal = openCareerModal;
+    globalThis.closeCareerModal = closeCareerModal;
+    globalThis.saveCareerNotes = saveCareerNotes;
+    globalThis.openAddTaskModal = openAddTaskModal;
+    globalThis.closeAddTaskModal = closeAddTaskModal;
+    globalThis.saveCustomTask = saveCustomTask;
+    globalThis.deleteCustomTask = deleteCustomTask;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -2872,7 +3651,15 @@ if (typeof module !== 'undefined' && module.exports) {
         openTopologyDrawer,
         closeTopologyDrawer,
         updateDashboardMetrics,
-        renderTodayMissionCard
+        renderTodayMissionCard,
+        renderTaskHub,
+        toggleTaskCompleted,
+        setRoutineMode,
+        saveAlgorithmProblem,
+        saveBooksProgress,
+        saveCareerNotes,
+        saveCustomTask,
+        deleteCustomTask
     };
 }
 
