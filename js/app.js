@@ -1704,6 +1704,11 @@ function renderLearningCppTab() {
                                                     <label for="check-${escapeHtml(item.id)}" class="text-sm font-bold font-serifHeading cursor-pointer ${isLearned ? 'line-through text-stone-400' : 'text-stone-900'}">
                                                         ${escapeHtml(item.title)}
                                                     </label>
+                                                    ${item.yuqueSection ? `
+                                                        <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-serifMono font-bold shrink-0">
+                                                            <i class="fa-solid fa-feather text-emerald-600"></i> 语雀路线: ${escapeHtml(item.yuqueSection)}
+                                                        </span>
+                                                    ` : ''}
                                                     <span class="px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 text-xs font-serifMono font-bold shrink-0">
                                                         <i class="fa-solid fa-book-bookmark text-sky-600"></i> ${escapeHtml(item.bookReference)}
                                                     </span>
