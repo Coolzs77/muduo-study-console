@@ -7283,14 +7283,13 @@ window.jumpToYuqueArticle = function(artId) {
     if (typeof selectYuqueArticle === 'function') selectYuqueArticle(artId);
 };
 
-// 渲染 muduo 知识库研读攻坚进度卡片 (与 YUQUE_DATASET 中 10 篇 muduo-core 专栏研读及 6 阶掌握度 100% 动态绑定)
+// 渲染 muduo 知识库进度卡片 (与 CppAIService 进度结构与逻辑 100% 保持一致与复用)
 function renderHomeMuduoCoreProgress() {
     const el = document.getElementById('home-muduo-core-progress-content');
     if (!el) return;
 
     let s = (typeof stateManager !== 'undefined' && stateManager) ? stateManager.getState() : appState;
     const masteryMap = (s && s.knowledgeMastery) || (window.appState && window.appState.knowledgeMastery) || {};
-    const recentList = (s && s.knowledgeRecent) || (window.appState && window.appState.knowledgeRecent) || [];
 
     // 获取所有 muduo-core 权威专栏篇目 (共 10 篇)
     const allDocs = (typeof getYuqueDataset === 'function' ? getYuqueDataset() : (window.YUQUE_DATASET || []));
@@ -7310,121 +7309,76 @@ function renderHomeMuduoCoreProgress() {
         ];
     }
 
-    // 1. 统计真实阅读与掌握篇目
-    const readDocs = muduoDocs.filter(d => {
+    // 1. 已研读/验证模块列表：严格基于掌握度（>= 1 为已研读，0 为未学习，绝不使用浏览历史伪造完成）
+    const completedDocs = muduoDocs.filter(d => {
         const lvl = (masteryMap[d.id] !== undefined ? masteryMap[d.id] : (masteryMap[d.slug] || 0));
-        return lvl >= 1 || recentList.includes(d.id);
+        return lvl >= 1;
     });
+    const completedModules = completedDocs.map(d => d.title.replace(/^[0-9]+[、\.]\s*/, ''));
 
-    const masteredDocs = muduoDocs.filter(d => {
-        const lvl = (masteryMap[d.id] !== undefined ? masteryMap[d.id] : (masteryMap[d.slug] || 0));
-        return lvl >= 3;
-    });
-
-    // 2. 动态定位当前正在研读/推荐攻坚的篇目
-    let currentDoc = null;
-    const curId = (window.appState && window.appState.currentYuqueArticleId);
-    if (curId && muduoDocs.some(d => d.id === curId)) {
-        currentDoc = muduoDocs.find(d => d.id === curId);
-    } else {
-        // 优先在最近研读记录中找 muduo 篇目
-        currentDoc = muduoDocs.find(d => recentList.includes(d.id));
-    }
-    // 若无最近阅读，寻找第一个尚未阅读(L < 1)的篇目驱动进度
-    if (!currentDoc) {
-        currentDoc = muduoDocs.find(d => {
-            const lvl = (masteryMap[d.id] !== undefined ? masteryMap[d.id] : (masteryMap[d.slug] || 0));
-            return lvl < 1 && !recentList.includes(d.id);
-        });
-    }
-    // 若均已读，寻找第一个尚未达到口述面试级(L < 3)的篇目强化巩固
-    if (!currentDoc) {
-        currentDoc = muduoDocs.find(d => {
-            const lvl = (masteryMap[d.id] !== undefined ? masteryMap[d.id] : (masteryMap[d.slug] || 0));
-            return lvl < 3;
-        });
-    }
-    if (!currentDoc) currentDoc = muduoDocs[0];
-
-    const curLvl = (masteryMap[currentDoc.id] !== undefined ? masteryMap[currentDoc.id] : (masteryMap[currentDoc.slug] || 0));
-    const cleanDocTitle = currentDoc.title.replace(/^[0-9]+[、\.]\s*/, '');
-
-    // 3. 计算所属阶段
-    let stageName = "阶段一：导读、大纲与演进路线 (架构总览)";
-    const idx = currentDoc.index || 1;
-    if (idx <= 3) {
-        stageName = "阶段一：导读、大纲与演进路线 (架构总览)";
-    } else if (idx <= 5) {
-        stageName = "阶段二：Reactor 核心架构与核心组件 (模型精髓)";
-    } else if (idx <= 7) {
-        stageName = "阶段三：重点类源码精讲与辅助工具 (手撕源码)";
-    } else {
-        stageName = "阶段四：项目难点攻关与求职面试 (面试突破)";
-    }
-
-    // 4. 计算徽章与状态文本
-    let statusBadge = "";
-    let statusDesc = "";
-    if (curLvl === 0) {
-        statusBadge = `<span class="font-mono text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">待研读 (L0)</span>`;
-        statusDesc = `${escapeHtml(currentDoc.category)} · 点击直接开始阅读`;
-    } else if (curLvl === 1) {
-        statusBadge = `<span class="font-mono text-sky-800 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200">通读了解 (L1)</span>`;
-        statusDesc = `${escapeHtml(currentDoc.category)} · 基础概念已过一遍`;
-    } else if (curLvl === 2) {
-        statusBadge = `<span class="font-mono text-blue-800 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">底层理解 (L2)</span>`;
-        statusDesc = `${escapeHtml(currentDoc.category)} · 状态机与调用链路理解`;
-    } else if (curLvl === 3) {
-        statusBadge = `<span class="font-mono text-indigo-800 font-bold bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">能够解释 (L3)</span>`;
-        statusDesc = `${escapeHtml(currentDoc.category)} · 达到面试口述级`;
-    } else if (curLvl === 4) {
-        statusBadge = `<span class="font-mono text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">能够编码 (L4)</span>`;
-        statusDesc = `${escapeHtml(currentDoc.category)} · 核心逻辑可独立手撕`;
-    } else {
-        statusBadge = `<span class="font-mono text-purple-800 font-bold bg-purple-50 px-2 py-0.5 rounded border border-purple-200">能够应用 (L5)</span>`;
-        statusDesc = `${escapeHtml(currentDoc.category)} · 生产调优与扩展`;
-    }
-
-    const doneCount = readDocs.length;
+    const doneCount = completedModules.length;
     const totalCount = muduoDocs.length;
     const pct = Math.round((doneCount / totalCount) * 100);
 
-    const completedTitles = readDocs.map(d => d.title.replace(/^[0-9]+[、\.]\s*/, ''));
-    const completedDisplay = completedTitles.length > 0 
-        ? completedTitles.join(', ')
-        : '尚未开始阅读（点击右上角“语雀专栏”开始）';
+    // 2. 当前攻坚模块：优先取当前正在阅读的篇目，若无则取首个未掌握(L0)篇目
+    let activeDoc = null;
+    const curId = (window.appState && window.appState.currentYuqueArticleId);
+    if (curId && muduoDocs.some(d => d.id === curId)) {
+        activeDoc = muduoDocs.find(d => d.id === curId);
+    }
+    if (!activeDoc) {
+        activeDoc = muduoDocs.find(d => {
+            const lvl = (masteryMap[d.id] !== undefined ? masteryMap[d.id] : (masteryMap[d.slug] || 0));
+            return lvl < 1;
+        });
+    }
+    if (!activeDoc) activeDoc = muduoDocs[muduoDocs.length - 1];
+
+    const activeModule = activeDoc.title.replace(/^[0-9]+[、\.]\s*/, '');
+    const idx = activeDoc.index || 1;
+
+    // 3. 当前攻坚阶段
+    let currentStage = "阶段一：导读、大纲与演进路线";
+    if (idx <= 3) {
+        currentStage = "阶段一：导读、大纲与演进路线";
+    } else if (idx <= 5) {
+        currentStage = "阶段二：Reactor 核心架构与核心组件";
+    } else if (idx <= 7) {
+        currentStage = "阶段三：重点类源码精讲与辅助工具";
+    } else {
+        currentStage = "阶段四：项目难点攻关与求职面试";
+    }
+
+    const safeStage = typeof escapeHtml === 'function' ? escapeHtml(currentStage) : currentStage;
+    const safeModule = typeof escapeHtml === 'function' ? escapeHtml(activeModule) : activeModule;
+    const completedStr = completedModules.length > 0 ? completedModules.join(', ') : '暂无';
+    const safeCompleted = typeof escapeHtml === 'function' ? escapeHtml(completedStr) : completedStr;
 
     el.innerHTML = `
         <div class="space-y-2.5">
             <div>
-                <span class="text-stone-400 text-[10px] block">当前研读阶段</span>
-                <span class="font-bold text-stone-900 text-xs">${escapeHtml(stageName)}</span>
+                <span class="text-stone-400 text-[10px] block">当前攻坚阶段</span>
+                <span class="font-bold text-stone-900 text-xs">${safeStage}</span>
             </div>
             <div>
-                <span class="text-stone-400 text-[10px] block">当前研读章节</span>
-                <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                    <button onclick="jumpToYuqueArticle('${currentDoc.id}')" class="font-mono text-sky-800 font-bold bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded border border-sky-200 text-left transition cursor-pointer" title="点击直接打开此章节研读">
-                        ${escapeHtml(cleanDocTitle)} <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-sky-600"></i>
-                    </button>
-                    ${statusBadge}
+                <span class="text-stone-400 text-[10px] block">当前攻坚模块</span>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="font-mono text-sky-800 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200">${safeModule}</span>
+                    <span class="text-[10px] text-stone-500">源码精读与架构研读中</span>
                 </div>
-                <div class="text-[10px] text-stone-500 mt-1">${statusDesc}</div>
             </div>
             <div class="pt-1">
                 <div class="flex items-center justify-between text-[11px] mb-1">
-                    <span class="text-stone-500">专栏研读掌握进度</span>
-                    <div class="flex items-center gap-1.5">
-                        <span class="font-bold text-sky-800">${doneCount} / ${totalCount} 篇 (${pct}%)</span>
-                        <span class="text-[10px] text-stone-400 font-normal">L3+精通: ${masteredDocs.length} 篇</span>
-                    </div>
+                    <span class="text-stone-500">模块验证进度</span>
+                    <span class="font-bold text-stone-800">${doneCount} / ${totalCount} (${pct}%)</span>
                 </div>
                 <div class="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
                     <div class="bg-sky-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
                 </div>
             </div>
             <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px]">
-                <span class="text-stone-400 shrink-0">已研读篇目:</span>
-                <span class="text-stone-700 font-semibold truncate max-w-[190px] ml-2" title="${escapeHtml(completedTitles.join(', '))}">${escapeHtml(completedDisplay)}</span>
+                <span class="text-stone-400">已验证模块:</span>
+                <span class="text-stone-700 font-semibold truncate max-w-[170px]" title="${safeCompleted}">${safeCompleted}</span>
             </div>
         </div>
     `;

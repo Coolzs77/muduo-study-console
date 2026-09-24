@@ -442,11 +442,6 @@ function selectYuqueArticle(artId) {
     // 记录到最近阅读 (去重，保留最新)
     appState.knowledgeRecent = [artId, ...appState.knowledgeRecent.filter(id => id !== artId)].slice(0, 10);
 
-    // 如果打开此前未学习(L0)的文章，自动记为已通读(L1 了解)，真实阅读进展立刻生效
-    if (appState.knowledgeMastery[artId] === undefined || appState.knowledgeMastery[artId] === 0) {
-        appState.knowledgeMastery[artId] = 1;
-    }
-
     saveYuqueState();
 
     renderYuqueRecentPills();

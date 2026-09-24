@@ -42,25 +42,53 @@ setTimeout(async () => {
       await send('Page.navigate', { url: 'file:///e:/workspace/muduo-study-console/index.html' });
       await new Promise(r => setTimeout(r, 2000));
 
-      // 1. Initial State Check
+      // 1. Initial State Check (should be 0%)
       const initialText = await send('Runtime.evaluate', {
         expression: `document.getElementById('home-muduo-core-progress-content').innerText`,
         returnByValue: true
       });
-      console.log('--- Initial Muduo Core Card Text ---\n', initialText?.result?.value);
+      console.log('--- Step 1: Initial Muduo Core Card Text ---\n', initialText?.result?.value);
 
-      // 2. Simulate reading article 1 (L3) and article 6 (L4)
-      console.log('\nSimulating user reading and rating articles...');
+      // 2. Open article 1 without rating -> MUST REMAIN 0%
+      await send('Runtime.evaluate', {
+        expression: `selectYuqueArticle('yq_muduo_01');`
+      });
+      const textAfterOpen = await send('Runtime.evaluate', {
+        expression: `document.getElementById('home-muduo-core-progress-content').innerText`,
+        returnByValue: true
+      });
+      console.log('--- Step 2: After Simply Opening Article 1 (Must be 0%) ---\n', textAfterOpen?.result?.value);
+
+      // 3. Mark article 1 as L1 (了解) -> MUST BECOME 1/10 (10%)
+      await send('Runtime.evaluate', {
+        expression: `setYuqueMastery('yq_muduo_01', 1);`
+      });
+      const textAfterL1 = await send('Runtime.evaluate', {
+        expression: `document.getElementById('home-muduo-core-progress-content').innerText`,
+        returnByValue: true
+      });
+      console.log('--- Step 3: After Setting Article 1 to L1 (Must be 1/10 10%) ---\n', textAfterL1?.result?.value);
+
+      // 4. Mark article 1 back to L0 (未学习) -> MUST REVERT TO 0/10 (0%)
+      await send('Runtime.evaluate', {
+        expression: `setYuqueMastery('yq_muduo_01', 0);`
+      });
+      const textAfterRevertL0 = await send('Runtime.evaluate', {
+        expression: `document.getElementById('home-muduo-core-progress-content').innerText`,
+        returnByValue: true
+      });
+      console.log('--- Step 4: After Reverting Article 1 to L0 未学习 (Must be 0/10 0%) ---\n', textAfterRevertL0?.result?.value);
+
+      // 5. Finally, set article 1 (L3) and article 6 (L4)
       await send('Runtime.evaluate', {
         expression: `(() => {
-          selectYuqueArticle('yq_muduo_01');
-          setYuqueMastery('yq_muduo_01', 3); // L3 口述面试级
+          setYuqueMastery('yq_muduo_01', 3);
           selectYuqueArticle('yq_muduo_06');
-          setYuqueMastery('yq_muduo_06', 4); // L4 能够编码级
+          setYuqueMastery('yq_muduo_06', 4);
           switchView('dashboard');
         })()`
       });
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 400));
 
       const updatedText = await send('Runtime.evaluate', {
         expression: `document.getElementById('home-muduo-core-progress-content').innerText`,
