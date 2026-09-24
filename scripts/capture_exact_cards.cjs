@@ -50,6 +50,7 @@ setTimeout(async () => {
       const rects = await send('Runtime.evaluate', {
         expression: `(() => {
           const p = document.getElementById('home-zone-project-progress').getBoundingClientRect();
+          const core = document.getElementById('home-zone-muduo-core-progress').getBoundingClientRect();
           const m = document.getElementById('home-zone-muduo-progress').getBoundingClientRect();
           return JSON.stringify({
             x: Math.round(window.scrollX + p.left - 10),
@@ -60,7 +61,7 @@ setTimeout(async () => {
         })()`,
         returnByValue: true
       });
-      console.log('Absolute page rect:', rects?.result?.value);
+      console.log('Absolute page rect for 3 cards:', rects?.result?.value);
 
       const clip = JSON.parse(rects.result.value);
       clip.scale = 1;

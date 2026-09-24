@@ -7103,6 +7103,7 @@ if (typeof globalThis !== 'undefined') {
 function renderHomeDashboard() {
     renderTodayTasks();
     renderHomeProjectProgress();
+    renderHomeMuduoCoreProgress();
     renderHomeMuduoProgress();
     renderRecentWorkLogs();
     renderHomeWeeklyMetrics();
@@ -7276,8 +7277,9 @@ function renderHomeProjectProgress() {
     `;
 }
 
-function renderHomeMuduoProgress() {
-    const el = document.getElementById('home-muduo-progress-content');
+// 渲染 muduo 知识库攻坚进度卡片 (紧随 CppAIService 进度下方，结构与设计语言 100% 对齐)
+function renderHomeMuduoCoreProgress() {
+    const el = document.getElementById('home-muduo-core-progress-content');
     if (!el) return;
 
     let s = (typeof stateManager !== 'undefined' && stateManager) ? stateManager.getState() : appState;
@@ -7295,7 +7297,6 @@ function renderHomeMuduoProgress() {
     if (s && s.muduoProgress && typeof s.muduoProgress === 'object') {
         muduoProj = Object.assign({}, muduoProj, s.muduoProgress);
     } else {
-        // 动态根据 28 天打卡进度推导 muduo 底层核心模块研读进展
         const coreModules = [
             { name: "Channel", day: 8 },
             { name: "Poller", day: 9 },
@@ -7359,6 +7360,66 @@ function renderHomeMuduoProgress() {
             <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px]">
                 <span class="text-stone-400">已研读核心模块:</span>
                 <span class="text-stone-700 font-semibold truncate max-w-[170px]" title="${(muduoProj.completedModules || []).join(', ')}">${(muduoProj.completedModules || []).join(', ')}</span>
+            </div>
+        </div>
+    `;
+}
+
+// 渲染 muduo 28天学习日程与完成率进度卡片 (独立原版 28 天任务驱动)
+function renderHomeMuduoProgress() {
+    const el = document.getElementById('home-muduo-progress-content');
+    if (!el) return;
+
+    let s = (typeof stateManager !== 'undefined' && stateManager) ? stateManager.getState() : appState;
+    const completedDays = (s && s.completedDays) ? s.completedDays : [];
+    const activeDay = completedDays.length > 0 ? Math.min(28, Math.max(...completedDays) + 1) : 1;
+    const pct = Math.round((completedDays.length / 28) * 100);
+
+    const weekThemes = {
+        1: "Week 1: 生命周期与 RAII",
+        2: "Week 2: 智能指针与 Buffer 机制",
+        3: "Week 3: EventLoop 事件分发",
+        4: "Week 4: 多线程 Reactor 与 TCP 全流程"
+    };
+    const curWeek = Math.ceil(activeDay / 7);
+    const theme = weekThemes[curWeek] || "Week 1: 源码基础";
+
+    const coreCodes = {
+        1: "muduo/base/Timestamp.h",
+        2: "muduo/base/Atomic.h",
+        3: "muduo/base/Thread.cc",
+        4: "muduo/base/Mutex.h",
+        5: "muduo/base/Condition.h",
+        6: "muduo/base/CountDownLatch.cc",
+        7: "muduo/base/BlockingQueue.h",
+        8: "muduo/net/Channel.cc",
+        9: "muduo/net/Poller.cc",
+        10: "muduo/net/poller/EPollPoller.cc",
+        11: "muduo/net/EventLoop.cc",
+        12: "muduo/net/EventLoopThread.cc",
+        13: "muduo/net/EventLoopThreadPool.cc",
+        14: "muduo/net/TimerQueue.cc"
+    };
+    const todayCode = coreCodes[activeDay] || "muduo/net/EventLoop.cc";
+
+    el.innerHTML = `
+        <div class="space-y-2.5">
+            <div>
+                <span class="text-stone-400 text-[10px] block">当前学习日程</span>
+                <span class="font-bold text-stone-900 text-xs">Day ${activeDay} / 28 天 · ${theme}</span>
+            </div>
+            <div class="pt-1">
+                <div class="flex items-center justify-between text-[11px] mb-1">
+                    <span class="text-stone-500">28天完成率</span>
+                    <span class="font-bold text-indigo-800">${completedDays.length} / 28 (${pct}%)</span>
+                </div>
+                <div class="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
+                    <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                </div>
+            </div>
+            <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                <span class="text-stone-400">今日研读核心:</span>
+                <span class="font-mono text-indigo-800 font-bold">${todayCode}</span>
             </div>
         </div>
     `;

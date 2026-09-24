@@ -312,18 +312,33 @@
                     </div>
                 </div>
 
-                <!-- 区域 3：muduo 核心进度 (结构完全对齐 CppAIService 进度) -->
+                <!-- 卡片 2：muduo 知识库进度 (结构与 CppAIService 进度完全对齐，紧接在 CppAIService 下方) -->
+                <div id="home-zone-muduo-core-progress" class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
+                        <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5 font-serifHeading">
+                            <i class="fa-solid fa-book-bookmark text-sky-700"></i> muduo 知识库进度
+                        </h3>
+                        <button onclick="switchView('knowledge')" class="text-xs text-sky-700 hover:text-sky-900 font-serifMono cursor-pointer">
+                            语雀专栏 &rarr;
+                        </button>
+                    </div>
+                    <div id="home-muduo-core-progress-content" class="space-y-2.5 font-serifMono text-xs text-stone-700">
+                        <!-- JS 渲染 muduo 知识库攻坚进度 -->
+                    </div>
+                </div>
+
+                <!-- 卡片 3：muduo 28天学习日程 (原版 28 天任务打卡进度卡片，独立保留) -->
                 <div id="home-zone-muduo-progress" class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
                     <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
                         <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5 font-serifHeading">
-                            <i class="fa-solid fa-code-branch text-sky-700"></i> muduo 核心进度
+                            <i class="fa-solid fa-code-branch text-indigo-700"></i> muduo 28天学习日程
                         </h3>
-                        <button onclick="switchView('daily')" class="text-xs text-sky-700 hover:text-sky-900 font-serifMono cursor-pointer">
+                        <button onclick="switchView('daily')" class="text-xs text-indigo-700 hover:text-indigo-900 font-serifMono cursor-pointer">
                             28天路线 &rarr;
                         </button>
                     </div>
                     <div id="home-muduo-progress-content" class="space-y-2.5 font-serifMono text-xs text-stone-700">
-                        <!-- JS 渲染 muduo 核心进度 -->
+                        <!-- JS 渲染 28 天学习日程与完成率 -->
                     </div>
                 </div>
 
