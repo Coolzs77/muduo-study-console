@@ -6,17 +6,21 @@
 
 // 1. 双核心项目字典 (DOMAIN_PROJECTS)
 var DOMAIN_PROJECTS = [
-  {
+    {
     id: "proj_muduo",
     name: "muduo C++ 网络库",
-    tagline: "基于 C++11 的 Reactor 模式网络库实现",
+    tagline: "基于 C++11 重构的 Reactor 模式网络库实现",
     standard: "C++11",
     repoUrl: "https://github.com/chenshuo/muduo",
     localStudyRepo: "https://github.com/Coolzs77/muduo-study-console",
-    role: "L0~L2 网络层：负责 epoll 水平/边缘触发、One Loop Per Thread 事件循环模型、非阻塞 I/O 与应用层 Buffer 读写管理",
+    yuqueUrl: "https://www.yuque.com/chengxuyuancarl/gixnqn",
+    yuquePassword: "khf4",
+    yuqueTitle: "网络库muduo-core",
+    role: "L0~L2 底座：吃透 epoll 水平/边缘触发、One Loop Per Thread 事件循环模型、非阻塞 I/O 与应用层 Buffer 读写",
     techStack: ["C++11", "Linux", "epoll", "Reactor", "pthread", "POSIX Socket", "RAII"],
     modulesCount: 10,
     tasksCount: 28,
+    articlesCount: 10,
     status: "active",
     badgeClass: "bg-sky-50 text-sky-800 border-sky-300"
   },
@@ -50,7 +54,8 @@ var DOMAIN_MODULES = [
     functions: ["loop()", "quit()", "runInLoop()", "queueInLoop()", "wakeup()", "handleRead()"],
     desc: "One Loop Per Thread 机制实现。每个线程最多拥有一个 EventLoop，通过 eventfd 实现跨线程安全唤醒，调用 Poller 派发就绪 Channel。",
     threadModel: "单线程独占，通过 pendingFunctors_ 跨线程转移计算任务",
-    keyConcepts: ["One Loop Per Thread", "eventfd 唤醒", "pendingFunctors 双缓冲防死锁"]
+    keyConcepts: ["One Loop Per Thread", "eventfd 唤醒", "pendingFunctors 双缓冲防死锁"],
+    yuqueDocIds: ["yq_muduo_04", "yq_muduo_05", "yq_muduo_06", "yq_muduo_10"]
   },
   {
     id: "mod_net_channel",
@@ -63,7 +68,8 @@ var DOMAIN_MODULES = [
     functions: ["setReadCallback()", "setWriteCallback()", "enableReading()", "handleEventWithGuard()", "tie()"],
     desc: "单个文件描述符 (fd) 的事件生命周期包装器。不拥有 fd，负责挂载读写/错误/关闭回调，并使用 weak_ptr 绑定生命周期杜绝空指针悬挂。",
     threadModel: "严格从属于所属 EventLoop 所在线程",
-    keyConcepts: ["fd 关注事件掩码 (POLLIN/POLLOUT)", "tie_ 弱引用生命周期防撕裂"]
+    keyConcepts: ["fd 关注事件掩码 (POLLIN/POLLOUT)", "tie_ 弱引用生命周期防撕裂"],
+    yuqueDocIds: ["yq_muduo_05", "yq_muduo_06", "yq_muduo_10"]
   },
   {
     id: "mod_net_poller",
@@ -76,7 +82,8 @@ var DOMAIN_MODULES = [
     functions: ["poll()", "updateChannel()", "removeChannel()", "fillActiveChannels()"],
     desc: "底层 I/O 多路复用解耦层。封装 Linux epoll_create1 / epoll_ctl / epoll_wait，实现 Channel 从关注树到就绪列表的高效映射。",
     threadModel: "被 EventLoop 线程独占调用",
-    keyConcepts: ["epoll 水平/边缘触发", "ChannelMap 维护", "操作系统的就绪事件队列转存"]
+    keyConcepts: ["epoll 水平/边缘触发", "ChannelMap 维护", "操作系统的就绪事件队列转存"],
+    yuqueDocIds: ["yq_muduo_05", "yq_muduo_06", "yq_muduo_08", "yq_muduo_10"]
   },
   {
     id: "mod_net_tcpconnection",
@@ -89,7 +96,8 @@ var DOMAIN_MODULES = [
     functions: ["send()", "shutdown()", "handleRead()", "handleWrite()", "handleClose()"],
     desc: "已建立的客户端 TCP 物理连接抽象。内部持有输入输出 Buffer、高低水位回调与半关闭状态机。",
     threadModel: "运行在所属 SubReactor (I/O) 线程",
-    keyConcepts: ["应用层发送缓冲区管理", "shutdownWrite 半关闭", "enable_shared_from_this 跨线程生命期安全"]
+    keyConcepts: ["应用层发送缓冲区管理", "shutdownWrite 半关闭", "enable_shared_from_this 跨线程生命期安全"],
+    yuqueDocIds: ["yq_muduo_05", "yq_muduo_06", "yq_muduo_10"]
   },
   {
     id: "mod_net_buffer",
@@ -102,7 +110,8 @@ var DOMAIN_MODULES = [
     functions: ["readFd()", "append()", "retrieve()", "peek()", "makeSpace()"],
     desc: "基于 std::vector<char> 实现的应用层缓冲区。包含 prependable / readable / writable 三段式设计，利用 readv 与栈上临时 64KB 空间兼顾空间利用率与系统调用开销。",
     threadModel: "每个连接独占，无锁并发",
-    keyConcepts: ["readv 分散读", "动态扩容", "内存紧凑 moveReadable"]
+    keyConcepts: ["readv 分散读", "动态扩容", "内存紧凑 moveReadable"],
+    yuqueDocIds: ["yq_muduo_06", "yq_muduo_10"]
   },
   {
     id: "mod_net_tcpserver",
@@ -115,7 +124,8 @@ var DOMAIN_MODULES = [
     functions: ["setThreadNum()", "start()", "newConnection()", "removeConnection()"],
     desc: "主从 Reactor 模型实现。主线程 Acceptor 监听连接并通过轮询分发给工作线程的 EventLoop，处理后续数据 I/O。",
     threadModel: "单 MainReactor 监听 + N 个 SubReactor 工作线程",
-    keyConcepts: ["主从 Reactor 模型", "轮询分发负载均衡", "退出清理机制"]
+    keyConcepts: ["主从 Reactor 模型", "轮询分发负载均衡", "退出清理机制"],
+    yuqueDocIds: ["yq_muduo_03", "yq_muduo_05", "yq_muduo_06", "yq_muduo_09"]
   },
   {
     id: "mod_base_threadpool",

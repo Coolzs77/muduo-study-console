@@ -19,9 +19,10 @@ function ensureYuqueState() {
     if (!appState.knowledgeMastery) appState.knowledgeMastery = {};
     if (!Array.isArray(appState.knowledgeFavorites)) appState.knowledgeFavorites = [];
     if (!Array.isArray(appState.knowledgeRecent)) appState.knowledgeRecent = [];
-    if (!appState.currentYuqueArticleId) appState.currentYuqueArticleId = "yq_01";
+    if (!appState.currentYuqueArticleId) appState.currentYuqueArticleId = "yq_muduo_01";
     if (!appState.yuqueActiveTag) appState.yuqueActiveTag = "all";
     if (!appState.yuqueSearchQuery) appState.yuqueSearchQuery = "";
+    if (!appState.yuqueBookFilter) appState.yuqueBookFilter = "all";
 }
 
 // 掌握度等级定义 (6阶)
@@ -266,12 +267,14 @@ function renderYuqueExplorer() {
     renderYuqueReader(appState.currentYuqueArticleId);
 }
 
-// 统计掌握度与收藏指标
+// 统计掌握度与收藏指标 (支持按专栏动态过滤统计)
 function renderYuqueMetrics() {
     const dataset = getYuqueDataset();
-    const total = dataset.length;
+    const filter = appState.yuqueBookFilter || 'all';
+    const filtered = filter === 'all' ? dataset : dataset.filter(d => d.bookId === filter);
+    const total = filtered.length;
     let masteredCount = 0;
-    dataset.forEach(art => {
+    filtered.forEach(art => {
         const lvl = appState.knowledgeMastery[art.id] || 0;
         if (lvl >= 3) masteredCount++; // 达到“能够解释”或以上算掌握
     });
@@ -280,7 +283,10 @@ function renderYuqueMetrics() {
     if (masteredEl) masteredEl.innerText = `${masteredCount} / ${total} 篇`;
 
     const favEl = document.getElementById('yq-fav-stat');
-    if (favEl) favEl.innerText = `${appState.knowledgeFavorites.length} 篇`;
+    if (favEl) {
+        const favCount = filtered.filter(art => appState.knowledgeFavorites.includes(art.id)).length;
+        favEl.innerText = `${favCount} 篇`;
+    }
 }
 
 // 渲染左侧“最近阅读”小药丸
@@ -317,6 +323,11 @@ function renderYuqueDirectoryList() {
 
     // 过滤文档
     let filtered = dataset.filter(art => {
+        // 专栏知识库过滤
+        if (appState.yuqueBookFilter && appState.yuqueBookFilter !== 'all') {
+            if (art.bookId !== appState.yuqueBookFilter) return false;
+        }
+
         // 标签过滤
         if (activeTag === 'fav') {
             if (!appState.knowledgeFavorites.includes(art.id)) return false;
@@ -377,6 +388,7 @@ function renderYuqueDirectoryList() {
 
                 <div class="flex items-center justify-between text-[11px] font-serifMono text-stone-500 mt-0.5">
                     <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${art.bookId === 'muduo-core' ? 'bg-sky-100 text-sky-900 border border-sky-200' : 'bg-emerald-50 text-emerald-900 border border-emerald-200'}">${safeEscape(art.bookBadge || (art.bookId === 'muduo-core' ? 'muduo核心' : 'HTTP框架'))}</span>
                         <span class="px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 text-[10px]">${safeEscape(art.category)}</span>
                         <span>${(art.wordCount / 1000).toFixed(1)}k 字</span>
                     </div>
@@ -419,7 +431,8 @@ function renderYuqueReader(artId) {
     const metaEl = document.getElementById('yq-reader-meta');
     if (metaEl) {
         metaEl.innerHTML = `
-            <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-bold">${safeEscape(art.category)}</span>
+            <span class="px-2 py-0.5 rounded-md ${art.bookId === 'muduo-core' ? 'bg-sky-100 text-sky-900 border-sky-300 font-black' : 'bg-amber-100 text-amber-900 border-amber-300 font-black'}">${safeEscape(art.bookTitle || '语雀专栏')}${art.bookId === 'muduo-core' ? ' · 密码: khf4' : ''}</span>
+            <span class="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 border border-stone-200 font-bold">${safeEscape(art.category)}</span>
             <span>字数: <strong class="text-stone-800">${art.wordCount.toLocaleString()}</strong> 字</span>
             <span>更新: ${art.updatedAt ? art.updatedAt.slice(0, 10) : '近期'}</span>
             <span class="text-emerald-700 font-bold"><i class="fa-solid fa-circle-check"></i> 100% FULL 离线就绪</span>
@@ -889,8 +902,62 @@ window.handleImageLoadError = function(img) {
 };
 
 // 自执行加载
+
+// 切换专栏知识库 (all, muduo-core, http-server)
+window.filterYuqueBook = function(bookId) {
+    ensureYuqueState();
+    appState.yuqueBookFilter = bookId;
+
+    // 更新书籍切换按钮 UI 状态
+    document.querySelectorAll('.yq-book-tab').forEach(btn => {
+        const b = btn.getAttribute('data-book');
+        if (b === bookId) {
+            btn.className = "yq-book-tab px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 bg-stone-900 text-white shadow-xs cursor-pointer";
+        } else {
+            btn.className = "yq-book-tab px-3.5 py-1.5 rounded-xl font-semibold transition flex items-center gap-1.5 bg-white border border-stone-200 hover:bg-stone-100 text-stone-800 cursor-pointer";
+        }
+    });
+
+    // 如果当前选中的文章不在当前知识库范围内，切换到该知识库首篇文章
+    const dataset = getYuqueDataset();
+    if (bookId !== 'all') {
+        const cur = dataset.find(d => d.id === appState.currentYuqueArticleId);
+        if (!cur || cur.bookId !== bookId) {
+            const firstOfBook = dataset.find(d => d.bookId === bookId);
+            if (firstOfBook) {
+                appState.currentYuqueArticleId = firstOfBook.id;
+            }
+        }
+    }
+
+    renderYuqueMetrics();
+    renderYuqueDirectoryList();
+    renderYuqueReader(appState.currentYuqueArticleId);
+    saveYuqueState();
+};
+
+// 全局一键直达指定语雀文章
+window.jumpToYuqueArticle = function(artId) {
+    if (typeof switchView === 'function') {
+        switchView('knowledge');
+    }
+    ensureYuqueState();
+    const dataset = getYuqueDataset();
+    const art = dataset.find(d => d.id === artId);
+    if (art && art.bookId) {
+        window.filterYuqueBook(art.bookId);
+    }
+    selectYuqueArticle(artId);
+    window.scrollToReaderTop();
+    if (typeof showToast === 'function' && art) {
+        showToast(`已直达专栏精读：【${art.title}】`);
+    }
+};
+
 if (typeof window !== 'undefined') {
     window.renderYuqueExplorer = renderYuqueExplorer;
+    window.filterYuqueBook = filterYuqueBook;
+    window.jumpToYuqueArticle = jumpToYuqueArticle;
     window.loadYuqueState = loadYuqueState;
     window.selectYuqueArticle = selectYuqueArticle;
     window.openYuqueImageModal = openYuqueImageModal;

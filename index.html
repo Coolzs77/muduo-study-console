@@ -1374,23 +1374,23 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-900 text-[10px] font-bold font-serifMono">
-                            KNOWLEDGE REPOSITORY
+                            DUAL KNOWLEDGE BASES
                         </span>
-                        <span class="text-xs text-stone-400 font-serifMono">17 篇完整专栏 · 68,091 字精析</span>
+                        <span class="text-xs text-stone-500 font-serifMono">2 大权威专栏 · 27 篇深度解析 · 98,011 字原版图解精析 · 密码 khf4 离线全量嵌入</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-black text-stone-900 mt-1 font-serifHeading flex items-center gap-2">
-                        <i class="fa-solid fa-book-bookmark text-blue-600"></i>
-                        CppAIService 核心架构与设计模式专栏
+                        <i class="fa-solid fa-book-bookmark text-sky-700"></i>
+                        muduo-core & CppAIService 语雀原版专栏知识库
                     </h2>
                     <p class="text-xs text-stone-600 mt-1 max-w-3xl leading-relaxed">
-                        基于程序员 Carl《HTTP服务框架》专栏，分析现代 C++ 网络库与服务实现。已建立 <strong>文章 ➔ 源码行级 ➔ 面试考点</strong> 关联索引。
+                        深度整合程序员 Carl《网络库muduo-core》(访问密码: khf4) 与《HTTP服务框架》双专栏，覆盖底层 Reactor 反应堆、epoll 核心类、异步日志、HTTP 状态机解析与两段式 MCP 协议。已打通 <strong>专栏文章 ➔ 源码行级 ➔ 避坑记录 ➔ 考点自测</strong> 全链路。
                     </p>
                 </div>
                 <!-- 右侧掌握度指标卡 -->
                 <div class="flex items-center gap-3 shrink-0 font-serifMono">
                     <div class="bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-center">
                         <div class="text-[10px] text-stone-500 font-bold">深度掌握</div>
-                        <div class="text-base font-bold text-blue-700 mt-0.5" id="yq-mastered-stat">0 / 17 篇</div>
+                        <div class="text-base font-bold text-sky-800 mt-0.5" id="yq-mastered-stat">0 / 27 篇</div>
                     </div>
                     <div class="bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-center">
                         <div class="text-[10px] text-stone-500 font-bold">重点收藏</div>
@@ -1399,15 +1399,36 @@
                 </div>
             </div>
 
+            <!-- 双权威专栏知识库切换选择器 -->
+            <div class="flex flex-wrap items-center gap-2 mb-4 p-2 bg-stone-50/90 rounded-xl border border-stone-200/80 font-serifMono text-xs">
+                <span class="text-stone-500 font-bold px-2 shrink-0 flex items-center gap-1.5">
+                    <i class="fa-solid fa-layer-group text-sky-700"></i> 专栏切换：
+                </span>
+                <button onclick="filterYuqueBook('all')" data-book="all" class="yq-book-tab px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 bg-stone-900 text-white shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-cubes text-amber-400"></i>
+                    <span>全部知识库 (27篇 · 98,011字)</span>
+                </button>
+                <button onclick="filterYuqueBook('muduo-core')" data-book="muduo-core" class="yq-book-tab px-3.5 py-1.5 rounded-xl font-semibold transition flex items-center gap-1.5 bg-white border border-stone-200 hover:bg-stone-100 text-stone-800 cursor-pointer">
+                    <i class="fa-solid fa-server text-sky-600"></i>
+                    <span>网络库 muduo-core (10篇 · 密码 khf4)</span>
+                </button>
+                <button onclick="filterYuqueBook('http-server')" data-book="http-server" class="yq-book-tab px-3.5 py-1.5 rounded-xl font-semibold transition flex items-center gap-1.5 bg-white border border-stone-200 hover:bg-stone-100 text-stone-800 cursor-pointer">
+                    <i class="fa-solid fa-microchip text-emerald-600"></i>
+                    <span>HTTP服务框架与AI平台 (17篇)</span>
+                </button>
+            </div>
+
             <!-- 搜索与标签过滤器 -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-serifMono">
-                    <button onclick="filterYuqueTag('all')" data-tag="all" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-bold bg-amber-800 text-white shadow-xs transition cursor-pointer">全部 (17)</button>
+                    <button onclick="filterYuqueTag('all')" data-tag="all" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-bold bg-amber-800 text-white shadow-xs transition cursor-pointer">全部 (27)</button>
+                    <button onclick="filterYuqueTag('重点源码精讲')" data-tag="重点源码精讲" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">重点源码精讲</button>
+                    <button onclick="filterYuqueTag('难点与高频面试')" data-tag="难点与高频面试" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">项目难点汇总</button>
                     <button onclick="filterYuqueTag('架构设计')" data-tag="架构设计" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">架构设计</button>
-                    <button onclick="filterYuqueTag('设计模式')" data-tag="设计模式" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">设计模式</button>
-                    <button onclick="filterYuqueTag('协议解析')" data-tag="协议解析" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">协议解析</button>
                     <button onclick="filterYuqueTag('核心组件')" data-tag="核心组件" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">核心组件</button>
-                    <button onclick="filterYuqueTag('高级特性')" data-tag="高级特性" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">高级特性</button>
+                    <button onclick="filterYuqueTag('工具组件')" data-tag="工具组件" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">工具组件</button>
+                    <button onclick="filterYuqueTag('八股与扩展')" data-tag="八股与扩展" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">八股与扩展</button>
+                    <button onclick="filterYuqueTag('求职面试')" data-tag="求职面试" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer">求职面试</button>
                     <button onclick="filterYuqueTag('fav')" data-tag="fav" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer text-amber-700"><i class="fa-solid fa-star text-[10px] mr-1"></i>收藏</button>
                     <button onclick="filterYuqueTag('pending')" data-tag="pending" class="yq-tag-btn px-3 py-1 rounded-lg text-xs font-serifMono font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer text-rose-700"><i class="fa-solid fa-hourglass-half text-[10px] mr-1"></i>待学习</button>
                 </div>
