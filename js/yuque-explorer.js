@@ -436,15 +436,27 @@ function selectYuqueArticle(artId) {
     const art = dataset.find(d => d.id === artId);
     if (!art) return;
 
+    ensureYuqueState();
     appState.currentYuqueArticleId = artId;
 
     // 记录到最近阅读 (去重，保留最新)
     appState.knowledgeRecent = [artId, ...appState.knowledgeRecent.filter(id => id !== artId)].slice(0, 10);
+
+    // 如果打开此前未学习(L0)的文章，自动记为已通读(L1 了解)，真实阅读进展立刻生效
+    if (appState.knowledgeMastery[artId] === undefined || appState.knowledgeMastery[artId] === 0) {
+        appState.knowledgeMastery[artId] = 1;
+    }
+
     saveYuqueState();
 
     renderYuqueRecentPills();
     renderYuqueDirectoryList();
     renderYuqueReader(artId);
+
+    // 联动触发首页进度卡片动态更新
+    if (typeof renderHomeMuduoCoreProgress === 'function') {
+        renderHomeMuduoCoreProgress();
+    }
 }
 
 // 静态文章渲染 HTML 缓存，杜绝重复 Markdown 解析与高亮计算
@@ -537,6 +549,11 @@ window.setYuqueMastery = function(artId, level) {
     renderYuqueMetrics();
     renderYuqueDirectoryList();
     renderMasterySelector(artId);
+
+    // 联动触发首页进度卡片动态更新
+    if (typeof renderHomeMuduoCoreProgress === 'function') {
+        renderHomeMuduoCoreProgress();
+    }
 };
 
 // 收藏切换
@@ -910,6 +927,11 @@ function loadYuqueState() {
         const isCollapsed = localStorage.getItem('cppai_sidebar_collapsed');
         if (isCollapsed === 'true') {
             toggleYuqueSidebar(true);
+        }
+
+        // 恢复后即时刷新首页关联研读进度卡片
+        if (typeof renderHomeMuduoCoreProgress === 'function') {
+            renderHomeMuduoCoreProgress();
         }
     } catch (e) {
         console.warn("恢复语雀状态失败:", e);
