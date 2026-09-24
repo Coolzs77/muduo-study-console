@@ -237,6 +237,12 @@ function renderMarkdownSafe(mdText) {
         text = text.replace(`__CODE_BLOCK_${idx}__`, renderedBlock);
     });
 
+    // 11. 终极兜底扫描：无论在任何标签内部残留的 __INLINE_CODE_，百分之百还原为带样式的 code 标签！
+    text = text.replace(/__INLINE_CODE_(\d+)__/g, (m, idx) => {
+        const code = inlineCodes[parseInt(idx, 10)] || "";
+        return `<code class="bg-stone-100 text-amber-900 border border-stone-200 px-1.5 py-0.5 rounded text-[11px] font-mono">${safeEscape(code)}</code>`;
+    });
+
     return text;
 }
 
