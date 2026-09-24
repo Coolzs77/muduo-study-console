@@ -4,7 +4,21 @@ const path = require('path');
 const rootDir = path.resolve(__dirname, '..');
 const distDir = path.resolve(rootDir, 'dist');
 
+const { execSync } = require('child_process');
+
 console.log('[BUILD] Packaging decoupled static web console into dist/ ...');
+
+// Compile static Tailwind CSS
+try {
+  console.log('[BUILD] Compiling static Tailwind CSS (css/tailwind.min.css)...');
+  execSync('node ./node_modules/tailwindcss/lib/cli.js -c ./tailwind.config.cjs -i ./css/input.css -o ./css/tailwind.min.css --minify', {
+    cwd: rootDir,
+    stdio: 'inherit'
+  });
+  console.log('✓ Successfully compiled static Tailwind CSS');
+} catch (e) {
+  console.warn('⚠️ Tailwind compilation failed, using existing css/tailwind.min.css if present:', e.message);
+}
 
 if (fs.existsSync(distDir)) {
   fs.rmSync(distDir, { recursive: true, force: true });

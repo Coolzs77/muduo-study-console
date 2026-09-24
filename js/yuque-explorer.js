@@ -204,19 +204,42 @@ function renderMarkdownSafe(mdText) {
     }).join('\n\n');
 
     // 10. 还原代码块并执行高亮 (完全对齐 28 天任务实验代码块纸质白底高亮风格)
+    const langAliases = {
+        'c++': 'cpp',
+        'cc': 'cpp',
+        'cxx': 'cpp',
+        'h': 'cpp',
+        'hpp': 'cpp',
+        'c': 'cpp',
+        'javascript': 'javascript',
+        'js': 'javascript',
+        'typescript': 'typescript',
+        'ts': 'typescript',
+        'python': 'python',
+        'py': 'python',
+        'bash': 'bash',
+        'sh': 'bash',
+        'shell': 'bash',
+        'json': 'json',
+        'cmake': 'cmake',
+        'sql': 'sql',
+        'xml': 'xml',
+        'html': 'xml'
+    };
+
     codeBlocks.forEach((block, idx) => {
-        const lang = (block.lang || "cpp").toLowerCase();
-        let highlightedCode = safeEscape(block.code);
-        if (typeof hljs !== 'undefined') {
+        const rawLang = (block.lang || "cpp").toLowerCase().trim();
+        const lang = langAliases[rawLang] || rawLang || "cpp";
+        let highlightedCode = "";
+
+        if (typeof hljs !== 'undefined' && hljs.getLanguage(lang)) {
             try {
-                if (hljs.getLanguage(lang)) {
-                    highlightedCode = hljs.highlight(block.code, { language: lang }).value;
-                } else {
-                    highlightedCode = hljs.highlightAuto(block.code).value;
-                }
+                highlightedCode = hljs.highlight(block.code, { language: lang, ignoreIllegals: true }).value;
             } catch (e) {
                 highlightedCode = safeEscape(block.code);
             }
+        } else {
+            highlightedCode = safeEscape(block.code);
         }
 
         const codeId = `code-block-${idx}-${Date.now()}`;
@@ -424,6 +447,9 @@ function selectYuqueArticle(artId) {
     renderYuqueReader(artId);
 }
 
+// 静态文章渲染 HTML 缓存，杜绝重复 Markdown 解析与高亮计算
+var _articleRenderCache = (typeof _articleRenderCache !== 'undefined') ? _articleRenderCache : new Map();
+
 // 渲染右侧文章沉浸阅读器与关联卡片
 function renderYuqueReader(artId) {
     const dataset = getYuqueDataset();
@@ -456,10 +482,15 @@ function renderYuqueReader(artId) {
     // 源码与工程调用链路锚定卡片渲染
     renderSourceTraceCard(art);
 
-    // 渲染正文 Markdown
+    // 渲染正文 Markdown (优先从毫秒级内存缓存提取，0ms秒开)
     const bodyEl = document.getElementById('yq-reader-body');
     if (bodyEl) {
-        bodyEl.innerHTML = renderMarkdownSafe(art.content);
+        let cachedHtml = _articleRenderCache.get(art.id);
+        if (!cachedHtml) {
+            cachedHtml = renderMarkdownSafe(art.content);
+            _articleRenderCache.set(art.id, cachedHtml);
+        }
+        bodyEl.innerHTML = cachedHtml;
     }
 
     // 滚动至顶部
@@ -542,11 +573,15 @@ window.filterYuqueTag = function(tag) {
     renderYuqueDirectoryList();
 };
 
-// 搜索输入过滤
+// 搜索输入过滤 (防抖优化，杜绝高频击键主线程卡顿)
+var _yuqueSearchDebounceTimer = null;
 window.handleYuqueSearch = function(query) {
     ensureYuqueState();
     appState.yuqueSearchQuery = query;
-    renderYuqueDirectoryList();
+    if (_yuqueSearchDebounceTimer) clearTimeout(_yuqueSearchDebounceTimer);
+    _yuqueSearchDebounceTimer = setTimeout(() => {
+        renderYuqueDirectoryList();
+    }, 120);
 };
 
 // 渲染源码与工程调用链路锚定卡片

@@ -1528,7 +1528,7 @@ function renderMappingTable() {
 // ==========================================================================
 
 function switchLearningTab(tabKey, updateState = true) {
-    if (typeof appState !== 'undefined' && appState && appState.currentView && appState.currentView !== 'learning') {
+    if (updateState && typeof appState !== 'undefined' && appState && appState.currentView && appState.currentView !== 'learning') {
         const secLearning = document.getElementById('view-learning');
         if (secLearning && secLearning.classList.contains('hidden')) {
             if (typeof switchView === 'function') switchView('learning');
@@ -5936,12 +5936,21 @@ window.addEventListener('DOMContentLoaded', () => {
     try { renderTaskHub(); } catch(e) { console.error('renderTaskHub error:', e); }
     try { updateDashboardMetrics(); } catch(e) { console.error('updateDashboardMetrics error:', e); }
     try { renderHomeDashboard(); } catch(e) { console.error('renderHomeDashboard error:', e); }
-    try { renderModuleHierarchyMap(); } catch(e) { console.error('renderModuleHierarchyMap error:', e); }
-    try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
-    try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
-    try { renderLearningSystem(); } catch(e) { console.error('renderLearningSystem error:', e); }
-    try { renderCareerSystem(); } catch(e) { console.error('renderCareerSystem error:', e); }
     try { if (typeof loadYuqueState === 'function') loadYuqueState(); } catch(e) { console.error('loadYuqueState error:', e); }
+
+    // 延迟懒加载隐藏视图，释放主线程首屏渲染压力，消除加载白屏与卡顿
+    const deferLoadInactiveViews = () => {
+        try { renderModuleHierarchyMap(); } catch(e) { console.error('renderModuleHierarchyMap error:', e); }
+        try { renderDailyCards(); } catch(e) { console.error('renderDailyCards error:', e); }
+        try { renderMappingTable(); } catch(e) { console.error('renderMappingTable error:', e); }
+        try { renderLearningSystem(); } catch(e) { console.error('renderLearningSystem error:', e); }
+        try { renderCareerSystem(); } catch(e) { console.error('renderCareerSystem error:', e); }
+    };
+    if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(deferLoadInactiveViews, { timeout: 1500 });
+    } else {
+        setTimeout(deferLoadInactiveViews, 100);
+    }
 
     // 绑定笔记本自动存盘
     try {
@@ -7274,35 +7283,82 @@ function renderHomeMuduoProgress() {
     let s = (typeof stateManager !== 'undefined' && stateManager) ? stateManager.getState() : appState;
     const completedDays = (s && s.completedDays) ? s.completedDays : [];
     const activeDay = completedDays.length > 0 ? Math.min(28, Math.max(...completedDays) + 1) : 1;
-    const pct = Math.round((completedDays.length / 28) * 100);
 
-    const weekThemes = {
-        1: "Week 1: 生命周期与 RAII",
-        2: "Week 2: 智能指针与 Buffer 机制",
-        3: "Week 3: EventLoop 事件分发",
-        4: "Week 4: 多线程 Reactor 与 TCP 全流程"
+    let muduoProj = {
+        currentStage: "阶段二：Reactor 核心事件循环与Channel分发",
+        activeModule: "EventLoop",
+        completedModules: ["Channel", "Poller", "EPollPoller"],
+        inProgressModules: ["EventLoop"],
+        totalModules: 10
     };
-    const curWeek = Math.ceil(activeDay / 7);
-    const theme = weekThemes[curWeek] || "Week 1: 源码基础";
+
+    if (s && s.muduoProgress && typeof s.muduoProgress === 'object') {
+        muduoProj = Object.assign({}, muduoProj, s.muduoProgress);
+    } else {
+        // 动态根据 28 天打卡进度推导 muduo 底层核心模块研读进展
+        const coreModules = [
+            { name: "Channel", day: 8 },
+            { name: "Poller", day: 9 },
+            { name: "EPollPoller", day: 10 },
+            { name: "EventLoop", day: 11 },
+            { name: "TimerQueue", day: 15 },
+            { name: "EventLoopThreadPool", day: 18 },
+            { name: "Acceptor", day: 22 },
+            { name: "TcpConnection", day: 24 },
+            { name: "TcpServer", day: 26 },
+            { name: "Buffer", day: 27 }
+        ];
+
+        const finished = coreModules.filter(m => completedDays.includes(m.day)).map(m => m.name);
+        if (activeDay <= 7) {
+            muduoProj.currentStage = "阶段一：基础与生命周期 (Timestamp, Thread)";
+            muduoProj.activeModule = "Thread & Mutex";
+        } else if (activeDay <= 14) {
+            muduoProj.currentStage = "阶段二：Reactor 核心事件循环与分发";
+            muduoProj.activeModule = "EventLoop";
+        } else if (activeDay <= 21) {
+            muduoProj.currentStage = "阶段三：定时器与多线程 Reactor 模型";
+            muduoProj.activeModule = "EventLoopThreadPool";
+        } else {
+            muduoProj.currentStage = "阶段四：TCP 连接管理与高性能 Buffer";
+            muduoProj.activeModule = "TcpConnection";
+        }
+        muduoProj.completedModules = finished.length > 0 ? finished : ["Channel", "Poller", "EPollPoller"];
+        muduoProj.totalModules = coreModules.length;
+    }
+
+    const doneCount = (muduoProj.completedModules || []).length;
+    const totalCount = muduoProj.totalModules || 10;
+    const pct = Math.round((doneCount / totalCount) * 100);
+
+    const safeStage = typeof escapeHtml === 'function' ? escapeHtml(muduoProj.currentStage) : muduoProj.currentStage;
+    const safeModule = typeof escapeHtml === 'function' ? escapeHtml(muduoProj.activeModule) : muduoProj.activeModule;
 
     el.innerHTML = `
         <div class="space-y-2.5">
             <div>
-                <span class="text-stone-400 text-[10px] block">当前学习日程</span>
-                <span class="font-bold text-stone-900 text-xs">Day ${activeDay} / 28 天 · ${theme}</span>
+                <span class="text-stone-400 text-[10px] block">当前攻坚阶段</span>
+                <span class="font-bold text-stone-900 text-xs">${safeStage}</span>
+            </div>
+            <div>
+                <span class="text-stone-400 text-[10px] block">当前攻坚模块</span>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="font-mono text-sky-800 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200">${safeModule}</span>
+                    <span class="text-[10px] text-stone-500">源码精读与架构研读中</span>
+                </div>
             </div>
             <div class="pt-1">
                 <div class="flex items-center justify-between text-[11px] mb-1">
-                    <span class="text-stone-500">28天完成率</span>
-                    <span class="font-bold text-sky-800">${completedDays.length} / 28 (${pct}%)</span>
+                    <span class="text-stone-500">核心模块研读进度</span>
+                    <span class="font-bold text-sky-800">${doneCount} / ${totalCount} (${pct}%)</span>
                 </div>
                 <div class="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
                     <div class="bg-sky-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
                 </div>
             </div>
             <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px]">
-                <span class="text-stone-400">今日研读核心:</span>
-                <span class="font-mono text-sky-800 font-bold">muduo/net/EventLoop.cc</span>
+                <span class="text-stone-400">已研读核心模块:</span>
+                <span class="text-stone-700 font-semibold truncate max-w-[170px]" title="${(muduoProj.completedModules || []).join(', ')}">${(muduoProj.completedModules || []).join(', ')}</span>
             </div>
         </div>
     `;
