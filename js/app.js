@@ -931,7 +931,7 @@ function renderTodayMissionCard(dueCount) {
                 <i class="fa-solid fa-layer-group text-amber-600"></i> 今日任务推荐
             </span>
             <span class="text-[11px] text-stone-400">
-                模式: <strong class="text-stone-800">${mode === 'muduo' ? 'muduo 网络核心' : (mode === 'cppai' ? 'CppAIService 服务层' : '架构全景视图')}</strong>
+                模式: <strong class="text-stone-800">${mode === 'muduo' ? 'muduo 网络核心' : (mode === 'cppai' ? 'CppAIService 服务层' : '架构视图')}</strong>
             </span>
         </div>
         ${tracksLayout}
@@ -1637,7 +1637,7 @@ function renderLearningCppTab() {
                 <!-- 进度看板 -->
                 <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
                     <div class="flex items-center justify-between text-xs font-serifMono">
-                        <span class="text-stone-600 font-bold">全景路线已学</span>
+                        <span class="text-stone-600 font-bold">路线已学</span>
                         <span class="text-sky-700 font-bold">${learnedCount} / ${totalItems} (${percent}%)</span>
                     </div>
                     <div class="w-full bg-stone-200 rounded-full h-2 overflow-hidden">
@@ -1804,7 +1804,7 @@ function renderLearningLinuxTab() {
                 <!-- 进度看板 -->
                 <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
                     <div class="flex items-center justify-between text-xs font-serifMono">
-                        <span class="text-stone-600 font-bold">私房菜掌握度</span>
+                        <span class="text-stone-600 font-bold">Linux 掌握度</span>
                         <span class="text-emerald-700 font-bold">${learnedCount} / ${totalItems} (${percent}%)</span>
                     </div>
                     <div class="w-full bg-stone-200 rounded-full h-2 overflow-hidden">
@@ -2054,7 +2054,7 @@ function renderLearningBooksTab() {
 }
 
 // ==========================================================================
-// 4. 算法手撕 Lab 渲染器 (对齐代码随想录 12 大分类，直达力扣，支持完成标记)
+// 4. 算法题库 渲染器 (对齐代码随想录 12 大分类，直达力扣，支持完成标记)
 // ==========================================================================
 
 let currentAlgoSection = 'all'; // 'all' | 'hot100' | 'carl'
@@ -2082,7 +2082,11 @@ function renderLearningAlgoTab() {
     }
 
     const isAlgoItemDone = (p) => {
-        return (p.num !== null && p.num !== undefined && !!completedMap[p.num]) || (p.id && !!completedMap[p.id]);
+        if (!completedMap) return false;
+        if (p.num !== null && p.num !== undefined) {
+            return !!completedMap[p.num] || !!completedMap[String(p.num)];
+        }
+        return p.id ? !!completedMap[p.id] : false;
     };
 
     const categories = ['全部', '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
@@ -2425,7 +2429,7 @@ function renderLearningQATab() {
 
                         <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 font-serifMono text-xs">
                             <button onclick="openCrossLinkModal('${qa.id}')" class="px-3 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-lg transition text-[11px] flex items-center gap-1 cursor-pointer">
-                                <i class="fa-solid fa-crosshairs text-[10px]"></i> 六维关联追踪
+                                <i class="fa-solid fa-crosshairs text-[10px]"></i> 技术关联
                             </button>
                             <button onclick="toggleQAMastery('${qa.id}')" class="px-3 py-1.5 ${isMastered ? 'bg-stone-100 hover:bg-stone-200 text-stone-700' : 'bg-purple-700 hover:bg-purple-800 text-white'} rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
                                 <i class="fa-solid ${isMastered ? 'fa-rotate-left' : 'fa-check'}"></i>
@@ -2498,7 +2502,7 @@ function renderLearningReadingTab() {
     `;
 }
 
-// 六维整体流程穿透透视器 (Cross-Link Engine Inspector)
+// 技术关联透视器 (Cross-Link Engine Inspector)
 function openCrossLinkModal(nodeId) {
     const modal = document.getElementById('crosslink-modal');
     if (!modal) return;
@@ -2521,7 +2525,7 @@ function openCrossLinkModal(nodeId) {
         };
     }
 
-    if (title) title.innerText = chain.title || "六维技术关联透视";
+    if (title) title.innerText = chain.title || "技术关联";
     if (subtitle) subtitle.innerText = `${chain.id || nodeId} • Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview`;
 
     if (content) {
@@ -2962,7 +2966,7 @@ function renderCareerCapabilityTab() {
                             能力评估
                         </span>
                         <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1.5 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-sky-600"></i> 14 维后端核心能力矩阵评估态势
+                            <i class="fa-solid fa-layer-group text-sky-600"></i> 后端核心能力评估
                         </h3>
                         <p class="text-xs text-stone-600 mt-1 max-w-2xl leading-relaxed">
                             <strong>反浮夸原则：</strong>能力等级<strong>严禁</strong>通过打勾或阅读时长自动解锁，必须由代码修改、调优断言、Bug 修复等真实有效工程凭证驱动晋级。
@@ -3066,7 +3070,7 @@ function renderCareerInterviewTab() {
 
     const modules = [
         { id: 'pitch', label: '1. 电梯演讲 (30s/1m/3m)', icon: 'fa-stopwatch' },
-        { id: 'arch', label: '2. 项目架构全景剖析', icon: 'fa-network-wired' },
+        { id: 'arch', label: '2. 项目架构剖析', icon: 'fa-network-wired' },
         { id: 'difficulties', label: '3. 核心技术难点攻坚', icon: 'fa-mountain' },
         { id: 'bugs', label: '4. 典型生产 Bug 复盘', icon: 'fa-bug' },
         { id: 'perf', label: '5. 性能压测与极限调优', icon: 'fa-gauge-high' },
@@ -3102,7 +3106,7 @@ function renderCareerInterviewTab() {
                         <span class="px-2.5 py-0.5 rounded-md bg-stone-100 text-stone-800 text-xs font-serifMono font-bold">30 秒闪电速通</span>
                         <span class="text-xs text-stone-400 font-serifMono">HR / 初筛</span>
                     </div>
-                    <p class="text-xs text-stone-700 font-sans leading-relaxed whitespace-pre-line">${escapeHtml(p['30s'] || '基于 Reactor 模型与现代化 C++ 设计的高性能网络服务底座与 AI 编排系统。')}</p>
+                    <p class="text-xs text-stone-700 font-sans leading-relaxed whitespace-pre-line">${escapeHtml(p['30s'] || '基于 Reactor 模型与现代化 C++ 设计的高性能网络服务与 AI 编排系统。')}</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-stone-200 academic-card">
                     <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
@@ -5804,7 +5808,7 @@ function exportMarkdownReport() {
     md += `- **上层 CppAIService 专栏掌握**: ${masteredYqCount} / 17 篇 (熟练及以上，重点收藏: ${yqFavsCount} 篇)\n`;
     md += `- **生产避坑事故积累**: ${(appState.pitfalls || []).length} 条\n\n`;
 
-    md += `## 二、muduo 底层网络库 28 天掌握度全景矩阵\n\n`;
+    md += `## 二、muduo 28 天掌握度矩阵\n\n`;
     md += `| Day | 重点课题 | 掌握评级 | 自测表现 | Demo 状态 | 独立实现 | 源码理解 |\n`;
     md += `|:---:|:---|:---:|:---:|:---:|:---:|:---:|\n`;
 
@@ -6127,9 +6131,9 @@ function renderTaskHub() {
         const timeLabel = task.estimatedMinutes ? `${task.estimatedMinutes} min` : '';
 
         let badgePriority = '';
-        if (task.priority === 'S') badgePriority = '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 font-bold text-[10px]">S 级·核心攻坚</span>';
-        else if (task.priority === 'A') badgePriority = '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px]">A 级·主干底座</span>';
-        else if (task.priority === 'B') badgePriority = '<span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-300 font-bold text-[10px]">B 级·知识巩固</span>';
+        if (task.priority === 'S') badgePriority = '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 font-bold text-[10px]">S 级</span>';
+        else if (task.priority === 'A') badgePriority = '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px]">A 级</span>';
+        else if (task.priority === 'B') badgePriority = '<span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-300 font-bold text-[10px]">B 级</span>';
         else badgePriority = '<span class="px-2 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-300 font-bold text-[10px]">C 级·通识拓展</span>';
 
         let suspensionBadge = isSusp 
@@ -6172,10 +6176,10 @@ function renderTaskHub() {
                         <span>今日已记录算法：<strong>${algoList.length} / 3 题</strong></span>
                         <div class="flex items-center gap-1.5">
                             <button onclick="switchView('learning'); switchLearningTab('algo');" class="px-2.5 py-1 bg-white border border-indigo-300 hover:bg-indigo-100 text-indigo-900 rounded font-bold transition cursor-pointer flex items-center gap-1">
-                                <span>直达手撕 Lab</span> <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                                <span>算法题库</span> <i class="fa-solid fa-arrow-right text-[9px]"></i>
                             </button>
                             <button onclick="openAlgorithmModal()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition flex items-center gap-1 cursor-pointer">
-                                <i class="fa-solid fa-plus text-[10px]"></i> 记录手撕题
+                                <i class="fa-solid fa-plus text-[10px]"></i> 记录算法题
                             </button>
                         </div>
                     </div>
@@ -6192,7 +6196,7 @@ function renderTaskHub() {
                     <span>当前阅读进度：<strong>P.${curPage}</strong> (今日目标: +10页)</span>
                     <div class="flex items-center gap-1.5">
                         <button onclick="switchView('learning'); switchLearningTab('books');" class="px-2.5 py-1 bg-white border border-sky-300 hover:bg-sky-100 text-sky-900 rounded font-bold transition cursor-pointer flex items-center gap-1">
-                            <span>直达书目伴读</span> <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                            <span>查看书目</span> <i class="fa-solid fa-arrow-right text-[9px]"></i>
                         </button>
                         <button onclick="openBooksModal('${task.bookKey}')" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-700 text-white rounded font-bold transition cursor-pointer">
                             更新页码
@@ -6323,7 +6327,7 @@ function renderTaskHub() {
         <div class="space-y-2">
             <div class="flex items-center justify-between">
                 <div class="text-xs font-serifMono font-bold text-amber-900 flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block"></span> A 级 · 主干算法与底座 (2.5h)
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block"></span> A 级 · 算法与系统 (2.5h)
                 </div>
                 <span class="text-[11px] font-serifMono text-stone-400">算法 3 题 + Linux 服务端书目研读</span>
             </div>
@@ -6690,7 +6694,7 @@ function saveAlgorithmProblem() {
     renderTaskHub();
     updateDashboardMetrics();
 
-    // 若当前正在算法手撕 Lab，即时刷新分类全览与题目列表
+    // 若当前正在算法题库，即时刷新分类全览与题目列表
     if (typeof renderLearningAlgoTab === 'function') {
         renderLearningAlgoTab();
     }
@@ -7158,7 +7162,7 @@ function renderTodayTasks() {
 
     const categoryLabels = {
         project: '项目攻坚',
-        algorithm: '手撕算法',
+        algorithm: '算法',
         book: '专业书目',
         quiz: '考点自测',
         reading: '通识阅读',
@@ -7181,9 +7185,9 @@ function renderTodayTasks() {
         if (t.id === 'task_s_project' || t.category === 'project') {
             directLinkBtn = `<button onclick="switchView('knowledge')" class="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达语雀专栏研读"><span>直达专栏</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
         } else if (t.id === 'task_a_algo' || t.category === 'algorithm') {
-            directLinkBtn = `<button onclick="switchView('learning'); switchLearningTab('algo');" class="px-2 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达手撕算法 Lab"><span>直达手撕 Lab</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
+            directLinkBtn = `<button onclick="switchView('learning'); switchLearningTab('algo');" class="px-2 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达算法 Lab"><span>算法题库</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
         } else if (t.id === 'task_a_linux_book' || t.id === 'task_a_bird_linux' || t.category === 'book') {
-            directLinkBtn = `<button onclick="switchView('learning'); switchLearningTab('books');" class="px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达专业书目伴读"><span>直达书目伴读</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
+            directLinkBtn = `<button onclick="switchView('learning'); switchLearningTab('books');" class="px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达专业书目伴读"><span>查看书目</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
         } else if (t.id === 'task_b_quiz' || t.category === 'quiz') {
             directLinkBtn = `<button onclick="switchView('quiz')" class="px-2 py-0.5 rounded bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 text-[10px] font-bold font-serifMono flex items-center gap-1 transition cursor-pointer shadow-2xs" title="直达面试题库与自测"><span>直达自测中心</span><i class="fa-solid fa-arrow-right text-[8px]"></i></button>`;
         } else if (t.id === 'task_c_reading' || t.category === 'reading') {
@@ -7612,7 +7616,7 @@ function renderHomeWeeklyMetrics() {
             <span class="text-sm font-bold text-emerald-800">${completedTasksCount} / ${totalTasksCount} 项</span>
         </div>
         <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">
-            <span class="text-[10px] text-stone-400 block font-bold">算法手撕完成</span>
+            <span class="text-[10px] text-stone-400 block font-bold">算法完成</span>
             <span class="text-sm font-bold text-indigo-800">${solvedAlgosCount} / 178 题</span>
         </div>
         <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200/80">

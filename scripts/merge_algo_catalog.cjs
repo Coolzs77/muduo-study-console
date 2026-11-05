@@ -105,62 +105,49 @@ const HOT_100_PROBLEMS = [
   { num: 1143, title: "1143. 最长公共子序列", difficulty: "Medium", category: "动态规划", leetcodeUrl: "https://leetcode.cn/problems/longest-common-subsequence/", pattern: "二维双序列动态规划", timeComp: "O(mn)", spaceComp: "O(mn)" }
 ];
 
-// 2. 读取当前 dataset-learning.js
+// 2. 从原始提交提取原汁原味的 179 道代码随想录题目
+const { execSync } = require('child_process');
 const filePath = path.join(__dirname, '..', 'js', 'dataset-learning.js');
 const fileContent = fs.readFileSync(filePath, 'utf8');
 
-const match = fileContent.match(/var ALGORITHM_LAB_CATALOG = (\[[\s\S]*?\]);/);
-if (!match) {
-  console.error('Cannot locate ALGORITHM_LAB_CATALOG');
+const originalRaw = execSync('git show f9e7fe7ecf35c2b8b10768beae70624ee94abf1c:js/dataset-learning.js', { maxBuffer: 10 * 1024 * 1024 }).toString();
+const originalMatch = originalRaw.match(/var ALGORITHM_LAB_CATALOG = (\[[\s\S]*?\]);/);
+if (!originalMatch) {
+  console.error('Cannot locate original ALGORITHM_LAB_CATALOG in git commit f9e7fe7ecf35c2b8b10768beae70624ee94abf1c');
   process.exit(1);
 }
 
-const existingCatalog = JSON.parse(match[1]);
+const originalCarl = JSON.parse(originalMatch[1]);
+console.log('Original Carl catalog loaded. Total items:', originalCarl.length); // 179
 
-// 建立唯一题号映射
-const uniqueMap = new Map();
+// 构建 Hot 100 查找 Map
+const hot100Map = new Map();
+HOT_100_PROBLEMS.forEach(h => hot100Map.set(h.num, h));
 
-// 先装入原题库 (全部打标 isCarl: true, isHot100: false)
-existingCatalog.forEach(p => {
-  const key = (p.num !== null && p.num !== undefined) ? String(p.num) : p.title;
-  if (!uniqueMap.has(key)) {
-    uniqueMap.set(key, {
-      id: p.id || `algo_${p.num}`,
-      num: p.num,
-      title: p.title,
-      difficulty: p.difficulty || "Medium",
-      category: p.category || "数组",
-      topic: p.topic || p.category || "数组",
-      leetcodeUrl: p.leetcodeUrl,
-      pattern: p.pattern || "经典模式",
-      timeComp: p.timeComp || "O(n)",
-      spaceComp: p.spaceComp || "O(1)",
-      independent: true,
-      mistakes: p.mistakes || "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
-      projectLink: p.projectLink || "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
-      isCarl: true,
-      isHot100: false
-    });
+// 1. 处理所有 179 道代码随想录题目（一道不少，100% 保留）
+const markedHotNums = new Set();
+const fullCatalog = originalCarl.map(p => {
+  let isHot = false;
+  if (p.num !== null && p.num !== undefined && hot100Map.has(p.num)) {
+    // 若在 Hot 100 中，且尚未为 Hot 100 标记该题，则标记为 true（确保 Hot 100 视图中每道题仅出现 1 次）
+    if (!markedHotNums.has(p.num)) {
+      isHot = true;
+      markedHotNums.add(p.num);
+    }
   }
+  return {
+    ...p,
+    isCarl: true,
+    isHot100: isHot
+  };
 });
 
-console.log('Original unique Carl problems:', uniqueMap.size);
-
-// 合并 Hot 100
-let hot100Overlap = 0;
-let hot100New = 0;
-
+// 2. 将 Hot 100 中不在代码随想录中的题目（54 道）追加进来
+let hot100OnlyCount = 0;
 HOT_100_PROBLEMS.forEach(h => {
-  const key = String(h.num);
-  if (uniqueMap.has(key)) {
-    // 已经存在：打标 isHot100 = true
-    const item = uniqueMap.get(key);
-    item.isHot100 = true;
-    hot100Overlap++;
-  } else {
-    // 全新题目：打标 isHot100 = true, isCarl = false
-    uniqueMap.set(key, {
-      id: `algo_${h.num}`,
+  if (!markedHotNums.has(h.num)) {
+    fullCatalog.push({
+      id: `algo_hot_${h.num}`,
       num: h.num,
       title: h.title,
       difficulty: h.difficulty,
@@ -176,55 +163,28 @@ HOT_100_PROBLEMS.forEach(h => {
       isCarl: false,
       isHot100: true
     });
-    hot100New++;
+    markedHotNums.add(h.num);
+    hot100OnlyCount++;
   }
 });
 
-console.log('Hot 100 overlapping with Carl:', hot100Overlap);
-console.log('Hot 100 newly added:', hot100New);
-console.log('Total merged unique questions:', uniqueMap.size);
+console.log('Hot 100 only added items:', hot100OnlyCount);
+console.log('Total full catalog items:', fullCatalog.length);
 
-// 统计
-const allItems = Array.from(uniqueMap.values());
-const hot100Count = allItems.filter(p => p.isHot100).length;
-const carlCount = allItems.filter(p => p.isCarl).length;
-console.log('Total Hot 100 marked:', hot100Count);
-console.log('Total Carl marked:', carlCount);
+const carlCount = fullCatalog.filter(p => p.isCarl).length;
+const hot100Count = fullCatalog.filter(p => p.isHot100).length;
+const overlapCount = fullCatalog.filter(p => p.isCarl && p.isHot100).length;
 
-// 排序
-const categoryOrder = [
-  "数组", "链表", "哈希表", "字符串", "双指针法",
-  "栈与队列", "二叉树", "回溯算法", "贪心算法", "动态规划", "单调栈", "图论"
-];
+console.log(`Verification: Carl=${carlCount} (Expected 179), Hot100=${hot100Count} (Expected 100), Overlap=${overlapCount}`);
 
-const mergedList = allItems.sort((a, b) => {
-  const catA = categoryOrder.indexOf(a.category);
-  const catB = categoryOrder.indexOf(b.category);
-  if (catA !== catB) {
-    return (catA === -1 ? 999 : catA) - (catB === -1 ? 999 : catB);
-  }
-  const numA = typeof a.num === 'number' ? a.num : 99999;
-  const numB = typeof b.num === 'number' ? b.num : 99999;
-  return numA - numB;
-});
-
-// 验证唯一性
-const verifySet = new Set();
-let dupes = 0;
-mergedList.forEach(item => {
-  const k = item.num !== null && item.num !== undefined ? String(item.num) : item.title;
-  if (verifySet.has(k)) dupes++;
-  verifySet.add(k);
-});
-
-if (dupes > 0) {
-  console.error('Fatal: duplicate detected during merge verification!');
+if (carlCount !== 179 || hot100Count !== 100 || fullCatalog.length !== 233) {
+  console.error('Counts mismatch! Carl:', carlCount, 'Hot100:', hot100Count, 'Total:', fullCatalog.length);
   process.exit(1);
 }
 
-// 格式化输出
-const replacement = 'var ALGORITHM_LAB_CATALOG = ' + JSON.stringify(mergedList, null, 2) + ';';
+// 格式化输出到 dataset-learning.js
+const replacement = 'var ALGORITHM_LAB_CATALOG = ' + JSON.stringify(fullCatalog, null, 2) + ';';
 const updatedContent = fileContent.replace(/var ALGORITHM_LAB_CATALOG = \[[\s\S]*?\];/, replacement);
 
 fs.writeFileSync(filePath, updatedContent, 'utf8');
-console.log('✓ Successfully written merged & deduplicated catalog to dataset-learning.js');
+console.log('✓ Successfully written 233 items (179 Carl + 54 Hot 100) to dataset-learning.js');

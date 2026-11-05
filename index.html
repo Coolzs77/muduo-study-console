@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>C++ 与算法</title>
+    <title>Muduo & CppAIService</title>
     <!-- 1. 静态预编译 Tailwind CSS (56KB，首屏瞬间渲染，零编译延迟) -->
     <link rel="stylesheet" href="css/tailwind.min.css?v=6.1.0">
     <!-- 2. 本地高亮与核心主题样式 (无外部 CDN 依赖，秒开) -->
@@ -75,9 +75,7 @@
         <!-- 第一行：系统标题与右侧环境指引 -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-serif-heading">
-                    C++ 与算法
-                </h1>
+                <h1 class="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-serif-heading">Muduo & CppAIService</h1>
             </div>
             <div class="flex flex-wrap items-center gap-2 shrink-0 font-serifMono">
                 <button onclick="openEnvGuideModal()" class="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold transition flex items-center gap-2 shadow-xs cursor-pointer">
@@ -91,7 +89,7 @@
             </div>
         </div>
 
-        <!-- 第三行：专注学习计时<!-- 第三行：专注学习计时与快捷记时栏 -->
+        <!-- 专注计时 -->
         <div class="mt-4 pt-4 border-t border-stone-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs font-serifMono bg-stone-50/60 p-3 rounded-xl border border-stone-200/80">
             <div class="flex items-center gap-3 flex-wrap">
                 <span class="font-bold text-stone-800 flex items-center gap-1.5">
@@ -114,7 +112,7 @@
                 </select>
                 <select id="timer-type" class="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700 font-serifMono" title="任务类型">
                     <option value="coding">代码攻坚</option>
-                    <option value="algorithm">手撕算法</option>
+                    <option value="algorithm">算法</option>
                     <option value="reading">书目研读</option>
                     <option value="quiz">考点自测</option>
                     <option value="career">求职调研</option>
@@ -241,8 +239,7 @@
                             <h2 class="text-base font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
                                 <i class="fa-solid fa-terminal text-emerald-700"></i> 最近工程记录
                             </h2>
-                            <p class="text-xs text-stone-500 mt-0.5">代码修改、Bug 排查、Demo 实验与技术复盘日志</p>
-                        </div>
+                            </div>
                         <div class="flex items-center gap-2 font-serifMono text-xs">
                             <button onclick="openWorkLogModal()" class="text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer">
                                 + 记工作日志
@@ -1086,11 +1083,7 @@
         <!-- 六维联动与统一学习系统快捷进入条 -->
         <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 rounded-2xl p-5 border border-emerald-200 academic-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-serifMono font-bold mb-1">
-                    <i class="fa-solid fa-link text-emerald-700"></i> 六维联动 ➔ 底层体系
-                </div>
-                <h3 class="text-sm font-bold text-stone-900 font-serifHeading">探索 C++ 8维核心语法、Linux 9维底座与代码随想录算法手撕？</h3>
-                <p class="text-xs text-stone-600 mt-0.5">进入统一学习系统，查看 C++ 15项映射、陈硕书目伴读、179 道手撕算法 Lab 与项目真实八股。</p>
+                <h3 class="text-sm font-bold text-stone-900 font-serifHeading">C++ 语法、Linux 系统与算法题库</h3>
             </div>
             <button onclick="switchView('learning')" class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold font-serifMono transition flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer">
                 <span>进入统一学习系统</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -1111,17 +1104,12 @@
                         <span>系统化实践沉淀</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
-                        <i class="fa-solid fa-graduation-cap text-emerald-700"></i> 算法与知识与实践关联中心
+                        <i class="fa-solid fa-graduation-cap text-emerald-700"></i> 算法与知识体系
                     </h2>
-                    <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
-                        系统化对照：将 C++ 核心语法、Linux 系统原理、经典专业书目、算法手撕训练与项目实战代码建立对应关联。遵循
-                        <span class="font-semibold text-stone-700 font-serifMono">Learn ➔ Apply ➔ Build ➔ Explain ➔ Review</span> 渐进式学习路径，
-                        在 <span class="font-semibold text-emerald-800 font-serifMono">理论知识 ➔ 工程模块 ➔ 源码实现 ➔ 日程任务 ➔ 面试考点</span> 之间形成清晰追溯。
-                    </p>
                 </div>
                 <div class="flex items-center gap-2 font-serifMono shrink-0">
                     <button onclick="openCrossLinkModal('cpp_dim_modern')" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
-                        <i class="fa-solid fa-diagram-project"></i> 查看知识与工程全景关联
+                        <i class="fa-solid fa-diagram-project"></i> 知识与工程关联
                     </button>
                 </div>
             </div>
@@ -1168,11 +1156,8 @@
                         <div class="p-5 sm:p-6 bg-stone-50/80 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <div>
                                 <h3 class="font-bold text-stone-900 text-base flex items-center gap-2 font-serifHeading">
-                                    <i class="fa-solid fa-table-list text-sky-800"></i> C++ 核心机制 ➔ muduo 源码设计映射全景图
+                                    <i class="fa-solid fa-table-list text-sky-800"></i> C++ 核心机制 ➔ muduo 源码映射
                                 </h3>
-                                <p class="text-xs text-stone-500 mt-1">
-                                    对应 C++ 关键语法在 muduo 源码中的所在文件、设计思想与代表性代码片段。
-                                </p>
                             </div>
                             <span class="text-xs font-serifMono text-stone-400 bg-white px-3 py-1 rounded-lg border border-stone-200 w-fit">
                                 共 15 项核心映射
@@ -1341,12 +1326,8 @@
                         <span class="text-xs text-stone-500 font-serifMono">2 大权威专栏 · 27 篇深度解析 · 98,011 字原版图解精析 · 密码 khf4 离线全量嵌入</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-black text-stone-900 mt-1 font-serifHeading flex items-center gap-2">
-                        <i class="fa-solid fa-book-bookmark text-sky-700"></i>
-                        muduo-core & CppAIService 语雀原版专栏知识库
+                        <i class="fa-solid fa-book-bookmark text-sky-700"></i> Muduo & CppAIService 语雀专栏
                     </h2>
-                    <p class="text-xs text-stone-600 mt-1 max-w-3xl leading-relaxed">
-                        深度整合程序员 Carl《网络库muduo-core》(访问密码: khf4) 与《HTTP服务框架》双专栏，覆盖底层 Reactor 反应堆、epoll 核心类、异步日志、HTTP 状态机解析与两段式 MCP 协议。已打通 <strong>专栏文章 ➔ 源码行级 ➔ 避坑记录 ➔ 考点自测</strong> 全链路。
-                    </p>
                 </div>
                 <!-- 右侧掌握度指标卡 -->
                 <div class="flex items-center gap-3 shrink-0 font-serifMono">
@@ -2132,12 +2113,12 @@ add_executable(my_server ${SOURCES})</pre>
 </div>
 
 <!-- ==================== 算法手撕记录 Modal ==================== -->
-<div id="algorithm-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="算法手撕记录">
+<div id="algorithm-modal" class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="算法记录">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-stone-200" onclick="event.stopPropagation()">
         <div class="flex items-center justify-between pb-3 border-b border-stone-200 mb-4">
             <h4 class="font-bold text-stone-900 text-sm sm:text-base font-serifHeading flex items-center gap-2">
                 <i class="fa-solid fa-laptop-code text-indigo-600"></i>
-                <span>记录手撕算法题</span>
+                <span>记录算法题</span>
             </h4>
             <button onclick="closeAlgorithmModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
                 <i class="fa-solid fa-xmark"></i>
@@ -2288,9 +2269,9 @@ add_executable(my_server ${SOURCES})</pre>
                 <div>
                     <label class="block text-stone-600 font-bold mb-1">优先级</label>
                     <select id="new-task-priority" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
-                        <option value="S">S 级 · 核心攻坚</option>
-                        <option value="A" selected>A 级 · 主干底座</option>
-                        <option value="B">B 级 · 知识巩固</option>
+                        <option value="S">S 级</option>
+                        <option value="A" selected>A 级</option>
+                        <option value="B">B 级</option>
                         <option value="C">C 级 · 通识拓展</option>
                     </select>
                 </div>
@@ -2304,7 +2285,7 @@ add_executable(my_server ${SOURCES})</pre>
                 <label class="block text-stone-600 font-bold mb-1">任务分类</label>
                 <select id="new-task-category" class="w-full bg-stone-50 border border-stone-200 rounded-lg p-2">
                     <option value="project">项目攻坚</option>
-                    <option value="algorithm">手撕算法</option>
+                    <option value="algorithm">算法</option>
                     <option value="book">专业书目</option>
                     <option value="quiz">考点自测</option>
                     <option value="reading">通识阅读</option>
@@ -2365,7 +2346,7 @@ add_executable(my_server ${SOURCES})</pre>
         <div class="flex items-center justify-between pb-3 border-b border-stone-200 mb-3">
             <h4 class="font-bold text-stone-900 text-sm font-serifHeading flex items-center gap-2">
                 <i class="fa-solid fa-image text-blue-600"></i>
-                <span id="yuque-modal-title">架构与技术全景图</span>
+                <span id="yuque-modal-title">架构与技术图</span>
             </h4>
             <div class="flex items-center gap-2">
                 <a id="yuque-modal-open-tab" href="#" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-serifMono transition flex items-center gap-1">
@@ -2382,8 +2363,8 @@ add_executable(my_server ${SOURCES})</pre>
     </div>
 </div>
 
-<!-- ==================== 六维整体流程穿透透视 Modal ==================== -->
-<div id="crosslink-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-5" role="dialog" aria-modal="true" aria-label="六维技术穿透透视">
+<!-- 技术关联 Modal -->
+<div id="crosslink-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-5" role="dialog" aria-modal="true" aria-label="技术关联">
     <div class="relative bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl border border-stone-300 max-h-[90vh] overflow-y-auto flex flex-col justify-between">
         <div>
             <div class="flex items-center justify-between pb-4 border-b border-stone-200 mb-4">
@@ -2392,8 +2373,7 @@ add_executable(my_server ${SOURCES})</pre>
                         <i class="fa-solid fa-cubes-stacked"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-stone-900 text-base font-serifHeading" id="crosslink-modal-title">六维技术关联透视</h4>
-                        <p class="text-xs text-stone-500 font-serifMono" id="crosslink-modal-subtitle">Knowledge ➔ Project ➔ Source ➔ Task ➔ Evidence ➔ Interview</p>
+                        <h4 class="font-bold text-stone-900 text-base font-serifHeading" id="crosslink-modal-title">技术关联</h4>
                     </div>
                 </div>
                 <button onclick="closeCrossLinkModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
@@ -2409,7 +2389,7 @@ add_executable(my_server ${SOURCES})</pre>
 
         <div class="mt-6 pt-4 border-t border-stone-200 flex justify-end">
             <button onclick="closeCrossLinkModal()" class="px-5 py-2 bg-stone-900 hover:bg-stone-800 text-stone-100 text-xs font-bold rounded-xl transition cursor-pointer">
-                关闭透视
+                关闭
             </button>
         </div>
     </div>
@@ -2425,8 +2405,7 @@ add_executable(my_server ${SOURCES})</pre>
                         <i class="fa-solid fa-certificate"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-stone-900 text-base font-serifHeading">录入真实工程凭证</h4>
-                        <p class="text-xs text-stone-500 font-serifMono">严禁虚构 · 凭证驱动 · 支撑能力晋级</p>
+                        <h4 class="font-bold text-stone-900 text-base font-serifHeading">录入工程凭据</h4>
                     </div>
                 </div>
                 <button onclick="closeNewEvidenceModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
@@ -2570,8 +2549,7 @@ add_executable(my_server ${SOURCES})</pre>
                         <i class="fa-solid fa-pen-to-square"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-stone-900 text-base font-serifHeading">记录工程工作日志</h4>
-                        <p class="text-xs text-stone-500 font-serifMono">记录真实过程 · 沉淀排错经验 · 积累求职凭据</p>
+                        <h4 class="font-bold text-stone-900 text-base font-serifHeading">记录工程日志</h4>
                     </div>
                 </div>
                 <button onclick="closeWorkLogModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition cursor-pointer" aria-label="关闭">
