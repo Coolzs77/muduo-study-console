@@ -2,31 +2,42 @@
 module.exports = {
   content: [
     "./index.html",
-    "./classic.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
     "./js/**/*.js"
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        serifMono: ['"Courier Prime"', '"Noto Serif SC"', '"Songti SC"', '"STSong"', 'SimSun', 'serif', 'monospace'],
-        serifHeading: ['"Noto Serif SC"', '"Songti SC"', 'STSong', 'Georgia', 'serif']
+        sans: [
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
+          '"PingFang SC"',
+          '"Hiragino Sans GB"',
+          '"Microsoft YaHei"',
+          'sans-serif'
+        ],
+        mono: [
+          '"JetBrains Mono"',
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'Monaco',
+          'Consolas',
+          'monospace'
+        ]
       },
       colors: {
-        parchment: {
-          50: '#faf9f6',
-          100: '#f4efe6',
-          200: '#e8ded0',
-          800: '#3d342a',
-          900: '#231d16'
-        },
-        oxford: {
-          50: '#f0f4f8',
-          100: '#d9e2ec',
-          500: '#1e40af',
-          600: '#0369a1',
-          700: '#075985',
-          800: '#0c4a6e',
-          900: '#082f49'
+        brand: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
         }
       }
     }
