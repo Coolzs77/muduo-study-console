@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>muduo C++ 个人训练系统 V5</title>
+    <title>C++ 与算法</title>
     <!-- 1. 静态预编译 Tailwind CSS (56KB，首屏瞬间渲染，零编译延迟) -->
     <link rel="stylesheet" href="css/tailwind.min.css?v=6.1.0">
     <!-- 2. 本地高亮与核心主题样式 (无外部 CDN 依赖，秒开) -->
@@ -75,37 +75,9 @@
         <!-- 第一行：系统标题与右侧环境指引 -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
             <div>
-                <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-300/80 text-stone-800 text-xs font-serifMono mb-2.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="font-bold text-sky-800">DUAL-CORE OS V6.0</span>
-                    <span class="text-stone-300">•</span>
-                    <span>L0~L2 muduo 网络库 ⇋ L3~L5 CppAIService 服务平台</span>
-                </div>
                 <h1 class="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-serif-heading">
-                    CppAIService & muduo 学习与代码解析控制台
+                    C++ 与算法
                 </h1>
-                <p class="text-stone-600 text-xs sm:text-sm mt-1.5 max-w-3xl leading-relaxed">
-                    项目包含基于 muduo (C++11) 的网络层和基于 C++17 的 AI 应用服务层。网络层实现 epoll 事件循环与应用层 Buffer；服务层实现 HTTP 状态机解析、路由分发、两段式 MCP 协议与 RabbitMQ 异步任务消费。
-                </p>
-
-                <!-- 工程工作台模式切换条 (Dual-Core Workspace Switcher) -->
-                <div class="mt-4 flex flex-wrap items-center gap-2 font-serifMono text-xs" id="workspace-mode-switcher">
-                    <span class="text-stone-500 font-bold flex items-center gap-1.5 shrink-0">
-                        <i class="fa-solid fa-layer-group text-sky-700"></i> 工程工作台：
-                    </span>
-                    <button onclick="setWorkspaceMode('full')" id="ws-btn-full" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
-                        <i class="fa-solid fa-globe text-sky-400"></i>
-                        <span>架构全景视图</span>
-                    </button>
-                    <button onclick="setWorkspaceMode('muduo')" id="ws-btn-muduo" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100 cursor-pointer">
-                        <i class="fa-solid fa-server text-sky-700"></i>
-                        <span>muduo 网络核心 (L0~L2)</span>
-                    </button>
-                    <button onclick="setWorkspaceMode('cppai')" id="ws-btn-cppai" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100 cursor-pointer">
-                        <i class="fa-solid fa-robot text-amber-700"></i>
-                        <span>CppAIService 服务层 (L3~L5)</span>
-                    </button>
-                </div>
             </div>
 
             <!-- 右侧快捷指引与架构概览 -->
@@ -174,28 +146,28 @@
         <!-- 7大核心学习视图切换导航 -->
         <nav class="flex space-x-2 overflow-x-auto pb-2 sm:pb-0 font-serifHeading text-xs sm:text-sm flex-1 min-w-0" id="view-tabs" role="tablist" aria-label="主视图导航">
             <button onclick="switchView('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-xl flex items-center gap-2 font-bold bg-white text-stone-900 border border-stone-300 shadow-sm transition whitespace-nowrap" role="tab" aria-selected="true" aria-label="工作台">
-                <i class="fa-solid fa-chart-pie text-sky-700"></i> 工作台
+                <i class="fa-solid fa-chart-pie text-sky-700"></i> 控制台
             </button>
             <button onclick="switchView('mapping')" id="nav-mapping" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="CppAIService 项目">
-                <i class="fa-solid fa-diagram-project text-emerald-600"></i> CppAIService 项目
+                <i class="fa-solid fa-diagram-project text-emerald-600"></i> CppAIService
             </button>
             <button onclick="switchView('learning')" id="nav-learning" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="统一学习系统与关联中心">
-                <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 统一学习系统
+                <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 算法
             </button>
             <button onclick="switchView('daily')" id="nav-daily" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="muduo 源码路线">
-                <i class="fa-solid fa-calendar-check text-amber-600"></i> muduo 源码路线
+                <i class="fa-solid fa-calendar-check text-amber-600"></i> Muduo 路线
             </button>
             <button onclick="switchView('knowledge')" id="nav-knowledge" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="知识库 (语雀)">
-                <i class="fa-solid fa-book-bookmark text-blue-600"></i> 知识库 (语雀)
+                <i class="fa-solid fa-book-bookmark text-blue-600"></i> 知识库
             </button>
             <button onclick="switchView('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="面试题库与自测">
-                <i class="fa-solid fa-clipboard-question text-purple-600"></i> 面试题库与自测
+                <i class="fa-solid fa-clipboard-question text-purple-600"></i> 测验
             </button>
             <button onclick="switchView('source')" id="nav-source" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="源码速查">
-                <i class="fa-solid fa-code-branch text-teal-600"></i> 源码速查
+                <i class="fa-solid fa-code-branch text-teal-600"></i> 源码
             </button>
             <button onclick="switchView('pitfalls')" id="nav-pitfalls" class="px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition whitespace-nowrap" role="tab" aria-selected="false" aria-label="踩坑档案">
-                <i class="fa-solid fa-bug text-rose-600"></i> 踩坑档案
+                <i class="fa-solid fa-bug text-rose-600"></i> 避坑
             </button>
         </nav>
 
@@ -249,9 +221,7 @@
                             <h2 class="text-base font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
                                 <i class="fa-solid fa-list-check text-sky-800"></i> 今日任务
                             </h2>
-                            <span id="today-tasks-badge" class="text-xs font-serifMono px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-900 font-bold">
-                                预计 5.5h · 0/4 已完成
-                            </span>
+                            
                         </div>
                         <div class="flex items-center gap-2 font-serifMono text-xs">
                             <button onclick="openAddTaskModal()" class="text-sky-700 hover:text-sky-900 font-semibold cursor-pointer">
@@ -312,11 +282,11 @@
                     </div>
                 </div>
 
-                <!-- 卡片 2：muduo 知识库进度 (结构与 CppAIService 进度完全对齐，紧接在 CppAIService 下方) -->
+                <!-- 卡片 2：Muduo 知识库进度 (结构与 CppAIService 进度完全对齐，紧接在 CppAIService 下方) -->
                 <div id="home-zone-muduo-core-progress" class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
                     <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
                         <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5 font-serifHeading">
-                            <i class="fa-solid fa-book-bookmark text-sky-700"></i> muduo 知识库进度
+                            <i class="fa-solid fa-book-bookmark text-sky-700"></i> Muduo 知识库进度
                         </h3>
                         <button onclick="switchView('knowledge')" class="text-xs text-sky-700 hover:text-sky-900 font-serifMono cursor-pointer">
                             语雀专栏 &rarr;
@@ -327,11 +297,11 @@
                     </div>
                 </div>
 
-                <!-- 卡片 3：muduo 28天学习日程 (原版 28 天任务打卡进度卡片，独立保留) -->
+                <!-- 卡片 3：Muduo 28天日程 (原版 28 天任务打卡进度卡片，独立保留) -->
                 <div id="home-zone-muduo-progress" class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
                     <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
                         <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5 font-serifHeading">
-                            <i class="fa-solid fa-code-branch text-indigo-700"></i> muduo 28天学习日程
+                            <i class="fa-solid fa-code-branch text-indigo-700"></i> Muduo 28天日程
                         </h3>
                         <button onclick="switchView('daily')" class="text-xs text-indigo-700 hover:text-indigo-900 font-serifMono cursor-pointer">
                             28天路线 &rarr;
@@ -342,7 +312,7 @@
                     </div>
                 </div>
 
-                <!-- 区域 5：本周统计 (核心指标) -->
+                <!-- 区域 5：本周统计 -->
                 <div id="home-zone-weekly-metrics" class="bg-white rounded-2xl p-5 border border-stone-200 academic-card">
                     <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
                         <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5 font-serifHeading">
@@ -480,10 +450,10 @@
             <!-- 图例说明与快捷指示 -->
             <div class="flex items-center justify-between flex-wrap gap-2 text-xs font-serifMono text-stone-600 mb-3 px-1">
                 <div class="flex items-center gap-3 flex-wrap">
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-50 border border-sky-400 inline-block"></span> muduo 网络模块 (L0~L2)</span>
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-50 border border-amber-400 inline-block"></span> HTTP 协议与路由 (L3)</span>
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-purple-50 border border-purple-400 inline-block"></span> AI 业务与 MCP 推理 (L4)</span>
-                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-50 border border-emerald-400 inline-block"></span> 多模态与异步任务 (L5)</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-50 border border-sky-400 inline-block"></span> muduo 网络模块</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-50 border border-amber-400 inline-block"></span> HTTP 协议与路由</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-purple-50 border border-purple-400 inline-block"></span> AI 业务与 MCP 推理</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-50 border border-emerald-400 inline-block"></span> 多模态与异步任务</span>
                 </div>
                 <div class="text-[11px] text-stone-400">
                     <i class="fa-solid fa-hand-pointer text-amber-600 mr-1"></i>悬停节点高亮，点击查看源码与直达任务
@@ -1159,7 +1129,7 @@
                         <span>系统化实践沉淀</span>
                     </div>
                     <h2 class="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2 font-serifHeading">
-                        <i class="fa-solid fa-graduation-cap text-emerald-700"></i> 统一学习系统与知识与实践关联中心
+                        <i class="fa-solid fa-graduation-cap text-emerald-700"></i> 算法与知识与实践关联中心
                     </h2>
                     <p class="text-xs text-stone-500 mt-1 max-w-3xl leading-relaxed">
                         系统化对照：将 C++ 核心语法、Linux 系统原理、经典专业书目、算法手撕训练与项目实战代码建立对应关联。遵循
@@ -1177,27 +1147,27 @@
             <!-- 6 大子体系切换标签导航 -->
             <div class="flex items-center gap-2 overflow-x-auto pt-4 pb-1 font-serifMono text-xs" id="learning-subtabs-nav">
                 <button onclick="switchLearningTab('cpp')" id="learn-tab-btn-cpp" class="px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1.5 bg-stone-900 text-white border-stone-900 shadow-xs cursor-pointer">
-                    <i class="fa-solid fa-code text-sky-400"></i> 1. C++ 学习路线
+                    <i class="fa-solid fa-code text-sky-400"></i> C++ 路线
                 </button>
                 <button onclick="switchLearningTab('linux')" id="learn-tab-btn-linux" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-terminal text-emerald-600"></i> 2. Linux 私房菜底座
+                    <i class="fa-solid fa-terminal text-emerald-600"></i> Linux
                 </button>
                 <button onclick="switchLearningTab('books')" id="learn-tab-btn-books" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-book-open text-amber-600"></i> 3. 专业书目伴读
+                    <i class="fa-solid fa-book-open text-amber-600"></i> 专业书目
                 </button>
                 <button onclick="switchLearningTab('algo')" id="learn-tab-btn-algo" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-code-compare text-indigo-600"></i> 4. 算法手撕 Lab
+                    <i class="fa-solid fa-code-compare text-indigo-600"></i> 算法题库
                 </button>
                 <button onclick="switchLearningTab('qa')" id="learn-tab-btn-qa" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-circle-question text-purple-600"></i> 5. 项目代码八股
+                    <i class="fa-solid fa-circle-question text-purple-600"></i> 项目八股
                 </button>
                 <button onclick="switchLearningTab('reading')" id="learn-tab-btn-reading" class="px-3 py-1.5 rounded-xl border font-semibold transition flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200 cursor-pointer">
-                    <i class="fa-solid fa-compass text-rose-600"></i> 6. 通识阅读三部曲
+                    <i class="fa-solid fa-compass text-rose-600"></i> 通识阅读
                 </button>
             </div>
         </div>
 
-        <!-- 1. C++ 学习路线面板 (双栏布局：左侧 1/4 导航，右侧 3/4 内容) -->
+        <!-- C++ 路线面板 (双栏布局：左侧 1/4 导航，右侧 3/4 内容) -->
         <div id="learn-panel-cpp" class="space-y-6">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- 左侧 1/4 导航与进度 -->
@@ -1249,7 +1219,7 @@
             </div>
         </div>
 
-        <!-- 2. Linux 私房菜底座体系面板 (双栏布局：左侧 1/4 导航，右侧 3/4 内容) -->
+        <!-- Linux体系面板 (双栏布局：左侧 1/4 导航，右侧 3/4 内容) -->
         <div id="learn-panel-linux" class="hidden space-y-6">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- 左侧 1/4 导航与进度 -->
@@ -1266,14 +1236,14 @@
             </div>
         </div>
 
-        <!-- 3. 专业书目伴读面板 -->
+        <!-- 专业书目面板 -->
         <div id="learn-panel-books" class="hidden space-y-6">
             <div id="books-companion-container" class="space-y-6">
                 <!-- 由 JS 动态渲染两大经典书目章节、调控器与实践命令 -->
             </div>
         </div>
 
-        <!-- 4. 算法手撕 Lab 面板 -->
+        <!-- 算法题库 面板 -->
         <div id="learn-panel-algo" class="hidden space-y-6">
             <div id="algo-lab-container" class="space-y-6">
                 <!-- 由 JS 动态渲染算法题目、复杂度、二刷状态与模式解析 -->
@@ -1287,7 +1257,7 @@
             </div>
         </div>
 
-        <!-- 6. 通识阅读三部曲面板 -->
+        <!-- 通识阅读面板 -->
         <div id="learn-panel-reading" class="hidden space-y-6">
             <div id="general-reading-container" class="space-y-6">
                 <!-- 由 JS 动态渲染通识三部曲与工程思维映射 -->
@@ -1327,15 +1297,9 @@
         <div class="bg-white p-5 sm:p-7 rounded-2xl border border-stone-200 academic-card">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                 <div>
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-teal-50 border border-teal-200 text-teal-800 text-[11px] font-serifMono uppercase tracking-wider mb-1">
-                        Sequential Source Code Exploration
-                    </div>
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        muduo 8 阶核心源码演进路线图
+                        <i class="fa-solid fa-code-branch text-teal-600"></i> 源码速查
                     </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">
-                        按照底层网络调度到高层连接实体的精确执行时序：从 Channel ➔ Poller ➔ EventLoop ➔ Acceptor ➔ TcpConnection ➔ TcpServer ➔ Buffer ➔ TimerQueue 步步进阶。
-                    </p>
                 </div>
                 <div class="text-xs font-serifMono text-stone-500 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200">
                     精读进度: <span id="source-read-progress" class="font-bold text-teal-700">0 / 8</span> 已攻克
@@ -1355,9 +1319,8 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                 <div>
                     <h2 class="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2 font-serif-heading">
-                        <i class="fa-solid fa-bug text-rose-600"></i> C++ 典型问题与避坑档案库
+                        <i class="fa-solid fa-bug text-rose-600"></i> 避坑指南
                     </h2>
-                    <p class="text-xs text-stone-500 mt-0.5">记录内存越界、Double Free、循环引用、悬挂闭包与迭代器失效等典型问题与排查方案。</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button onclick="openNewPitfallModal()" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-serifMono font-bold rounded-xl shadow-xs transition flex items-center gap-1.5" aria-label="新建踩坑记录">

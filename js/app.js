@@ -2260,15 +2260,9 @@ function renderLearningAlgoTab() {
         <!-- 顶部指标栏 -->
         <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="text-xs font-serifMono font-bold text-indigo-700 uppercase tracking-wider mb-1">
-                    LeetCode Hand-Coding Laboratory · 代码随想录 12 大体系
-                </div>
                 <h3 class="text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                    <i class="fa-solid fa-laptop-code text-indigo-700"></i> 手撕算法 Lab (题单参照代码随想录 · 力扣官方直达)
+                    <i class="fa-solid fa-laptop-code text-indigo-700"></i> 算法题库
                 </h3>
-                <p class="text-xs text-stone-500 mt-0.5">
-                    涵盖数组、链表、哈希表、字符串、双指针、栈队列、二叉树、回溯、贪心、动态规划、单调栈、图论。支持状态标记与力扣直连。
-                </p>
             </div>
             <div class="flex items-center gap-3 font-serifMono text-xs shrink-0">
                 <div class="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-center">
@@ -2287,12 +2281,12 @@ function renderLearningAlgoTab() {
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-stone-100 font-serifMono">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-cubes-stacked text-indigo-700"></i>
-                    <span class="font-bold text-stone-900 text-xs sm:text-sm font-serifHeading">代码随想录 12 大算法体系全览图</span>
-                    <span class="text-[10px] text-stone-400 font-normal">（点击分类卡片可下钻筛选，勾选完成题目即时动态更新）</span>
+                    <span class="font-bold text-stone-900 text-xs sm:text-sm font-serifHeading">算法分类</span>
+                    
                 </div>
                 <div class="flex items-center gap-2 text-[11px]">
                     <button onclick="setAlgoCategoryFilter('全部')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${currentAlgoCategory === '全部' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700'}">
-                        全部 179 题 (${completedCount}/${totalCount})
+                        全部 (${completedCount}/${totalCount})
                     </button>
                 </div>
             </div>
@@ -3118,7 +3112,7 @@ function renderCareerInterviewTab() {
                     <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-serifMono font-bold">项目架构剖析</span>
                     <span class="text-xs text-stone-400 font-serifMono">muduo 底座 ➔ CppAIService 业务微服务</span>
                 </div>
-                <h4 class="text-base font-bold text-stone-900 font-serifHeading">${escapeHtml(arch.title || '双核多线程 Reactor 架构设计')}</h4>
+                <h4 class="text-base font-bold text-stone-900 font-serifHeading">${escapeHtml(arch.title || '多线程 Reactor 架构设计')}</h4>
                 <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 font-mono text-xs text-stone-800 overflow-x-auto leading-relaxed whitespace-pre">
 ${escapeHtml(arch.diagram || `+--------------------------------------------------------------+
 |                    Client Connections (epoll)                |
@@ -3177,7 +3171,7 @@ ${escapeHtml(arch.diagram || `+-------------------------------------------------
             <div class="flex items-center justify-between pb-3 border-b border-stone-100">
                 <div>
                     <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-serifMono font-bold">
-                        4-HOP REVERSE INTERVIEW CHAIN
+                        INTERVIEW LINK
                     </span>
                     <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1 flex items-center gap-2">
                         <i class="fa-solid fa-arrows-split-up-and-left text-amber-600"></i> 面试真题逆向 4-Hop 关联穿行
@@ -5675,7 +5669,7 @@ function handleJsonImport(event) {
             // 弹出自定义导入确认框：合并 vs 覆盖
             const msgEl = document.getElementById('modal-message');
             const btns = document.getElementById('modal-buttons-container');
-            document.getElementById('modal-title').innerText = "双核系统 JSON 导入方式选择";
+            document.getElementById('modal-title').innerText = "JSON 导入方式选择";
             msgEl.innerText = "请选择导入策略：【合并数据】将保留本地更高级别的掌握度与笔记；【完全覆盖】将完全替换本地所有进度。";
             
             btns.innerHTML = `
@@ -5865,10 +5859,10 @@ function exportMarkdownReport() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `我的_双核工程学习档案_${getTodayDateStr()}.md`;
+    a.download = `我的_工程学习档案_${getTodayDateStr()}.md`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast("我的双核工程学习档案.md 已成功生成！");
+    showToast("我的工程学习档案.md 已成功生成！");
 }
 
 // 全局键盘快捷键监听
@@ -6023,6 +6017,14 @@ function ensureDailyRoutineInitialized() {
                 },
                 history: {}
             };
+        }
+    }
+        // 自动对齐最新纯化任务模型 (若仍包含旧书目/通识任务则平滑迁移为纯化 4 核心任务)
+    if (appState.dailyRoutine && Array.isArray(appState.dailyRoutine.tasks)) {
+        const hasLegacyTasks = appState.dailyRoutine.tasks.some(t => t.id === 'task_a_linux_book' || t.id === 'task_c_reading' || t.category === 'book' || t.category === 'reading');
+        if (hasLegacyTasks && typeof TaskDomain !== 'undefined' && typeof TaskDomain.createFreshDailyTasks === 'function') {
+            appState.dailyRoutine.tasks = TaskDomain.createFreshDailyTasks();
+            if (typeof persistState === 'function') persistState();
         }
     }
     return appState.dailyRoutine;
