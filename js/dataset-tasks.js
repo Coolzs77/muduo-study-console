@@ -11,37 +11,37 @@
   const TASK_PRIORITIES = {
     S: {
       level: 'S',
-      name: 'S 级',
+      name: 'S 级·核心攻坚',
       badgeClass: 'bg-rose-100 text-rose-800 border-rose-300',
       tagClass: 'text-rose-700',
-      description: '优先完成',
-      defaultMinutes: 150,
+      description: '核心主线，必须优先完成',
+      defaultMinutes: 180,
       weight: 4
     },
     A: {
       level: 'A',
-      name: 'A 级',
+      name: 'A 级·主干底座',
       badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
       tagClass: 'text-amber-800',
-      description: '重要任务',
-      defaultMinutes: 60,
+      description: '算法与基础理论支撑',
+      defaultMinutes: 90,
       weight: 3
     },
     B: {
       level: 'B',
-      name: 'B 级',
+      name: 'B 级·知识巩固',
       badgeClass: 'bg-sky-100 text-sky-800 border-sky-300',
       tagClass: 'text-sky-700',
-      description: '日常巩固',
+      description: '考点自测与八股梳理',
       defaultMinutes: 30,
       weight: 2
     },
     C: {
       level: 'C',
-      name: 'C 级',
+      name: 'C 级·通识拓展',
       badgeClass: 'bg-stone-100 text-stone-700 border-stone-300',
       tagClass: 'text-stone-600',
-      description: '拓展学习',
+      description: '思维阅读与就业行情',
       defaultMinutes: 30,
       weight: 1
     }
@@ -49,65 +49,106 @@
 
   // 任务分类枚举
   const TASK_CATEGORIES = {
-    algorithm: { id: 'algorithm', name: '算法', icon: 'fa-laptop-code', color: 'indigo' },
-    project: { id: 'project', name: '项目', icon: 'fa-microchip', color: 'amber' },
-    agent: { id: 'agent', name: 'Agent', icon: 'fa-robot', color: 'emerald' },
-    nowcoder: { id: 'nowcoder', name: '牛客', icon: 'fa-clipboard-question', color: 'purple' },
+    project: { id: 'project', name: '项目攻坚', icon: 'fa-microchip', color: 'amber' },
+    algorithm: { id: 'algorithm', name: '手撕算法', icon: 'fa-laptop-code', color: 'indigo' },
     book: { id: 'book', name: '专业书目', icon: 'fa-book', color: 'sky' },
     quiz: { id: 'quiz', name: '考点自测', icon: 'fa-clipboard-question', color: 'purple' },
     reading: { id: 'reading', name: '通识阅读', icon: 'fa-glasses', color: 'teal' },
     career: { id: 'career', name: '求职行情', icon: 'fa-briefcase', color: 'stone' }
   };
 
-  // 默认日常任务模板
+  // 默认日常任务模板 (对齐用户 Google Tasks 真实日程)
   const DEFAULT_ROUTINE_TEMPLATE = [
     {
-      id: 'task_algorithm',
-      priority: 'S',
-      category: 'algorithm',
-      title: '算法',
-      subtitle: '',
-      estimatedMinutes: 150,
-      recurring: true,
-      actionType: 'algorithm',
-      description: '算法题库练习与复盘。',
-      targetLink: 'view-learning'
-    },
-    {
-      id: 'task_project',
+      id: 'task_s_project',
       priority: 'S',
       category: 'project',
-      title: '项目',
-      subtitle: '',
-      estimatedMinutes: 150,
+      title: 'CppAIService 模块攻坚与源码研读',
+      subtitle: '每日 3.0h · 推进 Reactor 网络与服务平台模块',
+      estimatedMinutes: 180,
       recurring: true,
       actionType: 'project',
-      description: 'CppAIService 服务架构推进。',
-      targetLink: 'view-mapping'
+      description: '研读并实现 CppAIService 与 muduo 核心组件，深入 HTTP 解析、路由、MCP 协议或异步处理逻辑。',
+      targetLink: 'view-knowledge'
     },
     {
-      id: 'task_agent',
+      id: 'task_a_algo',
       priority: 'A',
-      category: 'agent',
-      title: 'Agent',
-      subtitle: '',
+      category: 'algorithm',
+      title: 'C++ 手撕算法每日 3 题',
+      subtitle: '每日 1.5h · 高频经典题与时空复杂度分析',
+      estimatedMinutes: 90,
+      recurring: true,
+      actionType: 'algorithm',
+      description: '手撕数组、双指针、滑动窗口、树与动态规划等高频题，记录推导过程与时空复杂度。',
+      targetLink: 'algo-modal'
+    },
+    {
+      id: 'task_a_linux_book',
+      priority: 'A',
+      category: 'book',
+      title: '《Linux多线程服务端编程》研读 10 页',
+      subtitle: '每日 0.5h · 学习网络编程与并发控制',
       estimatedMinutes: 30,
       recurring: true,
-      actionType: 'agent',
-      description: 'MCP 协议与工具调用。',
-      targetLink: 'view-mapping'
+      actionType: 'book',
+      bookKey: 'linuxServer',
+      bookName: 'Linux多线程服务端编程',
+      dailyPages: 10,
+      description: '精读陈硕著经典，理解多线程安全生命周期管理、互斥锁戒律与应用层 Buffer 设计。',
+      targetLink: 'books-modal'
     },
     {
-      id: 'task_nowcoder',
+      id: 'task_a_bird_linux',
       priority: 'A',
-      category: 'nowcoder',
-      title: '牛客',
-      subtitle: '',
-      estimatedMinutes: 45,
+      category: 'book',
+      title: '《鸟哥的Linux私房菜》研读 10 页 (从 bash 开始)',
+      subtitle: '每日 0.5h · 掌握系统管理与命令行环境',
+      estimatedMinutes: 30,
+      recurring: true,
+      actionType: 'book',
+      bookKey: 'birdLinux',
+      bookName: '鸟哥的Linux私房菜',
+      dailyPages: 10,
+      description: '从 bash 环境出发，掌握环境变量、重定向、管道与系统管理脚本编写。',
+      targetLink: 'books-modal'
+    },
+    {
+      id: 'task_b_quiz',
+      priority: 'B',
+      category: 'quiz',
+      title: 'C++ / muduo / AI 考点自测与八股梳理',
+      subtitle: '每日 0.5h · 巩固底层概念与自测判分',
+      estimatedMinutes: 30,
       recurring: true,
       actionType: 'quiz',
-      description: '核心考点梳理。',
+      description: '复习现代 C++ 规范、epoll 多路复用、智能指针与多线程网络考点，完成配套自测题。',
       targetLink: 'view-quiz'
+    },
+    {
+      id: 'task_c_reading',
+      priority: 'C',
+      category: 'reading',
+      title: '通识阅读三部曲 (各 10 页)',
+      subtitle: '每日 0.5h · 《非暴力沟通》+《金融学》+《图解博弈论》',
+      estimatedMinutes: 30,
+      recurring: true,
+      actionType: 'reading',
+      books: ['nonviolentComm', 'financeZero', 'gameTheory'],
+      description: '阅读《非暴力沟通》、《从零开始学习金融学》、《图解博弈论》，拓宽思维模型与认知边界。',
+      targetLink: 'books-modal'
+    },
+    {
+      id: 'task_c_career',
+      priority: 'C',
+      category: 'career',
+      title: '牛客网就业与行业信息调研',
+      subtitle: '每日 0.5h · 跟踪招聘信息与岗位要求',
+      estimatedMinutes: 30,
+      recurring: true,
+      actionType: 'career',
+      description: '调研技术求职动态、企业招聘要求、技术栈偏好与面试面经，整理个人求职信息库。',
+      targetLink: 'career-modal'
     }
   ];
 
