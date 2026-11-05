@@ -2057,14 +2057,21 @@ function renderLearningBooksTab() {
 // 4. 算法手撕 Lab 渲染器 (对齐代码随想录 12 大分类，直达力扣，支持完成标记)
 // ==========================================================================
 
+let currentAlgoSection = 'all'; // 'all' | 'hot100' | 'carl'
 let currentAlgoCategory = '全部';
 let algoSearchKeyword = '';
+
+function setAlgoSectionFilter(section) {
+    currentAlgoSection = section;
+    renderLearningAlgoTab();
+}
+window.setAlgoSectionFilter = setAlgoSectionFilter;
 
 function renderLearningAlgoTab() {
     const container = document.getElementById('algo-lab-container');
     if (!container) return;
     const catalog = (typeof ALGORITHM_LAB_CATALOG !== 'undefined') ? ALGORITHM_LAB_CATALOG : [];
-    
+
     // 获取已完成题目集合
     let completedMap = {};
     if (typeof stateManager !== 'undefined' && stateManager && stateManager.getState) {
@@ -2074,9 +2081,13 @@ function renderLearningAlgoTab() {
         completedMap = appState.learningSystem.completedAlgos || {};
     }
 
+    const isAlgoItemDone = (p) => {
+        return (p.num !== null && p.num !== undefined && !!completedMap[p.num]) || (p.id && !!completedMap[p.id]);
+    };
+
     const categories = ['全部', '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列', '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'];
 
-    // 代码随想录 12 大分类元数据 (用于分类全览图)
+    // 12 大分类元数据
     const algoCategoriesMeta = [
         { name: '数组', icon: 'fa-table-cells', desc: '二分/双指针/滑动窗口' },
         { name: '链表', icon: 'fa-link', desc: '虚拟头/环检测/双指针' },
@@ -2092,25 +2103,40 @@ function renderLearningAlgoTab() {
         { name: '图论', icon: 'fa-circle-nodes', desc: '深搜/广搜/并查集/最短路' }
     ];
 
-    // 过滤
-    const filtered = catalog.filter(p => {
+    // 分区与统计
+    const totalCount = catalog.length;
+    const totalCompleted = catalog.filter(p => isAlgoItemDone(p)).length;
+
+    const hot100List = catalog.filter(p => !!p.isHot100);
+    const hot100Total = hot100List.length;
+    const hot100Completed = hot100List.filter(p => isAlgoItemDone(p)).length;
+
+    const carlList = catalog.filter(p => !!p.isCarl);
+    const carlTotal = carlList.length;
+    const carlCompleted = carlList.filter(p => isAlgoItemDone(p)).length;
+
+    // 当前分区数据集
+    const activeSectionList = catalog.filter(p => {
+        if (currentAlgoSection === 'hot100') return !!p.isHot100;
+        if (currentAlgoSection === 'carl') return !!p.isCarl;
+        return true;
+    });
+
+    // 过滤：结合当前分区、分类与搜索关键词
+    const filtered = activeSectionList.filter(p => {
         const matchCat = currentAlgoCategory === '全部' || p.category === currentAlgoCategory;
-        const matchKw = !algoSearchKeyword || 
-            p.title.toLowerCase().includes(algoSearchKeyword.toLowerCase()) || 
-            String(p.num).includes(algoSearchKeyword) || 
+        const matchKw = !algoSearchKeyword ||
+            p.title.toLowerCase().includes(algoSearchKeyword.toLowerCase()) ||
+            String(p.num).includes(algoSearchKeyword) ||
             (p.pattern && p.pattern.toLowerCase().includes(algoSearchKeyword.toLowerCase()));
         return matchCat && matchKw;
     });
 
-    const totalCount = catalog.length;
-    const completedCount = catalog.filter(p => !!completedMap[p.num]).length;
-    const completeRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
-    // 12 大分类全览全景图卡片 HTML (实时响应 completedMap 的改变)
+    // 分类全览卡片 HTML (响应当前分区与完成度)
     const overviewCardsHtml = algoCategoriesMeta.map(c => {
-        const catProbs = catalog.filter(p => p.category === c.name);
+        const catProbs = activeSectionList.filter(p => p.category === c.name);
         const catTotal = catProbs.length;
-        const catDone = catProbs.filter(p => !!completedMap[p.num]).length;
+        const catDone = catProbs.filter(p => isAlgoItemDone(p)).length;
         const pct = catTotal > 0 ? Math.round((catDone / catTotal) * 100) : 0;
         const isAllDone = (catDone === catTotal && catTotal > 0);
         const isSelected = (currentAlgoCategory === c.name);
@@ -2136,7 +2162,7 @@ function renderLearningAlgoTab() {
         const barColor = isAllDone ? 'bg-emerald-500' : (catDone > 0 ? 'bg-indigo-600' : 'bg-transparent');
 
         return `
-            <div onclick="setAlgoCategoryFilter('${c.name}')" class="p-2.5 sm:p-3 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none ${borderBgClass}" title="点击下钻筛选「${c.name}」(${catDone}/${catTotal}题)">
+            <div onclick="setAlgoCategoryFilter('${c.name}')" class="p-2.5 sm:p-3 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none ${borderBgClass}">
                 <div>
                     <div class="flex items-center justify-between gap-1 mb-1">
                         <span class="inline-flex items-center gap-1.5 font-bold text-xs font-serifHeading ${isAllDone ? 'text-emerald-900' : (isSelected ? 'text-indigo-900' : 'text-stone-800')}">
@@ -2162,8 +2188,8 @@ function renderLearningAlgoTab() {
 
     // 分类筛选按钮
     const catButtonsHtml = categories.map(cat => {
-        const catTotal = cat === '全部' ? totalCount : catalog.filter(p => p.category === cat).length;
-        const catDone = cat === '全部' ? completedCount : catalog.filter(p => p.category === cat && !!completedMap[p.num]).length;
+        const catTotal = cat === '全部' ? activeSectionList.length : activeSectionList.filter(p => p.category === cat).length;
+        const catDone = cat === '全部' ? activeSectionList.filter(p => isAlgoItemDone(p)).length : activeSectionList.filter(p => p.category === cat && isAlgoItemDone(p)).length;
         const isActive = cat === currentAlgoCategory;
 
         return `
@@ -2175,19 +2201,20 @@ function renderLearningAlgoTab() {
 
     // 题目卡片列表
     const cardsHtml = filtered.map(p => {
-        const isDone = !!completedMap[p.num];
-        const diffColor = p.difficulty === 'Easy' 
+        const isDone = isAlgoItemDone(p);
+        const pKey = (p.num !== null && p.num !== undefined) ? p.num : p.id;
+        const pDisplayNum = (p.num !== null && p.num !== undefined) ? p.num : p.id.replace('algo_', '');
+        const diffColor = p.difficulty === 'Easy'
             ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
             : (p.difficulty === 'Medium' ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-rose-50 text-rose-800 border-rose-200');
 
         return `
             <div class="bg-white rounded-2xl p-5 border ${isDone ? 'border-emerald-300 bg-emerald-50/10' : 'border-stone-200'} academic-card flex flex-col justify-between hover:shadow-md transition">
                 <div>
-                    <!-- 顶栏：题号 + 难度 + 分类 + 力扣直达 + 完成勾选 -->
                     <div class="flex items-center justify-between gap-2 mb-2.5 flex-wrap">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="px-2 py-0.5 rounded-md bg-stone-900 text-white text-xs font-serifMono font-bold">
-                                #${p.num}
+                                #${pDisplayNum}
                             </span>
                             <span class="text-xs font-serifMono px-2 py-0.5 rounded border font-bold ${diffColor}">
                                 ${escapeHtml(p.difficulty)}
@@ -2195,35 +2222,31 @@ function renderLearningAlgoTab() {
                             <span class="text-xs font-serifMono px-2 py-0.5 rounded bg-indigo-50 text-indigo-800 border border-indigo-200 font-semibold">
                                 ${escapeHtml(p.category)}
                             </span>
-                            <a href="${p.leetcodeUrl || p.link || '#'}" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 rounded ${p.leetcodeUrl && p.leetcodeUrl.includes('kamacoder') ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border-indigo-200' : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200'} text-xs font-serifMono font-bold flex items-center gap-1 transition shadow-2xs" title="打开官方题解">
+                            <a href="${p.leetcodeUrl || p.link || '#'}" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 rounded ${p.leetcodeUrl && p.leetcodeUrl.includes('kamacoder') ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border-indigo-200' : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200'} text-xs font-serifMono font-bold flex items-center gap-1 transition shadow-2xs">
                                 <span>${p.leetcodeUrl && p.leetcodeUrl.includes('kamacoder') ? '卡码 ↗' : '力扣 ↗'}</span>
                             </a>
                         </div>
-                        <!-- 完成标记勾选框 -->
                         <label class="flex items-center gap-1.5 cursor-pointer font-serifMono text-xs select-none">
-                            <input type="checkbox" onchange="toggleAlgoCompletedStatus(${p.num})" ${isDone ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                            <input type="checkbox" onchange="toggleAlgoCompletedStatus('${pKey}')" ${isDone ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer">
                             <span class="font-bold ${isDone ? 'text-emerald-700' : 'text-stone-400'}">
                                 ${isDone ? '✓ 已完成' : '○ 未完成'}
                             </span>
                         </label>
                     </div>
 
-                    <!-- 题目标题 -->
                     <h4 class="text-sm font-bold text-stone-900 font-serifHeading mb-2">
                         <a href="${p.leetcodeUrl}" target="_blank" class="hover:text-amber-800 transition">
                             ${escapeHtml(p.title)}
                         </a>
                     </h4>
 
-                    <!-- 核心套路 -->
                     <div class="text-xs text-stone-700 font-serifHeading mb-2.5 bg-stone-50 p-2.5 rounded-xl border border-stone-100">
                         <span class="font-bold text-stone-900 font-serifMono text-[11px] block mb-0.5">
-                            <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i>核心套路与不变量：
+                            <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i>核心套路：
                         </span>
-                        ${escapeHtml(p.pattern || '暂无套路描述')}
+                        ${escapeHtml(p.pattern || '经典题解模式')}
                     </div>
 
-                    <!-- 复杂度 -->
                     <div class="flex items-center gap-3 text-[11px] font-serifMono text-stone-500 mb-2.5 bg-stone-50/70 p-2 rounded-lg border border-stone-200/60">
                         <span><strong class="text-stone-700">时间:</strong> ${escapeHtml(p.timeComp || 'O(n)')}</span>
                         <span>•</span>
@@ -2232,21 +2255,19 @@ function renderLearningAlgoTab() {
                         <span><strong>分类:</strong> ${escapeHtml(p.topic || p.category)}</span>
                     </div>
 
-                    <!-- 易错陷阱 -->
                     ${p.mistakes ? `
                         <div class="p-2.5 bg-rose-50/60 rounded-xl border border-rose-200/80 text-xs text-rose-950 font-serifHeading mb-2">
                             <span class="font-bold font-serifMono text-[11px] text-rose-800 block mb-0.5">
-                                <i class="fa-solid fa-triangle-exclamation mr-1"></i>经典易错点：
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i>易错点：
                             </span>
                             <p class="text-[11px] leading-relaxed text-stone-700">${escapeHtml(p.mistakes)}</p>
                         </div>
                     ` : ''}
 
-                    <!-- 工程同构 -->
                     ${p.projectLink ? `
                         <div class="p-2.5 bg-sky-50/60 rounded-xl border border-sky-200/80 text-xs text-sky-950 font-serifHeading">
                             <span class="font-bold font-serifMono text-[11px] text-sky-800 block mb-0.5">
-                                <i class="fa-solid fa-code-branch mr-1"></i>项目工程映射：
+                                <i class="fa-solid fa-code-branch mr-1"></i>项目映射：
                             </span>
                             <p class="text-[11px] leading-relaxed text-stone-700">${escapeHtml(p.projectLink)}</p>
                         </div>
@@ -2257,43 +2278,36 @@ function renderLearningAlgoTab() {
     }).join('');
 
     container.innerHTML = `
-        <!-- 顶部指标栏 -->
+        <!-- 顶部题库主卡片与两部分切换 -->
         <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="text-xs font-serifMono font-bold text-indigo-700 uppercase tracking-wider mb-1">
-                    LeetCode Hand-Coding Laboratory · 代码随想录 12 大体系
-                </div>
                 <h3 class="text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                    <i class="fa-solid fa-laptop-code text-indigo-700"></i> 手撕算法 Lab (题单参照代码随想录 · 力扣官方直达)
+                    <i class="fa-solid fa-laptop-code text-indigo-700"></i> 算法题库
                 </h3>
-                <p class="text-xs text-stone-500 mt-0.5">
-                    涵盖数组、链表、哈希表、字符串、双指针、栈队列、二叉树、回溯、贪心、动态规划、单调栈、图论。支持状态标记与力扣直连。
-                </p>
             </div>
-            <div class="flex items-center gap-3 font-serifMono text-xs shrink-0">
-                <div class="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-center">
-                    <div class="text-[10px] text-emerald-600">已攻克手撕</div>
-                    <div class="text-base font-bold">${completedCount} / ${totalCount} 题</div>
-                </div>
-                <div class="px-4 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-800 text-center">
-                    <div class="text-[10px] text-indigo-600">完成率</div>
-                    <div class="text-base font-bold">${completeRate}%</div>
-                </div>
+            <!-- 两部分独立切换：Hot 100 与 代码随想录 -->
+            <div class="flex items-center gap-2 font-serifMono text-xs flex-wrap">
+                <button onclick="setAlgoSectionFilter('all')" class="px-3.5 py-1.5 rounded-xl font-bold cursor-pointer transition flex items-center gap-1.5 ${currentAlgoSection === 'all' ? 'bg-stone-900 text-white shadow-xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200'}">
+                    <span>全部</span>
+                    <span class="text-[11px] opacity-80">(${totalCompleted}/${totalCount})</span>
+                </button>
+                <button onclick="setAlgoSectionFilter('hot100')" class="px-3.5 py-1.5 rounded-xl font-bold cursor-pointer transition flex items-center gap-1.5 ${currentAlgoSection === 'hot100' ? 'bg-indigo-700 text-white shadow-xs' : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200'}">
+                    <span>Hot 100</span>
+                    <span class="text-[11px] opacity-80">(${hot100Completed}/${hot100Total})</span>
+                </button>
+                <button onclick="setAlgoSectionFilter('carl')" class="px-3.5 py-1.5 rounded-xl font-bold cursor-pointer transition flex items-center gap-1.5 ${currentAlgoSection === 'carl' ? 'bg-amber-700 text-white shadow-xs' : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200'}">
+                    <span>代码随想录</span>
+                    <span class="text-[11px] opacity-80">(${carlCompleted}/${carlTotal})</span>
+                </button>
             </div>
         </div>
 
-        <!-- 代码随想录 12 大算法分类全览全景图 (Category Overview Map) -->
+        <!-- 算法分类全览图 -->
         <div class="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 academic-card">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-stone-100 font-serifMono">
+            <div class="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-stone-100 font-serifMono">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-cubes-stacked text-indigo-700"></i>
-                    <span class="font-bold text-stone-900 text-xs sm:text-sm font-serifHeading">代码随想录 12 大算法体系全览图</span>
-                    <span class="text-[10px] text-stone-400 font-normal">（点击分类卡片可下钻筛选，勾选完成题目即时动态更新）</span>
-                </div>
-                <div class="flex items-center gap-2 text-[11px]">
-                    <button onclick="setAlgoCategoryFilter('全部')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${currentAlgoCategory === '全部' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700'}">
-                        全部 179 题 (${completedCount}/${totalCount})
-                    </button>
+                    <span class="font-bold text-stone-900 text-xs sm:text-sm font-serifHeading">算法分类</span>
                 </div>
             </div>
 
@@ -2357,13 +2371,9 @@ function renderLearningQATab() {
     container.innerHTML = `
         <div class="bg-white rounded-2xl p-5 border border-stone-200 academic-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-                <div class="text-xs font-serifMono font-bold text-purple-700 uppercase tracking-wider mb-1">
-                    Project-Derived Technical Interview
-                </div>
                 <h3 class="text-base font-bold text-stone-900 font-serifHeading flex items-center gap-2">
-                    <i class="fa-solid fa-circle-question text-purple-700"></i> 项目源码逆向八股自测中心 (每日 30min)
+                    <i class="fa-solid fa-circle-question text-purple-700"></i> 项目八股
                 </h3>
-                <p class="text-xs text-stone-500 mt-0.5">杜绝脱离实际背诵，所有八股问题均来自 muduo 底座与 CppAIService 真实实现。</p>
             </div>
             <div class="text-xs font-serifMono text-stone-500 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 shrink-0">
                 收录核心真题: <strong class="text-purple-800">${list.length}</strong> 道
@@ -3039,7 +3049,7 @@ function renderCareerCapabilityTab() {
     }).join('');
 }
 
-// 4. 子面板 3: 项目面试全案与 4-Hop 关联渲染器
+// 4. 子面板 3: 项目面试全案与考点关联渲染器
 function switchInterviewModule(modKey) {
     appState.activeInterviewModule = modKey;
     renderCareerInterviewTab();
@@ -3118,7 +3128,7 @@ function renderCareerInterviewTab() {
                     <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-serifMono font-bold">项目架构剖析</span>
                     <span class="text-xs text-stone-400 font-serifMono">muduo 底座 ➔ CppAIService 业务微服务</span>
                 </div>
-                <h4 class="text-base font-bold text-stone-900 font-serifHeading">${escapeHtml(arch.title || '双核多线程 Reactor 架构设计')}</h4>
+                <h4 class="text-base font-bold text-stone-900 font-serifHeading">${escapeHtml(arch.title || '多线程 Reactor 架构设计')}</h4>
                 <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 font-mono text-xs text-stone-800 overflow-x-auto leading-relaxed whitespace-pre">
 ${escapeHtml(arch.diagram || `+--------------------------------------------------------------+
 |                    Client Connections (epoll)                |
@@ -3171,22 +3181,16 @@ ${escapeHtml(arch.diagram || `+-------------------------------------------------
         `;
     }
 
-    // 下半部分：4-Hop 逆向真题穿透展示
+    // 下半部分：真题穿透展示
     let reverseHtml = `
         <div class="bg-white p-6 rounded-2xl border border-stone-200 academic-card space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-stone-100">
                 <div>
-                    <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-serifMono font-bold">
-                        4-HOP REVERSE INTERVIEW CHAIN
-                    </span>
                     <h3 class="text-base font-bold text-stone-900 font-serifHeading mt-1 flex items-center gap-2">
-                        <i class="fa-solid fa-arrows-split-up-and-left text-amber-600"></i> 面试真题逆向 4-Hop 关联穿行
+                        <i class="fa-solid fa-arrows-split-up-and-left text-amber-600"></i> 面试真题关联
                     </h3>
-                    <p class="text-xs text-stone-500 mt-0.5 font-serifMono">
-                        Question (面试题) ➔ Source (源码精确定位) ➔ Knowledge (理论深度剖析) ➔ Commit (真实提交凭据)
-                    </p>
                 </div>
-                <span class="text-xs text-stone-400 font-serifMono">${reverseQuestions.length} 道高频大厂真题</span>
+                <span class="text-xs text-stone-400 font-serifMono">${reverseQuestions.length} 道高频真题</span>
             </div>
 
             <div class="space-y-4">
@@ -3211,20 +3215,20 @@ ${escapeHtml(arch.diagram || `+-------------------------------------------------
                             ${escapeHtml(q.answer)}
                         </div>
 
-                        <!-- 4-Hop 关联链接按钮组 -->
+                        <!-- 考点关联链接按钮组 -->
                         <div class="flex flex-wrap items-center gap-2 pt-1 font-serifMono text-xs">
-                            <span class="text-[11px] text-stone-400 font-bold">4-Hop 联动:</span>
+                            <span class="text-[11px] text-stone-400 font-bold">考点关联:</span>
                             <span class="px-2.5 py-1 rounded-lg bg-white border border-stone-200 text-stone-700 flex items-center gap-1 text-[11px]">
-                                <i class="fa-solid fa-code text-sky-600"></i> Hop 2: <code>${escapeHtml(q.sourceLocation || 'muduo/net')}</code>
+                                <i class="fa-solid fa-code text-sky-600"></i> 源码: <code>${escapeHtml(q.sourceLocation || 'muduo/net')}</code>
                             </span>
                             ${q.relatedArticleSlug ? `
                                 <button onclick="openYuqueArticle('${escapeHtml(q.relatedArticleSlug)}')" class="px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 hover:bg-blue-100 transition flex items-center gap-1 text-[11px] cursor-pointer">
-                                    <i class="fa-solid fa-book-bookmark text-blue-600"></i> Hop 3: 查阅专栏剖析
+                                    <i class="fa-solid fa-book-bookmark text-blue-600"></i> 专栏剖析
                                 </button>
                             ` : ''}
                             ${q.commitHash ? `
                                 <button onclick="jumpToEvidence('${escapeHtml(q.commitHash)}')" class="px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-800 hover:bg-indigo-100 transition flex items-center gap-1 text-[11px] cursor-pointer">
-                                    <i class="fa-solid fa-code-commit text-indigo-600"></i> Hop 4: 查看 Commit 凭证 (${escapeHtml(q.commitHash)})
+                                    <i class="fa-solid fa-code-commit text-indigo-600"></i> 提交凭证 (${escapeHtml(q.commitHash)})
                                 </button>
                             ` : ''}
                         </div>
@@ -5675,7 +5679,7 @@ function handleJsonImport(event) {
             // 弹出自定义导入确认框：合并 vs 覆盖
             const msgEl = document.getElementById('modal-message');
             const btns = document.getElementById('modal-buttons-container');
-            document.getElementById('modal-title').innerText = "双核系统 JSON 导入方式选择";
+            document.getElementById('modal-title').innerText = "JSON 导入方式选择";
             msgEl.innerText = "请选择导入策略：【合并数据】将保留本地更高级别的掌握度与笔记；【完全覆盖】将完全替换本地所有进度。";
             
             btns.innerHTML = `
@@ -5865,10 +5869,10 @@ function exportMarkdownReport() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `我的_双核工程学习档案_${getTodayDateStr()}.md`;
+    a.download = `我的_工程学习档案_${getTodayDateStr()}.md`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast("我的双核工程学习档案.md 已成功生成！");
+    showToast("我的工程学习档案.md 已成功生成！");
 }
 
 // 全局键盘快捷键监听
