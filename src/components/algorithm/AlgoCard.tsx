@@ -64,8 +64,8 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
               </h3>
               {getDifficultyBadge(problem.difficulty)}
               {problem.isHot100 && (
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800">
-                  Hot 100
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800">
+                  {problem.hot100Chapter ? `Hot 100 · ${problem.hot100Chapter}` : 'Hot 100'}
                 </span>
               )}
               {problem.isCarl && (

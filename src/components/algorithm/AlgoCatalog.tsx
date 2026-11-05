@@ -4,6 +4,12 @@ import { AlgoCard } from './AlgoCard';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { Search, CheckCircle2, Filter } from 'lucide-react';
 
+const CARL_HOT100_CHAPTERS = [
+  '哈希', '双指针', '滑动窗口', '子串', '普通数组', '矩阵', '链表',
+  '二叉树', '图论', '回溯', '二分查找', '栈', '堆', '贪心算法',
+  '动态规划', '多维动态规划', '技巧'
+];
+
 export const AlgoCatalog: React.FC = () => {
   const [viewTrack, setViewTrack] = useState<'all' | 'hot100' | 'carl'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,7 +23,9 @@ export const AlgoCatalog: React.FC = () => {
   const trackProblems = useMemo(() => {
     switch (viewTrack) {
       case 'hot100':
-        return ALGORITHM_LAB_CATALOG.filter((p) => p.isHot100);
+        return ALGORITHM_LAB_CATALOG.filter((p) => p.isHot100).sort(
+          (a, b) => (a.hot100Order || 999) - (b.hot100Order || 999)
+        );
       case 'carl':
         return ALGORITHM_LAB_CATALOG.filter((p) => p.isCarl);
       case 'all':
@@ -26,32 +34,54 @@ export const AlgoCatalog: React.FC = () => {
     }
   }, [viewTrack]);
 
-  // Extract categories
+  // Extract categories / chapters
   const categories = useMemo(() => {
+    if (viewTrack === 'hot100') {
+      return CARL_HOT100_CHAPTERS;
+    }
     const set = new Set<string>();
     trackProblems.forEach((p) => {
       const cat = p.category || p.topic;
       if (cat) set.add(cat);
     });
     return Array.from(set);
-  }, [trackProblems]);
+  }, [viewTrack, trackProblems]);
+
+  // Category counts
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    trackProblems.forEach((p) => {
+      const key = viewTrack === 'hot100' ? p.hot100Chapter || '' : p.category || p.topic || '';
+      if (key) {
+        counts[key] = (counts[key] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [viewTrack, trackProblems]);
 
   // Filter problems based on search & category
   const displayedProblems = useMemo(() => {
     return trackProblems.filter((p) => {
-      if (selectedCategory !== 'all' && (p.category !== selectedCategory && p.topic !== selectedCategory)) {
-        return false;
+      if (selectedCategory !== 'all') {
+        if (viewTrack === 'hot100') {
+          if (p.hot100Chapter !== selectedCategory) return false;
+        } else {
+          if (p.category !== selectedCategory && p.topic !== selectedCategory) {
+            return false;
+          }
+        }
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const inTitle = p.title.toLowerCase().includes(q);
         const inNum = p.num !== null && String(p.num).includes(q);
         const inPattern = (p.pattern || '').toLowerCase().includes(q);
-        if (!inTitle && !inNum && !inPattern) return false;
+        const inChapter = (p.hot100Chapter || '').toLowerCase().includes(q);
+        if (!inTitle && !inNum && !inPattern && !inChapter) return false;
       }
       return true;
     });
-  }, [trackProblems, selectedCategory, searchQuery]);
+  }, [trackProblems, viewTrack, selectedCategory, searchQuery]);
 
   // Determine if problem is done
   const isProblemDone = (p: typeof ALGORITHM_LAB_CATALOG[0]) => {
@@ -135,7 +165,7 @@ export const AlgoCatalog: React.FC = () => {
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            全部 (233)
+            全部 ({ALGORITHM_LAB_CATALOG.length})
           </button>
           <button
             onClick={() => {
@@ -164,6 +194,13 @@ export const AlgoCatalog: React.FC = () => {
             代码随想录 (179)
           </button>
         </div>
+
+        {viewTrack === 'hot100' && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 text-xs">
+            <span className="font-semibold">路线说明:</span>
+            <span>严格遵循代码随想录官方 Hot 100 推荐的 17 个专题路线顺序学习，攻坚高频题。</span>
+          </div>
+        )}
       </div>
 
       {/* Filter & Search Bar */}
@@ -174,11 +211,11 @@ export const AlgoCatalog: React.FC = () => {
             onClick={() => setSelectedCategory('all')}
             className={`px-3 py-1 rounded-lg font-medium transition cursor-pointer shrink-0 ${
               selectedCategory === 'all'
-                ? 'bg-sky-600 text-white font-semibold'
+                ? viewTrack === 'hot100' ? 'bg-rose-600 text-white font-semibold' : 'bg-sky-600 text-white font-semibold'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            全部专题
+            {viewTrack === 'hot100' ? '全部章节 (100)' : '全部专题'}
           </button>
           {categories.map((cat) => (
             <button
@@ -186,11 +223,11 @@ export const AlgoCatalog: React.FC = () => {
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1 rounded-lg font-medium transition cursor-pointer shrink-0 ${
                 selectedCategory === cat
-                  ? 'bg-sky-600 text-white font-semibold'
+                  ? viewTrack === 'hot100' ? 'bg-rose-600 text-white font-semibold' : 'bg-sky-600 text-white font-semibold'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
-              {cat}
+              {cat} {categoryCounts[cat] !== undefined && `(${categoryCounts[cat]})`}
             </button>
           ))}
         </div>

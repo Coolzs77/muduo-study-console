@@ -11,7 +11,7 @@ assert(algoMatch, 'ALGORITHM_LAB_CATALOG must exist in dataset-learning.js');
 
 const catalog = JSON.parse(algoMatch[1]);
 console.log('✓ ALGORITHM_LAB_CATALOG parsed successfully. Total items:', catalog.length);
-assert.strictEqual(catalog.length, 233, 'Total items must be exactly 233 (179 Carl + 54 Hot 100)');
+assert.strictEqual(catalog.length, 234, 'Total items must be exactly 234 (179 Carl + 55 Hot 100 non-overlap)');
 
 const carlItems = catalog.filter(p => p.isCarl);
 const hot100Items = catalog.filter(p => p.isHot100);
@@ -19,11 +19,24 @@ const overlapItems = catalog.filter(p => p.isCarl && p.isHot100);
 
 console.log(`✓ Carl items count: ${carlItems.length} (Expected: 179)`);
 console.log(`✓ Hot 100 items count: ${hot100Items.length} (Expected: 100)`);
-console.log(`✓ Overlap items count: ${overlapItems.length} (Expected: 46)`);
+console.log(`✓ Overlap items count: ${overlapItems.length} (Expected: 45)`);
 
 assert.strictEqual(carlItems.length, 179, '代码随想录题库数量必须严格为 179 道，不能缩减！');
 assert.strictEqual(hot100Items.length, 100, 'Hot 100 题库数量必须严格为 100 道！');
-assert.strictEqual(overlapItems.length, 46, '重合标记数量必须严格为 46 道！');
+assert.strictEqual(overlapItems.length, 45, '重合标记数量必须严格为 45 道！');
+
+// 验证 Hot 100 涵盖代码随想录官方 17 个专题路线
+const expectedChapters = [
+  '哈希', '双指针', '滑动窗口', '子串', '普通数组', '矩阵', '链表',
+  '二叉树', '图论', '回溯', '二分查找', '栈', '堆', '贪心算法',
+  '动态规划', '多维动态规划', '技巧'
+];
+const actualChapters = [...new Set(hot100Items.map(p => p.hot100Chapter))];
+assert.strictEqual(actualChapters.length, 17, 'Hot 100 必须精确覆盖代码随想录 17 个章节');
+expectedChapters.forEach(chap => {
+  assert(actualChapters.includes(chap), `Hot 100 必须包含章节: ${chap}`);
+});
+console.log('✓ 代码随想录 Hot 100 官方 17 章节路线全覆盖断言通过！');
 
 // 2. 验证完成状态联动机制 (State linkage simulation)
 const completedMap = { 1: true, 15: true, 206: true };

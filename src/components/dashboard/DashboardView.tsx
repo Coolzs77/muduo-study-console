@@ -49,7 +49,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateTab }) =
           专注大厂 C++ 核心壁垒攻坚
         </h1>
         <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-          以底层网络库架构为基，融合 CppAIService 高并发工程与 233 道核心算法题单，构建扎实的工程与八股能力。
+          以底层网络库架构为基，融合 CppAIService 高并发工程与 {totalAlgos} 道核心算法题单，构建扎实的工程与八股能力。
         </p>
       </div>
 

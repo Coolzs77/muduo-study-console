@@ -46,6 +46,8 @@ export interface AlgoProblem {
   projectLink: string;
   isCarl: boolean;
   isHot100: boolean;
+  hot100Chapter?: string;
+  hot100Order?: number;
   independent?: boolean;
 }
 
