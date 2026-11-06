@@ -985,3 +985,121 @@ stateDiagram-v2
   ✓ built in 32.80s
   [BUILD SUCCESS] Production ready static build in dist/
   ```
+
+
+---
+
+## 第 9 轮 [2026-11-06 11:46]：GitHub Pages 线上部署与边缘/浏览器缓存实机验证
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求**：用户反馈在访问部署站点 `https://coolzs77.github.io/muduo-study-console/` 时未看到界面与功能的更新（“我在网站上还是看不到变化”）。
+- **技术指标**：
+  1. 排查远程仓库提交状态与 GitHub Actions 自动化部署工作流实际执行时效；
+  2. 通过客观网络探测与无头浏览器真实访问，获取远端线上真实渲染的 DOM 结构与快照凭据；
+  3. 分析用户端由于 Fastly CDN 边缘缓存与浏览器本地强缓存（`Cache-Control: max-age=600`）造成的内容滞后机理，并给出标准绕过方案。
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **新增验证脚本**：[verify_live_pages.cjs](file:///e:/workspace/muduo-study-console/scripts/verify_live_pages.cjs)
+  - 通过 Node.js 启动独立无缓存实例的 Microsoft Edge 无头进程，建立 CDP (Chrome DevTools Protocol) 调试通道；
+  - 真实请求 `https://coolzs77.github.io/muduo-study-console/`，执行 DOM 解析，提取导航栏 10 个 Tab 标签文本与页面核心文字；
+  - 自动调用 `Page.captureScreenshot` 输出线上真实渲染凭据图片；
+- **交付实机视觉凭据**：[live_screenshot_deployed.png](file:///e:/workspace/muduo-study-console/docs/live_screenshot_deployed.png)
+  - 固化保存线上环境的渲染快照，证明 10 个导航 Tab 与全景工作台组件已完成线上加载。
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+- **问题现象**：用户在代码推送后立即刷新网页，页面仍然显示旧版内容或未感知到新增的 10 大功能模块。
+- **根本原因 (RCA)**：
+  1. **构建与发布异步时间差**：本地推送完成时间为 11:39:13，而 GitHub Actions (`.github/workflows/deploy.yml`) 的 `npm install` 与 `npm run build` 编译打包流水线需要约 70 秒，远端 GitHub Pages 实际部署就绪时间戳为 `Fri, 06 Nov 2026 03:40:24 GMT`（北京时间 11:40:24）。在此之前访问必然处于旧版本；
+  2. **HTTP 缓存策略（强缓存拦截）**：GitHub Pages 针对静态 HTML 返回的响应头包含 `Cache-Control: max-age=600`（10 分钟缓存周期）。如果用户浏览器在此前已经打开并缓存了 `index.html`，普通刷新（F5）或地址栏回车会直接命中本地磁盘缓存（`from disk cache`），导致浏览器未向服务器发起最新的协商请求；
+  3. **单页应用资产哈希变更**：新构建生成的入口脚本为 `assets/index-IcwMY4T-.js`，旧版 `index.html` 仍指向旧版脚本文件。
+- **针对性解法**：
+  1. 采用无缓存的无头浏览器直接从 GitHub Pages 节点拉取并成功验证，确认线上环境代码已 100% 同步；
+  2. 指导用户执行硬刷新（强制绕过缓存）：Windows/Linux 下使用 `Ctrl + F5` 或 `Ctrl + Shift + R`，Mac 下使用 `Cmd + Shift + R`；
+  3. 提供带缓存穿透查询参数的直达链接（如 `?v=latest`）促使 CDN 与浏览器直接获取最新 HTML。
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 维度一：GitHub Actions 部署时序与 CDN 发布流水线
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Dev as 本地开发环境 (Git)
+    participant GH as GitHub 仓库 (origin/main)
+    participant Action as GitHub Actions CI (deploy.yml)
+    participant Pages as GitHub Pages (Fastly CDN)
+    participant Browser as 用户浏览器
+
+    Dev->>GH: git push origin main (Commit a9531c6) [11:39:13]
+    GH->>Action: Webhook 触发部署工作流
+    Note over Action: npm install && npm run build<br/>打包 10 个视图与 9 大全量数据集 (耗时 ~70s)
+    Action->>Pages: 部署产物上传并更新 gh-pages 分支 [11:40:24]
+    
+    Browser->>Pages: 普通访问 (携带 If-None-Match / 本地 max-age 命中)
+    Note over Browser: 若未过 600s 缓存期，直接读取本地 Disk Cache
+    Browser->>Pages: 强制刷新 (Ctrl+F5 或 ?v=latest)
+    Pages-->>Browser: 返回最新 200 OK，装载 index-IcwMY4T-.js
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)：
+- **流程推进**：本地提交推送后，GitHub Actions 启动容器运行构建脚本，编译输出 `dist` 目录，最后发布至 GitHub Pages 服务；
+- **时序关键点**：从 Push 到 Pages 实际完成发布存在约 70 秒流水线构建耗时。若用户在构建中途刷新，获取到的依然是上一次的静态资源；
+- **缓存拦截与解决**：页面部署后，由于 `max-age=600` 的约束，浏览器端需发起非缓存的强制刷新请求，使请求绕过客户端缓存池，直接获取最新 HTML 并加载新哈希命名的 JavaScript 资产。
+
+#### 维度二：浏览器多级缓存命中与穿透绕过判定流
+```mermaid
+flowchart TD
+    Req([用户请求 GitHub Pages URL]) --> CheckCache{浏览器本地是否存在 Disk Cache?}
+    
+    CheckCache -- 存在且未过期 --> RefreshType{用户操作类型}
+    RefreshType -- 普通刷新 / 回车 --> HitCache[读取 Disk Cache<br/>展现历史旧界面]
+    RefreshType -- 强制刷新 Ctrl+F5<br/>或添加查询参数 ?v=latest --> Bypass[绕过本地缓存]
+    
+    CheckCache -- 不存在 / 已过期 --> Bypass
+    
+    Bypass --> FetchRemote[向 GitHub Pages 边缘 CDN 发送 GET]
+    FetchRemote --> ResponseStatus{CDN 节点状态}
+    ResponseStatus -- 命中已更新节点 --> LoadNew[下载最新 index.html<br/>引用 index-IcwMY4T-.js]
+    
+    LoadNew --> MountSPA[React 18 SPA 挂载<br/>渲染 10 大完整视图]
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)：
+- **决策分支**：浏览器在发起页面请求前首先检查本地缓存状态。普通回车或软刷新在强缓存有效期内不与网络通信；
+- **穿透路径**：当使用 `Ctrl + F5` 或通过 URL 附带动态参数（如 `?v=latest`）时，浏览器跳过本地缓存判断，直接向远端发起未缓存请求；
+- **终态验证**：获取到的最新 HTML 解析加载包含全部 10 个功能模块的编译包，界面完成完整水合与呈现。
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **线上环境真实验证断言**：
+  - 页面标题：`Muduo & CppAIService`（与设计规范严格一致）；
+  - 导航标签全部就绪：`学习大盘`、`28天任务`、`专栏阅读`、`算法题库`、`学习系统`、`源码路线`、`源码映射`、`求职凭证`、`避坑档案`、`每日自测`，并包含 `Linux 开发指引` 弹窗入口；
+  - 数据统计联动：核心算法题库 234 题（含 100 道 Hot 100 与 45 道交集标记）、28 天全景任务网格与 8 阶源码演进均在线上正常初始化。
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+- **无头浏览器线上自动化取证命令**：
+  ```bash
+  cd e:\workspace\muduo-study-console
+  node scripts/verify_live_pages.cjs
+  ```
+- **终端实际输出断言**：
+  ```
+  [CDP] Navigating to live GitHub Pages: https://coolzs77.github.io/muduo-study-console/ ...
+  PAGE TITLE: Muduo & CppAIService
+  HEADER TABS: ["学习大盘","28天任务","专栏阅读","算法题库","学习系统","源码路线","源码映射","求职凭证","避坑档案","每日自测"]
+  BODY TEXT PREVIEW:
+  学习大盘
+  28天任务
+  专栏阅读
+  算法题库
+  学习系统
+  源码路线
+  源码映射
+  求职凭证
+  避坑档案
+  每日自测
+  MUDUO & CPPAISERVICE 全景冲刺控制台
+  专注大厂 C++ 核心壁垒攻坚
+  [PROOF] Screenshot saved to docs/live_screenshot_deployed.png
+  ```
+- **交付物状态**：
+  - 线上服务已处于稳定最新版；
+  - 实机快照生成于 [docs/live_screenshot_deployed.png](file:///e:/workspace/muduo-study-console/docs/live_screenshot_deployed.png)。
