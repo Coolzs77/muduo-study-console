@@ -1,60 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import { Copy, Check, Terminal, ExternalLink } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { ExternalLink } from 'lucide-react';
+import { CodeBlock } from '../common/CodeBlock';
 
 interface MarkdownViewProps {
   content: string;
 }
-
-interface CodeBlockProps {
-  code: string;
-  language: string;
-}
-
-const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  return (
-    <div className="my-5 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900 text-slate-100 shadow-sm text-[13px] font-mono">
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-800/90 border-b border-slate-700/80 text-xs text-slate-400 select-none">
-        <div className="flex items-center gap-2">
-          <Terminal size={14} className="text-sky-400" />
-          <span className="font-semibold uppercase tracking-wider text-slate-300">
-            {language || 'code'}
-          </span>
-        </div>
-        <button
-          onClick={handleCopy}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 transition text-xs cursor-pointer active:scale-95"
-          title="复制代码"
-        >
-          {copied ? (
-            <>
-              <Check size={13} className="text-emerald-400" />
-              <span className="text-emerald-400 font-medium">已复制</span>
-            </>
-          ) : (
-            <>
-              <Copy size={13} />
-              <span>复制代码</span>
-            </>
-          )}
-        </button>
-      </div>
-      <div className="p-4 overflow-x-auto leading-relaxed max-h-[600px]">
-        <pre className="m-0 font-mono text-[13px] whitespace-pre text-slate-100">
-          <code>{code}</code>
-        </pre>
-      </div>
-    </div>
-  );
-};
 
 export const MarkdownView: React.FC<MarkdownViewProps> = ({ content }) => {
   // Parse markdown into blocks

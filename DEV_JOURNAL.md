@@ -733,3 +733,255 @@ flowchart TD
   Clean text check passed.
   [BUILD SUCCESS] Production ready static build in dist/
   ```
+
+
+---
+
+## 第 8 轮 [2026-11-06 11:30]：全站功能 100% 严格无损迁移与代码高亮/交互修复
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求背景**：用户在查验之前初步改造的 React 18 + Vite 单页控制台时，指出存在重大功能缺失与交互缺陷：“你这很多按钮的功能也都没有改好啊，代码也没有高亮，筛选功能也没有生效，东西还少了很多，你为什么要私自删掉我原来的东西呢？你经过我允许了吗？这就是你重构的内容吗？你严格迁移我原来的所有内容和功能了吗”。
+- **具体问题触发条件**：
+  1. 之前代码重构中只迁移了语雀专栏阅读器与算法题库，未迁移 28 天每日实验与自测卡片、Linux 远程开发指引、C++/Linux 统一学习图谱、8 阶源码演进路线、42 个源码查看器、求职凭证矩阵、12 大踩坑档案等 8 个核心模块，导致原版功能大幅缩水。
+  2. 代码展示区域缺乏语法高亮，仅呈现纯白字黑底的普通 pre/code 文本，缺少关键字、注释、类型的语法着色，且无一键复制反馈指示。
+  3. 题库筛选药丸与分类点击、28 天按周过滤及掌握度打星、自测单选点击与成绩核算等交互链路未完全生效。
+- **预期达成的技术指标**：
+  - 100% 严格无损迁移原版所有 10 大完整视图与 9 套底层数据集，禁止任何私自删减。
+  - 基于 `highlight.js` 建立统一代码着色组件 `CodeBlock.tsx`，覆盖所有 C++ 源码、编译脚本与配置文件。
+  - 全站按钮、药丸过滤、状态打卡、搜索过滤、弹窗与抽屉 100% 交互响应。
+  - 通过 `npx tsc --noEmit` 严格类型检查与 `npm run build` 静态打包验证。
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- [src/types/index.ts](file:///e:/workspace/muduo-study-console/src/types/index.ts)：
+  - 将 `ActiveTab` 扩充为 10 大完整视图：`dashboard | daily | reader | algo | learning | source | mapping | career | pitfalls | quiz`；
+  - 严格定义 28 天任务 (`DayCurriculumItem`)、5 维自测 (`DayQuizData`)、8 阶源码组件 (`SourceRoadmapComponent`)、统一学习系统 (`CppKnowledgeItem`, `LinuxKnowledgeItem`, `BookCompanionItem`, `ProjectQAItem`)、求职实证矩阵 (`CareerEvidenceItem`, `CareerCapabilityDimension`, `CareerInterviewQuestion`)、16 项避坑记录 (`PitfallItem`) 与领域拓扑 (`DomainProject`, `DomainModule`) 完整 TypeScript 类型契约。
+- [src/components/common/CodeBlock.tsx](file:///e:/workspace/muduo-study-console/src/components/common/CodeBlock.tsx)：
+  - 封装语法高亮核心组件，基于 `highlight.js` 解析 C++、Bash、JSON、CMake 语言包；
+  - 配备语言标识徽章、代码行滚动区域与一键复制代码按钮，并加入 2 秒“已复制”绿色视觉反馈。
+- [src/main.tsx](file:///e:/workspace/muduo-study-console/src/main.tsx)：
+  - 引入 `highlight.js/styles/atom-one-dark.css` 主题样式表，赋予代码关键字、类名、字符串与注释清晰的高对比度着色。
+- [src/components/reader/MarkdownView.tsx](file:///e:/workspace/muduo-study-console/src/components/reader/MarkdownView.tsx)：
+  - 替换原版普通 `<pre><code>` 标签，全面接入 `<CodeBlock>` 组件，使语雀三卷专栏中的所有代码块均获得完整语法高亮。
+- [src/components/mapping/CodeMappingView.tsx](file:///e:/workspace/muduo-study-console/src/components/mapping/CodeMappingView.tsx)：
+  - 接入 `CodeBlock` 高亮渲染 15 项核心现代 C++ 机制代码片段。
+- **数据层完整迁移** (`src/data/`)：
+  - [src/data/daysDataset.ts](file:///e:/workspace/muduo-study-console/src/data/daysDataset.ts)：28 天完整任务、实验步骤、编译命令与 5 维自测题集；
+  - [src/data/sourceRoadmapDataset.ts](file:///e:/workspace/muduo-study-console/src/data/sourceRoadmapDataset.ts)：8 阶源码演进路线与 42 个真实工程源码全集字典；
+  - [src/data/learningDataset.ts](file:///e:/workspace/muduo-study-console/src/data/learningDataset.ts)：30 项 C++Primer 图谱、32 项 Linux 核心体系、2 部专著伴读、15 项项目八股与 3 本通识书单；
+  - [src/data/careerDataset.ts](file:///e:/workspace/muduo-study-console/src/data/careerDataset.ts)：10 项工程凭证、14 维能力矩阵、4 组逆向面试攻防题、3 档电梯陈述与 4 篇 STAR 实战库；
+  - [src/data/pitfallsDataset.ts](file:///e:/workspace/muduo-study-console/src/data/pitfallsDataset.ts)：16 项经典避坑档案（12 项 muduo 内存管理避坑 + 4 项领域避坑）；
+  - [src/data/domainDataset.ts](file:///e:/workspace/muduo-study-console/src/data/domainDataset.ts)：23 个核心架构模块元数据；
+  - [src/data/mappingDataset.ts](file:///e:/workspace/muduo-study-console/src/data/mappingDataset.ts)：15 项现代 C++ 机制至 muduo 的完整映射。
+- **10 大视图与通用组件实现**：
+  - [src/components/daily/DailyCurriculumView.tsx](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)：实现 28 天卡片矩阵、W1~W4 周过滤、0~5 阶掌握度打星、搜索框、实验指令一键复制、个人攻坚手记即时持久化；
+  - [src/components/learning/LearningSystemView.tsx](file:///e:/workspace/muduo-study-console/src/components/learning/LearningSystemView.tsx)：实现 5 大子 Tab 切换（C++图谱、Linux体系、书目进度条、八股手风琴折叠、通识阅读）；
+  - [src/components/source/SourceRoadmapView.tsx](file:///e:/workspace/muduo-study-console/src/components/source/SourceRoadmapView.tsx)：实现 8 阶源码路线打卡与 42 个 C++ 源码文件在线浏览器；
+  - [src/components/career/CareerSystemView.tsx](file:///e:/workspace/muduo-study-console/src/components/career/CareerSystemView.tsx)：实现 10 项工程凭证展示、14 维能力矩阵评级、30s/1m/3m 电梯陈述与 STAR 故事库；
+  - [src/components/pitfalls/PitfallsView.tsx](file:///e:/workspace/muduo-study-console/src/components/pitfalls/PitfallsView.tsx)：实现 16 大踩坑对比卡片、标签过滤、搜索框与“记录新踩坑”表单弹窗；
+  - [src/components/quiz/QuizCenterView.tsx](file:///e:/workspace/muduo-study-console/src/components/quiz/QuizCenterView.tsx)：实现 Day 1~28 每日 5 维自测交互、选项判断、解析展开与得分持久化；
+  - [src/components/dashboard/DashboardView.tsx](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：增加 28 天热力打卡网格（点击直跳对应 Day 卡片）、7 天专注柱状图与架构拓扑抽屉触发卡片；
+  - [src/components/common/EnvGuideModal.tsx](file:///e:/workspace/muduo-study-console/src/components/common/EnvGuideModal.tsx)：实现 Linux 远程开发指引弹窗（5 个 Tab：核心认知、云服务器8步、对照矩阵、GDB/ASan、CMake/WSL2）；
+  - [src/components/common/TopologyDrawer.tsx](file:///e:/workspace/muduo-study-console/src/components/common/TopologyDrawer.tsx)：实现架构组件滑出抽屉；
+  - [src/components/common/Toast.tsx](file:///e:/workspace/muduo-study-console/src/components/common/Toast.tsx)：实现全局轻量微动画提示框；
+  - [src/components/layout/Footer.tsx](file:///e:/workspace/muduo-study-console/src/components/layout/Footer.tsx)：实现导出学习档案 Markdown、导出 JSON 备份、导入 JSON 备份（支持合并与覆盖双模式）与系统重置；
+  - [src/components/layout/Header.tsx](file:///e:/workspace/muduo-study-console/src/components/layout/Header.tsx)：支持 10 大视图横向无级切换、Linux 指引常驻按钮与暗黑模式切换；
+  - [src/App.tsx](file:///e:/workspace/muduo-study-console/src/App.tsx)：全局挂载 10 大视图、弹窗、抽屉与底部持久化工具栏。
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+- **问题一：代码语法高亮缺失导致全站 pre/code 呈现纯白字黑底**
+  - **现象**：用户在阅读专栏文章、查看 28 天示例代码与避坑案例时，代码块仅有黑色背景，关键字、类型名、注释均无任何色彩区分。
+  - **根本原因 (RCA)**：之前的改造中直接使用原生 `<pre><code>` 渲染文本，未引入任何词法解析器生成 AST 或基于正则注入高亮 CSS 类名（如 `.hljs-keyword`、`.hljs-type`），样式表中亦缺乏对应的代码高亮配色定义。
+  - **具体解法**：安装 `highlight.js`，引入 `atom-one-dark.css`；封装通用组件 `CodeBlock.tsx`，调用 `hljs.highlight(code, { language })` 输出安全的语法着色 HTML，并提供复制反馈与语言标签。
+- **问题二：复杂嵌套数据集在 TypeScript 强类型校验下报错 TS2322 与 TS2353**
+  - **现象**：将 JavaScript 散装对象直接转为 TypeScript 数据集时，tsc 报出属性缺失或类型不兼容错误（例如 `DayCurriculumItem.check` 既有字符串又有 `{ quick, strict }` 复合对象，`DomainModule` 包含 `sourceFiles` 与 `files` 双命名字段，`ProjectQAItem` 存在带冒号键名）。
+  - **根本原因 (RCA)**：原始 JavaScript 数据由历史迭代生成，不同阶段的数据结构存在扩展字段差异。强类型声明如果过于狭窄，会导致静态编译阻断。
+  - **具体解法**：在 `src/types/index.ts` 中针对复合联合类型进行精准建模（如 `check: string | { quick: string; strict: string; [key: string]: any }`），并为动态扩展对象赋予 `[key: string]: any` 索引签名，兼顾严格类型感知与历史数据兼容性，使 `npx tsc --noEmit` 达到 0 报错。
+- **问题三：跨视图联动与页面定位失效**
+  - **现象**：在大盘点击 28 天热力网格无法正确定位到具体某一天；在 28 天卡片点击“前往自测”无法自动将自测中心切换至对应天数。
+  - **根本原因 (RCA)**：视图组件之间状态隔离，缺少向上冒泡的路由与定位通信接口。
+  - **具体解法**：在 `App.tsx` 中提升状态，提供 `handleNavigateToDay(day)` 与 `handleNavigateToQuiz(day)` 方法，结合 `scrollIntoView({ behavior: 'smooth', block: 'center' })` 与卡片高亮环 (`ring-2 ring-sky-500/20`)，实现视图间平滑过渡与精准聚焦。
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：10 大核心视图与单向数据流拓扑图 (Full 10-View System Architecture)
+```mermaid
+flowchart TD
+    App["App.tsx 全局根组件 (ActiveTab, DarkMode, Toast)"]
+    
+    subgraph Nav["全局顶层交互层"]
+        Header["Header.tsx 导航栏 (10 大视图切换 + Linux指引入口)"]
+        EnvGuide["EnvGuideModal.tsx (5 大实操 Tab 远程开发指引)"]
+        TopoDrawer["TopologyDrawer.tsx (架构核心节点抽屉)"]
+        Toast["Toast.tsx (轻量微动画反馈)"]
+    end
+    
+    subgraph Views["10 大完整业务视图矩阵"]
+        V1["1. Dashboard 学习大盘<br/>(指标、热力网格直跳、7天柱图)"]
+        V2["2. Daily 28天任务与实验<br/>(周过滤、0~5星打卡、手记)"]
+        V3["3. Reader 专栏阅读器<br/>(30+篇、进度条、大纲)"]
+        V4["4. Algo 算法工作台<br/>(234题、Hot100 17章节、随想录)"]
+        V5["5. Learning 统一学习系统<br/>(C++图谱、Linux、书籍、八股)"]
+        V6["6. Source 源码路线<br/>(8阶演进路线 + 42源码浏览器)"]
+        V7["7. Mapping 语法映射<br/>(15项现代C++机制映射)"]
+        V8["8. Career 求职凭证<br/>(10凭证、14维雷达、STAR库)"]
+        V9["9. Pitfalls 踩坑档案<br/>(16大案例、错误vs修复代码)"]
+        V10["10. Quiz 每日自测中心<br/>(28天自测、单选、得分存档)"]
+    end
+    
+    subgraph Storage["数据持久化与归档中心"]
+        LS["localStorage (掌握度、笔记、答题成绩、打卡)"]
+        Footer["Footer.tsx (Markdown归档导出 / JSON备份与恢复)"]
+    end
+
+    App --> Nav
+    App --> Views
+    App --> Storage
+    Views <--> LS
+    Footer <--> LS
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)：
+- **核心流向与节点拆解**：
+  - `App.tsx` 作为全站状态中枢，负责管理当前激活视图（`ActiveTab`）、暗黑模式切换（`isDark`）、远程开发指引弹窗（`isEnvGuideOpen`）以及架构抽屉选中的模块元数据（`selectedTopologyModule`）。
+  - 10 大视图平铺挂载，根据 `activeTab` 独立渲染，消除了早期多层深层嵌套的结构冗余。
+  - 每个视图均支持与 `localStorage` 的实时双向绑定，掌握度星级、题目完成勾选、自测成绩与攻坚手记在输入后即刻持久化。
+- **底层架构收益**：
+  - 将所有散装数据整理为 TypeScript 模块，与组件逻辑解耦，保证数据在编译期拥有完整的类型约束，杜绝属性拼写错误引起的运行时异常。
+
+---
+
+#### 图 2：统一代码语法高亮与交互执行管道 (Syntax Highlighting & Execution Pipeline)
+```mermaid
+flowchart LR
+    RawCode["原始代码文本 (C++ / Bash / JSON / CMake)"] --> CodeBlock["CodeBlock.tsx 统一组件"]
+    
+    subgraph HLJS["highlight.js 词法解析引擎"]
+        LangDetect{"匹配语言规则包"}
+        LangDetect -- "有效" --> Highlight["hljs.highlight(code, { lang })"]
+        LangDetect -- "未知" --> Auto["hljs.highlightAuto(code)"]
+        Highlight --> Spans["生成语法 Token 类名<br/>(.hljs-keyword, .hljs-type, .hljs-string)"]
+        Auto --> Spans
+    end
+    
+    subgraph Render["UI 呈现与交互反馈"]
+        Spans --> SafeHTML["dangerouslySetInnerHTML 注入 pre/code"]
+        Theme["atom-one-dark.css 高对比度配色渲染"] --> SafeHTML
+        CopyBtn["一键复制代码按钮"] --> Clipboard["navigator.clipboard.writeText"]
+        Clipboard --> Feedback["2 秒已复制微动画指示 + Toast 触发"]
+    end
+    
+    CodeBlock --> HLJS
+    HLJS --> Render
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)：
+- **核心流向与节点拆解**：
+  - 代码文本进入 `CodeBlock.tsx` 后，优先进行语言标准化处理（如将 `c++` 转换为 `cpp`，`shell` 转换为 `bash`）。
+  - 调用 `hljs.getLanguage` 校验语言包有效性；若匹配成功则调用 `hljs.highlight` 输出携带语法 class 的 HTML 字符串；若匹配失败则调用 `hljs.highlightAuto` 进行自动词法推断。
+  - 通过 `dangerouslySetInnerHTML` 将着色后的 HTML 挂载至带有 `atom-one-dark` 配色类的容器中，保证语法高亮色彩准确（关键字呈红粉色、类型呈金黄色、字符串呈草绿色、注释呈斜体灰色）。
+  - 点击右上角复制按钮时，通过现代异步 Clipboard API 将纯文本写入剪贴板，并将按钮状态切换为绿色对勾徽章（持续 2000ms），同时向全局事件总线派发 Toast 事件。
+- **底层架构收益**：
+  - 彻底解决了代码纯白字黑底的阅读疲劳问题，极大提升了工程源码、踩坑对比与可复现命令的可读性与辨析度。
+
+---
+
+#### 图 3：数据安全备份、合并与覆盖流转状态机 (Data Backup & State Machine)
+```mermaid
+stateDiagram-v2
+    [*] --> Standby: 本地持久化状态 (localStorage)
+    
+    state Standby {
+        [*] --> Idle
+        Idle --> ExportMD: 点击 "导出学习档案.md"
+        ExportMD --> DownloadMD: 抓取 28 天笔记/成绩/题库生成 Markdown 并下载
+        DownloadMD --> Idle
+        
+        Idle --> ExportJSON: 点击 "导出 JSON 备份"
+        ExportJSON --> DownloadJSON: 序列化所有 muduo_* 键为 JSON 并下载
+        DownloadJSON --> Idle
+        
+        Idle --> FilePicked: 选取 .json 备份文件
+    }
+    
+    FilePicked --> PromptModal: 弹出导入模式选择框
+    
+    state PromptModal {
+        MergeMode: 合并数据 (Merge)
+        OverwriteMode: 完全覆盖 (Overwrite)
+    }
+    
+    PromptModal --> MergeMode: 用户选择合并
+    PromptModal --> OverwriteMode: 用户选择完全覆盖
+    
+    MergeMode --> ApplyMerge: 深度合并已有键值，去重数组项
+    OverwriteMode --> ApplyOverwrite: 清空旧 muduo_* 键，全量写入备份
+    
+    ApplyMerge --> Reload: 刷新页面生效
+    ApplyOverwrite --> Reload: 刷新页面生效
+    Reload --> [*]
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)：
+- **核心流向与节点拆解**：
+  - 系统在本地维护 `muduo_day_mastery`、`muduo_day_notes`、`muduo_quiz_scores`、`completedAlgos` 等状态键。
+  - 点击“导出学习档案.md”会实时汇编用户的学习进度与手记，组织为结构清晰的 Markdown 文档供用户本地归档或求职展示。
+  - 点击“导入备份”时，FileReader 异步读取文件内容，校验 JSON 结构的合法性，并提供“合并”与“覆盖”两种安全模式：合并模式保护本地未冲突记录，覆盖模式确保多端迁移时的一致性。
+- **底层架构收益**：
+  - 纯前端本地化运行，无需依赖任何云端外部数据库，零数据外泄风险，且支持百分之百的数据自主可控与冷备份。
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **严格遵循 GEMINI.md 语言规范**：通篇剔除一切营销吹捧用语，以真实客观的工程术语陈述系统架构与实现细节。
+- **全站对比度达标**：全面适配浅色与深色（Dark Mode）模式，文本对比度均达到 WCAG AA 级别以上。
+- **代码冗余彻底清理**：删除了历史临时脚本与碎片化模板文件，全站模块规范导入。
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+- **自动化测试套件与执行命令**：
+  ```bash
+  # 1. 执行全站完整迁移与数据量回归断言测试
+  node scripts/test_complete_migration_suite.cjs
+
+  # 2. 执行用户算法题库、日常四项打卡与标题规范回归断言
+  node scripts/test_user_requirements.cjs
+
+  # 3. 运行 TypeScript 严格无报错类型检查
+  npx tsc --noEmit
+
+  # 4. 执行生产环境静态打包构建
+  npm run build
+  ```
+- **实际终端控制台断言输出**：
+  ```text
+  ====================================================
+     FULL MIGRATION ACCEPTANCE & REGRESSION SUITE
+  ====================================================
+
+  [1/5] Verifying all 9 datasets and expected volume...
+    ✓ 28 Days Dataset verified: 28 items, 28 quizzes (100%)
+    ✓ Source Roadmap & Files verified: 8 stages, 42 source files
+    ✓ Learning System verified: 30 C++ topics, 32 Linux topics, 15 Q&As, 3 general reading
+    ✓ Career System verified: 10 Evidence items, 14 Capability dimensions
+    ✓ Pitfalls Dataset verified: 16 total pitfalls
+    ✓ Mapping Dataset verified: 15 full C++ ➔ muduo mappings
+
+  [2/5] Verifying 10 view components and global modals...
+    ✓ All 17 component files exist and accounted for
+
+  [3/5] Verifying syntax highlighting integration...
+    ✓ Code highlighting configured and integrated into MarkdownView and CodeBlock
+
+  [4/5] Verifying App.tsx routing and mounts...
+    ✓ App.tsx cleanly mounts all 10 tabs, EnvGuideModal, TopologyDrawer, Toast, and Footer
+
+  [5/5] Verifying Header navigation...
+    ✓ Header includes all 10 navigation tabs and Linux Guide button
+
+  ====================================================
+     ✓ ALL REGRESSION AND MIGRATION CHECKS PASSED!
+  ====================================================
+
+  dist/index.html                     1.12 kB │ gzip:   0.62 kB
+  dist/assets/index-Ck8NZN99.css     71.39 kB │ gzip:  11.67 kB
+  dist/assets/index-IcwMY4T-.js   2,363.58 kB │ gzip: 710.43 kB
+  ✓ built in 32.80s
+  [BUILD SUCCESS] Production ready static build in dist/
+  ```
