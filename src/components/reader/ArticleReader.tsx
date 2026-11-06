@@ -24,7 +24,7 @@ export const ArticleReader: React.FC<ArticleReaderProps> = ({
   const readMinutes = Math.max(1, Math.ceil((article.wordCount || 500) / 400));
 
   return (
-    <main className="flex-1 min-w-0 py-8 px-4 sm:px-8 lg:px-12 max-w-4xl mx-auto">
+    <main className="flex-1 min-w-0 py-8 px-6 lg:px-10 w-full">
       {/* Breadcrumb & Metadata */}
       <div className="space-y-4 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
