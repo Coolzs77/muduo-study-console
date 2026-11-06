@@ -100,11 +100,11 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
               <HelpCircle size={22} />
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              28 天每日深度自测中心
+              知识自测
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-            每一天均配备 5 维结构化自测（基础单选、代码辨析、原理深度、Muduo机制与编码手写），闭环检验学习成效。
+            包含基础概念、代码阅读、原理机制与编码实现自测题目。
           </p>
         </div>
 
@@ -175,7 +175,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400">
-                Day {currentDayItem.day} 专项测试
+                Day {currentDayItem.day} 自测题目
               </div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-0.5">
                 {currentDayItem.title}

@@ -1103,3 +1103,299 @@ flowchart TD
 - **交付物状态**：
   - 线上服务已处于稳定最新版；
   - 实机快照生成于 [docs/live_screenshot_deployed.png](file:///e:/workspace/muduo-study-console/docs/live_screenshot_deployed.png)。
+
+
+## 第 10 轮 [2026-11-06 13:30]：系统架构精简重构、CppAIService 核心聚焦与 Muduo 归档隔离
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始需求背景**：随着项目演进，控制台早期设立的 10 个顶栏平铺导航在大屏中占据过多水平宽度，且后四项（源码映射、求职凭证、避坑档案、每日自测）在功能性质上均属于实践与复盘范畴，具备明显的聚合属性；
+- **传输与应用分层解耦**：底层 C++ 源码实现中，Muduo 负责 Reactor 核心、非阻塞套接字抽象与字节流 I/O Buffer，纯粹基于 `onMessage(conn, buf, time)` 暴露应用层回调，对 HTTP 协议与上层大模型业务保持完全透明；此前前端数据层将两层职责混编，需要通过架构规范实现物理与概念边界的彻底解耦；
+- **业务主航道重心聚焦**：Muduo 基础网络库 8 个核心阶段已经全部掌握并完成闭环验证，继续将其作为每日核心任务与架构大盘主拓扑会造成认知冗余；本轮需将 Muduo 设为完结归档专区，大盘拓扑、日常任务与 28 天体系全景聚焦于 `CppAIService`（ONNX Runtime / TensorRT C++ 接口封装、CUDA Stream 多线程异步推理工作池、Dynamic Batching 动态批处理引擎、SSE 流式 Token 输出与 KV-Cache 显存复用）；
+- **语言风格全面纯化**：严格贯彻工作区规范，清除所有夸张修饰语（如“专注大厂核心壁垒攻坚”、“全景冲刺控制台”等），全站统一使用朴实客观的工程语言；
+- **全链路严谨验证与构建交付**：通过 TypeScript 静态编译（0 错误）、生产打包构建、全量对抗性自动化测试套件（35/35），并提交推送至 GitHub `origin/main`。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+
+#### (1) 涉及文件清单与快速索引
+- [`src/types/index.ts`](file:///e:/workspace/muduo-study-console/src/types/index.ts)：主导航类型 `ActiveTab` 精简为 7 项，新增二级子标签 `PracticeSubTab` 与三层架构层级类型 `ArchitectureLayer`；
+- [`src/components/layout/Header.tsx`](file:///e:/workspace/muduo-study-console/src/components/layout/Header.tsx)：顶栏导航精简为严格 7 项，引入 `Briefcase` 图标对应「综合实战」，移除冗余图标；
+- [`src/components/practice/PracticeCenterView.tsx`](file:///e:/workspace/muduo-study-console/src/components/practice/PracticeCenterView.tsx)：新建综合实战容器，顶部吸顶二级 Tab 栏承载「代码映射」、「面试题解」、「问题记录」、「知识自测」，支持受控/非受控双模式，使用 `key={quizDay}` 保证跨天跳转强制刷新；
+- [`src/App.tsx`](file:///e:/workspace/muduo-study-console/src/App.tsx)：主路由挂载点精简，新增 `practiceSubTab` 状态，接入 LocalStorage 旧 Tab 自动平滑重定向迁移机制；
+- [`src/data/domainDataset.ts`](file:///e:/workspace/muduo-study-console/src/data/domainDataset.ts)：重塑为三层架构（L4 传输网络层 `proj_muduo` [已归档]、L7 应用协议层 `proj_http_component`、AI 服务端架构层 `proj_cppai`），补全 `mod_net_timerqueue` 与 5 大 CppAIService 核心推理模块；
+- [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：欢迎横幅纯化无浮夸副标，卡片 3 设为 Muduo 归档状态，中央交互拓扑切换为 CppAIService 5 大核心推理模块，下方新增归档网络库抽屉查看专区，修复节点类名匹配逻辑；
+- [`src/data/tasksDataset.ts`](file:///e:/workspace/muduo-study-console/src/data/tasksDataset.ts)：日常任务全面聚焦 CppAIService（算法练习、AI 推理服务架构、动态批处理引擎、流式输出与并发评测）；
+- [`src/components/daily/DailyCurriculumView.tsx`](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)：Week 1~4 选项卡名称同步更新为 CppAIService 4 大课程研发阶段。
+
+#### (2) 核心代码改动对比片段
+
+```diff
+// --- src/types/index.ts ---
+- export type ActiveTab =
+-   | 'dashboard' | 'daily' | 'reader' | 'algo' | 'learning'
+-   | 'source' | 'mapping' | 'career' | 'pitfalls' | 'quiz';
++ export type ActiveTab =
++   | 'dashboard' | 'daily' | 'reader' | 'algo' | 'learning'
++   | 'source' | 'practice';
++
++ export type PracticeSubTab = 'mapping' | 'career' | 'pitfalls' | 'quiz';
++ export type ArchitectureLayer = 'L4_Transport' | 'L7_Protocol' | 'L7_AIService';
+```
+
+```diff
+// --- src/App.tsx: 自动向后兼容迁移逻辑 ---
++ useEffect(() => {
++   const legacyTabs: Record<string, PracticeSubTab> = {
++     mapping: 'mapping',
++     career: 'career',
++     pitfalls: 'pitfalls',
++     quiz: 'quiz'
++   };
++   if ((activeTab as string) in legacyTabs) {
++     setPracticeSubTab(legacyTabs[activeTab as string]);
++     setActiveTab('practice');
++   }
++ }, [activeTab, setActiveTab]);
+```
+
+```diff
+// --- src/components/dashboard/DashboardView.tsx: 拓扑节点精准匹配修复 ---
+- const matchedModule = DOMAIN_MODULES.find(
+-   m => m.name.toLowerCase() === item.name.toLowerCase()
+- )
++ const matchedModule = DOMAIN_MODULES.find(
++   m => m.id === item.id || 
++        m.classes?.includes(item.name) || 
++        m.name.toLowerCase().startsWith(item.name.toLowerCase())
++ )
+```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题 1：跨组件跳转至自测模块天数状态滞后
+- **问题现象**：在「28天任务」中点击任意 Day 的「自测」跳转后，页面虽然能切到自测视图，但题目题库未能自动同步切换至目标天数。
+- **根本原因 (RCA)**：`QuizCenterView` 内部使用 `const [selectedDay, setSelectedDay] = useState<number>(initialDay);`，该组件未挂载监听 `initialDay` 变更的 `useEffect`。当父组件仅更新传入的 prop 而未销毁重建子组件时，内部 state 保持首次挂载的值不变。
+- **解决方案**：在 `PracticeCenterView` 挂载 `QuizCenterView` 时赋予动态 key：`<QuizCenterView key={quizDay} initialDay={quizDay} />`。利用 React 核心调和机制，当 `quizDay` 变化时触发卸载与全新初始化，以最小代码代价达成 100% 响应刷新。
+
+#### 问题 2：大盘架构节点详情抽屉展示降级后备数据
+- **问题现象**：在大盘点击架构节点卡片时，弹出的 `TopologyDrawer` 抽屉仅能显示默认的简单文字，无法展示 `DOMAIN_MODULES` 中沉淀的真实源码文件路径、核心函数与线程模型。
+- **根本原因 (RCA)**：`DashboardView.tsx` 中使用 `m.name.toLowerCase() === item.name.toLowerCase()`，然而 `DOMAIN_MODULES` 中的名字为 `"EventLoop 事件循环主控"`，而拓扑项 `item.name` 为 `"EventLoop"`，严格全等恒为 `false`，导致全部进入默认兜底对象。
+- **解决方案**：重构匹配规则为 `m.id === item.id || m.classes?.includes(item.name) || m.name.toLowerCase().startsWith(item.name.toLowerCase())`，实现领域元数据与视图拓扑节点的精准关联。
+
+#### 问题 3：用户端 LocalStorage 旧 Tab 键值兼容
+- **问题现象**：若用户浏览器本地已存储 `activeTab = "quiz"`，在更新代码后如果直接限制 `ActiveTab` 类型，可能导致页面空白或非预期行为。
+- **根本原因 (RCA)**：持久化存储跨版本升级时的数据格式迁移滞后。
+- **解决方案**：在 `App.tsx` 的初始生命周期与 `activeTab` 监听器中部署无感映射表：当命中旧键值时自动将 `practiceSubTab` 置为对应子视图并将 `activeTab` 平滑迁移至 `'practice'`。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：全局系统架构演进图 (7 项导航 + 综合实战 + CppAIService 核心聚焦 + Muduo 归档隔离)
+
+```mermaid
+flowchart TD
+    subgraph Browser ["Web 浏览器客户端"]
+        Header["顶栏 Header (7 项主导航)"]
+        Nav1["学习大盘 (dashboard)"]
+        Nav2["28天任务 (daily)"]
+        Nav3["专栏阅读 (reader)"]
+        Nav4["算法题库 (algo)"]
+        Nav5["学习系统 (learning)"]
+        Nav6["源码路线 (source)"]
+        Nav7["综合实战 (practice)"]
+    end
+
+    Header --> Nav1 & Nav2 & Nav3 & Nav4 & Nav5 & Nav6 & Nav7
+
+    subgraph PracticeArea ["综合实战 (PracticeCenterView) 二级容器"]
+        ST1["代码映射 (mapping)"]
+        ST2["面试题解 (career)"]
+        ST3["问题记录 (pitfalls)"]
+        ST4["知识自测 (quiz · key 强制重挂载)"]
+    end
+    Nav7 --> ST1 & ST2 & ST3 & ST4
+
+    subgraph CoreFocus ["当前主航道：CppAIService 高并发 AI 推理服务端"]
+        direction TB
+        M1["ModelManager (ORT/TRT C++ 会话)"]
+        M2["InferenceWorkerPool (CUDA Stream 流重叠)"]
+        M3["DynamicBatcher (超时与批量自适应调度)"]
+        M4["TokenStreamer (SSE 分块实时 Token 传输)"]
+        M5["MemoryPool (KV-Cache 分页管理与显存复用)"]
+    end
+    Nav1 --> CoreFocus
+
+    subgraph ArchivedArea ["已完结归档：Muduo 基础网络库 (L4 传输底座)"]
+        ArchNode["L4 字节流传输网络层\n(EventLoop, Channel, EPoll, TcpServer, TcpConn, Buffer, TimerQueue)"]
+        DrawerTrigger["查看归档架构与历史代码 (抽屉联动)"]
+    end
+    Nav1 -.-> DrawerTrigger --> ArchNode
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  整个前端控制台从过去的 10 项扁平并列重构为清晰的“主导航 - 二级综合实战 - 架构聚焦与归档隔离”三层拓扑。主导航项精确收敛为 7 项，符合人类认知负荷极值（米勒定律 7±2 原则），在大中小屏幕均能保持整齐排列而无需拥挤换行；
+- **条件决策与状态流转**：
+  「综合实战」内部封装二级吸顶栏，当用户从外部任务或课程点击“自测”跳转时，控制台统一将主 Tab 设为 `practice`，同时将子 Tab 切换为 `quiz`，配合 React key 机制完成组件无缝换入；
+- **底层架构收益**：
+  彻底隔离了“已封板的 Muduo 网络库”与“正在攻坚的 CppAIService 大模型推理服务”，使用户在日常开发中 100% 聚焦于 AI 推理核心，同时保留抽屉随时查阅 Muduo 底层实现细节。
+
+---
+
+#### 图 2：Muduo L4 传输网络层与 HTTP L7 协议层回调解耦时序图 (onMessage 状态机驱动)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as 客户端 (TCP Socket)
+    participant SubReactor as Muduo SubReactor (EventLoop/EPoll)
+    participant TcpConn as TcpConnection (L4 传输缓冲)
+    participant HttpFSM as HttpContext / Codec (L7 协议状态机)
+    participant Router as HttpRouter / Business Handler
+    participant AIService as CppAIService 推理平台
+
+    Note over Client,TcpConn: 1. 物理连接建立与应用层字节流读入
+    Client->>SubReactor: TCP 数据报文到达网卡
+    SubReactor->>TcpConn: Channel EPOLLIN 事件触发 -> readFd()
+    TcpConn->>TcpConn: 数据存入应用层 Buffer (分散读 readv 64KB)
+
+    Note over TcpConn,HttpFSM: 2. 物理与应用层协议分界线：void onMessage() 回调
+    TcpConn->>HttpFSM: onMessage(connPtr, &buf, receiveTime)
+    activate HttpFSM
+    HttpFSM->>HttpFSM: parseRequest(&buf): 逐行解析 Request-Line / Headers / Body
+    alt 报文不合法 (400 Bad Request)
+        HttpFSM->>TcpConn: send("HTTP/1.1 400 Bad Request\r\n\r\n")
+        HttpFSM->>TcpConn: shutdown() 半关闭写端
+    else 解析完成且收集完整报文 (gotAll)
+        HttpFSM->>Router: onRequest(conn, context->request())
+        activate Router
+        Router->>AIService: 业务分发 (POST /api/v1/chat/completions)
+        deactivate Router
+    end
+    deactivate HttpFSM
+
+    Note over AIService,Client: 3. 业务响应序列化回写裸字节流
+    AIService->>HttpFSM: 构造 HttpResponse (状态码 200, SSE Chunked 头部)
+    HttpFSM->>TcpConn: response.appendToBuffer(&sendBuffer)
+    TcpConn->>Client: conn->send(&sendBuffer) 发送 TCP 数据流
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  时序图准确呈现了 Muduo L4 传输网络层与 HTTP L7 应用协议层在 C++ 运行时的物理分界：
+  1. Muduo 侧的 `EventLoop` 与 `TcpConnection` 完全不解析应用报文，只通过 `Buffer::readFd()` 将内核 Socket 缓冲区数据读入应用层双端队列；
+  2. 传输层与协议层的唯一交汇点是 `MessageCallback`（即 `void onMessage(const TcpConnectionPtr&, Buffer*, Timestamp)`）；
+  3. HTTP 侧通过 `HttpContext` 挂载在连接的上下文（`boost::any`）中，逐字节驱动有限状态机（FSM）提取出方法、路径与请求头；
+- **异常分支与防御机制**：
+  若请求行畸形或协议超限，`HttpContext::parseRequest` 立即返回 false，直接通过 `conn->send()` 输出 400 并调用 `shutdown()`，传输层无须关心 HTTP 语义即可安全回收连接；
+- **底层架构收益**：
+  保证了基础网络库的高度可复用性，Muduo 既能支撑 HTTP/1.1，也能直接承载 RPC、WebSocket 或私有二进制协议，消除了传统网络代码与业务代码耦合的架构隐患。
+
+---
+
+#### 图 3：CppAIService 动态批处理与 SSE 流式 Token 推理执行管道图
+
+```mermaid
+flowchart LR
+    subgraph Ingress ["并发接入层"]
+        Req1["客户端请求 1\n(Prompt A, seq_len: 128)"]
+        Req2["客户端请求 2\n(Prompt B, seq_len: 256)"]
+        ReqN["客户端请求 N\n(Prompt N, seq_len: 96)"]
+    end
+
+    subgraph BatchEngine ["DynamicBatcher 动态批处理调度引擎"]
+        Queue["并发无锁任务队列 (BatchTaskQueue)"]
+        Timer["超时定时器 (5ms~10ms 上界)"]
+        Aggregator["张量聚合器 (Padding & Batch Tensor 组装)"]
+    end
+
+    Ingress --> Queue
+    Queue --> Timer --> Aggregator
+
+    subgraph WorkerPool ["InferenceWorkerPool 计算流水线"]
+        Stream1["CUDA Stream 1 (Worker Thread 1)"]
+        Stream2["CUDA Stream 2 (Worker Thread 2)"]
+        MemPool["MemoryPool\n(Paged KV-Cache 显存复用)"]
+    end
+
+    Aggregator --> Stream1 & Stream2
+    Stream1 & Stream2 <--> MemPool
+
+    subgraph InferenceExecution ["ORT / TensorRT 原生引擎"]
+        Prefill["Prefill 首字阶段"]
+        Decode["自回归解码循环 (Autoregressive Decode)"]
+    end
+
+    Stream1 & Stream2 --> Prefill --> Decode
+
+    subgraph EgressStream ["TokenStreamer 流式推送通道"]
+        SseFrame["data: {'token': 'xx', 'index': 1}\n\n"]
+        ChunkOutput["HTTP Chunked 非阻塞发送"]
+    end
+
+    Decode -->|每生成单个 Token| SseFrame --> ChunkOutput
+    ChunkOutput -.->|低首字延迟 TTFT| Ingress
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了 CppAIService 从接收请求、动态组批、GPU 异步执行到流式 Token 回传的完整计算管道：
+  1. 并发请求进入 `BatchTaskQueue` 无锁队列；
+  2. `DynamicBatcher` 在达到最大 BatchSize 或等待延迟上界（如 5ms~10ms）时触发聚合，将变长 Prompt 组装为连续张量；
+  3. `InferenceWorkerPool` 调度绑核工作线程，在专属 `CUDA Stream` 上并发执行推理，同时依托 `MemoryPool` 分页复用 KV-Cache 块，消除频繁 `cudaMalloc` 碎片；
+  4. 解码循环中模型每吐出一个 Token，由 `TokenStreamer` 立即格式化为 SSE 帧下发，显著压缩首字响应延迟（TTFT）；
+- **底层架构收益**：
+  在保持端到端毫秒级低延迟的前提下，大幅提升 GPU 计算单元的 Tensor Core 满载利用率，吞吐量相较单请求串行推理提升数倍。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **视觉空间与排版布局优化**：主顶栏项数从 10 项减少到 7 项，减少了 30% 水平视觉干扰，中等屏幕（如 iPad、笔记本）不再出现强制横向滚动条，界面整体更为通透沉稳；
+- **状态流转与平滑迁移**：通过 `useEffect` 部署了 LocalStorage 自动向下兼容迁移，老用户打开页面时无论此前停留在哪个子 Tab，均能无缝恢复到「综合实战」对应选项卡；
+- **数据结构真实性校正**：彻底修复了 `DashboardView.tsx` 中类名大小写与中英文后缀匹配失败的隐藏缺陷，所有架构节点均能准确拉取并展示底层模块数据；
+- **严格去除浮夸字眼**：全站文案统一采用中性、严谨、面向真实研发的工程用语，契合《工作区研发规范》。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 静态类型检查
+cd e:\workspace\muduo-study-console
+npx tsc --noEmit
+
+# 2. 生产环境静态打包构建
+npm run build
+
+# 3. 对抗性测试套件 (Milestone 1)
+node scripts/test_m1_challenger_adversarial.cjs
+
+# 4. 里程碑 2、3、4 全量架构断言测试套件
+node scripts/test_milestones_2_3_4.cjs
+
+# 5. 经典兼容性要求断言
+node scripts/test_user_requirements.cjs
+```
+
+#### (2) 实际运行结果断言
+- **`npx tsc --noEmit`**：退出码 `0`，0 个类型错误；
+- **`npm run build`**：
+  ```
+  ✓ 1823 modules transformed.
+  dist/index.html                     1.12 kB │ gzip:   0.62 kB
+  dist/assets/index-DtuWgUga.css     71.93 kB │ gzip:  11.74 kB
+  dist/assets/index-Df0OL2oE.js   2,372.62 kB │ gzip: 713.97 kB
+  ✓ built in 7.59s
+  ✓ Copied images/ to dist/images/
+  ✓ Successfully completed Vite production build
+  ✓ Copied classic.html -> dist/classic.html
+  [BUILD SUCCESS] Production ready static build in dist/
+  ```
+- **`test_m1_challenger_adversarial.cjs`**：`35 Ran | 35 Passed | 0 Failed`；
+- **`test_milestones_2_3_4.cjs`**：`ALL MILESTONES 2, 3, 4 VERIFICATION CHECKS PASSED (7/7)!`；
+- **`test_user_requirements.cjs`**：`ALL UPDATED REQUIREMENTS VERIFIED SUCCESSFULLY! ✓`。

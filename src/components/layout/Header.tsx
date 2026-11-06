@@ -11,9 +11,7 @@ import {
   Calendar,
   Layers,
   Bookmark,
-  Award,
-  ShieldAlert,
-  HelpCircle,
+  Briefcase,
   Server
 } from 'lucide-react';
 
@@ -39,10 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'algo', label: '算法题库', icon: <CheckSquare size={14} /> },
     { id: 'learning', label: '学习系统', icon: <Bookmark size={14} /> },
     { id: 'source', label: '源码路线', icon: <Layers size={14} /> },
-    { id: 'mapping', label: '源码映射', icon: <Code size={14} /> },
-    { id: 'career', label: '求职凭证', icon: <Award size={14} /> },
-    { id: 'pitfalls', label: '避坑档案', icon: <ShieldAlert size={14} /> },
-    { id: 'quiz', label: '每日自测', icon: <HelpCircle size={14} /> }
+    { id: 'practice', label: '综合实战', icon: <Briefcase size={14} /> }
   ];
 
   return (

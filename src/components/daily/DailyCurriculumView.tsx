@@ -120,11 +120,11 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               <Calendar size={22} />
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              28 天每日任务与硬核实验工作台
+              28天任务
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-            覆盖 C++ Primer Plus 与 muduo 核心源码演进闭环，每个 Task 配备严格掌握度评估、可复现实验命令与实验验证。
+            包含每日学习任务、掌握度记录与实验验证命令。
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
               {stats.mastered}
             </div>
-            <div className="text-[11px] text-slate-500 font-medium">已攻克 (4~5星)</div>
+            <div className="text-[11px] text-slate-500 font-medium">已完成 (4~5星)</div>
           </div>
           <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
           <div className="text-center">
@@ -177,7 +177,13 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
-              W{w} {w === 1 ? '基础与对象模型' : w === 2 ? '内存与并发网络' : w === 3 ? '核心组件闭环' : '高阶压测与演化'} (7)
+              {w === 1
+                ? 'W1 AI 服务端与 ORT/TRT 封装'
+                : w === 2
+                ? 'W2 异步推理工作池与显存'
+                : w === 3
+                ? 'W3 动态批处理与调度引擎'
+                : 'W4 推理网关与流式 Token 压测'} (7)
             </button>
           ))}
         </div>
@@ -325,7 +331,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                     <div className="space-y-1.5">
                       <div className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                         <Flame size={13} className="text-rose-500" />
-                        核心攻坚要点
+                        核心要点
                       </div>
                       <ul className="space-y-1.5 pl-4 list-disc text-slate-700 dark:text-slate-300 leading-relaxed">
                         {item.points.map((pt, pIdx) => (
@@ -344,7 +350,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                         <span className="text-slate-600 dark:text-slate-300">{item.muduoMap}</span>
                       </div>
                       <div>
-                        <span className="font-bold text-emerald-700 dark:text-emerald-300">攻克验收标准: </span>
+                        <span className="font-bold text-emerald-700 dark:text-emerald-300">验收标准: </span>
                         <span className="text-slate-600 dark:text-slate-300">
                           {typeof item.check === 'string' ? item.check : item.check?.strict || item.check?.quick || ''}
                         </span>
@@ -437,7 +443,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                       <textarea
                         value={note}
                         onChange={e => handleNoteChange(item.day, e.target.value)}
-                        placeholder={`记录关于 Day ${item.day} 的攻坚心得、报错排查或核心汇编思考...`}
+                        placeholder={`记录关于 Day ${item.day} 的学习笔记、报错排查或思考...`}
                         rows={3}
                         className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition leading-relaxed resize-y font-mono"
                       />

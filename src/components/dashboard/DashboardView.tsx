@@ -3,7 +3,6 @@ import { ActiveTab, DomainModule } from '../../types';
 import { YUQUE_DATASET } from '../../data/yuqueDataset';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { DAYS_DATASET } from '../../data/daysDataset';
-import { SOURCE_ROADMAP } from '../../data/sourceRoadmapDataset';
 import { DOMAIN_MODULES } from '../../data/domainDataset';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { FocusTimer } from './FocusTimer';
@@ -21,7 +20,8 @@ import {
   Activity,
   Flame,
   CheckCircle2,
-  ChevronRight
+  ChevronRight,
+  Archive
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -88,20 +88,50 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   ];
   const maxMins = Math.max(...weeklyFocus.map(w => w.mins), 240);
 
+  const CPPAI_CORE_MODULES = [
+    {
+      id: 'mod_ai_model_manager',
+      name: 'ModelManager',
+      layer: '运行时底座',
+      desc: 'ONNX/TensorRT C++ 原生会话封装'
+    },
+    {
+      id: 'mod_ai_worker_pool',
+      name: 'WorkerPool',
+      layer: '并发计算流池',
+      desc: 'CUDA Stream 异步流水线重叠'
+    },
+    {
+      id: 'mod_ai_dynamic_batcher',
+      name: 'DynamicBatcher',
+      layer: '批处理核心',
+      desc: '自适应动态 Batch 聚合调度'
+    },
+    {
+      id: 'mod_ai_token_streamer',
+      name: 'TokenStreamer',
+      layer: '流式输出',
+      desc: 'SSE 分块实时 Token 生成推送'
+    },
+    {
+      id: 'mod_ai_memory_pool',
+      name: 'MemoryPool',
+      layer: '显存复用',
+      desc: 'KV-Cache 分页管理与碎片消除'
+    }
+  ];
+
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-6">
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-slate-900 to-sky-950 text-white rounded-2xl p-6 sm:p-8 shadow-sm space-y-3">
         <div className="flex items-center gap-2 text-xs font-semibold text-sky-400 uppercase tracking-wider">
           <Sparkles size={14} />
-          <span>Muduo & CppAIService 全景冲刺控制台</span>
+          <span>Muduo & CppAIService</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-          专注大厂 C++ 核心壁垒攻坚
+          Muduo & CppAIService
         </h1>
-        <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-          以底层网络库架构为基，融合 28 天工业级实验、{totalAlgos} 道算法题单、8 阶源码演进与真实求职凭证，构建完整的工程与底层认知壁垒。
-        </p>
       </div>
 
       {/* 4 Core KPI Metric Cards */}
@@ -115,7 +145,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <Calendar size={18} className="text-sky-600 dark:text-sky-400" />
             <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition" />
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400">28天攻坚实验</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">28天开发实践</div>
           <div className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-1">
             {masteredDaysCount} <span className="text-xs text-slate-400 font-normal">/ 28 天</span>
           </div>
@@ -145,21 +175,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Card 3: Source Roadmap */}
+        {/* Card 3: Muduo Archived Foundation */}
         <div
-          onClick={() => onNavigateTab('source')}
+          onClick={() => {
+            const muduoCore = DOMAIN_MODULES.find(m => m.id === 'mod_net_eventloop') || DOMAIN_MODULES.find(m => m.projectId === 'proj_muduo');
+            if (muduoCore) {
+              onSelectTopologyModule(muduoCore);
+            } else {
+              onNavigateTab('source');
+            }
+          }}
           className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-amber-400 dark:hover:border-amber-600 transition cursor-pointer group"
         >
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <Layers size={18} className="text-amber-500" />
+            <Archive size={18} className="text-amber-500" />
             <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition" />
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400">Muduo 源码阶段</div>
-          <div className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-1">
-            {masteredRoadmapCount} <span className="text-xs text-slate-400 font-normal">/ 8 阶段</span>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Muduo 网络库底层</div>
+          <div className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-1">
+            已完结 <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">· 8 阶段全部掌握</span>
           </div>
           <div className="text-[11px] text-slate-400 mt-1">
-            自测及格: {passedQuizCount} / 28 天
+            L4 传输底座 · 点击查阅归档
           </div>
         </div>
 
@@ -184,11 +221,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="flex items-center gap-2">
             <Calendar size={17} className="text-sky-600" />
             <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-              28 天每日任务热力网格 (点击直接跳转对应 Day 卡片)
+              任务进度网格
             </h3>
           </div>
           <span className="text-xs text-slate-400">
-            已攻克 {masteredDaysCount} / 28
+            已完成 {masteredDaysCount} / 28
           </span>
         </div>
 
@@ -227,7 +264,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <div className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-xs bg-emerald-500" />
-            <span>已完全攻克 (4~5星)</span>
+            <span>已完成 (4~5星)</span>
           </div>
         </div>
       </div>
@@ -272,36 +309,35 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Muduo Architecture Topology Interactive Nodes */}
+        {/* CppAIService Architecture Topology Interactive Nodes */}
         <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
           <div className="flex items-center justify-between">
             <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
               <Layers size={16} className="text-sky-600" />
-              核心架构拓扑图谱 (点击滑出组件详情抽屉)
+              CppAIService 核心架构拓扑图谱 (点击滑出组件详情抽屉)
             </div>
-            <span className="text-xs text-slate-400">One Loop Per Thread</span>
+            <span className="text-xs text-sky-600 dark:text-sky-400 font-semibold">C++20 高并发推理</span>
           </div>
 
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            muduo 核心采用主从多 Reactor 架构。点击任意关键节点即可查看其数据成员、职责定位与线程边界：
+            CppAIService 核心聚焦于高并发大模型与多模态推理调度。点击任意关键模块即可查看其类层次、线程并发模型与源码实现：
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-xs">
-            {SOURCE_ROADMAP.map(item => {
-              // Match with domain module if available
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 font-mono text-xs">
+            {CPPAI_CORE_MODULES.map(item => {
               const matchedModule = DOMAIN_MODULES.find(
-                m => m.name.toLowerCase() === item.name.toLowerCase()
+                m => m.id === item.id || m.classes?.includes(item.name) || m.name.toLowerCase().startsWith(item.name.toLowerCase())
               ) || {
                 id: item.id,
-                projectId: 'muduo-cpp11',
+                projectId: 'proj_cppai',
                 name: item.name,
                 layer: item.layer,
-                responsibility: item.role,
-                desc: item.role,
+                responsibility: item.desc,
+                desc: item.desc,
                 classes: [item.name],
-                functions: item.functions,
-                keyConcepts: item.cppFeatures,
-                threadModel: item.name === 'EventLoop' ? '专属 I/O 线程循环' : '归属 I/O 线程'
+                functions: ['init()', 'process()'],
+                keyConcepts: ['高并发', '异步计算'],
+                threadModel: '多工作线程独占/共享'
               };
 
               return (
@@ -312,16 +348,58 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   type="button"
                 >
                   <div className="font-bold text-slate-900 dark:text-white group-hover:text-sky-600 flex items-center justify-between">
-                    <span>{item.name}</span>
-                    <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transition" />
+                    <span className="truncate">{item.name}</span>
+                    <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transition shrink-0" />
+                  </div>
+                  <div className="text-[10px] text-sky-600 dark:text-sky-400 font-semibold mt-1">
+                    {item.layer}
                   </div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                    {item.layer}
+                    {item.desc}
                   </div>
                 </button>
               );
             })}
           </div>
+        </div>
+      </div>
+
+      {/* Archived Foundational Network Library Section */}
+      <div className="bg-slate-100/80 dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Archive size={16} className="text-amber-500" />
+            <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+              Muduo 基础网络库 (已完结归档)
+            </span>
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800">
+              8 阶段全部掌握
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl">
+            L4 字节流传输网络层底座（EventLoop、Channel、EPollPoller、TcpServer、TcpConnection、Buffer、TimerQueue 等）。已全面封板并解耦隔离，为上层应用协议与 AI 推理服务提供底层传输保障。
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => {
+              const muduoFirst = DOMAIN_MODULES.find(m => m.projectId === 'proj_muduo') || null;
+              if (muduoFirst) onSelectTopologyModule(muduoFirst);
+            }}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-semibold shadow-2xs transition cursor-pointer"
+          >
+            <Layers size={14} className="text-amber-500" />
+            <span>查看归档架构与历史代码</span>
+          </button>
+          <button
+            onClick={() => onNavigateTab('source')}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-200/60 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition cursor-pointer"
+          >
+            <span>源码路线</span>
+            <ArrowRight size={12} />
+          </button>
         </div>
       </div>
     </div>

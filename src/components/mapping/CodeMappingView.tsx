@@ -13,11 +13,11 @@ export const CodeMappingView: React.FC = () => {
             <Bookmark size={22} />
           </span>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            C++ 核心机制 ➔ Muduo 源码设计映射全览
+            代码映射
           </h1>
         </div>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-          涵盖 15 项关键现代 C++ 特性在底层网络库与业务层中的文件落地、工程设计思想与代表性源码实现。
+          现代 C++ 特性在网络库与业务层中的实现映射与代码参考。
         </p>
       </div>
 

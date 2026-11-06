@@ -75,11 +75,11 @@ export const CareerSystemView: React.FC = () => {
             <Award size={22} />
           </span>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            C++ 后端求职凭证、能力矩阵与面试题库
+            面试题解
           </h1>
         </div>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-          用真实 Commit、代码修改证据、14 维能力水准与 STAR 经历，撕掉“纯抄代码”标签，支撑技术面试深度闭环。
+          整理工程实现、能力要点、面试题解与 STAR 经历。
         </p>
 
         {/* Sub-tab Navigation */}
@@ -268,7 +268,7 @@ export const CareerSystemView: React.FC = () => {
                   项目 30 秒 / 1 分钟 / 3 分钟技术陈述 (Elevator Pitch)
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
-                  面试开场向面试官精准汇报系统架构、并发模型、技术壁垒与实测指标。
+                  面试开场向面试官精准汇报系统架构、并发模型、关键设计与实测指标。
                 </p>
               </div>
 
@@ -359,7 +359,7 @@ export const CareerSystemView: React.FC = () => {
 
                         <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                           <div className="font-bold text-xs text-slate-800 dark:text-slate-200">
-                            标准攻坚答题思路:
+                            答题思路:
                           </div>
                           <div className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
                             {q.answer}
@@ -436,7 +436,7 @@ export const CareerSystemView: React.FC = () => {
           <div className="space-y-4">
             <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
               <Briefcase size={16} className="text-sky-600" />
-              STAR 法则技术攻坚实战故事库
+              STAR 法则实战经历
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

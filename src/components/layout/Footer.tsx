@@ -20,13 +20,13 @@ export const Footer: React.FC = () => {
 
       const now = new Date().toISOString().split('T')[0];
       let md = `# C++ 与 Muduo 后端工程全量学习与演进档案\n\n`;
-      md += `> 归档导出时间：${now} | 生成自 C++ 后台与算法冲刺工作台\n\n`;
+      md += `> 归档导出时间：${now} | Muduo & CppAIService\n\n`;
       md += `## 1. 学习指标与总体概况\n\n`;
       md += `- 算法题库完成数：${completedAlgos.length} 道\n`;
       md += `- 28天任务已标注天数：${Object.keys(dayMastery).length} / 28 天\n`;
       md += `- 自测通过天数：${Object.values(quizScores).filter((s: any) => s >= 75).length} 天\n\n`;
 
-      md += `## 2. 28 天每日攻坚任务与个人手记\n\n`;
+      md += `## 2. 28 天每日任务与学习手记\n\n`;
       DAYS_DATASET.forEach(d => {
         const mastery = dayMastery[d.day] || 0;
         const score = quizScores[d.day];
@@ -39,18 +39,18 @@ export const Footer: React.FC = () => {
           md += `- **自测得分**：${score} 分\n`;
         }
         if (note && note.trim()) {
-          md += `\n**攻坚手记与排障记录**：\n\n\`\`\`\n${note.trim()}\n\`\`\`\n`;
+          md += `\n**学习笔记与排障记录**：\n\n\`\`\`\n${note.trim()}\n\`\`\`\n`;
         }
         md += `\n---\n\n`;
       });
 
       if (customPitfalls.length > 0) {
-        md += `## 3. 自定义 C++ 踩坑档案\n\n`;
+        md += `## 3. 问题记录\n\n`;
         customPitfalls.forEach((p: any, idx: number) => {
-          md += `### 踩坑 #${idx + 1}: ${p.title}\n\n`;
+          md += `### 问题 #${idx + 1}: ${p.title}\n\n`;
           md += `- **现象**: ${p.errorSymptom}\n`;
           md += `- **原因**: ${p.errorCause}\n`;
-          md += `- **铁律**: ${p.conclusion}\n\n`;
+          md += `- **总结**: ${p.conclusion}\n\n`;
         });
       }
 
@@ -178,7 +178,7 @@ export const Footer: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
           <span className="font-bold text-slate-700 dark:text-slate-300">
-            C++ 后台与算法冲刺工作台
+            Muduo & CppAIService
           </span>
           <span className="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
           <span>数据仅保存在当前浏览器本地，无隐私泄漏风险</span>

@@ -80,7 +80,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
                 分类: {problem.category || problem.topic}
               </span>
               <span>•</span>
-              <span>套路: {problem.pattern}</span>
+              <span>解法: {problem.pattern}</span>
               <span>•</span>
               <span className="font-mono text-slate-400">
                 O({problem.timeComp}) / O({problem.spaceComp})
@@ -119,7 +119,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
             <div className="flex items-start gap-2 text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-lg border border-amber-200 dark:border-amber-900/60">
               <AlertCircle size={14} className="shrink-0 mt-0.5 text-amber-600" />
               <div>
-                <span className="font-bold">易错陷阱与盲打手写注意: </span>
+                <span className="font-bold">常见问题与注意事项: </span>
                 <span>{problem.mistakes}</span>
               </div>
             </div>
@@ -129,7 +129,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
             <div className="flex items-start gap-2 text-sky-800 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/40 p-2.5 rounded-lg border border-sky-200 dark:border-sky-900/60">
               <Cpu size={14} className="shrink-0 mt-0.5 text-sky-600" />
               <div>
-                <span className="font-bold">服务端/Muduo 工程映射: </span>
+                <span className="font-bold">工程实现映射: </span>
                 <span>{problem.projectLink}</span>
               </div>
             </div>

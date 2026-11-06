@@ -9,10 +9,11 @@ export type ActiveTab =
   | 'algo'
   | 'learning'
   | 'source'
-  | 'mapping'
-  | 'career'
-  | 'pitfalls'
-  | 'quiz';
+  | 'practice';
+
+export type PracticeSubTab = 'mapping' | 'career' | 'pitfalls' | 'quiz';
+
+export type ArchitectureLayer = 'L4_Transport' | 'L7_Protocol' | 'L7_AIService';
 
 // ----------------------------------------------------------------------------
 // Yuque Articles

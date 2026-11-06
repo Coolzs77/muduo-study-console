@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActiveTab, DomainModule } from './types';
+import { ActiveTab, DomainModule, PracticeSubTab } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Header } from './components/layout/Header';
 import { ReadingProgressBar } from './components/layout/ReadingProgressBar';
@@ -8,17 +8,14 @@ import { ToastContainer } from './components/common/Toast';
 import { EnvGuideModal } from './components/common/EnvGuideModal';
 import { TopologyDrawer } from './components/common/TopologyDrawer';
 
-// 10 Views
+// 7 Primary Views
 import { DashboardView } from './components/dashboard/DashboardView';
 import { DailyCurriculumView } from './components/daily/DailyCurriculumView';
 import { KnowledgeReader } from './components/reader/KnowledgeReader';
 import { AlgoCatalog } from './components/algorithm/AlgoCatalog';
 import { LearningSystemView } from './components/learning/LearningSystemView';
 import { SourceRoadmapView } from './components/source/SourceRoadmapView';
-import { CodeMappingView } from './components/mapping/CodeMappingView';
-import { CareerSystemView } from './components/career/CareerSystemView';
-import { PitfallsView } from './components/pitfalls/PitfallsView';
-import { QuizCenterView } from './components/quiz/QuizCenterView';
+import { PracticeCenterView } from './components/practice/PracticeCenterView';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useLocalStorage<ActiveTab>('activeTab', 'dashboard');
@@ -31,6 +28,21 @@ export const App: React.FC = () => {
   // Jump parameters
   const [highlightDay, setHighlightDay] = useState<number | null>(null);
   const [quizDay, setQuizDay] = useState<number>(1);
+  const [practiceSubTab, setPracticeSubTab] = useState<PracticeSubTab>('mapping');
+
+  // Backward compatibility migration for legacy localStorage tabs
+  useEffect(() => {
+    const legacyTabs: Record<string, PracticeSubTab> = {
+      mapping: 'mapping',
+      career: 'career',
+      pitfalls: 'pitfalls',
+      quiz: 'quiz'
+    };
+    if ((activeTab as string) in legacyTabs) {
+      setPracticeSubTab(legacyTabs[activeTab as string]);
+      setActiveTab('practice');
+    }
+  }, [activeTab, setActiveTab]);
 
   // Sync dark class on document element
   useEffect(() => {
@@ -56,7 +68,8 @@ export const App: React.FC = () => {
   // Jump to quiz for specific day
   const handleNavigateToQuiz = (day: number) => {
     setQuizDay(day);
-    setActiveTab('quiz');
+    setPracticeSubTab('quiz');
+    setActiveTab('practice');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -65,7 +78,7 @@ export const App: React.FC = () => {
       {/* 2.5px Top Reading Progress Bar (active during reading) */}
       <ReadingProgressBar />
 
-      {/* Modern Sticky Navigation Header with 10 views & Linux guide button */}
+      {/* Modern Sticky Navigation Header with 7 views & Linux guide button */}
       <Header
         activeTab={activeTab}
         onSelectTab={setActiveTab}
@@ -93,10 +106,13 @@ export const App: React.FC = () => {
         {activeTab === 'algo' && <AlgoCatalog />}
         {activeTab === 'learning' && <LearningSystemView />}
         {activeTab === 'source' && <SourceRoadmapView />}
-        {activeTab === 'mapping' && <CodeMappingView />}
-        {activeTab === 'career' && <CareerSystemView />}
-        {activeTab === 'pitfalls' && <PitfallsView />}
-        {activeTab === 'quiz' && <QuizCenterView initialDay={quizDay} />}
+        {activeTab === 'practice' && (
+          <PracticeCenterView
+            activeSubTab={practiceSubTab}
+            onSelectSubTab={setPracticeSubTab}
+            quizDay={quizDay}
+          />
+        )}
       </main>
 
       {/* Global Linux Remote Dev Guide Modal */}

@@ -104,21 +104,23 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_59",
-    "num": 59,
-    "title": "59. 螺旋矩阵II",
+    "id": "algo_54",
+    "num": 54,
+    "title": "54. 螺旋矩阵",
     "difficulty": "Medium",
     "category": "数组",
     "topic": "数组",
-    "leetcodeUrl": "https://leetcode.cn/problems/spiral-matrix-ii/",
-    "pattern": "模拟循环不变量",
-    "timeComp": "O(n)",
-    "spaceComp": "O(n)",
+    "leetcodeUrl": "https://leetcode.cn/problems/spiral-matrix/",
+    "pattern": "顺时针模拟 / 边界收缩",
+    "timeComp": "O(m*n)",
+    "spaceComp": "O(1)",
     "independent": true,
-    "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
+    "mistakes": "循环边界定义统一，转圈边界严格左闭右开或边界收缩。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": true,
+    "hot100Chapter": "矩阵",
+    "hot100Order": 19
   },
   {
     "id": "algo_203",
@@ -408,7 +410,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "title": "146. LRU 缓存机制 (LRU Cache)",
     "difficulty": "Medium",
     "category": "哈希表",
-    "topic": "哈希表 + 双向链表",
+    "topic": "哈希表",
     "leetcodeUrl": "https://leetcode.cn/problems/lru-cache/",
     "pattern": "std::unordered_map 映射 key 到双向链表迭代器/指针，O(1) 访问与淘汰",
     "timeComp": "O(1)",
@@ -456,23 +458,21 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_54",
+    "id": "algo_kc_54",
     "num": 54,
     "title": "54. 替换数字",
-    "difficulty": "Medium",
+    "difficulty": "Easy",
     "category": "字符串",
     "topic": "字符串",
     "leetcodeUrl": "https://kamacoder.com/problempage.php?pid=1054",
-    "pattern": "双指针反转/位移",
+    "pattern": "双指针从后向前 / 空间预扩充",
     "timeComp": "O(n)",
-    "spaceComp": "O(n)",
+    "spaceComp": "O(1)",
     "independent": true,
-    "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
-    "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
+    "mistakes": "从后向前遍历填充，避免每次插入导致的 O(n^2) 元素整体搬移。",
+    "projectLink": "对应服务端协议解析中 URL 解码、转义字符扩充与字节流重组。",
     "isCarl": true,
-    "isHot100": true,
-    "hot100Chapter": "矩阵",
-    "hot100Order": 19
+    "isHot100": false
   },
   {
     "id": "algo_151",
@@ -492,7 +492,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_55",
+    "id": "algo_kc_55",
     "num": 55,
     "title": "55. 右旋字符串",
     "difficulty": "Medium",
@@ -543,7 +543,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_27",
+    "id": "algo_dptr_27",
     "num": 27,
     "title": "27. 移除元素",
     "difficulty": "Easy",
@@ -560,7 +560,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_344",
+    "id": "algo_dptr_344",
     "num": 344,
     "title": "344. 反转字符串",
     "difficulty": "Easy",
@@ -577,7 +577,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_54",
+    "id": "algo_dptr_54",
     "num": 54,
     "title": "54. 替换数字",
     "difficulty": "Medium",
@@ -594,7 +594,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_151",
+    "id": "algo_dptr_151",
     "num": 151,
     "title": "151. 翻转字符串里的单词",
     "difficulty": "Medium",
@@ -611,7 +611,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_206",
+    "id": "algo_dptr_206",
     "num": 206,
     "title": "206. 翻转链表",
     "difficulty": "Easy",
@@ -628,7 +628,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_19",
+    "id": "algo_dptr_19",
     "num": 19,
     "title": "19. 删除链表的倒数第N个节点",
     "difficulty": "Medium",
@@ -645,7 +645,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_02.07",
+    "id": "algo_dptr_02_07",
     "num": "02.07",
     "title": "02.07. 链表相交",
     "difficulty": "Easy",
@@ -662,7 +662,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_142",
+    "id": "algo_dptr_142",
     "num": 142,
     "title": "142. 环形链表II",
     "difficulty": "Medium",
@@ -679,7 +679,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_15",
+    "id": "algo_dptr_15",
     "num": 15,
     "title": "15. 三数之和",
     "difficulty": "Medium",
@@ -698,7 +698,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "hot100Order": 6
   },
   {
-    "id": "algo_18",
+    "id": "algo_dptr_18",
     "num": 18,
     "title": "18. 四数之和",
     "difficulty": "Medium",
@@ -840,38 +840,42 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "hot100Order": 75
   },
   {
-    "id": "algo_48",
-    "num": null,
-    "title": "二叉树的递归遍历",
-    "difficulty": "Medium",
+    "id": "algo_94",
+    "num": 94,
+    "title": "94. 二叉树的中序遍历",
+    "difficulty": "Easy",
     "category": "二叉树",
     "topic": "二叉树",
-    "leetcodeUrl": "https://leetcode.cn/problemset/?search=%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86",
-    "pattern": "DFS 递归 / BFS 队列层序",
+    "leetcodeUrl": "https://leetcode.cn/problems/binary-tree-inorder-traversal/",
+    "pattern": "二叉树中序遍历 / 递归与迭代",
     "timeComp": "O(n)",
     "spaceComp": "O(n)",
     "independent": true,
-    "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
-    "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
+    "mistakes": "注意左子树为空时的回溯逻辑，迭代法使用显式调用栈防死循环。",
+    "projectLink": "对应语法树/AST 中序展开与有序事件分发管道遍历。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": true,
+    "hot100Chapter": "二叉树",
+    "hot100Order": 36
   },
   {
-    "id": "algo_49",
-    "num": null,
-    "title": "二叉树的迭代遍历",
+    "id": "algo_105",
+    "num": 105,
+    "title": "105. 从前序与中序遍历序列构造二叉树",
     "difficulty": "Medium",
     "category": "二叉树",
     "topic": "二叉树",
-    "leetcodeUrl": "https://leetcode.cn/problemset/?search=%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E8%BF%AD%E4%BB%A3%E9%81%8D%E5%8E%86",
-    "pattern": "DFS 递归 / BFS 队列层序",
+    "leetcodeUrl": "https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/",
+    "pattern": "分治递归 / 哈希加速定位",
     "timeComp": "O(n)",
     "spaceComp": "O(n)",
     "independent": true,
-    "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
-    "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
+    "mistakes": "注意子区间切分索引边界计算，中序哈希表预存加速根节点查询。",
+    "projectLink": "对应网络协议序列化帧解析反序列化还原拓扑树结构。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": true,
+    "hot100Chapter": "二叉树",
+    "hot100Order": 47
   },
   {
     "id": "algo_50",
@@ -1347,7 +1351,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_77",
+    "id": "algo_77_opt",
     "num": 77,
     "title": "77. 组合优化",
     "difficulty": "Medium",
@@ -1824,7 +1828,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_104",
+    "id": "algo_406_seq",
     "num": null,
     "title": "406.根据身高重建队列（续集）",
     "difficulty": "Medium",
@@ -2174,7 +2178,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_70",
+    "id": "algo_70_knapsack",
     "num": 70,
     "title": "70. 爬楼梯完全背包版本",
     "difficulty": "Easy",
@@ -2320,7 +2324,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "hot100Order": 77
   },
   {
-    "id": "algo_122",
+    "id": "algo_122_dp",
     "num": 122,
     "title": "122. 买卖股票的最佳时机II",
     "difficulty": "Medium",
@@ -2494,7 +2498,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_53",
+    "id": "algo_53_dp",
     "num": 53,
     "title": "53. 最大子序和",
     "difficulty": "Medium",
@@ -2706,7 +2710,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "hot100Order": 73
   },
   {
-    "id": "algo_98",
+    "id": "algo_kama_98",
     "num": 98,
     "title": "98. 所有可达路径",
     "difficulty": "Medium",
@@ -2723,7 +2727,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_99",
+    "id": "algo_kama_99_dfs",
     "num": 99,
     "title": "99. 岛屿的数量深搜",
     "difficulty": "Medium",
@@ -2740,7 +2744,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_99",
+    "id": "algo_kama_99_bfs",
     "num": 99,
     "title": "99. 岛屿的数量广搜",
     "difficulty": "Medium",
@@ -2757,7 +2761,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_100",
+    "id": "algo_kama_100",
     "num": 100,
     "title": "100. 岛屿的最大面积",
     "difficulty": "Medium",
@@ -2774,7 +2778,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_101",
+    "id": "algo_kama_101",
     "num": 101,
     "title": "101. 孤岛的总面积",
     "difficulty": "Medium",
@@ -2791,7 +2795,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_102",
+    "id": "algo_kama_102",
     "num": 102,
     "title": "102. 沉没孤岛",
     "difficulty": "Medium",
@@ -2808,7 +2812,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_103",
+    "id": "algo_kama_103",
     "num": 103,
     "title": "103. 水流问题",
     "difficulty": "Medium",
@@ -2825,7 +2829,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_104",
+    "id": "algo_kama_104",
     "num": 104,
     "title": "104. 建造最大岛屿",
     "difficulty": "Medium",
@@ -2842,7 +2846,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_106",
+    "id": "algo_kama_106",
     "num": 106,
     "title": "106. 岛屿的周长",
     "difficulty": "Medium",
@@ -2859,7 +2863,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_110",
+    "id": "algo_kama_110",
     "num": 110,
     "title": "110. 字符串接龙",
     "difficulty": "Medium",
@@ -2876,26 +2880,24 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_105",
+    "id": "algo_kama_105",
     "num": 105,
     "title": "105. 有向图的完全可达性",
     "difficulty": "Medium",
     "category": "图论",
     "topic": "图论",
     "leetcodeUrl": "https://kamacoder.com/problempage.php?pid=1177",
-    "pattern": "拓扑排序 / A* 启发式",
-    "timeComp": "O(n)",
-    "spaceComp": "O(n)",
+    "pattern": "有向图可达性搜索 / DFS / BFS",
+    "timeComp": "O(V + E)",
+    "spaceComp": "O(V)",
     "independent": true,
-    "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
-    "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
+    "mistakes": "注意有向边的单向性，从节点 1 开始遍历并使用 visited 数组统计遍历节点数。",
+    "projectLink": "对应分布式微服务拓扑可达性检测与强连通分支健康检查。",
     "isCarl": true,
-    "isHot100": true,
-    "hot100Chapter": "二叉树",
-    "hot100Order": 47
+    "isHot100": false
   },
   {
-    "id": "algo_107",
+    "id": "algo_kama_107",
     "num": 107,
     "title": "107. 寻找存在的路径",
     "difficulty": "Medium",
@@ -2912,7 +2914,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_108",
+    "id": "algo_kama_108",
     "num": 108,
     "title": "108. 冗余连接",
     "difficulty": "Medium",
@@ -2929,7 +2931,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_109",
+    "id": "algo_kama_109",
     "num": 109,
     "title": "109. 冗余连接II",
     "difficulty": "Medium",
@@ -2946,7 +2948,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_53",
+    "id": "algo_kama_53_prim",
     "num": 53,
     "title": "53. 寻宝-prim",
     "difficulty": "Medium",
@@ -2963,7 +2965,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_53",
+    "id": "algo_kama_53_kruskal",
     "num": 53,
     "title": "53. 寻宝-Kruskal",
     "difficulty": "Medium",
@@ -2980,7 +2982,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_117",
+    "id": "algo_kama_117",
     "num": 117,
     "title": "117. 软件构建",
     "difficulty": "Medium",
@@ -2997,7 +2999,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_47",
+    "id": "algo_kama_47_naive",
     "num": 47,
     "title": "47. 参会dijkstra朴素",
     "difficulty": "Medium",
@@ -3014,7 +3016,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_47",
+    "id": "algo_kama_47_heap",
     "num": 47,
     "title": "47. 参会dijkstra堆",
     "difficulty": "Medium",
@@ -3031,26 +3033,24 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_94",
+    "id": "algo_kama_94",
     "num": 94,
     "title": "94. 城市间货物运输I",
     "difficulty": "Medium",
     "category": "图论",
     "topic": "图论",
     "leetcodeUrl": "https://kamacoder.com/problempage.php?pid=1166",
-    "pattern": "拓扑排序 / A* 启发式",
-    "timeComp": "O(n)",
-    "spaceComp": "O(n)",
+    "pattern": "单源最短路 / Bellman-Ford 算法",
+    "timeComp": "O(V * E)",
+    "spaceComp": "O(V)",
     "independent": true,
-    "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
-    "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
+    "mistakes": "每轮对所有边松弛时必须使用上一轮 minDist 数组的副本，防止单轮多次松弛发生级联串通。",
+    "projectLink": "对应带负权指标的网络链路时延计算与动态路由协议收敛。",
     "isCarl": true,
-    "isHot100": true,
-    "hot100Chapter": "二叉树",
-    "hot100Order": 36
+    "isHot100": false
   },
   {
-    "id": "algo_94",
+    "id": "algo_kama_94_spfa",
     "num": 94,
     "title": "94. 城市间货物运输I-SPFA",
     "difficulty": "Medium",
@@ -3067,7 +3067,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_95",
+    "id": "algo_kama_95",
     "num": 95,
     "title": "95. 城市间货物运输II",
     "difficulty": "Medium",
@@ -3084,7 +3084,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_96",
+    "id": "algo_kama_96",
     "num": 96,
     "title": "96. 城市间货物运输III",
     "difficulty": "Medium",
@@ -3101,7 +3101,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_97",
+    "id": "algo_kama_97",
     "num": 97,
     "title": "97. 小明逛公园",
     "difficulty": "Medium",
@@ -3118,7 +3118,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isHot100": false
   },
   {
-    "id": "algo_126",
+    "id": "algo_kama_126",
     "num": 126,
     "title": "126. 骑士的攻击astar",
     "difficulty": "Medium",
@@ -3804,7 +3804,7 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "title": "35. 搜索插入位置",
     "difficulty": "Easy",
     "category": "数组",
-    "topic": "二分查找",
+    "topic": "数组",
     "leetcodeUrl": "https://leetcode.cn/problems/search-insert-position/",
     "pattern": "二分查找",
     "timeComp": "O(log n)",

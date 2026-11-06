@@ -27,7 +27,7 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-sm sm:text-base text-slate-900 dark:text-white">
           <ListTodo size={18} className="text-sky-600 dark:text-sky-400" />
-          <span>今日攻坚任务清单</span>
+          <span>今日任务清单</span>
         </div>
         <span className="text-xs text-slate-500 dark:text-slate-400">
           已完成 {completedCount} / {tasks.length} 项

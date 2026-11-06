@@ -67,11 +67,11 @@ export const SourceRoadmapView: React.FC = () => {
             <Layers size={22} />
           </span>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            muduo 核心源码演进路线与工程源码全集
+            源码路线
           </h1>
         </div>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-          涵盖从 Channel 事件分发到 One Loop Per Thread 全生命周期 8 阶演进，并提供 42 个生产级工程源码与单元测试文件在线精读。
+          包含 8 个源码演进阶段与工程源码文件阅读。
         </p>
 
         {/* Tab Toggle */}
@@ -85,7 +85,7 @@ export const SourceRoadmapView: React.FC = () => {
             }`}
           >
             <GitCommit size={15} />
-            <span>8 阶核心源码演进路线</span>
+            <span>8 个源码演进阶段</span>
           </button>
           <button
             onClick={() => setActiveTab('files')}
@@ -96,7 +96,7 @@ export const SourceRoadmapView: React.FC = () => {
             }`}
           >
             <FileCode size={15} />
-            <span>42 个真实工程源码全集</span>
+            <span>工程源码文件</span>
           </button>
         </div>
       </div>
@@ -166,7 +166,7 @@ export const SourceRoadmapView: React.FC = () => {
                           </span>
                         </div>
                         <div className="text-xs text-slate-500 mt-0.5">
-                          关联攻坚天数: Day {item.relatedDays.join(', Day ')}
+                          关联学习天数: Day {item.relatedDays.join(', Day ')}
                         </div>
                       </div>
                     </div>

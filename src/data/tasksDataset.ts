@@ -3,41 +3,42 @@ import { DailyTask } from "../types/index";
 export const DEFAULT_ROUTINE_TASKS: DailyTask[] = [
   {
     id: "task_algo",
-    title: "算法",
+    title: "算法练习",
     category: "算法",
     estimatedMinutes: 60,
     priority: "S",
     completed: false,
-    focusPoint: "Hot 100 / 代码随想录盲打手写，15 分钟无思路查卡，手写 AC",
+    focusPoint: "LeetCode Hot 100 / 代码随想录手写练习，15 分钟无思路查卡，手写 AC",
     linkTab: "algo"
   },
   {
-    id: "task_project",
-    title: "项目",
+    id: "task_ai_inference",
+    title: "AI 推理服务架构",
     category: "项目",
     estimatedMinutes: 90,
     priority: "S",
     completed: false,
-    focusPoint: "完成 CppAIService 核心模块开发与真实压测",
-    linkTab: "reader"
+    focusPoint: "ONNX Runtime / TensorRT C++ 运行时封装、模型加载与输入张量自适应",
+    linkTab: "practice"
   },
   {
-    id: "task_agent",
-    title: "Agent",
-    category: "AI",
-    estimatedMinutes: 30,
-    priority: "A",
+    id: "task_dynamic_batching",
+    title: "动态批处理引擎",
+    category: "架构",
+    estimatedMinutes: 60,
+    priority: "S",
     completed: false,
-    focusPoint: "阅读 MCP 规范与两段式 Tool Call 架构落地",
-    linkTab: "reader"
+    focusPoint: "Dynamic Batching 请求队列设计、超时调度机制与并发请求张量聚合",
+    linkTab: "practice"
   },
   {
-    id: "task_interview",
-    title: "牛客",
-    category: "求职",
+    id: "task_stream_eval",
+    title: "流式输出与并发评测",
+    category: "网络",
     estimatedMinutes: 45,
     priority: "A",
     completed: false,
-    focusPoint: "刷最新大厂 C++ 真实面经与 TCP/Linux 底层八股"
+    focusPoint: "SSE 长连接实时分块 Token 推送、首字延迟 (TTFT) 优化与并发压测",
+    linkTab: "practice"
   }
 ];

@@ -120,11 +120,11 @@ export const PitfallsView: React.FC = () => {
               <ShieldAlert size={22} />
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              C++ 底层踩坑、灾难案例与避坑铁律
+              问题记录
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-            收录内存越界、Double Free、Use-After-Free、悬挂引用等 {allPitfalls.length} 个经典灾难现场，错误与正确方案高亮对比。
+            收录常见 C++ 问题案例与排查记录，提供错误与正确代码对比。
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export const PitfallsView: React.FC = () => {
           type="button"
         >
           <Plus size={16} />
-          <span>记录新踩坑</span>
+          <span>记录新问题</span>
         </button>
       </div>
 
@@ -147,7 +147,7 @@ export const PitfallsView: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="搜索避坑标题、报错特征（如 SIGSEGV、double free）、原因或铁律..."
+            placeholder="搜索标题、报错信息、原因或总结..."
             className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition"
           />
         </div>
@@ -216,7 +216,7 @@ export const PitfallsView: React.FC = () => {
                 <div className="bg-rose-50/60 dark:bg-rose-950/20 p-3.5 rounded-xl border border-rose-100 dark:border-rose-900/30 space-y-1">
                   <div className="font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
                     <Flame size={14} />
-                    崩溃现场与现象 (Symptom):
+                    错误现象 (Symptom):
                   </div>
                   <p className="text-rose-900 dark:text-rose-200 leading-relaxed font-mono">
                     {item.errorSymptom}
@@ -239,7 +239,7 @@ export const PitfallsView: React.FC = () => {
                 <div>
                   <div className="font-bold text-xs text-rose-600 dark:text-rose-400 mb-1 flex items-center gap-1">
                     <AlertTriangle size={13} />
-                    灾难代码示例 (Buggy Code)
+                    错误代码示例 (Buggy Code)
                   </div>
                   <CodeBlock
                     code={item.errorCode}
@@ -268,7 +268,7 @@ export const PitfallsView: React.FC = () => {
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2">
                   <Lightbulb size={15} className="text-amber-500 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-slate-900 dark:text-white">工程铁律: </span>
+                    <span className="font-bold text-slate-900 dark:text-white">总结建议: </span>
                     <span>{item.conclusion}</span>
                   </div>
                 </div>
@@ -285,7 +285,7 @@ export const PitfallsView: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <h3 className="font-black text-lg text-slate-900 dark:text-white flex items-center gap-2">
                 <Plus size={18} className="text-sky-600" />
-                新增 C++ 踩坑攻坚档案
+                新增问题记录
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -298,7 +298,7 @@ export const PitfallsView: React.FC = () => {
             <form onSubmit={handleAddSubmit} className="space-y-3 text-xs sm:text-sm">
               <div>
                 <label className="font-bold block text-slate-700 dark:text-slate-300 mb-1">
-                  踩坑标题 *
+                  问题标题 *
                 </label>
                 <input
                   type="text"
@@ -378,7 +378,7 @@ export const PitfallsView: React.FC = () => {
 
               <div>
                 <label className="font-bold block text-slate-700 dark:text-slate-300 mb-1">
-                  工程避坑铁律与总结
+                  总结与建议
                 </label>
                 <input
                   type="text"

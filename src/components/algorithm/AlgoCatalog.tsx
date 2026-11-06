@@ -1,14 +1,19 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { AlgoCard } from './AlgoCard';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { Search, CheckCircle2, Filter } from 'lucide-react';
 
-const CARL_HOT100_CHAPTERS = [
+export const STANDARD_CATEGORIES = [
+  '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列',
+  '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'
+] as const;
+
+export const CARL_HOT100_CHAPTERS = [
   '哈希', '双指针', '滑动窗口', '子串', '普通数组', '矩阵', '链表',
   '二叉树', '图论', '回溯', '二分查找', '栈', '堆', '贪心算法',
   '动态规划', '多维动态规划', '技巧'
-];
+] as const;
 
 export const AlgoCatalog: React.FC = () => {
   const [viewTrack, setViewTrack] = useState<'all' | 'hot100' | 'carl'>('all');
@@ -18,6 +23,11 @@ export const AlgoCatalog: React.FC = () => {
     'completedAlgos',
     {}
   );
+
+  // Reset selected category when switching track
+  useEffect(() => {
+    setSelectedCategory('all');
+  }, [viewTrack]);
 
   // Filter problems based on viewTrack
   const trackProblems = useMemo(() => {
@@ -39,19 +49,14 @@ export const AlgoCatalog: React.FC = () => {
     if (viewTrack === 'hot100') {
       return CARL_HOT100_CHAPTERS;
     }
-    const set = new Set<string>();
-    trackProblems.forEach((p) => {
-      const cat = p.category || p.topic;
-      if (cat) set.add(cat);
-    });
-    return Array.from(set);
-  }, [viewTrack, trackProblems]);
+    return STANDARD_CATEGORIES;
+  }, [viewTrack]);
 
   // Category counts
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     trackProblems.forEach((p) => {
-      const key = viewTrack === 'hot100' ? p.hot100Chapter || '' : p.category || p.topic || '';
+      const key = viewTrack === 'hot100' ? p.hot100Chapter || '' : p.category || '';
       if (key) {
         counts[key] = (counts[key] || 0) + 1;
       }
@@ -59,20 +64,18 @@ export const AlgoCatalog: React.FC = () => {
     return counts;
   }, [viewTrack, trackProblems]);
 
-  // Filter problems based on search & category
+  // Filter problems based on search & category (strict 0 leakage)
   const displayedProblems = useMemo(() => {
     return trackProblems.filter((p) => {
       if (selectedCategory !== 'all') {
         if (viewTrack === 'hot100') {
           if (p.hot100Chapter !== selectedCategory) return false;
         } else {
-          if (p.category !== selectedCategory && p.topic !== selectedCategory) {
-            return false;
-          }
+          if (p.category !== selectedCategory) return false;
         }
       }
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
+        const q = searchQuery.toLowerCase().trim();
         const inTitle = p.title.toLowerCase().includes(q);
         const inNum = p.num !== null && String(p.num).includes(q);
         const inPattern = (p.pattern || '').toLowerCase().includes(q);
@@ -123,9 +126,6 @@ export const AlgoCatalog: React.FC = () => {
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               算法题库与刷题工作台
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              涵盖 LeetCode Hot 100 与代码随想录 179 题无损套路，盲打手写，双向状态联动。
-            </p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -198,7 +198,7 @@ export const AlgoCatalog: React.FC = () => {
         {viewTrack === 'hot100' && (
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 text-xs">
             <span className="font-semibold">路线说明:</span>
-            <span>严格遵循代码随想录官方 Hot 100 推荐的 17 个专题路线顺序学习，攻坚高频题。</span>
+            <span>按 17 个专题路线顺序练习题目。</span>
           </div>
         )}
       </div>
@@ -239,7 +239,7 @@ export const AlgoCatalog: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="搜索题号、题名或套路..."
+            placeholder="搜索题号或题名..."
             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-sky-500 transition shadow-2xs"
           />
         </div>
