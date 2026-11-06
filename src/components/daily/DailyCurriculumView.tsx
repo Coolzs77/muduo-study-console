@@ -27,11 +27,13 @@ import {
 interface DailyCurriculumViewProps {
   onJumpToQuiz?: (day: number) => void;
   selectedDayHighlight?: number | null;
+  onClearHighlight?: () => void;
 }
 
 export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
   onJumpToQuiz,
-  selectedDayHighlight
+  selectedDayHighlight,
+  onClearHighlight
 }) => {
   const [selectedDayNum, setSelectedDayNum] = useLocalStorage<number>(
     'curriculum_active_day',
@@ -50,8 +52,9 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
   useEffect(() => {
     if (selectedDayHighlight) {
       setSelectedDayNum(selectedDayHighlight);
+      onClearHighlight?.();
     }
-  }, [selectedDayHighlight, setSelectedDayNum]);
+  }, [selectedDayHighlight, onClearHighlight, setSelectedDayNum]);
 
   // Current active day
   const currentDay = useMemo(() => {
@@ -196,6 +199,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             return (
               <div
                 key={item.day}
+                id={`day-card-${item.day}`}
                 onClick={() => setSelectedDayNum(item.day)}
                 className={`group flex items-start gap-2.5 p-2.5 rounded-xl transition cursor-pointer text-xs ${
                   isSelected
@@ -258,7 +262,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
       {/* ==================================================================== */}
       {/* Middle Column: Core Task Workspace Canvas                            */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-6 max-w-4xl">
+      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-6">
         {/* Task Header */}
         <div className="border-b border-slate-200 dark:border-slate-800 pb-5 space-y-3">
           <div className="flex flex-wrap items-center gap-2">

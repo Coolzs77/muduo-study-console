@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { AlgoCard } from './AlgoCard';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { Search, CheckCircle2, CheckSquare, Dices, ExternalLink, BookOpen, FileEdit, ChevronDown, ChevronUp, Code2, Sparkles, Target } from 'lucide-react';
+import { Search, CheckCircle2, CheckSquare, Dices, ExternalLink } from 'lucide-react';
 
 export const STANDARD_CATEGORIES = [
   '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列',
@@ -25,8 +25,6 @@ export const AlgoCatalog: React.FC = () => {
     'completedAlgos',
     {}
   );
-  const [algoNotes, setAlgoNotes] = useLocalStorage<string>('muduo_algo_notes', '');
-  const [patternsOpen, setPatternsOpen] = useState(false);
 
   // Reset category when switching track
   useEffect(() => {
@@ -330,7 +328,7 @@ export const AlgoCatalog: React.FC = () => {
       {/* ==================================================================== */}
       {/* Middle Column: LeetCode-style Problem List                           */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-4 max-w-4xl">
+      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-4">
         {/* Search & Filter Toolbar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-2 border-b border-slate-200 dark:border-slate-800">
           {/* Difficulty Chips */}
@@ -528,61 +526,6 @@ export const AlgoCatalog: React.FC = () => {
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Algorithm Patterns Cheat-sheet */}
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2 text-xs">
-          <button
-            onClick={() => setPatternsOpen(!patternsOpen)}
-            type="button"
-            className="w-full flex items-center justify-between font-bold text-slate-800 dark:text-slate-200 cursor-pointer"
-          >
-            <div className="flex items-center gap-1.5">
-              <Code2 size={13} className="text-purple-500" />
-              <span>常用解题模版速查</span>
-            </div>
-            {patternsOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-          </button>
-
-          {patternsOpen && (
-            <div className="space-y-2 pt-1 text-[11px] animate-stagger">
-              <div className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 font-mono space-y-0.5">
-                <div className="text-purple-600 dark:text-purple-400 font-bold font-sans">滑动窗口收敛</div>
-                <div className="text-slate-600 dark:text-slate-400 text-[10px] leading-tight">
-                  while(r&lt;n)&#123; w[s[r]]++; while(inv) w[s[l]]--; ans=min(ans, r-l+1); r++; &#125;
-                </div>
-              </div>
-              <div className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 font-mono space-y-0.5">
-                <div className="text-sky-600 dark:text-sky-400 font-bold font-sans">二分查找闭区间</div>
-                <div className="text-slate-600 dark:text-slate-400 text-[10px] leading-tight">
-                  while(l&lt;=r)&#123; m=l+(r-l)/2; if(a[m]&gt;=t) r=m-1; else l=m+1; &#125; return l;
-                </div>
-              </div>
-              <div className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 font-mono space-y-0.5">
-                <div className="text-emerald-600 dark:text-emerald-400 font-bold font-sans">单调栈找更大元素</div>
-                <div className="text-slate-600 dark:text-slate-400 text-[10px] leading-tight">
-                  while(!st.empty() &amp;&amp; a[i]&gt;a[st.top()])&#123; res[st.top()]=a[i]; st.pop(); &#125;
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Algo Notes Scratchpad - Fills the vertical space completely */}
-        <div className="flex-1 flex flex-col space-y-1.5 min-h-[160px]">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-            <div className="flex items-center gap-1.5">
-              <FileEdit size={13} className="text-amber-500" />
-              <span>刷题心得与错题备忘</span>
-            </div>
-            <span className="text-[10px] text-slate-400 font-normal">自动保存</span>
-          </div>
-          <textarea
-            value={algoNotes}
-            onChange={e => setAlgoNotes(e.target.value)}
-            placeholder="记录高频题目的边界条件、易错点与时间复杂度分析..."
-            className="flex-1 w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition resize-none leading-relaxed"
-          />
         </div>
       </aside>
     </div>

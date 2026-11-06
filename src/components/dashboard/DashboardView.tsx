@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ActiveTab, DomainModule } from '../../types';
 import { YUQUE_DATASET } from '../../data/yuqueDataset';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
@@ -17,9 +17,7 @@ import {
   BookOpen,
   Bookmark,
   Briefcase,
-  Activity,
-  ArrowRight,
-  Sparkles
+  Activity
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -54,19 +52,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const masteredDaysCount = useMemo(() => {
     return Object.values(dayMastery).filter(lvl => lvl >= 4).length;
   }, [dayMastery]);
-
-  // Find next uncompleted day for Hero Spotlight
-  const heroDay = useMemo(() => {
-    const unmastered = DAYS_DATASET.find(d => (dayMastery[d.day] || 0) < 4);
-    return unmastered || DAYS_DATASET[0];
-  }, [dayMastery]);
-
-  // Interactive selected day on the calendar (defaults to heroDay)
-  const [selectedDayNum, setSelectedDayNum] = useState<number>(heroDay.day);
-
-  const selectedDay = useMemo(() => {
-    return DAYS_DATASET.find(d => d.day === selectedDayNum) || heroDay;
-  }, [selectedDayNum, heroDay]);
 
   const CPPAI_CORE_MODULES = [
     {
@@ -274,39 +259,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </h1>
         </div>
 
-        {/* Hero Spotlight Banner: 今日攻坚 (Bento Hero) */}
-        <div className="relative overflow-hidden p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-sky-500/5 dark:from-sky-950/40 dark:via-indigo-950/30 dark:to-slate-900/40 border border-sky-200/80 dark:border-sky-800/60 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="space-y-1.5 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-600 text-white shadow-2xs">
-                <Sparkles size={12} />
-                今日攻坚
-              </span>
-              <span className="text-xs font-mono font-bold text-sky-700 dark:text-sky-300">
-                Day {heroDay.day < 10 ? `0${heroDay.day}` : heroDay.day}
-              </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">
-                第 {heroDay.week} 周 · {calendarRows[heroDay.week - 1]?.label || '核心阶段'}
-              </span>
-            </div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
-              {SHORT_DAY_TITLES[heroDay.day] || heroDay.title}
-            </h2>
-            <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1">
-              达标核心: {typeof heroDay.check === 'object' ? heroDay.check.strict : heroDay.check}
-            </p>
-          </div>
-
-          <button
-            onClick={() => onNavigateToDay(heroDay.day)}
-            type="button"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition cursor-pointer active-press smooth-hover shrink-0"
-          >
-            <span>进入今日攻坚</span>
-            <ArrowRight size={14} />
-          </button>
-        </div>
-
         {/* 4 Bento KPI Metric Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* 任务 */}
@@ -416,7 +368,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* 28-Day Task Calendar: 任务日历 (Pure square aspect tiles with interactive Spotlight) */}
+        {/* 28-Day Task Calendar: 任务日历 (4 Rows x 7 Columns with concise task names and direct 1-click jump) */}
         <section className="space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div className="flex items-center gap-2">
@@ -438,48 +390,62 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          {/* 4 Rows x 7 Columns Square Aspect Tiles Grid */}
+          {/* 4 Rows x 7 Columns Direct Jump Matrix */}
           <div className="space-y-3">
             {calendarRows.map(row => (
               <div key={row.week} className="space-y-1.5">
                 <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 px-0.5">
                   {row.label}
                 </div>
-                <div className="grid grid-cols-7 gap-2 sm:gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
                   {row.days.map(d => {
                     const mastery = dayMastery[d.day] || 0;
                     const isMastered = mastery >= 4;
                     const isLearning = mastery >= 1 && mastery < 4;
-                    const isSelected = d.day === selectedDayNum;
+                    const shortTitle = SHORT_DAY_TITLES[d.day] || d.title;
 
                     return (
                       <button
                         key={d.day}
-                        onClick={() => setSelectedDayNum(d.day)}
-                        onDoubleClick={() => onNavigateToDay(d.day)}
+                        onClick={() => onNavigateToDay(d.day)}
                         type="button"
-                        className={`aspect-square rounded-xl p-1 sm:p-2 flex flex-col items-center justify-center transition-all cursor-pointer relative font-mono active-press smooth-hover ${
-                          isSelected
-                            ? 'ring-2 ring-sky-500 ring-offset-2 dark:ring-offset-slate-900 shadow-md '
-                            : ''
-                        } ${
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[5.25rem] active-press smooth-hover group ${
                           isMastered
-                            ? 'bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-xs'
+                            ? 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-600 shadow-xs'
                             : isLearning
-                            ? 'bg-sky-500 hover:bg-sky-600 text-white font-bold shadow-xs'
-                            : 'bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/60'
+                            ? 'bg-sky-500 hover:bg-sky-600 text-white border-sky-600 shadow-xs'
+                            : 'bg-white dark:bg-slate-900/80 border-slate-200/80 dark:border-slate-800 hover:border-sky-400 dark:hover:border-sky-600 text-slate-800 dark:text-slate-200'
                         }`}
-                        title={`Day ${d.day}: ${d.title} (单击查看详情，双击直达)`}
+                        title={`Day ${d.day}: ${d.title} (点击直达攻坚)`}
                       >
-                        <span className="text-xs sm:text-base font-extrabold tracking-tight">
-                          {d.day < 10 ? `0${d.day}` : d.day}
-                        </span>
-                        {isMastered && (
-                          <span className="text-[9px] hidden sm:block opacity-90 font-sans mt-0.5">已吃透</span>
-                        )}
-                        {isLearning && (
-                          <span className="text-[9px] hidden sm:block opacity-90 font-sans mt-0.5">学习中</span>
-                        )}
+                        <div className="flex items-center justify-between w-full">
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
+                              isMastered || isLearning
+                                ? 'bg-black/20 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}
+                          >
+                            D{d.day < 10 ? `0${d.day}` : d.day}
+                          </span>
+                          {isMastered ? (
+                            <span className="text-[10px] opacity-90 font-medium">✓ 已吃透</span>
+                          ) : isLearning ? (
+                            <span className="text-[10px] opacity-90 font-medium">学习中</span>
+                          ) : (
+                            <ChevronRight size={12} className="text-slate-300 dark:text-slate-600 group-hover:text-sky-500 transition-colors" />
+                          )}
+                        </div>
+
+                        <div
+                          className={`text-xs font-semibold line-clamp-2 leading-tight mt-1.5 ${
+                            isMastered || isLearning
+                              ? 'text-white'
+                              : 'text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                          }`}
+                        >
+                          {shortTitle}
+                        </div>
                       </button>
                     );
                   })}
@@ -487,52 +453,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             ))}
           </div>
-
-          {/* Active Day Spotlight Card: Details for selected Day */}
-          {selectedDay && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-stagger">
-              <div className="space-y-1.5 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-md text-xs font-mono font-bold bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-                    Day {selectedDay.day < 10 ? `0${selectedDay.day}` : selectedDay.day}
-                  </span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    第 {selectedDay.week} 周 · {calendarRows[selectedDay.week - 1]?.label}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
-                      (dayMastery[selectedDay.day] || 0) >= 4
-                        ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
-                        : (dayMastery[selectedDay.day] || 0) > 0
-                        ? 'bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300'
-                        : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    {(dayMastery[selectedDay.day] || 0) >= 4
-                      ? '已吃透'
-                      : (dayMastery[selectedDay.day] || 0) > 0
-                      ? '学习中'
-                      : '未开始'}
-                  </span>
-                </div>
-                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
-                  {selectedDay.title}
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1">
-                  达标核心: {typeof selectedDay.check === 'object' ? selectedDay.check.strict : selectedDay.check}
-                </p>
-              </div>
-
-              <button
-                onClick={() => onNavigateToDay(selectedDay.day)}
-                type="button"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition cursor-pointer active-press smooth-hover shrink-0"
-              >
-                <span>进入该任务攻坚</span>
-                <ChevronRight size={14} />
-              </button>
-            </div>
-          )}
         </section>
 
         {/* CppAIService Architecture Interactive Nodes */}
@@ -592,7 +512,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </main>
 
       {/* ========================================================= */}
-      {/* RIGHT COLUMN: Focus Timer & Daily Checklist (Optimized)   */}
+      {/* RIGHT COLUMN: Focus Timer & Daily Checklist               */}
       {/* ========================================================= */}
       <aside className="w-80 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden xl:block">
         {/* Real Focus Timer */}

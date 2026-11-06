@@ -100,6 +100,7 @@ export const App: React.FC = () => {
           <DailyCurriculumView
             onJumpToQuiz={handleNavigateToQuiz}
             selectedDayHighlight={highlightDay}
+            onClearHighlight={() => setHighlightDay(null)}
           />
         )}
         {activeTab === 'reader' && <KnowledgeReader />}
