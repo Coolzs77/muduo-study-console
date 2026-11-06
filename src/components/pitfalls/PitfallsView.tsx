@@ -111,7 +111,7 @@ export const PitfallsView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-6">
+    <div className="w-full space-y-6">
       {/* Top Banner */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

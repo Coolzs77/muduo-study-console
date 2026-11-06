@@ -1399,3 +1399,204 @@ node scripts/test_user_requirements.cjs
 - **`test_m1_challenger_adversarial.cjs`**：`35 Ran | 35 Passed | 0 Failed`；
 - **`test_milestones_2_3_4.cjs`**：`ALL MILESTONES 2, 3, 4 VERIFICATION CHECKS PASSED (7/7)!`；
 - **`test_user_requirements.cjs`**：`ALL UPDATED REQUIREMENTS VERIFIED SUCCESSFULLY! ✓`。
+
+
+---
+
+## 第 11 轮 [2026-11-06 19:00]：全局三栏文档工作台统一、28天语雀教案对齐与虚构数据清零
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与核心痛点**：
+  在系统持续使用过程中，用户提出了多项核心直观体验与工程对齐诉求：
+  1. **代码块容器样式**：原有代码块在黑夜模式下存在多层嵌套内框（`CodeBlock` 外层包裹了带背景和 padding 的容器，内部 `highlight.js` 的 `.hljs` 规则又自带深色背景与内边距），视觉体验割裂。要求参考 LeetCode 风格，采用单层平铺容器，背景根据日间（`#f8fafc`）与夜间（`#1e1e1e`）自动切换，去除冗余边框与内套层；
+  2. **仪表盘虚构数据清零**：原仪表盘中硬编码了“近 7 天每日专注投入 (分钟)”模拟柱状图（`[120, 150, 90, 180, 140, 210, 165]`）。用户明确表示“我不接受虚构”，要求坚决彻底剔除所有伪造数据，仅连接真实 `FocusTimer` 与今日实际学习时长；
+  3. **任务进度可视化重构**：原 28 天任务网格仅显示 1~28 数字小方块，无法直观看到具体任务标题与学习内容；
+  4. **Muduo 与 CppAIService 彻底解耦与真实对齐**：原 `daysDataset.ts` 依然混杂旧版 Muduo 网络库基础内容，未能真正落地 Kama-HTTPServer 与 CppAIService 的分离。要求将原版 28 天 Muduo 任务完整归档至独立数据仓储，新 28 天开发任务 100% 严格对齐语雀知识库权威文档（包括有限状态机 HTTP 报文解析、动态正则路由、会话管理与 CORS 中间件、MySQL 连接池、HTTPS/OpenSSL、五子棋对战业务、DashScope 大模型 curl 交互、RabbitMQ 异步解耦、OpenCV+ONNX 推理服务、多轮对话与面试问答等）；
+  5. **算法题库分类与视觉规范**：要求算法分类按知识专题配备独立的进度条与百分比达成率；彻底删除题目展开后填充的模板化内容（“常见问题与注意事项”、“工程实现映射”）及无意义展开按钮；去掉“分类: 数组”生硬字样，统一采用题目右侧彩标；Hot 100 题目仅标明“Hot 100”，并将原本扎眼的亮红色改为柔和护眼的琥珀色调；
+  6. **顶栏导航名称极简化**：顶栏 7 个主 Tab 中文名称精简化，按两字规范调整为：“仪表盘”、“任务”、“项目”、“算法”、“学习系统”、“源码路线”、“其他”，对标找工作所需的技能能力维度；
+  7. **全局 7 大 Tab 统一重构为三栏工作台**：针对用户“我不喜欢我的网页充斥着大量的卡片，我最满意的就是专栏阅读的 UI 布局，左侧栏导航，右侧栏也有导航”的明确要求，不仅将“任务”和“算法”重构，而是将顶栏全部 7 个功能模块（仪表盘、任务、项目、算法、学习系统、源码路线、其他）全面统一为三栏文档/清单工作台布局（左侧粘性目录树、中间核心画布、右侧辅助与状态面板），大幅压缩割裂的浮动卡片；
+  8. **专栏学习状态明确区分**：专栏阅读模块停止使用含义模糊的 `L1-5` 标识，通过显著的“✓ 已吃透”绿色徽章与章节进度条直观展示学习情况。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及文件清单**：
+  - [`src/components/common/CodeBlock.tsx`](file:///e:/workspace/muduo-study-console/src/components/common/CodeBlock.tsx)：重构为单层 LeetCode 风格代码块，移除嵌套 padding 与内层 background，配置一键复制代码与语言标头；
+  - [`src/index.css`](file:///e:/workspace/muduo-study-console/src/index.css)：重写 `.hljs` 全局样式（背景透明、padding 为 0），新增 LeetCode 亮色与暗色模式的专属语法高亮 token（关键字、字符串、类型、注释高对比度）；
+  - [`src/main.tsx`](file:///e:/workspace/muduo-study-console/src/main.tsx)：移除 `import 'highlight.js/styles/atom-one-dark.css'` 外部样式冲突源；
+  - [`src/components/layout/Header.tsx`](file:///e:/workspace/muduo-study-console/src/components/layout/Header.tsx)：精简导航文案为 7 大标准项（仪表盘、任务、项目、算法、学习系统、源码路线、其他）；
+  - [`src/data/muduoArchiveDataset.ts`](file:///e:/workspace/muduo-study-console/src/data/muduoArchiveDataset.ts)：新建原版 Muduo 28 天网络库历史教案归档数据仓储；
+  - [`src/data/daysDataset.ts`](file:///e:/workspace/muduo-study-console/src/data/daysDataset.ts)：依据 `yuqueDataset.ts` 权威篇章，完整重写 28 天任务数据集，涵盖 4 大阶段（基础框架、中间件与存储、智能推理引擎、多模态与全栈）；
+  - [`src/components/daily/DailyCurriculumView.tsx`](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)：全面重构为三栏工作台（左侧 4 周任务树与搜索过滤、中间任务要点与终端构建验证实验、右侧星级评定与自测直达）；
+  - [`src/components/algorithm/AlgoCard.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoCard.tsx)：删除填充手风琴盒子与多余文字，统一右侧彩标，Hot 100 柔和琥珀配色；
+  - [`src/components/algorithm/AlgoCatalog.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoCatalog.tsx)：全面重构为三栏工作台（左侧 12 分类独立进度条与达成率、中间 LeetCode 题目清单、右侧统计概览面板）；
+  - [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：全面重构为三栏工作台，彻底删除虚构的 7 天柱状图，任务网格重构为带 Day 编号、任务全称与掌握星级的清单，右侧接入真实 FocusTimer；
+  - [`src/components/learning/LearningSystemView.tsx`](file:///e:/workspace/muduo-study-console/src/components/learning/LearningSystemView.tsx)：全面重构为三栏工作台（左侧 5 大模块与章节树、中间知识清单与自测点、右侧进度追踪）；
+  - [`src/components/source/SourceRoadmapView.tsx`](file:///e:/workspace/muduo-study-console/src/components/source/SourceRoadmapView.tsx)：全面重构为三栏工作台（左侧 8 大组件与源文件树、中间 LeetCode 单层代码画布、右侧调用时序与掌握评定）；
+  - [`src/components/practice/PracticeCenterView.tsx`](file:///e:/workspace/muduo-study-console/src/components/practice/PracticeCenterView.tsx)：全面重构为三栏工作台，新增 Muduo 历史归档子模块；
+  - [`src/components/archive/MuduoArchiveView.tsx`](file:///e:/workspace/muduo-study-console/src/components/archive/MuduoArchiveView.tsx)：新建 Muduo 28 天历史归档独立阅读组件；
+  - [`src/components/reader/ArticleSidebar.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/ArticleSidebar.tsx) & [`MasterySelector.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/MasterySelector.tsx)：增加“✓ 已吃透”绿色徽章、文章分类进度条与语义化评定标签。
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### (1) 代码块双层嵌套边框与背景碰撞
+- **问题现象**：在暗色模式下，代码块呈现两个深色矩形嵌套：外层是由 `CodeBlock.tsx` 声明的容器，内层是由 `highlight.js` 的 `.hljs` 生成的内框，两者边距不一致，导致出现突兀的双层灰色边缘；
+- **根本原因 (RCA)**：`highlight.js` 默认主题样式自带 `padding: 0.5em; background: #282c34;`。同时 `CodeBlock` 外层又定义了 `p-4 rounded-xl border`，从而产生了双层盒子模型嵌套（Nested Box Collision）；
+- **具体解法**：在 `src/index.css` 中显式重写 `.hljs` 规则，将 `background: transparent !important; padding: 0 !important;` 强制归零，并在 `CodeBlock.tsx` 中实行单层容器结构，同时依据系统白天/黑夜模式动态派发背景色与字体色彩。
+
+#### (2) 任务进度网格纯数字不可读与内容不符
+- **问题现象**：原网格只有 1~28 数字框，用户完全不知道“点击数字 4 到底在学什么”，且点击后弹出的内容仍然是旧版 Muduo 网络库的 C++ 基础；
+- **根本原因 (RCA)**：旧版组件仅渲染了 `Array.from({length: 28})` 的索引按钮，且 `daysDataset.ts` 数据集是从最初的 C++ Primer 学习打卡表复制而来，未根据 Kama-HTTPServer 与 CppAIService 项目实际研发文档进行重组；
+- **具体解法**：
+  1. 编写生成脚本 `scripts/generate_all_28_days.cjs`，从 `yuqueDataset.ts` 权威篇章中提取 28 天任务标题、核心模块、考察重点与验证命令；
+  2. 重构网格为分组清单，清晰标注 `Day 01: 环境构建与单线程 Echo 服务器`、`Day 04: HttpContext 协议解析状态机` 等具体业务场景，直观展示掌握度与状态徽标。
+
+#### (3) 虚构数据违背工程诚信原则
+- **问题现象**：仪表盘展示了“近 7 天每日专注投入 (分钟)”折线/柱状图，但其数值全部由硬编码静态数组组成；
+- **根本原因 (RCA)**：早期原型为了界面美观填充了 mock 数据，未与真实时间追踪系统建立闭环连接，形成了虚假数据展示；
+- **具体解法**：彻底移除该假数据图表代码，右侧面板直接集成真实的 `FocusTimer`，只按系统真实时钟记录用户在当前控制台中的有效投入时间。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：全系统统一三栏文档/清单工作台拓扑架构图
+```mermaid
+flowchart TD
+    subgraph GlobalLayout ["全站统一三栏文档/清单工作台规范 (Standard 3-Column Workstation)"]
+        TopNav["顶部全局固定导航栏 (Header)\n仪表盘 · 任务 · 项目 · 算法 · 学习系统 · 源码路线 · 其他"]
+
+        subgraph ThreeColumnContainer ["弹性三栏布局容器 (flex w-full min-h-[calc(100vh-4rem)])"]
+            LeftCol["📌 左侧目录树导航 (Left Column)\n• 宽度: w-80 shrink-0\n• 样式: 粘性停靠 sticky top-16\n• 功能: 分组树、分类进度条、实时搜索过滤"]
+            CenterCol["📝 中间核心工作区 (Center Column)\n• 宽度: flex-1 min-w-0\n• 样式: 原生滚动、单层 LeetCode 风格代码\n• 功能: 清单/文档流、实验命令、深度技术剖析"]
+            RightCol["🛠️ 右侧大纲与辅助面板 (Right Column)\n• 宽度: w-72 ~ w-80 shrink-0\n• 样式: 粘性停靠 hidden xl:block\n• 功能: 状态评定选择器、真实番茄钟、调用链速查"]
+        end
+
+        TopNav --> ThreeColumnContainer
+        ThreeColumnContainer --> LeftCol & CenterCol & RightCol
+    end
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  三栏工作台消除了原有全站大量无边界浮动卡片造成的视觉噪点：
+  1. 页面顶部统一维持 `h-16` 固定高度导航栏，承载 7 个核心业务 Tab 与日夜切换开关；
+  2. 主内容区采用 `flex w-full`，左侧目录树栏设定为 `w-80 shrink-0` 粘性停靠，承载各模块的分类索引与独立达成率进度条；
+  3. 中间区域作为最大可伸缩工作台（`flex-1 min-w-0`），去除冗余嵌套卡片，以清爽的文档流和单层代码区展示核心代码与技术推导；
+  4. 右侧辅助栏设定为 `w-72 ~ w-80` 粘性停靠，仅在大屏下展示状态选择器、真实专注计时器及调用链拓扑，在中等屏幕下自动隐藏以保障核心阅读空间；
+- **底层架构收益**：
+  7 个主模块的 DOM 骨架与交互心智模型完全统一，用户在切换标签时无需重新适应排版逻辑，极大提升了学习与查阅的沉浸感。
+
+---
+
+#### 图 2：28 天开发任务与语雀权威项目演进数据流图
+```mermaid
+flowchart LR
+    subgraph DataSources ["数据源与分层解耦"]
+        YQ["📖 yuqueDataset.ts\n(17 篇权威 Kama-HTTPServer & CppAIService 章节)"]
+        MA["📦 muduoArchiveDataset.ts\n(Muduo 原版 28 天网络库历史教案)"]
+    end
+
+    subgraph GeneratorPipeline ["自动化生成与转换管线 (generate_all_28_days.cjs)"]
+        W1["第 1 周：基础框架与协议解析\n(Day 1~7: Socket/FSM/Regex)"]
+        W2["第 2 周：存储池化与工程中间件\n(Day 8~14: MySQL Pool/CORS/SSL)"]
+        W3["第 3 周：智能推理引擎与异步队列\n(Day 15~21: Gomoku/DashScope/RabbitMQ)"]
+        W4["第 4 周：视觉与会话全栈进阶\n(Day 22~28: OpenCV ONNX/Session/QA)"]
+    end
+
+    subgraph WorkstationView ["任务工作台呈现 (DailyCurriculumView)"]
+        DaysDS["DAYS_DATASET (28 天完整真实项目任务)"]
+        CenterCanvas["深度任务画布\n• 任务背景与核心考点\n• LeetCode 风格代码\n• 终端构建验证与严格辨析"]
+    end
+
+    YQ --> GeneratorPipeline
+    GeneratorPipeline --> DaysDS
+    DaysDS --> CenterCanvas
+    MA -.->|归档引用| ArchView["其他 > Muduo 历史归档"]
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  清晰展现了从语雀权威技术篇章到 28 天任务数据集的完整映射流水线：
+  1. 彻底解耦 Muduo 与 CppAIService，旧版 Muduo 28 天内容被封装入 `muduoArchiveDataset.ts` 作为底层 L4 传输网库归档；
+  2. 新 28 天任务严格依据 `yuqueDataset.ts` 真实工程划分 4 个阶段演进：第 1 周完成网络通信与 FSM 报文解析；第 2 周完成数据库连接池、CORS 与 SSL；第 3 周接入五子棋对战、DashScope 大模型 API 与 RabbitMQ 异步削峰；第 4 周完成 OpenCV 图像预处理与 ONNX 推理集成；
+  3. 生成的 `DAYS_DATASET` 统一注入三栏工作台，驱动任务详情画布展示真实代码与编译测试命令；
+- **底层架构收益**：
+  根除了此前数据混杂、名不副实的缺陷，确保学习系统中的任务与真实业务代码库具备 100% 的真实对齐。
+
+---
+
+#### 图 3：LeetCode 风格单层代码高亮与主题切换状态机
+```mermaid
+stateDiagram-v2
+    [*] --> LightTheme: 系统加载 (isDarkMode = false)
+
+    state LightTheme {
+        [*] --> RenderLightCode
+        RenderLightCode: 容器背景 #f8fafc / 边框 border-slate-200
+        RenderLightCode: hljs-keyword: #0969da (亮蓝)
+        RenderLightCode: hljs-string: #0a3069 (深蓝)
+        RenderLightCode: hljs-comment: #6e7781 (淡灰斜体)
+    }
+
+    LightTheme --> DarkTheme: 切换暗黑模式 (isDarkMode = true)
+
+    state DarkTheme {
+        [*] --> RenderDarkCode
+        RenderDarkCode: 容器背景 #1e1e1e / 边框 border-slate-800
+        RenderDarkCode: hljs-keyword: #569cd6 (高亮蓝)
+        RenderDarkCode: hljs-string: #ce9178 (暖橙)
+        RenderDarkCode: hljs-comment: #6a9955 (浅绿斜体)
+    }
+
+    DarkTheme --> LightTheme: 切换日间模式 (isDarkMode = false)
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了代码高亮机制如何与全站主题实现无感响应联动：
+  1. 废除外部固定样式的硬编码加载，将 `.hljs` 的内边距与固定背景色全部重置；
+  2. 在日间模式下，代码块自动吸附 `#f8fafc` 柔和浅灰底色，关键字渲染为 GitHub 经典 `#0969da` 蓝，保障长时间阅读不刺眼；
+  3. 在暗黑模式下，代码块自动吸附 `#1e1e1e` 经典 VS Code / LeetCode 暗底，语法 Token 切换为高对比度配色；
+- **底层架构收益**：
+  消除了多层边框导致的容器重叠突兀感，提供了与主流算法刷题平台完全一致的专业代码阅读体验。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **虚构数据 100% 清零**：全面剔除未与系统事件连接的假数据图表，保护用户对学习系统统计数据的绝对信任；
+- **视觉去卡片化**：摒弃悬浮大卡片的层层嵌套，全站 7 个 Tab 均遵循严谨的工作台分栏结构，信息密度与屏幕利用率大幅提升；
+- **算法题库分类进度一目了然**：12 大算法分类均具备 `已完成 / 总题数` 进度条与达成率百分比，Hot 100 题目使用柔和琥珀色标，去除了填充式占位文字；
+- **专栏已完成明确标识**：新增绿色 `✓ 已吃透` 徽标与目录树分类统计，学习成果清晰可见。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 静态类型检查
+cd e:\workspace\muduo-study-console
+npx tsc --noEmit
+
+# 2. 生产环境静态打包构建
+npm run build
+```
+
+#### (2) 实际运行结果断言
+- **`npx tsc --noEmit`**：退出码 `0`，0 个类型错误；
+- **`npm run build`**：
+  ```
+  ✓ 1824 modules transformed.
+  rendering chunks...
+  dist/index.html                     1.12 kB │ gzip:   0.62 kB
+  dist/assets/index-DcrIPK4a.css     74.54 kB │ gzip:  12.00 kB
+  dist/assets/index-D2t-X_Qp.js   2,499.43 kB │ gzip: 756.15 kB
+  ✓ built in 39.91s
+  ✓ Copied images/ to dist/images/
+  ✓ Successfully completed Vite production build
+  ✓ Copied classic.html -> dist/classic.html
+  [BUILD SUCCESS] Production ready static build in dist/
+  ```

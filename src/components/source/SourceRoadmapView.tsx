@@ -12,7 +12,12 @@ import {
   Copy,
   ChevronRight,
   Cpu,
-  BookOpen
+  BookOpen,
+  Check,
+  Code2,
+  Sparkles,
+  ArrowRight,
+  Bookmark
 } from 'lucide-react';
 
 export const SourceRoadmapView: React.FC = () => {
@@ -27,17 +32,37 @@ export const SourceRoadmapView: React.FC = () => {
     'muduo_roadmap_notes',
     {}
   );
+  const [selectedCompId, setSelectedCompId] = useState<string>(SOURCE_ROADMAP[0]?.id || 'channel');
 
   // File browser state
   const fileKeys = useMemo(() => Object.keys(CPPAI_SOURCES_MAP), []);
   const [selectedFile, setSelectedFile] = useState<string>(fileKeys[0] || '');
-  const [fileSearch, setFileSearch] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedCode, setCopiedCode] = useState(false);
 
+  // Active component
+  const currentComp = useMemo(() => {
+    return SOURCE_ROADMAP.find(c => c.id === selectedCompId) || SOURCE_ROADMAP[0];
+  }, [selectedCompId]);
+
+  // Filtered components
+  const filteredComponents = useMemo(() => {
+    if (!searchQuery.trim()) return SOURCE_ROADMAP;
+    const q = searchQuery.toLowerCase().trim();
+    return SOURCE_ROADMAP.filter(
+      c =>
+        c.name.toLowerCase().includes(q) ||
+        c.layer.toLowerCase().includes(q) ||
+        c.role.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
+
+  // Filtered files
   const filteredFiles = useMemo(() => {
-    if (!fileSearch.trim()) return fileKeys;
-    const q = fileSearch.toLowerCase().trim();
+    if (!searchQuery.trim()) return fileKeys;
+    const q = searchQuery.toLowerCase().trim();
     return fileKeys.filter(f => f.toLowerCase().includes(q));
-  }, [fileKeys, fileSearch]);
+  }, [fileKeys, searchQuery]);
 
   const handleStatusChange = (id: string, status: string) => {
     setComponentStatus(prev => ({ ...prev, [id]: status }));
@@ -58,259 +83,394 @@ export const SourceRoadmapView: React.FC = () => {
     return { lines, kb: (chars / 1024).toFixed(1) };
   }, [currentFileContent]);
 
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(currentFileContent);
+      setCopiedCode(true);
+      showToast('源码已复制到剪贴板', 'success');
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch {
+      showToast('复制失败，请手动选择', 'warning');
+    }
+  };
+
+  // Stats
+  const masteredCompCount = useMemo(() => {
+    return Object.values(componentStatus).filter(s => s === '已吃透').length;
+  }, [componentStatus]);
+
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-6">
-      {/* Top Banner */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div className="flex items-center gap-2.5">
-          <span className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
-            <Layers size={22} />
-          </span>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            源码路线
-          </h1>
+    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950">
+      {/* ========================================================= */}
+      {/* LEFT COLUMN: Roadmap Components & Source Files Directory  */}
+      {/* ========================================================= */}
+      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-4 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
+        <div>
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Code2 size={16} className="text-sky-600 dark:text-sky-400" />
+            <span>源码与架构路线</span>
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            核心组件演进与真实工程代码
+          </p>
         </div>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-          包含 8 个源码演进阶段与工程源码文件阅读。
-        </p>
 
-        {/* Tab Toggle */}
-        <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+        {/* View Switcher Pills */}
+        <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-200/60 dark:bg-slate-800/80 rounded-xl text-xs font-semibold">
           <button
-            onClick={() => setActiveTab('roadmap')}
-            className={`px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            onClick={() => {
+              setActiveTab('roadmap');
+              setSearchQuery('');
+            }}
+            type="button"
+            className={`py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === 'roadmap'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <GitCommit size={15} />
-            <span>8 个源码演进阶段</span>
+            <Layers size={13} />
+            <span>核心组件 (8)</span>
           </button>
           <button
-            onClick={() => setActiveTab('files')}
-            className={`px-4 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            onClick={() => {
+              setActiveTab('files');
+              setSearchQuery('');
+            }}
+            type="button"
+            className={`py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === 'files'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <FileCode size={15} />
-            <span>工程源码文件</span>
+            <FileCode size={13} />
+            <span>源文件 ({fileKeys.length})</span>
           </button>
         </div>
-      </div>
 
-      {/* View 1: 8 阶演进路线 */}
-      {activeTab === 'roadmap' && (
-        <div className="space-y-6">
-          {/* Stepper overview */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
-            {SOURCE_ROADMAP.map((item, idx) => {
-              const status = componentStatus[item.id] || '未读';
-              return (
-                <a
-                  key={item.id}
-                  href={`#roadmap-step-${item.id}`}
-                  className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-sky-500 transition text-center group block"
-                >
-                  <div className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400">
-                    Step {idx + 1}
-                  </div>
-                  <div className="font-bold text-xs text-slate-900 dark:text-white truncate mt-0.5">
-                    {item.name}
-                  </div>
-                  <div className="mt-1">
-                    <span
-                      className={`text-[9px] px-1.5 py-0.5 rounded-md font-medium ${
-                        status === '已吃透'
-                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                          : status === '精读中'
-                          ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                          : 'bg-slate-100 text-slate-500'
-                      }`}
-                    >
-                      {status}
-                    </span>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-
-          {/* Cards for each stage */}
-          <div className="space-y-5">
-            {SOURCE_ROADMAP.map((item, idx) => {
-              const status = componentStatus[item.id] || '未读';
-              const note = componentNotes[item.id] || '';
-
-              return (
-                <div
-                  key={item.id}
-                  id={`roadmap-step-${item.id}`}
-                  className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4"
-                >
-                  {/* Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-xl bg-sky-600 text-white font-mono font-black text-sm flex items-center justify-center shrink-0">
-                        {idx + 1}
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-black text-lg text-slate-900 dark:text-white">
-                            {item.name}
-                          </h3>
-                          <span className="text-xs px-2.5 py-0.5 rounded-md bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200/60 font-semibold">
-                            {item.layer}
-                          </span>
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          关联学习天数: Day {item.relatedDays.join(', Day ')}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Status selector */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400">精读状态:</span>
-                      <select
-                        value={status}
-                        onChange={e => handleStatusChange(item.id, e.target.value)}
-                        className="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 cursor-pointer"
-                      >
-                        <option value="未读">未读</option>
-                        <option value="精读中">精读中</option>
-                        <option value="已吃透">已吃透</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Role description */}
-                  <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50/60 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-                    <span className="font-bold text-slate-900 dark:text-white">架构定位与职责: </span>
-                    {item.role}
-                  </div>
-
-                  {/* Members & Functions Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-                    {/* Members */}
-                    <div className="bg-slate-50/50 dark:bg-slate-800/30 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
-                      <div className="font-sans font-bold text-xs text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <Cpu size={14} className="text-sky-500" />
-                        核心数据成员
-                      </div>
-                      <ul className="space-y-1.5 list-disc pl-4 text-slate-600 dark:text-slate-400">
-                        {item.members.map((m, mIdx) => (
-                          <li key={mIdx}>{m}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Functions */}
-                    <div className="bg-slate-50/50 dark:bg-slate-800/30 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
-                      <div className="font-sans font-bold text-xs text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <FileCode size={14} className="text-emerald-500" />
-                        核心成员函数
-                      </div>
-                      <ul className="space-y-1.5 list-disc pl-4 text-slate-600 dark:text-slate-400">
-                        {item.functions.map((f, fIdx) => (
-                          <li key={fIdx}>{f}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* C++ Features Used */}
-                  <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                    <span className="font-bold text-slate-500 mr-1">涉及关键现代 C++ 机制:</span>
-                    {item.cppFeatures.map((feat, fIdx) => (
-                      <span
-                        key={fIdx}
-                        className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/60 font-medium"
-                      >
-                        {feat}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Notes Area */}
-                  <div className="pt-2">
-                    <textarea
-                      value={note}
-                      onChange={e => handleNoteChange(item.id, e.target.value)}
-                      placeholder={`记录对 ${item.name} 源码的阅读思考与关键断言机制...`}
-                      rows={2}
-                      className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition leading-relaxed font-mono"
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        {/* Search Input */}
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-2.5 text-slate-400" />
+          <input
+            type="text"
+            placeholder={activeTab === 'roadmap' ? '搜索组件或职责...' : '搜索源文件名...'}
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          />
         </div>
-      )}
 
-      {/* View 2: 42 源码文件全集浏览器 */}
-      {activeTab === 'files' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left File List */}
-          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-              <input
-                type="text"
-                value={fileSearch}
-                onChange={e => setFileSearch(e.target.value)}
-                placeholder="搜索文件路径（共 42 个）..."
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden"
-              />
+        {/* Components Tree */}
+        {activeTab === 'roadmap' && (
+          <div className="space-y-1">
+            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
+              8 大核心组件
             </div>
+            {filteredComponents.map(comp => {
+              const isSelected = selectedCompId === comp.id;
+              const status = componentStatus[comp.id] || '未读';
+              const isMastered = status === '已吃透';
 
-            <div className="max-h-[600px] overflow-y-auto space-y-1 pr-1 font-mono text-xs">
-              {filteredFiles.map(filename => {
-                const isSelected = selectedFile === filename;
-                return (
-                  <button
-                    key={filename}
-                    onClick={() => setSelectedFile(filename)}
-                    className={`w-full text-left px-3 py-2 rounded-xl transition cursor-pointer flex items-center justify-between ${
-                      isSelected
-                        ? 'bg-sky-600 text-white font-bold shadow-xs'
-                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+              return (
+                <button
+                  key={comp.id}
+                  onClick={() => setSelectedCompId(comp.id)}
+                  type="button"
+                  className={`w-full text-left p-2.5 rounded-xl transition cursor-pointer flex items-start justify-between gap-2 border ${
+                    isSelected
+                      ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-300 dark:border-sky-800 text-sky-900 dark:text-sky-200'
+                      : 'bg-white dark:bg-slate-900/50 border-slate-200/70 dark:border-slate-800 hover:bg-slate-100/70 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <div className="font-bold text-xs flex items-center gap-1.5">
+                      <span>{comp.name}</span>
+                      {isMastered && (
+                        <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                      )}
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                      {comp.layer}
+                    </div>
+                  </div>
+
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded font-mono shrink-0 mt-0.5 ${
+                      isMastered
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                        : status === '学习中'
+                        ? 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                     }`}
                   >
-                    <span className="truncate">{filename}</span>
-                    <ChevronRight size={13} className="shrink-0 opacity-60" />
+                    {status}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Source Files Tree */}
+        {activeTab === 'files' && (
+          <div className="space-y-1">
+            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
+              工程文件列表
+            </div>
+            {filteredFiles.map(file => {
+              const isSelected = selectedFile === file;
+              const isCpp = file.endsWith('.cpp');
+              return (
+                <button
+                  key={file}
+                  onClick={() => setSelectedFile(file)}
+                  type="button"
+                  className={`w-full text-left px-2.5 py-2 rounded-xl text-xs font-mono transition cursor-pointer flex items-center justify-between gap-2 border ${
+                    isSelected
+                      ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-300 dark:border-sky-800 text-sky-900 dark:text-sky-200 font-bold'
+                      : 'bg-white dark:bg-slate-900/50 border-slate-200/70 dark:border-slate-800 hover:bg-slate-100/70 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <span className="truncate">{file}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded font-sans shrink-0 ${
+                      isCpp
+                        ? 'bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300'
+                        : 'bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300'
+                    }`}
+                  >
+                    {isCpp ? 'CPP' : 'H'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </aside>
+
+      {/* ========================================================= */}
+      {/* CENTER COLUMN: Component Deep-Dive or LeetCode Code View  */}
+      {/* ========================================================= */}
+      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto">
+        {activeTab === 'roadmap' && currentComp && (
+          <div className="space-y-6">
+            {/* Component Header */}
+            <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wider mb-1">
+                <Layers size={14} />
+                <span>{currentComp.layer}</span>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <h1 className="text-2xl font-black text-slate-900 dark:text-white font-mono">
+                  class {currentComp.name}
+                </h1>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                    componentStatus[currentComp.id] === '已吃透'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800'
+                      : componentStatus[currentComp.id] === '学习中'
+                      ? 'bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-950/80 dark:text-sky-300 dark:border-sky-800'
+                      : 'bg-slate-100 text-slate-600 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                  }`}
+                >
+                  {componentStatus[currentComp.id] || '未读'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                {currentComp.role}
+              </p>
+            </div>
+
+            {/* Core Member Variables */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                <Cpu size={14} className="text-sky-600" />
+                <span>核心成员变量与状态</span>
+              </h3>
+              <div className="space-y-1.5">
+                {currentComp.members.map((m, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200"
+                  >
+                    {m}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Key Methods */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                <FileCode size={14} className="text-emerald-600" />
+                <span>关键接口与核心函数实现</span>
+              </h3>
+              <div className="space-y-1.5">
+                {currentComp.functions.map((fn, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200"
+                  >
+                    {fn}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* C++ Features Used */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles size={14} className="text-amber-500" />
+                <span>所涉及现代 C++ 语法机制</span>
+              </h3>
+              <div className="flex flex-wrap gap-1.5">
+                {currentComp.cppFeatures.map((feat, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 rounded-lg text-xs font-mono bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60"
+                  >
+                    {feat}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Personal Study Notes */}
+            <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white">
+                学习心得与工程手记
+              </h3>
+              <textarea
+                rows={3}
+                placeholder="记录对该组件调用链、死锁防护或生命周期边界的理解..."
+                value={componentNotes[currentComp.id] || ''}
+                onChange={e => handleNoteChange(currentComp.id, e.target.value)}
+                className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500 resize-y"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* File Browser Mode: Full LeetCode Style Code Canvas */}
+        {activeTab === 'files' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div>
+                <h1 className="text-base font-bold font-mono text-slate-900 dark:text-white flex items-center gap-2">
+                  <FileCode size={16} className="text-sky-600" />
+                  <span>{selectedFile}</span>
+                </h1>
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  {fileStats.lines} 行 · {fileStats.kb} KB
+                </div>
+              </div>
+
+              <button
+                onClick={handleCopyCode}
+                type="button"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer shadow-2xs"
+              >
+                {copiedCode ? (
+                  <>
+                    <Check size={13} className="text-emerald-500" />
+                    <span>已复制</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={13} />
+                    <span>复制代码</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* LeetCode-style Code Block */}
+            <CodeBlock code={currentFileContent} language="cpp" />
+          </div>
+        )}
+      </main>
+
+      {/* ========================================================= */}
+      {/* RIGHT COLUMN: Component Mastery Selector & Architecture   */}
+      {/* ========================================================= */}
+      <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden xl:block">
+        <div>
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <GitCommit size={16} className="text-sky-600 dark:text-sky-400" />
+            <span>组件评定与架构链</span>
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            状态记录与核心调用拓扑
+          </p>
+        </div>
+
+        {/* Component Mastery Selector */}
+        {activeTab === 'roadmap' && currentComp && (
+          <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 space-y-2.5">
+            <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              设置 {currentComp.name} 掌握状态
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {(['已吃透', '学习中', '未读'] as const).map(st => {
+                const isCur = (componentStatus[currentComp.id] || '未读') === st;
+                return (
+                  <button
+                    key={st}
+                    onClick={() => handleStatusChange(currentComp.id, st)}
+                    type="button"
+                    className={`py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                      isCur
+                        ? st === '已吃透'
+                          ? 'bg-emerald-500 text-white shadow-xs'
+                          : st === '学习中'
+                          ? 'bg-sky-500 text-white shadow-xs'
+                          : 'bg-slate-500 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    {st}
                   </button>
                 );
               })}
             </div>
           </div>
+        )}
 
-          {/* Right Code Viewer */}
-          <div className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div>
-                <h3 className="font-mono font-bold text-sm text-slate-900 dark:text-white">
-                  {selectedFile}
-                </h3>
-                <div className="text-xs text-slate-400 font-mono mt-0.5">
-                  {fileStats.lines} 行代码 · 大小 {fileStats.kb} KB
-                </div>
-              </div>
-            </div>
-
-            {/* Syntax-highlighted code block */}
-            <CodeBlock
-              code={currentFileContent}
-              language="cpp"
-              title={selectedFile}
-              maxHeight="max-h-[650px]"
+        {/* Roadmap Total Progress */}
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200">
+            <span>核心组件已吃透</span>
+            <span className="font-mono text-emerald-600 dark:text-emerald-400">
+              {masteredCompCount} / {SOURCE_ROADMAP.length}
+            </span>
+          </div>
+          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+              style={{
+                width: `${Math.round((masteredCompCount / SOURCE_ROADMAP.length) * 100)}%`
+              }}
             />
           </div>
         </div>
-      )}
+
+        {/* Call Chain Topology Guidance */}
+        <div className="p-3.5 rounded-xl bg-slate-100/70 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-xs space-y-2">
+          <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+            <Layers size={14} className="text-sky-500" />
+            <span>核心调用时序</span>
+          </div>
+          <div className="text-[11px] font-mono text-slate-600 dark:text-slate-400 space-y-1 leading-relaxed">
+            <div>1. EventLoop::loop()</div>
+            <div>&nbsp;&nbsp;↳ Poller::poll()</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;↳ Channel::handleEvent()</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ TcpConnection::handleRead()</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ HttpContext::parseRequest()</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Router::route()</div>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 };

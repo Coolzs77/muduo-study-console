@@ -31,13 +31,13 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenEnvGuide
 }) => {
   const navItems: Array<{ id: ActiveTab; label: string; icon: React.ReactNode }> = [
-    { id: 'dashboard', label: '学习大盘', icon: <LayoutDashboard size={14} /> },
-    { id: 'daily', label: '28天任务', icon: <Calendar size={14} /> },
-    { id: 'reader', label: '专栏阅读', icon: <BookOpen size={14} /> },
-    { id: 'algo', label: '算法题库', icon: <CheckSquare size={14} /> },
+    { id: 'dashboard', label: '仪表盘', icon: <LayoutDashboard size={14} /> },
+    { id: 'daily', label: '任务', icon: <Calendar size={14} /> },
+    { id: 'reader', label: '项目', icon: <BookOpen size={14} /> },
+    { id: 'algo', label: '算法', icon: <CheckSquare size={14} /> },
     { id: 'learning', label: '学习系统', icon: <Bookmark size={14} /> },
     { id: 'source', label: '源码路线', icon: <Layers size={14} /> },
-    { id: 'practice', label: '综合实战', icon: <Briefcase size={14} /> }
+    { id: 'practice', label: '其他', icon: <Briefcase size={14} /> }
   ];
 
   return (

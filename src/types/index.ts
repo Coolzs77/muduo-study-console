@@ -11,7 +11,7 @@ export type ActiveTab =
   | 'source'
   | 'practice';
 
-export type PracticeSubTab = 'mapping' | 'career' | 'pitfalls' | 'quiz';
+export type PracticeSubTab = 'mapping' | 'career' | 'pitfalls' | 'quiz' | 'archive';
 
 export type ArchitectureLayer = 'L4_Transport' | 'L7_Protocol' | 'L7_AIService';
 

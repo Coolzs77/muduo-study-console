@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { DAYS_DATASET } from '../../data/daysDataset';
 import { DayCurriculumItem } from '../../types';
 import { CodeBlock } from '../common/CodeBlock';
@@ -12,11 +12,16 @@ import {
   Copy,
   Star,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
+  HelpCircle,
   FileEdit,
   Flame,
-  HelpCircle
+  ChevronLeft,
+  ChevronRight,
+  ShieldCheck,
+  Cpu,
+  Layers,
+  ArrowRight,
+  Check
 } from 'lucide-react';
 
 interface DailyCurriculumViewProps {
@@ -28,433 +33,489 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
   onJumpToQuiz,
   selectedDayHighlight
 }) => {
+  const [selectedDayNum, setSelectedDayNum] = useLocalStorage<number>(
+    'curriculum_active_day',
+    selectedDayHighlight || 1
+  );
+
   const [selectedWeek, setSelectedWeek] = useState<number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'unlearned' | 'mastered' | 'review'>('all');
-  const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>(() => {
-    // If a day is highlighted, expand it by default
-    if (selectedDayHighlight) return { [selectedDayHighlight]: true };
-    return { 1: true };
-  });
+  const [statusFilter, setStatusFilter] = useState<'all' | 'unlearned' | 'learning' | 'mastered'>('all');
 
-  // Local storage for mastery (0~5 stars) and notes
+  // Persisted state
   const [dayMastery, setDayMastery] = useLocalStorage<Record<number, number>>('muduo_day_mastery', {});
   const [dayNotes, setDayNotes] = useLocalStorage<Record<number, string>>('muduo_day_notes', {});
+  const [copiedCmd, setCopiedCmd] = useState(false);
 
-  // Toggle card expand/collapse
-  const toggleExpand = (day: number) => {
-    setExpandedDays(prev => ({ ...prev, [day]: !prev[day] }));
-  };
+  useEffect(() => {
+    if (selectedDayHighlight) {
+      setSelectedDayNum(selectedDayHighlight);
+    }
+  }, [selectedDayHighlight, setSelectedDayNum]);
 
-  const setMasteryLevel = (day: number, level: number) => {
-    setDayMastery(prev => {
-      const updated = { ...prev, [day]: level };
-      return updated;
-    });
-    showToast(`Day ${day} 掌握度已更新为 ${level} 阶`, 'success');
-  };
+  // Current active day
+  const currentDay = useMemo(() => {
+    return DAYS_DATASET.find(d => d.day === selectedDayNum) || DAYS_DATASET[0];
+  }, [selectedDayNum]);
 
-  const handleNoteChange = (day: number, text: string) => {
-    setDayNotes(prev => ({ ...prev, [day]: text }));
-  };
+  const currentIndex = DAYS_DATASET.findIndex(d => d.day === selectedDayNum);
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex < DAYS_DATASET.length - 1;
 
-  const handleCopyCommand = (cmd: string) => {
-    navigator.clipboard.writeText(cmd).then(() => {
-      showToast('实验命令已复制到剪贴板', 'success');
-    });
-  };
-
-  // Filtered dataset
+  // Filtered days for sidebar
   const filteredDays = useMemo(() => {
     return DAYS_DATASET.filter(item => {
-      // Week filter
-      if (selectedWeek !== 'all' && item.week !== selectedWeek) {
-        return false;
-      }
+      if (selectedWeek !== 'all' && item.week !== selectedWeek) return false;
 
-      // Status filter
       const mastery = dayMastery[item.day] || 0;
       if (statusFilter === 'unlearned' && mastery > 0) return false;
+      if (statusFilter === 'learning' && (mastery === 0 || mastery >= 4)) return false;
       if (statusFilter === 'mastered' && mastery < 4) return false;
-      if (statusFilter === 'review' && (mastery === 0 || mastery >= 5)) return false;
 
-      // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
-        const matchesDay = `day ${item.day}`.includes(q) || `day${item.day}`.includes(q);
-        const matchesTitle = item.title.toLowerCase().includes(q);
-        const matchesTags = (item.tags || []).some(t => t.toLowerCase().includes(q));
-        const matchesPoints = (item.points || []).some(p => p.toLowerCase().includes(q));
-        const matchesBook = item.bookRange.toLowerCase().includes(q);
-        if (!matchesDay && !matchesTitle && !matchesTags && !matchesPoints && !matchesBook) {
-          return false;
-        }
+        const inDay = `day ${item.day}`.includes(q) || `day${item.day}`.includes(q);
+        const inTitle = item.title.toLowerCase().includes(q);
+        const inTags = (item.tags || []).some(t => t.toLowerCase().includes(q));
+        const inRange = (item.bookRange || '').toLowerCase().includes(q);
+        if (!inDay && !inTitle && !inTags && !inRange) return false;
       }
-
       return true;
     });
   }, [selectedWeek, statusFilter, searchQuery, dayMastery]);
 
+  // Stats
   const stats = useMemo(() => {
     let masteredCount = 0;
     let inProgressCount = 0;
-    Object.values(dayMastery).forEach(lvl => {
+    DAYS_DATASET.forEach(d => {
+      const lvl = dayMastery[d.day] || 0;
       if (lvl >= 4) masteredCount++;
       else if (lvl > 0) inProgressCount++;
     });
-    return {
-      total: DAYS_DATASET.length,
-      mastered: masteredCount,
-      inProgress: inProgressCount,
-      unstarted: DAYS_DATASET.length - masteredCount - inProgressCount
-    };
+    const pct = Math.round((masteredCount / DAYS_DATASET.length) * 100);
+    return { mastered: masteredCount, inProgress: inProgressCount, total: DAYS_DATASET.length, pct };
   }, [dayMastery]);
 
+  const setMasteryLevel = (level: number) => {
+    setDayMastery(prev => ({ ...prev, [selectedDayNum]: level }));
+    const labels = ['未学', '快速了解', '掌握机制', '能口述原理', '✓ 已吃透 (独立编码)', '✓ 深度调优'];
+    showToast(`Day ${selectedDayNum} 掌握状态更新为: ${labels[level] || '已更新'}`, 'success');
+  };
+
+  const handleCopyBuild = (cmd: string) => {
+    navigator.clipboard.writeText(cmd).then(() => {
+      setCopiedCmd(true);
+      setTimeout(() => setCopiedCmd(false), 2000);
+      showToast('编译测试命令已复制', 'success');
+    });
+  };
+
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-6">
-      {/* Top Header Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
-              <Calendar size={22} />
-            </span>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              28天任务
-            </h1>
+    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+      {/* ==================================================================== */}
+      {/* Left Column: 4-Week & 28-Day Task Directory Tree                     */}
+      {/* ==================================================================== */}
+      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-[calc(100vh-4rem)] sticky top-16 select-none">
+        {/* Top Header & Search */}
+        <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
+              <Calendar size={16} className="text-sky-600 dark:text-sky-400" />
+              <span>任务大纲目录</span>
+              <span className="text-xs text-slate-400 font-normal">({filteredDays.length}/28)</span>
+            </div>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-            包含每日学习任务、掌握度记录与实验验证命令。
-          </p>
-        </div>
 
-        {/* Progress Metrics */}
-        <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800/60 px-4 py-3 rounded-xl border border-slate-200/80 dark:border-slate-700/60 shrink-0">
-          <div className="text-center">
-            <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
-              {stats.mastered}
-            </div>
-            <div className="text-[11px] text-slate-500 font-medium">已完成 (4~5星)</div>
-          </div>
-          <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
-          <div className="text-center">
-            <div className="text-lg font-black text-amber-500">
-              {stats.inProgress}
-            </div>
-            <div className="text-[11px] text-slate-500 font-medium">学习中 (1~3星)</div>
-          </div>
-          <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
-          <div className="text-center">
-            <div className="text-lg font-black text-slate-700 dark:text-slate-300">
-              {stats.unstarted}
-            </div>
-            <div className="text-[11px] text-slate-500 font-medium">待开始</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-        {/* Week Pill Tabs */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setSelectedWeek('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
-              selectedWeek === 'all'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
-          >
-            全部天数 (28)
-          </button>
-          {[1, 2, 3, 4].map(w => (
+          {/* Week Selector */}
+          <div className="grid grid-cols-5 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-lg text-xs font-medium text-center">
             <button
-              key={w}
-              onClick={() => setSelectedWeek(w)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
-                selectedWeek === w
-                  ? 'bg-sky-600 text-white shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              onClick={() => setSelectedWeek('all')}
+              className={`py-1 rounded-md transition cursor-pointer ${
+                selectedWeek === 'all'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              {w === 1
-                ? 'W1 AI 服务端与 ORT/TRT 封装'
-                : w === 2
-                ? 'W2 异步推理工作池与显存'
-                : w === 3
-                ? 'W3 动态批处理与调度引擎'
-                : 'W4 推理网关与流式 Token 压测'} (7)
+              全部
             </button>
-          ))}
-        </div>
+            {[1, 2, 3, 4].map(w => (
+              <button
+                key={w}
+                onClick={() => setSelectedWeek(w)}
+                className={`py-1 rounded-md transition cursor-pointer ${
+                  selectedWeek === w
+                    ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-300 font-semibold shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                W{w}
+              </button>
+            ))}
+          </div>
 
-        {/* Search & Status Controls */}
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+          {/* Progress Header */}
+          <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-slate-700 dark:text-slate-300">
+                28天攻坚完成率: {stats.mastered} / {stats.total} 天
+              </span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                {stats.pct}%
+              </span>
+            </div>
+            <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+              <div
+                className="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                style={{ width: `${stats.pct}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Search Box */}
+          <div className="relative">
+            <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="搜索天数（如 Day 1）、知识点、书目范围、标签..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition"
+              placeholder="搜索天数（如 Day 4）、主题..."
+              className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition"
             />
           </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
-            <select
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value as any)}
-              className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 focus:outline-hidden cursor-pointer"
-            >
-              <option value="all">全部掌握状态</option>
-              <option value="unlearned">待学项 (0 星)</option>
-              <option value="review">复习巩固中 (1~3 星)</option>
-              <option value="mastered">已完全攻克 (4~5 星)</option>
-            </select>
-          </div>
         </div>
-      </div>
 
-      {/* Curriculum Card List */}
-      <div className="space-y-4">
-        {filteredDays.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-400 text-sm">
-            未找到符合筛选条件的学习任务
-          </div>
-        ) : (
-          filteredDays.map(item => {
+        {/* Task List */}
+        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+          {filteredDays.map(item => {
+            const isSelected = item.day === selectedDayNum;
             const mastery = dayMastery[item.day] || 0;
-            const isExpanded = !!expandedDays[item.day];
-            const note = dayNotes[item.day] || '';
+            const isMastered = mastery >= 4;
+            const isLearning = mastery > 0 && mastery < 4;
 
             return (
               <div
                 key={item.day}
-                id={`day-card-${item.day}`}
-                className={`bg-white dark:bg-slate-900 rounded-2xl border transition shadow-2xs overflow-hidden ${
-                  selectedDayHighlight === item.day
-                    ? 'border-sky-500 ring-2 ring-sky-500/20'
-                    : 'border-slate-200 dark:border-slate-800'
+                onClick={() => setSelectedDayNum(item.day)}
+                className={`group flex items-start gap-2.5 p-2.5 rounded-xl transition cursor-pointer text-xs ${
+                  isSelected
+                    ? 'bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-900 text-sky-900 dark:text-sky-100'
+                    : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent text-slate-700 dark:text-slate-300'
                 }`}
               >
-                {/* Header (Always Visible) */}
-                <div
-                  onClick={() => toggleExpand(item.day)}
-                  className="p-5 cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none"
-                >
-                  <div className="flex items-start sm:items-center gap-3">
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="w-8 h-8 rounded-xl bg-sky-600 text-white font-mono font-black text-xs flex items-center justify-center">
-                        D{item.day}
-                      </span>
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
-                        W{item.week}
-                      </span>
-                      <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-900/60">
-                        Tier {item.tier}
-                      </span>
-                    </div>
-
-                    <div>
-                      <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
-                        {item.title}
-                        {mastery >= 4 && (
-                          <CheckCircle2 size={16} className="text-emerald-500 shrink-0 inline" />
-                        )}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        <BookOpen size={12} className="shrink-0" />
-                        <span>{item.bookRange}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Header Controls */}
-                  <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
-                    {/* Star Rating Buttons */}
-                    <div
-                      className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800/80 px-2 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      {[1, 2, 3, 4, 5].map(star => (
-                        <button
-                          key={star}
-                          onClick={() => setMasteryLevel(item.day, mastery === star ? 0 : star)}
-                          title={`${star} 阶掌握度`}
-                          className="p-0.5 transition cursor-pointer hover:scale-110 active:scale-95"
-                          type="button"
-                        >
-                          <Star
-                            size={14}
-                            className={
-                              star <= mastery
-                                ? 'fill-amber-400 text-amber-400'
-                                : 'text-slate-300 dark:text-slate-600'
-                            }
-                          />
-                        </button>
-                      ))}
-                      <span className="text-[10px] font-mono font-bold text-slate-500 ml-1">
-                        {mastery}/5
-                      </span>
-                    </div>
-
-                    {/* Expand Toggle */}
-                    <button
-                      className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 transition"
-                      aria-label="展开或收起"
-                    >
-                      {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                    </button>
-                  </div>
+                {/* Day Badge */}
+                <div className="flex flex-col items-center shrink-0 mt-0.5">
+                  <span
+                    className={`px-1.5 py-0.5 rounded-md flex items-center justify-center font-mono text-[10px] font-bold ${
+                      isMastered
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : isSelected
+                        ? 'bg-sky-600 text-white'
+                        : isLearning
+                        ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                    }`}
+                  >
+                    D{item.day < 10 ? `0${item.day}` : item.day}
+                  </span>
                 </div>
 
-                {/* Expanded Content */}
-                {isExpanded && (
-                  <div className="px-5 pb-6 pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-5 text-xs sm:text-sm">
-                    {/* Tags */}
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {item.tags.map((tag, tIdx) => (
-                          <span
-                            key={tIdx}
-                            className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/40"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
+                {/* Day Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="font-semibold truncate leading-snug" title={item.title}>
+                      {item.title}
+                    </span>
+                    {isMastered && (
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                        ✓ 已吃透
+                      </span>
                     )}
-
-                    {/* Core Points */}
-                    <div className="space-y-1.5">
-                      <div className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <Flame size={13} className="text-rose-500" />
-                        核心要点
-                      </div>
-                      <ul className="space-y-1.5 pl-4 list-disc text-slate-700 dark:text-slate-300 leading-relaxed">
-                        {item.points.map((pt, pIdx) => (
-                          <li
-                            key={pIdx}
-                            dangerouslySetInnerHTML={{ __html: pt }}
-                          />
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Muduo Mapping & Check */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-xs">
-                      <div>
-                        <span className="font-bold text-sky-700 dark:text-sky-300">Muduo 源码落地: </span>
-                        <span className="text-slate-600 dark:text-slate-300">{item.muduoMap}</span>
-                      </div>
-                      <div>
-                        <span className="font-bold text-emerald-700 dark:text-emerald-300">验收标准: </span>
-                        <span className="text-slate-600 dark:text-slate-300">
-                          {typeof item.check === 'string' ? item.check : item.check?.strict || item.check?.quick || ''}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Code Sample */}
-                    {item.code && (
-                      <div>
-                        <div className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5">
-                          <Terminal size={13} className="text-sky-500" />
-                          核心验证代码
-                        </div>
-                        <CodeBlock code={item.code} language="cpp" title={`Day ${item.day} 代码示例`} />
-                      </div>
+                    {isLearning && (
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-medium bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 shrink-0">
+                        学习中
+                      </span>
                     )}
-
-                    {/* Experiment Section */}
-                    {item.experiment && (
-                      <div className="bg-sky-50/50 dark:bg-sky-950/20 rounded-xl p-4 border border-sky-100 dark:border-sky-900/40 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="font-bold text-xs uppercase tracking-wider text-sky-800 dark:text-sky-300 flex items-center gap-1.5">
-                            <Terminal size={14} className="text-sky-600" />
-                            可复现实验目标: {item.experiment.goal}
-                          </div>
-                          {item.experiment.buildCommand && (
-                            <button
-                              onClick={() => handleCopyCommand(item.experiment!.buildCommand!)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sky-600 dark:text-sky-400 text-xs font-semibold hover:bg-sky-50 dark:hover:bg-slate-700 transition cursor-pointer"
-                              type="button"
-                            >
-                              <Copy size={12} />
-                              <span>复制实验指令</span>
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Steps */}
-                        {item.experiment.steps && (
-                          <div className="space-y-1">
-                            <div className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">实验执行步骤:</div>
-                            <ol className="list-decimal pl-4 space-y-1 text-slate-700 dark:text-slate-300 text-xs">
-                              {item.experiment.steps.map((step, sIdx) => (
-                                <li key={sIdx}>{step}</li>
-                              ))}
-                            </ol>
-                          </div>
-                        )}
-
-                        {/* Build Command Display */}
-                        {item.experiment.buildCommand && (
-                          <div>
-                            <div className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">终端编译与运行指令:</div>
-                            <div className="bg-slate-900 text-emerald-400 font-mono text-xs px-3 py-2 rounded-lg border border-slate-800 overflow-x-auto flex items-center justify-between">
-                              <span>$ {item.experiment.buildCommand}</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Expected Output */}
-                        {item.experiment.expectedOutput && (
-                          <div className="text-xs">
-                            <span className="font-semibold text-slate-600 dark:text-slate-400">预期输出: </span>
-                            <span className="font-mono text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
-                              {item.experiment.expectedOutput}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Notes Area & Bottom Actions */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                          <FileEdit size={13} className="text-amber-500" />
-                          个人手记与调试笔记 (实时本地保存)
-                        </label>
-                        {item.quiz && onJumpToQuiz && (
-                          <button
-                            onClick={() => onJumpToQuiz(item.day)}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
-                            type="button"
-                          >
-                            <HelpCircle size={13} />
-                            <span>前往 Day {item.day} 自测中心 (5题) &rarr;</span>
-                          </button>
-                        )}
-                      </div>
-                      <textarea
-                        value={note}
-                        onChange={e => handleNoteChange(item.day, e.target.value)}
-                        placeholder={`记录关于 Day ${item.day} 的学习笔记、报错排查或思考...`}
-                        rows={3}
-                        className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition leading-relaxed resize-y font-mono"
-                      />
-                    </div>
                   </div>
-                )}
+                  <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                    <span className="truncate">W{item.week}</span>
+                    <span>•</span>
+                    <span className="truncate">{item.tags?.[0] || '核心实战'}</span>
+                    <span>•</span>
+                    <span>{item.estimatedMinutes || 90}分</span>
+                  </div>
+                </div>
               </div>
             );
-          })
+          })}
+
+          {filteredDays.length === 0 && (
+            <div className="py-12 text-center text-xs text-slate-400">
+              无匹配任务
+            </div>
+          )}
+        </div>
+      </aside>
+
+      {/* ==================================================================== */}
+      {/* Middle Column: Core Task Workspace Canvas                            */}
+      {/* ==================================================================== */}
+      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-6 max-w-4xl">
+        {/* Task Header */}
+        <div className="border-b border-slate-200 dark:border-slate-800 pb-5 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-lg bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 text-xs font-black font-mono">
+              第 {currentDay.week} 周 · Day {currentDay.day}
+            </span>
+            <span className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-semibold">
+              考点等级: Tier {currentDay.tier}
+            </span>
+            <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[11px]">
+              预计 {currentDay.estimatedMinutes || 90} 分钟
+            </span>
+          </div>
+
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+            {currentDay.title}
+          </h1>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 pt-1">
+            <span className="font-semibold text-slate-700 dark:text-slate-300">对照专栏:</span>
+            <span>{currentDay.bookRange}</span>
+          </div>
+
+          {currentDay.tags && currentDay.tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              {currentDay.tags.map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="px-2 py-0.5 rounded text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Section 1: 核心要点 (Key Technical Points) */}
+        <section className="space-y-3">
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+            <Flame size={16} className="text-amber-500" />
+            <span>核心技术要点与设计意图</span>
+          </h2>
+          <div className="space-y-2 text-[13.5px] leading-relaxed text-slate-700 dark:text-slate-300">
+            {currentDay.points.map((pt, idx) => (
+              <div key={idx} className="flex items-start gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mt-2 shrink-0" />
+                <span dangerouslySetInnerHTML={{ __html: pt }} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Section 2: 核心代码实现 (Code Implementation) */}
+        {currentDay.code && (
+          <section className="space-y-2">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+              <Terminal size={16} className="text-sky-500" />
+              <span>核心 C++ 源码实现</span>
+            </h2>
+            <CodeBlock code={currentDay.code} language="cpp" title={`Day ${currentDay.day} - 核心源码`} />
+          </section>
         )}
-      </div>
+
+        {/* Section 3: 架构深潜与实验步骤 (Experiment) */}
+        {currentDay.experiment && (
+          <section className="space-y-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Cpu size={16} className="text-indigo-500" />
+              <span>实验验证与避坑指南</span>
+            </h2>
+
+            <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+              <strong className="text-slate-800 dark:text-slate-200">实验目标: </strong>
+              {currentDay.experiment.goal}
+            </div>
+
+            {currentDay.experiment.steps && currentDay.experiment.steps.length > 0 && (
+              <div className="space-y-1.5 pt-1 text-xs text-slate-600 dark:text-slate-400">
+                <div className="font-semibold text-slate-700 dark:text-slate-300">实操步骤:</div>
+                {currentDay.experiment.steps.map((st, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="font-mono text-sky-600 dark:text-sky-400 font-bold">{i + 1}.</span>
+                    <span>{st}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {currentDay.experiment.expectedOutput && (
+              <div className="text-xs pt-1 text-slate-600 dark:text-slate-400">
+                <span className="font-semibold text-slate-700 dark:text-slate-300">预期输出: </span>
+                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">{currentDay.experiment.expectedOutput}</span>
+              </div>
+            )}
+
+            {currentDay.experiment.buildCommand && (
+              <div className="pt-2">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                  <span>编译运行命令:</span>
+                  <button
+                    onClick={() => handleCopyBuild(currentDay.experiment!.buildCommand!)}
+                    className="flex items-center gap-1 text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                  >
+                    {copiedCmd ? <Check size={11} /> : <Copy size={11} />}
+                    <span>{copiedCmd ? '已复制' : '复制命令'}</span>
+                  </button>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-900 text-sky-300 font-mono text-xs overflow-x-auto select-all">
+                  {currentDay.experiment.buildCommand}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Section 4: 细微辨析 (Nuance) */}
+        {currentDay.rigorousNuance && (
+          <section className="space-y-2">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+              <ShieldCheck size={16} className="text-emerald-500" />
+              <span>快速认知 vs 严谨工程认知</span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50 space-y-1">
+                <div className="font-bold text-amber-800 dark:text-amber-300">常见表面理解:</div>
+                <p className="text-amber-900/80 dark:text-amber-200/80 leading-relaxed">
+                  {typeof currentDay.rigorousNuance === 'object' && currentDay.rigorousNuance !== null
+                    ? currentDay.rigorousNuance.quick
+                    : String(currentDay.rigorousNuance || '')}
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 space-y-1">
+                <div className="font-bold text-emerald-800 dark:text-emerald-300">严谨底层机理:</div>
+                <p className="text-emerald-900/80 dark:text-emerald-200/80 leading-relaxed">
+                  {typeof currentDay.rigorousNuance === 'object' && currentDay.rigorousNuance !== null
+                    ? currentDay.rigorousNuance.strict
+                    : typeof currentDay.check === 'string'
+                    ? currentDay.check
+                    : ''}
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Bottom Pagination */}
+        <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-slate-800 text-xs">
+          <button
+            onClick={() => hasPrev && setSelectedDayNum(DAYS_DATASET[currentIndex - 1].day)}
+            disabled={!hasPrev}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition cursor-pointer ${
+              hasPrev
+                ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'opacity-40 cursor-not-allowed text-slate-400'
+            }`}
+          >
+            <ChevronLeft size={14} />
+            <span>上一天 (Day {hasPrev ? DAYS_DATASET[currentIndex - 1].day : ''})</span>
+          </button>
+
+          <button
+            onClick={() => hasNext && setSelectedDayNum(DAYS_DATASET[currentIndex + 1].day)}
+            disabled={!hasNext}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition cursor-pointer ${
+              hasNext
+                ? 'bg-sky-600 text-white hover:bg-sky-700 shadow-xs'
+                : 'opacity-40 cursor-not-allowed text-slate-400'
+            }`}
+          >
+            <span>下一天 (Day {hasNext ? DAYS_DATASET[currentIndex + 1].day : ''})</span>
+            <ChevronRight size={14} />
+          </button>
+        </div>
+      </main>
+
+      {/* ==================================================================== */}
+      {/* Right Column: Mastery Rating, Quiz Launcher & Daily Notes             */}
+      {/* ==================================================================== */}
+      <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-5 select-none overflow-y-auto">
+        {/* Mastery Rating */}
+        <div className="space-y-2">
+          <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            掌握状态标记
+          </h3>
+          <div className="space-y-1">
+            {[
+              { lvl: 0, label: '0 未开始', desc: '尚未研读' },
+              { lvl: 1, label: '1 概念通读', desc: '阅读背景与定位' },
+              { lvl: 2, label: '2 机制掌握', desc: '理清调用链时序' },
+              { lvl: 3, label: '3 熟练阐述', desc: '口述方案与设计' },
+              { lvl: 4, label: '4 ✓ 独立编码', desc: '手写核心类与逻辑' },
+              { lvl: 5, label: '5 ✓ 彻底吃透', desc: '排障与生产级优化' }
+            ].map(tier => {
+              const currentLvl = dayMastery[currentDay.day] || 0;
+              const isSelected = currentLvl === tier.lvl;
+              return (
+                <button
+                  key={tier.lvl}
+                  onClick={() => setMasteryLevel(tier.lvl)}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition cursor-pointer text-left ${
+                    isSelected
+                      ? tier.lvl >= 4
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800'
+                        : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-800'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  <span>{tier.label}</span>
+                  {isSelected && <Check size={12} className={tier.lvl >= 4 ? 'text-emerald-500' : 'text-sky-500'} />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Check Criteria */}
+        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5 text-xs">
+          <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+            <CheckCircle2 size={13} className="text-emerald-500" />
+            <span>自检达标标准</span>
+          </div>
+          <p className="text-slate-600 dark:text-slate-400 text-[11.5px] leading-relaxed">
+            {typeof currentDay.check === 'object' ? currentDay.check.strict : currentDay.check}
+          </p>
+        </div>
+
+        {/* Quiz Launcher */}
+        {onJumpToQuiz && (
+          <button
+            onClick={() => onJumpToQuiz(currentDay.day)}
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold transition cursor-pointer"
+          >
+            <HelpCircle size={14} />
+            <span>进入 Day {currentDay.day} 专属自测</span>
+          </button>
+        )}
+
+        {/* Daily Notes Scratchpad */}
+        <div className="flex-1 flex flex-col space-y-1.5 min-h-[160px]">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
+            <div className="flex items-center gap-1">
+              <FileEdit size={13} />
+              <span>随堂攻坚笔记</span>
+            </div>
+            <span className="text-[10px] text-slate-400">自动保存</span>
+          </div>
+          <textarea
+            value={dayNotes[currentDay.day] || ''}
+            onChange={e => setDayNotes(prev => ({ ...prev, [currentDay.day]: e.target.value }))}
+            placeholder="记录踩坑心得、参数细节与思考..."
+            className="flex-1 w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition resize-none leading-relaxed"
+          />
+        </div>
+      </aside>
     </div>
   );
 };

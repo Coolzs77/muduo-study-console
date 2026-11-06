@@ -8,12 +8,12 @@ interface MasterySelectorProps {
 }
 
 const MASTERY_TIERS = [
-  { level: 0, label: 'L0 未读', color: 'slate', desc: '尚未研读' },
-  { level: 1, label: 'L1 了解', color: 'amber', desc: '通读概念' },
-  { level: 2, label: 'L2 理解', color: 'sky', desc: '理清时序与状态机' },
-  { level: 3, label: 'L3 能够解释', color: 'indigo', desc: '清晰口述架构亮点' },
-  { level: 4, label: 'L4 能够编码', color: 'emerald', desc: '独立重构核心模块' },
-  { level: 5, label: 'L5 能够应用', color: 'purple', desc: '深入排障与生产调优' },
+  { level: 0, label: '未读', desc: '尚未研读' },
+  { level: 1, label: '了解概念', desc: '通读核心概念与背景' },
+  { level: 2, label: '理清时序', desc: '理清调用链与状态机' },
+  { level: 3, label: '能够阐述', desc: '口述架构亮点与设计取舍' },
+  { level: 4, label: '✓ 已吃透 (独立编码)', desc: '独立编写与重构核心模块' },
+  { level: 5, label: '✓ 生产调优', desc: '深入排障与生产级性能调优' },
 ];
 
 export const MasterySelector: React.FC<MasterySelectorProps> = ({

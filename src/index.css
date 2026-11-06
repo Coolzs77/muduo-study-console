@@ -182,3 +182,33 @@
 .dark .reading-content img {
   border-color: #334155;
 }
+
+/* ========================================================================== */
+/* LeetCode 语法高亮自适应 (白天模式 & 夜间模式) */
+/* ========================================================================== */
+.hljs {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* 白天模式 (LeetCode 浅色语法高亮) */
+.hljs-keyword, .hljs-selector-tag { color: #d73a49 !important; font-weight: 600; }
+.hljs-built_in, .hljs-type { color: #005cc5 !important; }
+.hljs-string, .hljs-title { color: #22863a !important; }
+.hljs-comment, .hljs-quote { color: #6a737d !important; font-style: italic; }
+.hljs-number, .hljs-literal { color: #005cc5 !important; }
+.hljs-function { color: #6f42c1 !important; }
+.hljs-attr, .hljs-variable, .hljs-template-variable { color: #e36209 !important; }
+.hljs-params { color: #24292e !important; }
+
+/* 夜间模式 (LeetCode 深色语法高亮) */
+.dark .hljs-keyword, .dark .hljs-selector-tag { color: #c678dd !important; font-weight: 600; }
+.dark .hljs-built_in, .dark .hljs-type { color: #e5c07b !important; }
+.dark .hljs-string, .dark .hljs-title { color: #98c379 !important; }
+.dark .hljs-comment, .dark .hljs-quote { color: #7f848e !important; font-style: italic; }
+.dark .hljs-number, .dark .hljs-literal { color: #d19a66 !important; }
+.dark .hljs-function { color: #61afef !important; }
+.dark .hljs-attr, .dark .hljs-variable, .dark .hljs-template-variable { color: #e06c75 !important; }
+.dark .hljs-params { color: #abb2bf !important; }
+

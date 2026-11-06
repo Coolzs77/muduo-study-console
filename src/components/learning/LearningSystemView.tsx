@@ -17,11 +17,13 @@ import {
   Circle,
   Search,
   ChevronDown,
-  ChevronUp,
+  ChevronRight,
   FileCode,
-  Flame,
   Lightbulb,
-  Check
+  Check,
+  BookMarked,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 type SubTab = 'cpp' | 'linux' | 'books' | 'qa' | 'general';
@@ -29,6 +31,7 @@ type SubTab = 'cpp' | 'linux' | 'books' | 'qa' | 'general';
 export const LearningSystemView: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('cpp');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedChapter, setSelectedChapter] = useState<string>('all');
 
   // Persisted state
   const [cppChecks, setCppChecks] = useLocalStorage<Record<string, boolean>>('muduo_cpp_checks', {});
@@ -44,7 +47,7 @@ export const LearningSystemView: React.FC = () => {
   const toggleCppCheck = (id: string) => {
     setCppChecks(prev => {
       const next = !prev[id];
-      showToast(next ? '已勾选知识点' : '已取消勾选', 'info');
+      showToast(next ? '已标记掌握知识点' : '已取消标记', 'info');
       return { ...prev, [id]: next };
     });
   };
@@ -65,12 +68,42 @@ export const LearningSystemView: React.FC = () => {
   const cppChapters = useMemo(() => {
     const map = new Map<string, typeof CPP_KNOWLEDGE_SYSTEM>();
     CPP_KNOWLEDGE_SYSTEM.forEach(item => {
-      const chap = item.chapterTitle || '基础章节';
+      const chap = item.chapterTitle || '基础核心';
       if (!map.has(chap)) map.set(chap, []);
       map.get(chap)!.push(item);
     });
     return Array.from(map.entries());
   }, []);
+
+  // Filtered C++ items
+  const filteredCppItems = useMemo(() => {
+    let items = CPP_KNOWLEDGE_SYSTEM;
+    if (selectedChapter !== 'all') {
+      items = items.filter(i => (i.chapterTitle || '基础核心') === selectedChapter);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      items = items.filter(
+        i =>
+          i.title.toLowerCase().includes(q) ||
+          i.coreConcept.toLowerCase().includes(q) ||
+          (i.interviewPoint && i.interviewPoint.toLowerCase().includes(q))
+      );
+    }
+    return items;
+  }, [selectedChapter, searchQuery]);
+
+  // Filtered Linux items
+  const filteredLinuxItems = useMemo(() => {
+    if (!searchQuery.trim()) return LINUX_SYSTEM_KNOWLEDGE;
+    const q = searchQuery.toLowerCase().trim();
+    return LINUX_SYSTEM_KNOWLEDGE.filter(
+      item =>
+        item.title.toLowerCase().includes(q) ||
+        item.projectScene.toLowerCase().includes(q) ||
+        item.syscallOrCmd.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
 
   // Filtered QA
   const filteredQA = useMemo(() => {
@@ -84,419 +117,553 @@ export const LearningSystemView: React.FC = () => {
     );
   }, [searchQuery]);
 
-  return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-6">
-      {/* Top Banner */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div className="flex items-center gap-2.5">
-          <span className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
-            <BookOpen size={22} />
-          </span>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            C++ / Linux 后端统一知识系统
-          </h1>
-        </div>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-          涵盖《C++ Primer Plus》体系化知识图谱、Linux 核心系统与指令、经典专著进度跟踪、高频八股真题与通识文献。
-        </p>
+  // Stats
+  const cppMasteredCount = Object.values(cppChecks).filter(Boolean).length;
+  const linuxMasteredCount = Object.values(linuxChecks).filter(Boolean).length;
 
-        {/* Sub-tab Navigation */}
-        <div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+  return (
+    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950">
+      {/* ========================================================= */}
+      {/* LEFT COLUMN: Sub-Tab Directory & Chapter Navigation Tree  */}
+      {/* ========================================================= */}
+      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
+        <div>
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <BookMarked size={16} className="text-sky-600 dark:text-sky-400" />
+            <span>学习系统目录</span>
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            体系化进阶、系统编程与面试知识
+          </p>
+        </div>
+
+        {/* 5 Sub-Modules Nav */}
+        <div className="space-y-1">
+          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
+            核心模块
+          </div>
           <button
-            onClick={() => setActiveSubTab('cpp')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            onClick={() => {
+              setActiveSubTab('cpp');
+              setSelectedChapter('all');
+            }}
+            type="button"
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
               activeSubTab === 'cpp'
                 ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800'
             }`}
           >
-            <Bookmark size={14} />
-            <span>C++ 知识图谱 (30)</span>
+            <div className="flex items-center gap-2">
+              <Bookmark size={14} />
+              <span>C++ 知识图谱</span>
+            </div>
+            <span className={`text-[11px] font-mono ${activeSubTab === 'cpp' ? 'text-sky-100' : 'text-slate-400'}`}>
+              {cppMasteredCount}/{CPP_KNOWLEDGE_SYSTEM.length}
+            </span>
           </button>
+
           <button
             onClick={() => setActiveSubTab('linux')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            type="button"
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
               activeSubTab === 'linux'
                 ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800'
             }`}
           >
-            <Terminal size={14} />
-            <span>Linux 核心体系 (32)</span>
+            <div className="flex items-center gap-2">
+              <Terminal size={14} />
+              <span>Linux 核心系统</span>
+            </div>
+            <span className={`text-[11px] font-mono ${activeSubTab === 'linux' ? 'text-sky-100' : 'text-slate-400'}`}>
+              {linuxMasteredCount}/{LINUX_SYSTEM_KNOWLEDGE.length}
+            </span>
           </button>
+
           <button
             onClick={() => setActiveSubTab('books')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            type="button"
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
               activeSubTab === 'books'
                 ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800'
             }`}
           >
-            <BookOpen size={14} />
-            <span>经典书目伴读</span>
+            <div className="flex items-center gap-2">
+              <BookOpen size={14} />
+              <span>经典书目伴读</span>
+            </div>
+            <span className={`text-[11px] ${activeSubTab === 'books' ? 'text-sky-100' : 'text-slate-400'}`}>
+              2 本专著
+            </span>
           </button>
+
           <button
             onClick={() => setActiveSubTab('qa')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            type="button"
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
               activeSubTab === 'qa'
                 ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800'
             }`}
           >
-            <HelpCircle size={14} />
-            <span>项目核心八股 (15)</span>
+            <div className="flex items-center gap-2">
+              <HelpCircle size={14} />
+              <span>项目核心八股</span>
+            </div>
+            <span className={`text-[11px] font-mono ${activeSubTab === 'qa' ? 'text-sky-100' : 'text-slate-400'}`}>
+              {PROJECT_QA_CATALOG.length} 题
+            </span>
           </button>
+
           <button
             onClick={() => setActiveSubTab('general')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            type="button"
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
               activeSubTab === 'general'
                 ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800'
             }`}
           >
-            <Lightbulb size={14} />
-            <span>通识文献阅读</span>
+            <div className="flex items-center gap-2">
+              <Lightbulb size={14} />
+              <span>通识文献阅读</span>
+            </div>
+            <span className={`text-[11px] ${activeSubTab === 'general' ? 'text-sky-100' : 'text-slate-400'}`}>
+              {GENERAL_READING_CATALOG.length} 篇
+            </span>
           </button>
         </div>
-      </div>
 
-      {/* Sub-Tab 1: C++ 知识图谱 */}
-      {activeSubTab === 'cpp' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <span>
-              已掌握: {Object.values(cppChecks).filter(Boolean).length} / {CPP_KNOWLEDGE_SYSTEM.length} 项
-            </span>
-          </div>
+        {/* Search */}
+        <div className="relative pt-2">
+          <Search size={14} className="absolute left-3 top-5 text-slate-400" />
+          <input
+            type="text"
+            placeholder="搜索知识点、考点、指令..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          />
+        </div>
 
-          <div className="space-y-6">
-            {cppChapters.map(([chapterTitle, items], cIdx) => (
-              <div
-                key={cIdx}
-                className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4"
+        {/* Contextual Chapter Filter for C++ */}
+        {activeSubTab === 'cpp' && (
+          <div className="space-y-1.5 pt-2 border-t border-slate-200 dark:border-slate-800">
+            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
+              章节分类索引
+            </div>
+            <button
+              onClick={() => setSelectedChapter('all')}
+              type="button"
+              className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center justify-between ${
+                selectedChapter === 'all'
+                  ? 'bg-sky-100/80 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <span>全部章节</span>
+              <span className="text-[10px] text-slate-400">{CPP_KNOWLEDGE_SYSTEM.length}</span>
+            </button>
+            {cppChapters.map(([chap, items]) => (
+              <button
+                key={chap}
+                onClick={() => setSelectedChapter(chap)}
+                type="button"
+                className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center justify-between truncate ${
+                  selectedChapter === chap
+                    ? 'bg-sky-100/80 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
               >
-                <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-                  <Bookmark size={16} className="text-sky-600" />
-                  <span>{chapterTitle}</span>
-                  <span className="text-xs font-normal text-slate-400">({items.length} 个知识点)</span>
-                </h3>
-
-                <div className="space-y-3">
-                  {items.map(item => {
-                    const isChecked = !!cppChecks[item.id];
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => toggleCppCheck(item.id)}
-                        className={`p-4 rounded-xl border transition cursor-pointer ${
-                          isChecked
-                            ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800/60'
-                            : 'bg-slate-50/50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/60 hover:bg-slate-100/60 dark:hover:bg-slate-800/80'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-start gap-2.5">
-                            <button
-                              type="button"
-                              className="mt-0.5 text-slate-400 hover:text-emerald-500 transition"
-                            >
-                              {isChecked ? (
-                                <CheckCircle2 size={18} className="text-emerald-500 fill-emerald-50" />
-                              ) : (
-                                <Circle size={18} />
-                              )}
-                            </button>
-                            <div>
-                              <div className="font-bold text-sm text-slate-900 dark:text-white">
-                                {item.title}
-                              </div>
-                              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
-                                对应专著: {item.bookReference}
-                              </div>
-                            </div>
-                          </div>
-                          {item.sourceFile && (
-                            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 shrink-0">
-                              {item.sourceFile}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Concept & Keypoints */}
-                        <div className="mt-3 text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pl-7">
-                          <p className="leading-relaxed">{item.coreConcept}</p>
-                          {item.keyPoints && item.keyPoints.length > 0 && (
-                            <ul className="list-disc pl-4 space-y-0.5 text-slate-500 dark:text-slate-400">
-                              {item.keyPoints.map((kp, kIdx) => (
-                                <li key={kIdx}>{kp}</li>
-                              ))}
-                            </ul>
-                          )}
-                          {item.interviewPoint && (
-                            <div className="text-[11px] text-amber-700 dark:text-amber-400 mt-2 bg-amber-50/60 dark:bg-amber-950/30 p-2 rounded-lg border border-amber-200/40 dark:border-amber-900/40">
-                              <span className="font-semibold">高频面试考察点: </span>
-                              {item.interviewPoint}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                <span className="truncate">{chap}</span>
+                <span className="text-[10px] text-slate-400 shrink-0 ml-1">{items.length}</span>
+              </button>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </aside>
 
-      {/* Sub-Tab 2: Linux 核心 */}
-      {activeSubTab === 'linux' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <span>
-              已标记: {Object.values(linuxChecks).filter(Boolean).length} / {LINUX_SYSTEM_KNOWLEDGE.length} 项
-            </span>
+      {/* ========================================================= */}
+      {/* CENTER COLUMN: Clean Documentation Workbench              */}
+      {/* ========================================================= */}
+      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto">
+        {/* Module Header */}
+        <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div className="text-xs font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wider mb-1">
+            {activeSubTab === 'cpp' && 'C++ 进阶知识图谱'}
+            {activeSubTab === 'linux' && 'Linux 核心系统与指令'}
+            {activeSubTab === 'books' && '经典书目伴读'}
+            {activeSubTab === 'qa' && '项目核心八股与面试题解'}
+            {activeSubTab === 'general' && '通识文献与计算机科学基础'}
           </div>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">
+            {activeSubTab === 'cpp' && '现代 C++ 机制与工程规范'}
+            {activeSubTab === 'linux' && 'Linux 系统编程与核心诊断'}
+            {activeSubTab === 'books' && '服务器与网络编程经典著作伴读'}
+            {activeSubTab === 'qa' && '高频项目面试真题与深度解析'}
+            {activeSubTab === 'general' && '技术思维与工程通识文献'}
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            拒绝虚构浮夸，紧密贴合 CppAIService 与 Kama-HTTPServer 的真实技术脉络。
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {LINUX_SYSTEM_KNOWLEDGE.map(item => {
-              const isChecked = !!linuxChecks[item.id];
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => toggleLinuxCheck(item.id)}
-                  className={`p-4 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${
-                    isChecked
-                      ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800/60'
-                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-                  }`}
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <button type="button" className="text-slate-400">
+        {/* 1. C++ 知识图谱 */}
+        {activeSubTab === 'cpp' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span>
+                当前展示 {filteredCppItems.length} 项 · 已掌握{' '}
+                <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{cppMasteredCount}</strong> /{' '}
+                {CPP_KNOWLEDGE_SYSTEM.length}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {filteredCppItems.map(item => {
+                const isChecked = !!cppChecks[item.id];
+                return (
+                  <div
+                    key={item.id}
+                    className={`p-4 rounded-xl border transition ${
+                      isChecked
+                        ? 'bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800/60'
+                        : 'bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => toggleCppCheck(item.id)}
+                          className="mt-0.5 text-slate-400 hover:text-emerald-500 transition cursor-pointer"
+                        >
                           {isChecked ? (
-                            <CheckCircle2 size={16} className="text-emerald-500" />
+                            <CheckCircle2 size={18} className="text-emerald-500 fill-emerald-50 dark:fill-transparent" />
                           ) : (
-                            <Circle size={16} />
+                            <Circle size={18} />
                           )}
                         </button>
-                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                          {item.title}
-                        </h4>
+                        <div>
+                          <div className="font-bold text-sm text-slate-900 dark:text-white">
+                            {item.title}
+                          </div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
+                            参考专著: {item.bookReference}
+                          </div>
+                        </div>
                       </div>
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
-                        {item.dimension}
-                      </span>
+                      {item.sourceFile && (
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                          {item.sourceFile}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="text-xs font-mono text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/40 p-2 rounded-lg border border-sky-100 dark:border-sky-900/40">
-                      $ {item.syscallOrCmd}
+                    <div className="mt-3 text-xs text-slate-600 dark:text-slate-300 space-y-2 pl-7">
+                      <p className="leading-relaxed">{item.coreConcept}</p>
+                      {item.keyPoints && item.keyPoints.length > 0 && (
+                        <ul className="list-disc pl-4 space-y-0.5 text-slate-500 dark:text-slate-400">
+                          {item.keyPoints.map((kp, kIdx) => (
+                            <li key={kIdx}>{kp}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {item.interviewPoint && (
+                        <div className="text-[11px] text-amber-800 dark:text-amber-300 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 rounded-lg border border-amber-200/50 dark:border-amber-900/40">
+                          <strong className="font-semibold">面试重点：</strong>
+                          {item.interviewPoint}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 2. Linux 核心系统 */}
+        {activeSubTab === 'linux' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span>
+                当前展示 {filteredLinuxItems.length} 项 · 已完成{' '}
+                <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{linuxMasteredCount}</strong> /{' '}
+                {LINUX_SYSTEM_KNOWLEDGE.length}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {filteredLinuxItems.map(item => {
+                const isChecked = !!linuxChecks[item.id];
+                return (
+                  <div
+                    key={item.id}
+                    className={`p-4 rounded-xl border transition ${
+                      isChecked
+                        ? 'bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800/60'
+                        : 'bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => toggleLinuxCheck(item.id)}
+                          className="mt-0.5 text-slate-400 hover:text-emerald-500 transition cursor-pointer"
+                        >
+                          {isChecked ? (
+                            <CheckCircle2 size={18} className="text-emerald-500 fill-emerald-50 dark:fill-transparent" />
+                          ) : (
+                            <Circle size={18} />
+                          )}
+                        </button>
+                        <div>
+                          <div className="font-bold text-sm text-slate-900 dark:text-white">
+                            {item.title}
+                          </div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                            {item.projectScene}
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">工程场景: </span>
-                      {item.projectScene}
-                    </p>
-
-                    {item.interviewPoint && (
-                      <div className="text-[11px] text-amber-700 dark:text-amber-400 bg-amber-50/60 dark:bg-amber-950/20 p-2 rounded-lg border border-amber-200/40 dark:border-amber-900/30">
-                        <span className="font-semibold">面试重点: </span>
-                        {item.interviewPoint}
+                    {item.syscallOrCmd && (
+                      <div className="mt-3 pl-7 flex flex-wrap gap-1.5">
+                        {item.syscallOrCmd.split('/').map((cmd: string, cIdx: number) => (
+                          <code
+                            key={cIdx}
+                            className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 border border-slate-200/80 dark:border-slate-700/60"
+                          >
+                            {cmd.trim()}
+                          </code>
+                        ))}
                       </div>
                     )}
                   </div>
-
-                  <div className="text-[11px] text-slate-400 mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    出处: {item.bookReference}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Sub-Tab 3: 经典书目伴读 */}
-      {activeSubTab === 'books' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Object.entries(BOOKS_COMPANION_DATA).map(([k, book]) => {
-              const currentPages = booksProgress[k] || 0;
-              const totalPages = book.totalPages || 600;
-              const pct = Math.min(100, Math.round((currentPages / totalPages) * 100));
+        {/* 3. 经典书目伴读 */}
+        {activeSubTab === 'books' && (
+          <div className="space-y-6">
+            {Object.values(BOOKS_COMPANION_DATA).map(book => {
+              const totalP = book.totalPages || 500;
+              const currentP = booksProgress[book.key] || 120;
+              const pct = Math.min(100, Math.round((currentP / totalP) * 100));
 
               return (
                 <div
-                  key={k}
-                  className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4"
+                  key={book.key}
+                  className="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-4"
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">
                         {book.name}
                       </h3>
-                      <div className="text-xs text-slate-500 mt-1">作者: {book.author}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        作者: {book.author} · 预计页数 {totalP} 页
+                      </div>
                     </div>
-                    <span className="text-xs font-mono px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold shrink-0">
+                    <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2.5 py-1 rounded-lg">
                       {pct}%
                     </span>
                   </div>
 
-                  {/* Progress Bar */}
-                  <div className="space-y-1.5">
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  {book.dynamicAdjustRule && (
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {book.dynamicAdjustRule}
+                    </p>
+                  )}
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span>当前阅读进度: 第 {currentP} 页</span>
+                      <span>剩余 {Math.max(0, totalP - currentP)} 页</span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div
-                        className="bg-sky-600 h-full rounded-full transition-all duration-300"
+                        className="h-full bg-sky-500 rounded-full transition-all duration-300"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span>已读 {currentPages} 页</span>
-                      <span>总计 {totalPages} 页</span>
-                    </div>
                   </div>
 
-                  {/* Daily Goal & Update */}
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-                    <span className="text-slate-500">
-                      推荐每日目标: {book.defaultDailyGoal} {book.unit}
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <label className="text-slate-400">更新页码:</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max={totalPages}
-                        value={currentPages}
-                        onChange={e => {
-                          const val = parseInt(e.target.value) || 0;
-                          setBooksProgress(prev => ({ ...prev, [k]: val }));
-                        }}
-                        className="w-16 px-2 py-1 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center font-mono font-bold text-xs"
-                      />
-                    </div>
+                  <div className="flex items-center gap-3 pt-2">
+                    <span className="text-xs text-slate-500">更新页码:</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={totalP}
+                      value={currentP}
+                      onChange={e => {
+                        const val = parseInt(e.target.value) || 0;
+                        setBooksProgress(prev => ({ ...prev, [book.key]: val }));
+                      }}
+                      className="w-24 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-900 dark:text-white"
+                    />
+                    <span className="text-xs text-slate-400">页</span>
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Sub-Tab 4: 项目核心八股 */}
-      {activeSubTab === 'qa' && (
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="搜索八股问题、答案关键词、分类..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition shadow-2xs"
+        {/* 4. 项目核心八股 */}
+        {activeSubTab === 'qa' && (
+          <div className="space-y-4">
+            <div className="text-xs text-slate-500">
+              共 {filteredQA.length} 道面试常考题，紧密围绕 Kama-HTTPServer 状态机解析与 CppAIService 推理并发模型：
+            </div>
+
+            <div className="space-y-3">
+              {filteredQA.map(qa => {
+                const isExpanded = !!expandedQA[qa.id];
+                return (
+                  <div
+                    key={qa.id}
+                    className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 overflow-hidden"
+                  >
+                    <button
+                      onClick={() => toggleQAExpand(qa.id)}
+                      type="button"
+                      className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 shrink-0">
+                          {qa.category}
+                        </span>
+                        <span className="font-bold text-sm text-slate-900 dark:text-white">
+                          {qa.question}
+                        </span>
+                      </div>
+                      <ChevronDown
+                        size={16}
+                        className={`text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {isExpanded && (
+                      <div className="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/60 text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50/30 dark:bg-slate-950/20 whitespace-pre-line space-y-2">
+                        <div>{qa.answer}</div>
+                        {qa.relatedModule && (
+                          <div className="pt-2 text-[11px] text-slate-400 font-mono">
+                            对应工程实现: {qa.relatedModule}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 5. 通识文献阅读 */}
+        {activeSubTab === 'general' && (
+          <div className="space-y-4">
+            <div className="text-xs text-slate-500">
+              精选经典技术文献与架构通识：
+            </div>
+
+            <div className="space-y-3">
+              {GENERAL_READING_CATALOG.map((doc, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 space-y-2"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                      {doc.title}
+                    </h3>
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      {doc.source}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {doc.summary}
+                  </p>
+                  <div className="flex items-center gap-2 text-[11px] text-sky-600 dark:text-sky-400 font-medium pt-1">
+                    <span>核心启发: {doc.keyTakeaway}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* ========================================================= */}
+      {/* RIGHT COLUMN: Statistics & Quick Actions Panel            */}
+      {/* ========================================================= */}
+      <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden xl:block">
+        <div>
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Layers size={16} className="text-sky-600 dark:text-sky-400" />
+            <span>学习进度与自测</span>
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            辅助诊断与指标统计
+          </p>
+        </div>
+
+        {/* C++ Mastery Progress */}
+        <div className="p-3 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200">
+            <span>C++ 核心项掌握</span>
+            <span className="font-mono text-sky-600 dark:text-sky-400">
+              {cppMasteredCount} / {CPP_KNOWLEDGE_SYSTEM.length}
+            </span>
+          </div>
+          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-sky-500 rounded-full transition-all duration-300"
+              style={{
+                width: `${Math.round((cppMasteredCount / (CPP_KNOWLEDGE_SYSTEM.length || 1)) * 100)}%`
+              }}
             />
           </div>
+        </div>
 
-          <div className="space-y-3">
-            {filteredQA.map(item => {
-              const isExpanded = !!expandedQA[item.id];
-              return (
-                <div
-                  key={item.id}
-                  className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden transition"
-                >
-                  <div
-                    onClick={() => toggleQAExpand(item.id)}
-                    className="p-4 cursor-pointer hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition flex items-center justify-between gap-4 select-none"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-lg bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">
-                        Q
-                      </span>
-                      <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-                        {item.question}
-                      </h4>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        {item.category}
-                      </span>
-                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                    </div>
-                  </div>
-
-                  {isExpanded && (
-                    <div className="px-5 pb-5 pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs sm:text-sm">
-                      <div className="text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-                        {item.answer}
-                      </div>
-
-                      {item.keyPoints && item.keyPoints.length > 0 && (
-                        <div>
-                          <div className="font-semibold text-xs text-slate-500 mb-1">关键得分点:</div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {item.keyPoints.map((kp, kIdx) => (
-                              <span
-                                key={kIdx}
-                                className="px-2 py-0.5 rounded-md text-[11px] bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/60"
-                              >
-                                {kp}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {item.sourceReference && (
-                        <div className="text-xs text-slate-400 font-mono">
-                          源码参考: {item.sourceReference}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+        {/* Linux Mastery Progress */}
+        <div className="p-3 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200">
+            <span>Linux 核心掌握</span>
+            <span className="font-mono text-emerald-600 dark:text-emerald-400">
+              {linuxMasteredCount} / {LINUX_SYSTEM_KNOWLEDGE.length}
+            </span>
+          </div>
+          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+              style={{
+                width: `${Math.round((linuxMasteredCount / (LINUX_SYSTEM_KNOWLEDGE.length || 1)) * 100)}%`
+              }}
+            />
           </div>
         </div>
-      )}
 
-      {/* Sub-Tab 5: 通识文献阅读 */}
-      {activeSubTab === 'general' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {GENERAL_READING_CATALOG.map(book => (
-            <div
-              key={book.id}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3 flex flex-col justify-between"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                    {book.title}
-                  </h4>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/40">
-                    {book.timeOfDay}
-                  </span>
-                </div>
-                <div className="text-xs text-slate-500">作者: {book.author}</div>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">工程沉淀聚焦: </span>
-                  {book.reflectionFocus || book.engineeringReflection}
-                </p>
-              </div>
-
-              <div className="text-xs text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span>推荐每日阅读: {book.targetPagesDaily} 页</span>
-                <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                  <Check size={13} />
-                  已列入书单
-                </span>
-              </div>
-            </div>
-          ))}
+        {/* Tips & Engineering Guidance */}
+        <div className="p-3 rounded-xl bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200/50 dark:border-sky-900/40 text-xs space-y-1.5">
+          <div className="font-bold text-sky-900 dark:text-sky-300 flex items-center gap-1.5">
+            <Sparkles size={14} className="text-sky-600 dark:text-sky-400" />
+            <span>学习建议</span>
+          </div>
+          <p className="text-[11px] text-sky-800 dark:text-sky-300/80 leading-relaxed">
+            建议结合专栏项目中的源码实现，重点攻克 RAII 资源管理、移动语义、epoll 水平/边缘触发及多线程无锁队列，并做好自测记录。
+          </p>
         </div>
-      )}
+      </aside>
     </div>
   );
 };
