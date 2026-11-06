@@ -41,26 +41,27 @@ export const FocusTimer: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-sm text-slate-800 dark:text-slate-200">
-          <Clock size={16} className="text-sky-600 dark:text-sky-400" />
-          <span>专注计时器</span>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+        <div className="flex items-center gap-1.5">
+          <Clock size={15} className="text-sky-600 dark:text-sky-400" />
+          <span>专注计时</span>
         </div>
-        <div className="text-xs font-mono text-slate-500 dark:text-slate-400">
-          今日累计: <strong className="text-sky-600 dark:text-sky-400">{todayMins}</strong> 分钟
+        <div className="font-mono text-slate-500 dark:text-slate-400 font-normal">
+          今日 <strong className="text-sky-600 dark:text-sky-400 font-bold">{todayMins}</strong> 分钟
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-        <div className="font-mono text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-3 text-center">
+        <div className="font-mono text-3xl font-black tracking-wider text-slate-900 dark:text-white py-1">
           {formatTime(seconds)}
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={handleToggle}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white transition cursor-pointer active:scale-95 ${
+            type="button"
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold text-white transition cursor-pointer active:scale-95 whitespace-nowrap shadow-xs ${
               isRunning ? 'bg-amber-600 hover:bg-amber-700' : 'bg-sky-600 hover:bg-sky-700'
             }`}
           >
@@ -78,11 +79,12 @@ export const FocusTimer: React.FC = () => {
           </button>
           <button
             onClick={handleReset}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer active:scale-95"
-            title="归档时间并重置"
+            type="button"
+            className="flex items-center justify-center gap-1 py-2 px-3 rounded-lg text-xs font-semibold bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer active:scale-95 shrink-0 whitespace-nowrap"
+            title="结算并归档时间"
           >
-            <RotateCcw size={14} />
-            <span>归档</span>
+            <RotateCcw size={13} />
+            <span>重置</span>
           </button>
         </div>
       </div>

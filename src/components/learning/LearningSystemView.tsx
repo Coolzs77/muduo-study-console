@@ -127,21 +127,15 @@ export const LearningSystemView: React.FC = () => {
       {/* LEFT COLUMN: Sub-Tab Directory & Chapter Navigation Tree  */}
       {/* ========================================================= */}
       <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
-        <div>
+        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <BookMarked size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>学习系统目录</span>
+            <span>系统目录</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            体系化进阶、系统编程与面试知识
-          </p>
         </div>
 
         {/* 5 Sub-Modules Nav */}
         <div className="space-y-1">
-          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
-            核心模块
-          </div>
           <button
             onClick={() => {
               setActiveSubTab('cpp');
@@ -156,7 +150,7 @@ export const LearningSystemView: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <Bookmark size={14} />
-              <span>C++ 知识图谱</span>
+              <span>C++ 知识</span>
             </div>
             <span className={`text-[11px] font-mono ${activeSubTab === 'cpp' ? 'text-sky-100' : 'text-slate-400'}`}>
               {cppMasteredCount}/{CPP_KNOWLEDGE_SYSTEM.length}
@@ -174,7 +168,7 @@ export const LearningSystemView: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <Terminal size={14} />
-              <span>Linux 核心系统</span>
+              <span>Linux 编程</span>
             </div>
             <span className={`text-[11px] font-mono ${activeSubTab === 'linux' ? 'text-sky-100' : 'text-slate-400'}`}>
               {linuxMasteredCount}/{LINUX_SYSTEM_KNOWLEDGE.length}
@@ -192,10 +186,10 @@ export const LearningSystemView: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <BookOpen size={14} />
-              <span>经典书目伴读</span>
+              <span>经典书目</span>
             </div>
             <span className={`text-[11px] ${activeSubTab === 'books' ? 'text-sky-100' : 'text-slate-400'}`}>
-              2 本专著
+              2 本
             </span>
           </button>
 
@@ -210,7 +204,7 @@ export const LearningSystemView: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <HelpCircle size={14} />
-              <span>项目核心八股</span>
+              <span>问答与面试</span>
             </div>
             <span className={`text-[11px] font-mono ${activeSubTab === 'qa' ? 'text-sky-100' : 'text-slate-400'}`}>
               {PROJECT_QA_CATALOG.length} 题
@@ -228,7 +222,7 @@ export const LearningSystemView: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <Lightbulb size={14} />
-              <span>通识文献阅读</span>
+              <span>通识文献</span>
             </div>
             <span className={`text-[11px] ${activeSubTab === 'general' ? 'text-sky-100' : 'text-slate-400'}`}>
               {GENERAL_READING_CATALOG.length} 篇
@@ -290,24 +284,14 @@ export const LearningSystemView: React.FC = () => {
       {/* ========================================================= */}
       <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto">
         {/* Module Header */}
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
-          <div className="text-xs font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wider mb-1">
-            {activeSubTab === 'cpp' && 'C++ 进阶知识图谱'}
-            {activeSubTab === 'linux' && 'Linux 核心系统与指令'}
-            {activeSubTab === 'books' && '经典书目伴读'}
-            {activeSubTab === 'qa' && '项目核心八股与面试题解'}
-            {activeSubTab === 'general' && '通识文献与计算机科学基础'}
-          </div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white">
-            {activeSubTab === 'cpp' && '现代 C++ 机制与工程规范'}
-            {activeSubTab === 'linux' && 'Linux 系统编程与核心诊断'}
-            {activeSubTab === 'books' && '服务器与网络编程经典著作伴读'}
-            {activeSubTab === 'qa' && '高频项目面试真题与深度解析'}
-            {activeSubTab === 'general' && '技术思维与工程通识文献'}
+        <div className="border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+            {activeSubTab === 'cpp' && 'C++ 知识'}
+            {activeSubTab === 'linux' && 'Linux 编程'}
+            {activeSubTab === 'books' && '经典书目'}
+            {activeSubTab === 'qa' && '问答与面试'}
+            {activeSubTab === 'general' && '通识文献'}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            拒绝虚构浮夸，紧密贴合 CppAIService 与 Kama-HTTPServer 的真实技术脉络。
-          </p>
         </div>
 
         {/* 1. C++ 知识图谱 */}
@@ -607,14 +591,11 @@ export const LearningSystemView: React.FC = () => {
       {/* RIGHT COLUMN: Statistics & Quick Actions Panel            */}
       {/* ========================================================= */}
       <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden xl:block">
-        <div>
+        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <Layers size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>学习进度与自测</span>
+            <span>学习进度</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            辅助诊断与指标统计
-          </p>
         </div>
 
         {/* C++ Mastery Progress */}

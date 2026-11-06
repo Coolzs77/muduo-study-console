@@ -1,6 +1,6 @@
 # Muduo & CppAIService 学习与训练控制台 (Muduo Study Console)
 
-![Version](https://img.shields.io/badge/version-v6.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-v6.1.0-blue.svg)
 ![React](https://img.shields.io/badge/React-18-cyan.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6.svg)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-38B2AC.svg)
@@ -85,6 +85,7 @@ npm run build
 
 | 版本 | 发布日期 | 更新重点与改动说明 |
 | :--- | :--- | :--- |
+| **v6.1.0** | 2026-11-06 | **28天任务日历矩阵、正文表格渲染与全站干练去冗余重构**：<br/>• 28 天任务升级为四行七列 (4×7) 日历矩阵看板，直观呈现每周进度与掌握状态；<br/>• 正文全面支持原生 Markdown GFM 表格流式解析与自适应斑马纹渲染；<br/>• 专注计时器重构为垂直自然流，彻底消除侧边栏挤压导致的文字竖向断裂；<br/>• 全站所有小标题与文案全面去浮夸与去冗余，干练直白；<br/>• 任务侧栏移除易致误解的“90分”标记，修正为预计时长（分钟）；<br/>• 算法题库与任务工作台右侧栏充实重构，新增“🎲 随机刷一题”即时推荐与分类速览，消灭大片死白；<br/>• 顶栏铺满全屏，与下层三栏工作台完全对齐。 |
 | **v6.0.0** | 2026-11-06 | **全局三栏文档工作台统一与真实对齐**：<br/>• 全面重构顶栏 7 个模块为统一三栏工作台（左目录树、中工作区、右辅助面板）；<br/>• 代码块单层化，参考 LeetCode 语法高亮并支持日间/暗黑主题自适应；<br/>• 28 天任务 100% 对齐语雀 Kama-HTTPServer & CppAIService 权威文档；<br/>• 算法题库支持分类独立进度条与达成率，Hot 100 柔和琥珀配色；<br/>• 彻底剔除仪表盘虚构 7 天柱状图，任务网格改为带具体标题的任务清单；<br/>• Muduo 原版 28 天任务完整独立归档于「其他」模块；<br/>• 顶栏导航中文精简（仪表盘、任务、项目、算法、学习系统、源码路线、其他）。 |
 | **v5.0.0** | 2026-11-06 | 架构精简重构，CppAIService 核心聚焦与 Muduo 归档解耦，顶栏收敛为 7 项。 |
 | **v4.0.0** | 2026-10-15 | 语雀知识库全景集成，增加双向代码映射与知识自测中心。 |

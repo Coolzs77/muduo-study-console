@@ -122,7 +122,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
               <Calendar size={16} className="text-sky-600 dark:text-sky-400" />
-              <span>任务大纲目录</span>
+              <span>任务目录</span>
               <span className="text-xs text-slate-400 font-normal">({filteredDays.length}/28)</span>
             </div>
           </div>
@@ -237,12 +237,10 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
-                    <span className="truncate">W{item.week}</span>
+                  <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-400">
+                    <span>W{item.week}</span>
                     <span>•</span>
                     <span className="truncate">{item.tags?.[0] || '核心实战'}</span>
-                    <span>•</span>
-                    <span>{item.estimatedMinutes || 90}分</span>
                   </div>
                 </div>
               </div>
@@ -440,20 +438,23 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
       {/* ==================================================================== */}
       {/* Right Column: Mastery Rating, Quiz Launcher & Daily Notes             */}
       {/* ==================================================================== */}
-      <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-5 select-none overflow-y-auto">
+      <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-4 select-none overflow-y-auto">
         {/* Mastery Rating */}
-        <div className="space-y-2">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            掌握状态标记
-          </h3>
-          <div className="space-y-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+            <span>掌握度</span>
+            <span className="font-mono text-[11px] text-sky-600 dark:text-sky-400 font-semibold">
+              {(dayMastery[currentDay.day] || 0) >= 4 ? '已吃透' : `${dayMastery[currentDay.day] || 0} 阶`}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-1">
             {[
-              { lvl: 0, label: '0 未开始', desc: '尚未研读' },
-              { lvl: 1, label: '1 概念通读', desc: '阅读背景与定位' },
-              { lvl: 2, label: '2 机制掌握', desc: '理清调用链时序' },
-              { lvl: 3, label: '3 熟练阐述', desc: '口述方案与设计' },
-              { lvl: 4, label: '4 ✓ 独立编码', desc: '手写核心类与逻辑' },
-              { lvl: 5, label: '5 ✓ 彻底吃透', desc: '排障与生产级优化' }
+              { lvl: 0, label: '0 未学' },
+              { lvl: 1, label: '1 概念' },
+              { lvl: 2, label: '2 机制' },
+              { lvl: 3, label: '3 阐述' },
+              { lvl: 4, label: '4 编码' },
+              { lvl: 5, label: '5 吃透' }
             ].map(tier => {
               const currentLvl = dayMastery[currentDay.day] || 0;
               const isSelected = currentLvl === tier.lvl;
@@ -461,16 +462,17 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                 <button
                   key={tier.lvl}
                   onClick={() => setMasteryLevel(tier.lvl)}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition cursor-pointer text-left ${
+                  type="button"
+                  className={`flex items-center justify-between px-2 py-1.5 rounded-lg text-xs transition cursor-pointer text-left border ${
                     isSelected
                       ? tier.lvl >= 4
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800'
-                        : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-300 dark:border-sky-800'
-                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold border-emerald-300 dark:border-emerald-800'
+                        : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border-sky-300 dark:border-sky-800'
+                      : 'border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   <span>{tier.label}</span>
-                  {isSelected && <Check size={12} className={tier.lvl >= 4 ? 'text-emerald-500' : 'text-sky-500'} />}
+                  {isSelected && <Check size={11} className={tier.lvl >= 4 ? 'text-emerald-500' : 'text-sky-500'} />}
                 </button>
               );
             })}
@@ -478,12 +480,12 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         </div>
 
         {/* Check Criteria */}
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5 text-xs">
-          <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1 text-xs">
+          <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
             <CheckCircle2 size={13} className="text-emerald-500" />
-            <span>自检达标标准</span>
+            <span>达标标准</span>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 text-[11.5px] leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
             {typeof currentDay.check === 'object' ? currentDay.check.strict : currentDay.check}
           </p>
         </div>
@@ -492,21 +494,22 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         {onJumpToQuiz && (
           <button
             onClick={() => onJumpToQuiz(currentDay.day)}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold transition cursor-pointer"
+            type="button"
+            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold transition cursor-pointer"
           >
-            <HelpCircle size={14} />
-            <span>进入 Day {currentDay.day} 专属自测</span>
+            <HelpCircle size={13} />
+            <span>Day {currentDay.day} 自测</span>
           </button>
         )}
 
-        {/* Daily Notes Scratchpad */}
-        <div className="flex-1 flex flex-col space-y-1.5 min-h-[160px]">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
+        {/* Daily Notes Scratchpad - Fills the vertical space naturally */}
+        <div className="flex-1 flex flex-col space-y-1.5 min-h-[180px]">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
             <div className="flex items-center gap-1">
               <FileEdit size={13} />
-              <span>随堂攻坚笔记</span>
+              <span>随堂笔记</span>
             </div>
-            <span className="text-[10px] text-slate-400">自动保存</span>
+            <span className="text-[10px] text-slate-400 font-normal">自动保存</span>
           </div>
           <textarea
             value={dayNotes[currentDay.day] || ''}

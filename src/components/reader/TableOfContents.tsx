@@ -74,7 +74,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => 
     <nav className="w-64 shrink-0 hidden xl:block sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 pl-4 border-l border-slate-200 dark:border-slate-800 text-xs">
       <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-3">
         <AlignLeft size={13} className="text-sky-600 dark:text-sky-400" />
-        <span>本章大纲导览</span>
+        <span>本篇大纲</span>
       </div>
       <ul className="space-y-1.5">
         {headings.map((h) => {

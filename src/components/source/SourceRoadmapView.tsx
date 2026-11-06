@@ -105,14 +105,11 @@ export const SourceRoadmapView: React.FC = () => {
       {/* LEFT COLUMN: Roadmap Components & Source Files Directory  */}
       {/* ========================================================= */}
       <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-4 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
-        <div>
+        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <Code2 size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>源码与架构路线</span>
+            <span>源码路线</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            核心组件演进与真实工程代码
-          </p>
         </div>
 
         {/* View Switcher Pills */}
@@ -130,7 +127,7 @@ export const SourceRoadmapView: React.FC = () => {
             }`}
           >
             <Layers size={13} />
-            <span>核心组件 (8)</span>
+            <span>组件 (8)</span>
           </button>
           <button
             onClick={() => {
@@ -145,7 +142,7 @@ export const SourceRoadmapView: React.FC = () => {
             }`}
           >
             <FileCode size={13} />
-            <span>源文件 ({fileKeys.length})</span>
+            <span>源码 ({fileKeys.length})</span>
           </button>
         </div>
 
@@ -286,7 +283,7 @@ export const SourceRoadmapView: React.FC = () => {
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                 <Cpu size={14} className="text-sky-600" />
-                <span>核心成员变量与状态</span>
+                <span>成员变量</span>
               </h3>
               <div className="space-y-1.5">
                 {currentComp.members.map((m, idx) => (
@@ -304,7 +301,7 @@ export const SourceRoadmapView: React.FC = () => {
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                 <FileCode size={14} className="text-emerald-600" />
-                <span>关键接口与核心函数实现</span>
+                <span>核心函数</span>
               </h3>
               <div className="space-y-1.5">
                 {currentComp.functions.map((fn, idx) => (
@@ -395,14 +392,11 @@ export const SourceRoadmapView: React.FC = () => {
       {/* RIGHT COLUMN: Component Mastery Selector & Architecture   */}
       {/* ========================================================= */}
       <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden xl:block">
-        <div>
+        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <GitCommit size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>组件评定与架构链</span>
+            <span>组件评定</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            状态记录与核心调用拓扑
-          </p>
         </div>
 
         {/* Component Mastery Selector */}

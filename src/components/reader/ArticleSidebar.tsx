@@ -83,7 +83,7 @@ export const ArticleSidebar: React.FC<ArticleSidebarProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
             <BookOpen size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>专栏目录索引</span>
+            <span>专栏目录</span>
             <span className="text-xs text-slate-400 font-normal">({filteredArticles.length} 篇)</span>
           </div>
           <button

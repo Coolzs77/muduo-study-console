@@ -20,6 +20,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({ content }) => {
       lang?: string;
       items?: string[];
       headers?: string[];
+      alignments?: ('left' | 'center' | 'right')[];
       rows?: string[][];
     }> = [];
 
@@ -78,6 +79,39 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({ content }) => {
         flushList();
         result.push({ type: 'img', text: imgMatch[1], src: imgMatch[2] });
         continue;
+      }
+
+      // Tables: header row with '|' followed by delimiter row
+      if (line.includes('|') && i + 1 < lines.length) {
+        const nextLine = lines[i + 1].trim();
+        const delimParts = nextLine.split('|').map(s => s.trim()).filter(Boolean);
+        const isTable = delimParts.length > 0 && delimParts.every(p => /^:?-+:?$/.test(p));
+        if (isTable) {
+          flushList();
+          const parseRow = (str: string) => {
+            let s = str.trim();
+            if (s.startsWith('|')) s = s.slice(1);
+            if (s.endsWith('|')) s = s.slice(0, -1);
+            return s.split('|').map(c => c.trim());
+          };
+
+          const headers = parseRow(line);
+          const alignments: ('left' | 'center' | 'right')[] = delimParts.map(p => {
+            if (p.startsWith(':') && p.endsWith(':')) return 'center';
+            if (p.endsWith(':')) return 'right';
+            return 'left';
+          });
+
+          const rows: string[][] = [];
+          i += 2;
+          while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+            rows.push(parseRow(lines[i]));
+            i++;
+          }
+          i--; // compensate for loop i++
+          result.push({ type: 'table', headers, alignments, rows });
+          continue;
+        }
       }
 
       // Headings
@@ -273,6 +307,53 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({ content }) => {
             );
           case 'hr':
             return <hr key={idx} className="my-8 border-slate-200 dark:border-slate-800" />;
+          case 'table': {
+            const headers = block.headers || [];
+            const rows = block.rows || [];
+            const alignments = block.alignments || [];
+            const getAlignClass = (align?: 'left' | 'center' | 'right') => {
+              if (align === 'center') return 'text-center';
+              if (align === 'right') return 'text-right';
+              return 'text-left';
+            };
+            return (
+              <div key={idx} className="my-6 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                <table className="w-full text-left text-xs border-collapse">
+                  {headers.length > 0 && (
+                    <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 font-semibold">
+                      <tr>
+                        {headers.map((h, hIdx) => (
+                          <th
+                            key={hIdx}
+                            className={`px-4 py-3 border-r last:border-r-0 border-slate-200 dark:border-slate-800 whitespace-nowrap ${getAlignClass(alignments[hIdx])}`}
+                          >
+                            {renderInline(h)}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                  )}
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">
+                    {rows.map((row, rIdx) => (
+                      <tr
+                        key={rIdx}
+                        className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
+                      >
+                        {row.map((cell, cIdx) => (
+                          <td
+                            key={cIdx}
+                            className={`px-4 py-2.5 border-r last:border-r-0 border-slate-100 dark:border-slate-800/60 ${getAlignClass(alignments[cIdx])}`}
+                          >
+                            {renderInline(cell)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          }
           case 'img':
             return (
               <figure key={idx} className="my-6 text-center">

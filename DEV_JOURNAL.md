@@ -1600,3 +1600,254 @@ npm run build
   ✓ Copied classic.html -> dist/classic.html
   [BUILD SUCCESS] Production ready static build in dist/
   ```
+
+
+---
+
+## 第 12 轮 [2026-11-06 19:35]：28天任务日历矩阵、正文表格渲染与全站干练去冗余重构
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与背景**：在完成 V6.0.0 的三栏文档工作台统一后，用户在实机使用与宽屏体验中指出了 7 项直观体验问题与视觉瑕疵：
+  1. **右侧栏内容被严重挤压**：在仪表盘中，右侧栏的专注计时器按钮在列宽为 320px 时发生了文字竖向折行断裂（“开\n始\n专\n注”），且今日清单卡片内边距过大；
+  2. **28 天任务希望采用日历形式**：仪表盘中间的 28 天任务采用了大面积纵向卡片列表，用户强烈建议采用**四行七列 (4 rows × 7 cols)** 的日历矩阵形式，每周一行、每天一格，清晰展示 1~28 天任务标题与掌握星级，杜绝杂乱卡片堆叠；
+  3. **标题与文案全面去冗余（说人话、干练干脆）**：“任务就是任务，项目就是项目，算法就是算法”，杜绝宣传性副标题、假大空描述与修饰词（如“双向状态自动持久化”、“体系化进阶、系统编程与面试知识”等冗余文字），全站所有标题均以干练简洁为主；
+  4. **去除误导性“90分”标记**：任务侧边栏条目原先标注 `· 90分`，普通用户直观误解为考试成绩或考核打分，必须修正为清晰的预计时长或直接移除；
+  5. **算法与任务右侧栏大面积死白空隙**：在宽屏显示下，算法题库和任务工作台的右侧栏下方有超过 70% 的空白空洞，必须进行垂直高度均衡重构，引入实用的交互组件（如“🎲 随机刷一题”、分类速览快捷方式等），充实侧边栏；
+  6. **顶栏左右两侧有多余空隙**：顶栏 `Header` 存在 `max-w-7xl` 限制，导致超宽屏下顶栏与下方 `w-full` 的三栏工作台两侧不对齐，出现突兀留白；
+  7. **项目正文不支持 Markdown 表格渲染**：阅读专栏文章时，含有表格的内容（如 `| 模块 | 职责 | 实现文件 |`）以包含管道符的原始文本段落呈现，严重破坏可读性，需要支持标准 GFM 表格解析与自适应样式渲染。
+- **预期达成指标**：
+  1. 全站 7 个 Tab 彻底消除虚浮装饰文案，小标题一律精简干练；
+  2. 仪表盘实现标准的 4 行 × 7 列日历矩阵，点击对应天数直达学习画布；
+  3. `FocusTimer` 采用纵向自然流，彻底消除任何屏幕宽度下的按钮换行折断问题；
+  4. `MarkdownView` 内置完整的 GFM 表格流式语法解析与斑马纹自适应表格渲染；
+  5. 消除算法题库和任务工作台右侧栏的大片死白，右侧栏布局均衡充实；
+  6. 顶栏铺满全屏，与下层三栏工作台完全对齐。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及文件**：
+  - [`src/components/layout/Header.tsx`](file:///e:/workspace/muduo-study-console/src/components/layout/Header.tsx)：解除 `max-w-7xl` 限制，改为 `w-full px-4 sm:px-6 lg:px-8`，实现全宽顶栏对齐；
+  - [`src/components/dashboard/FocusTimer.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/FocusTimer.tsx)：重构计时器排版，大号数字时间居中显示，主副按钮独立成行，彻底杜绝按钮文字折断；
+  - [`src/components/dashboard/TaskRoutineList.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/TaskRoutineList.tsx)：剔除冗余长文段落与装饰微标，紧凑化今日任务清单；
+  - [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：实现 4 行 × 7 列日历矩阵，精简主副标题与 4 大指标展示（“任务”、“项目”、“算法”、“专注”）；
+  - [`src/components/daily/DailyCurriculumView.tsx`](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)：剔除侧边栏误导性的 `· 90分` 标记，右侧栏整合掌握度打分器与弹性高度笔记区；
+  - [`src/components/algorithm/AlgoCatalog.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoCatalog.tsx)：重构右侧数据栏，加入“🎲 随机刷一题”即时推荐与换题交互、Hot 100 进度条与常用专题速览，消灭空白死角；
+  - [`src/components/reader/MarkdownView.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/MarkdownView.tsx)：新增标准 GFM Markdown 表格流式解析器与 `case 'table':` 渲染逻辑，支持对齐方式与行内加粗/代码解析；
+  - [`src/components/learning/LearningSystemView.tsx`](file:///e:/workspace/muduo-study-console/src/components/learning/LearningSystemView.tsx)：精简导航子标签文案与主标题，去除冗余描述文字；
+  - [`src/components/source/SourceRoadmapView.tsx`](file:///e:/workspace/muduo-study-console/src/components/source/SourceRoadmapView.tsx)：精简左侧组件树与右侧调用链路标题，直观呈现 8 大组件与源码；
+  - [`src/components/practice/PracticeCenterView.tsx`](file:///e:/workspace/muduo-study-console/src/components/practice/PracticeCenterView.tsx)：精简各子模块标题与描述；
+  - [`src/components/reader/ArticleSidebar.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/ArticleSidebar.tsx)：精简专栏目录标题与模块进度条文案；
+  - [`src/components/reader/TableOfContents.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/TableOfContents.tsx)：精简大纲导航标题为“本篇大纲”；
+  - [`package.json`](file:///e:/workspace/muduo-study-console/package.json)：版本号升级至 `v6.1.0`；
+  - [`README.md`](file:///e:/workspace/muduo-study-console/README.md)：更新版本徽章与 v6.1.0 详细更新日志。
+
+- **GFM 表格流式解析与对齐算法实现**：
+  ```typescript
+  // src/components/reader/MarkdownView.tsx
+  // 识别首行管道符与第二行分隔行语法结构
+  if (line.includes('|') && i + 1 < lines.length) {
+    const nextLine = lines[i + 1].trim();
+    const delimParts = nextLine.split('|').map(s => s.trim()).filter(Boolean);
+    const isTable = delimParts.length > 0 && delimParts.every(p => /^:?-+:?$/.test(p));
+    if (isTable) {
+      flushList();
+      const parseRow = (str: string) => {
+        let s = str.trim();
+        if (s.startsWith('|')) s = s.slice(1);
+        if (s.endsWith('|')) s = s.slice(0, -1);
+        return s.split('|').map(c => c.trim());
+      };
+
+      const headers = parseRow(line);
+      const alignments: ('left' | 'center' | 'right')[] = delimParts.map(p => {
+        if (p.startsWith(':') && p.endsWith(':')) return 'center';
+        if (p.endsWith(':')) return 'right';
+        return 'left';
+      });
+
+      const rows: string[][] = [];
+      i += 2; // 跳过表头和分隔线
+      while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+        rows.push(parseRow(lines[i]));
+        i++;
+      }
+      i--; // 抵消外层循环递增
+      result.push({ type: 'table', headers, alignments, rows });
+      continue;
+    }
+  }
+  ```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### (1) 专注计时器按钮文字竖向断裂
+- **问题现象**：在侧边栏宽度为 300~320px 时，“开始专注”四个字被挤压成单字竖排换行（“开\n始\n专\n注”）。
+- **根本原因 (RCA)**：`FocusTimer` 原实现使用了 `flex flex-col sm:flex-row items-center justify-between`，在桌面端强行让时间数字和操作按钮左右水平并排。当侧边栏宽度有限时，左侧时间占据了 180px，留给按钮的宽度不足 80px，按钮文字被迫垂直换行。
+- **具体解法**：重构为纵向垂直排版：顶部居中展示超大计时数字（`text-3xl font-black`），下方放置独立的操作按钮条，主操作按钮占满剩余宽度（`flex-1 py-2`），归档重置按钮置于右侧（`shrink-0`），彻底杜绝任何挤压。
+
+#### (2) 项目正文表格渲染失效退化为纯文本
+- **问题现象**：专栏正文中含有多列架构对照表，渲染到页面上变成多行带着 `|` 的混乱普通段落。
+- **根本原因 (RCA)**：`MarkdownView.tsx` 虽在 TypeScript 类型定义中声明了 `type: 'table'`，但在核心逐行解析状态机中完全缺少表格语法的探测逻辑（直接落入 `result.push({ type: 'p', text: line })`），且在 JSX 的 `switch (block.type)` 中缺少 `case 'table':` 分支。
+- **具体解法**：在 Markdown 行解析中加入对 Markdown 标头与 `:---:` 分隔线的预判探测，提取列对齐属性（左对齐、居中、右对齐），解析数据行；在渲染层输出符合 GFM 标准的自适应带横向滚动的表格容器，配备柔和斑马纹与深浅色模式边框。
+
+#### (3) 顶栏与下层工作台两侧边缘错位
+- **问题现象**：宽屏下顶栏内容局限在居中 1280px，而工作台占满整个屏幕，两端留下巨大的突兀空隙。
+- **根本原因 (RCA)**：`Header.tsx` 根容器内层写了 `max-w-7xl mx-auto`（最大宽度 1280px 并居中），而下方三栏工作台统一使用了 `w-full`。
+- **具体解法**：移除 `max-w-7xl mx-auto`，统一使用 `w-full px-4 sm:px-6 lg:px-8`，使顶栏与下层工作台视觉基线 100% 对齐。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：全宽响应式工作台网格与防挤压拓扑图
+```mermaid
+flowchart TD
+    subgraph Viewport ["全视口宽度 (w-full Viewport)"]
+        subgraph TopBar ["顶层导航栏 (Header.tsx: w-full px-4 sm:px-8)"]
+            Logo["Logo: Muduo & CppAI"] --- TabGroup["干练 Tab 导航: 仪表盘 · 任务 · 项目 · 算法 · 源码路线 · 其他"] --- Actions["模式切换 / 环境指南"]
+        end
+
+        subgraph ThreeColumnWorkbench ["统一三栏工作台网格布局 (h-[calc(100vh-4rem)])"]
+            subgraph LeftCol ["左侧固定导航栏 (w-80 shrink-0)"]
+                LNav["干练目录树导航\n• 仪表盘: 核心入口 + 阶段进度\n• 任务: 28 天周期索引\n• 算法: 12 专题达成率\n• 源码: 8 大核心组件"]
+            end
+
+            subgraph CenterCanvas ["中间核心工作区 (flex-1 max-w-4xl / max-w-5xl)"]
+                CCalendar["4×7 日历矩阵 / 深度任务画布 / LeetCode 题单 / 源码深潜"]
+            end
+
+            subgraph RightCol ["右侧辅助操作栏 (w-72 shrink-0 均衡填充)"]
+                subgraph FocusZone ["计时与清单区"]
+                    FTimer["FocusTimer (垂直流布局, 永不挤压换行)"]
+                    TRoutine["TaskRoutineList (干练紧凑清单)"]
+                end
+                subgraph ToolZone ["算法与任务辅助区"]
+                    DiceTool["🎲 随机刷一题即时推荐"]
+                    MasteryTool["0~5 阶掌握度打分器"]
+                    NotesTool["随堂笔记 (flex-1 弹性填充消除死白)"]
+                end
+            end
+        end
+
+        TopBar --- ThreeColumnWorkbench
+    end
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了全宽工作台如何实现自顶向下的无缝对齐：
+  1. 顶层 `Header` 解除 1280px 的居中枷锁，直接吸附视口两端，与下方三栏工作台的左边界、右边界完美贴合；
+  2. 左侧固定栏保持 320px（`w-80`），放置干练的目录树或周期阶段进度；
+  3. 中间核心画布采用 `flex-1` 动态自适应，承载 4×7 矩阵日历或 Markdown 阅读区；
+  4. 右侧操作栏保持 288px（`w-72`），仪表盘承载垂直防挤压计时器，算法与任务承载随机刷题工具与弹性随堂笔记，实现垂直维度的自然撑满。
+- **底层架构收益**：
+  彻底解决了原先宽屏下顶栏居中悬空、右侧栏下方 70% 空白死角以及侧栏元素宽度不足时文本扭曲折断的三大排版难题。
+
+---
+
+#### 图 2：GFM 表格流式语法解析与渲染流水线
+```mermaid
+flowchart LR
+    RawLines["Markdown 原始文本行流"] --> DetectTable{"当前行含 '|' 且下一行为分隔行 (:---:)"}
+
+    DetectTable -- 否 --> NormalBlock["进入 Headings / List / CodeBlock / P 正常块解析"]
+    
+    DetectTable -- 是 --> ParseHeader["解析表头行: parseRow(line)"]
+    ParseHeader --> ParseAlign["提取对齐模式: delimParts.map(align)"]
+    ParseAlign --> LoopRows["流式提取后续数据行: parseRow(lines[i])"]
+    LoopRows --> GenTableBlock["生成 TableBlock AST 节点:\n{ type: 'table', headers, alignments, rows }"]
+    
+    GenTableBlock --> JSXRender["JSX Switch 分支: case 'table'"]
+    JSXRender --> TableContainer["响应式容器: overflow-x-auto rounded-xl border"]
+    TableContainer --> TableHeader["渲染 thead: bg-slate-50 表头 + 列对齐"]
+    TableHeader --> TableBody["渲染 tbody: divide-y 斑马纹 + renderInline 行内高亮"]
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了 Markdown 文本从逐行扫描到 GFM 结构化表格组件的流式转换过程：
+  1. **探测阶段**：当检测到当前行包含 `|` 且其紧邻下一行为分隔符模式（`/^:?-+:?$/`）时，立即截获状态流；
+  2. **元数据提取**：拆解列名称，并根据冒号位置（`:---:` 为居中，`---:` 为右对齐，其余为左对齐）确定各列对齐规则；
+  3. **数据聚集**：继续流式读取后续包含 `|` 的连续行，直到空行或文档结尾；
+  4. **组件渲染**：将生成的结构体传入 JSX 渲染引擎，结合 `renderInline` 函数保留单元格内的行内代码与加粗样式。
+- **底层架构收益**：
+  在不引入庞大第三方 Markdown 解析器（如 react-markdown/remark）的前提下，以轻量、零依赖的方式原生支持了严谨的技术表格展现。
+
+---
+
+#### 图 3：28 天 4×7 日历矩阵状态机与掌握度驱动
+```mermaid
+stateDiagram-v2
+    [*] --> InitMatrix: 加载 DAYS_DATASET (28 天真实任务)
+
+    state InitMatrix {
+        [*] --> SplitWeeks
+        SplitWeeks: 切分为 4 周 (每行 7 天: Day 1~7, 8~14, 15~21, 22~28)
+    }
+
+    InitMatrix --> RenderGrid: 读取本地持久化 muduo_day_mastery
+
+    state RenderGrid {
+        state "未开始 (lvl = 0)" as Unstarted
+        state "学习中 (lvl = 1~3)" as Learning
+        state "已吃透 (lvl = 4~5)" as Mastered
+
+        Unstarted: 浅灰底色 · 灰色天数角标
+        Learning: 天蓝微高亮 · 蓝色星级标
+        Mastered: 翡翠绿底色 · 白色高对比度字体 · ✓ 标记
+    }
+
+    RenderGrid --> UserClick: 用户点击指定 Day 方格
+    UserClick --> NavigateCanvas: 触发 onNavigateToDay(day) 直达该日深度工作台
+    NavigateCanvas --> [*]
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了 4×7 日历矩阵如何将平铺的 28 个任务转化为直观的月份/周期日历视图：
+  1. 系统将 `DAYS_DATASET` 按周切分成 4 个固定长度为 7 的数组；
+  2. 每一个日历格根据用户的真实掌握度级别（0~5 阶）动态赋予语义化色彩样式；
+  3. 点击任意网格后，系统通过状态提升事件（`onNavigateToDay`）立即跳转到“任务”模块的对应日期，并展开该日期的代码解析与编译实操指导。
+- **底层架构收益**：
+  将原本占满一整屏的冗长任务列表收敛为仅仅 4 行紧凑而有条理的日历看板，使用户对整月学习节奏一览无余。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **文案全面去浮夸与去冗余**：全站所有模块的小标题一律精简为干练名称（如“仪表盘”、“系统目录”、“源码路线”、“自测中心”），彻底清理装饰性副标题；
+- **消除误导性打分标记**：将左侧栏易引起误解的“90分”全面修正为清晰的“预计 90 分钟”或在紧凑列表中移除，避免用户产生“考试打分”的困惑；
+- **算法题库右栏互动化**：新增“🎲 随机刷一题”即时推荐器，支持一键切换题目与直接标记完成，消灭原本 70% 的死白留白；
+- **全站宽屏对齐**：顶栏去除 `max-w-7xl` 限制，整站两端严丝合缝，高分辨率下视觉张力与专业度显著提升。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 静态类型无错误验证
+cd e:\workspace\muduo-study-console
+npx tsc --noEmit
+
+# 2. 生产环境打包验证
+npm run build
+```
+
+#### (2) 实际运行结果断言
+- **`npx tsc --noEmit`**：退出码 `0`，0 个 TypeScript 编译错误；
+- **`npm run build`**：
+  ```
+  ✓ 1824 modules transformed.
+  rendering chunks...
+  dist/index.html                     1.12 kB │ gzip:   0.62 kB
+  dist/assets/index-J81PIfd4.css     74.61 kB │ gzip:  12.04 kB
+  dist/assets/index-BdB2UD7_.js   2,500.06 kB │ gzip: 755.93 kB
+  ✓ built in 9.74s
+  ✓ Copied images/ to dist/images/
+  ✓ Successfully completed Vite production build
+  ✓ Copied classic.html -> dist/classic.html
+  [BUILD SUCCESS] Production ready static build in dist/
+  ```

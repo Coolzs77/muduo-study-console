@@ -23,70 +23,61 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
   const completedCount = tasks.filter((t) => t.completed).length;
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-          <ListTodo size={18} className="text-sky-600 dark:text-sky-400" />
-          <span>今日任务清单</span>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+        <div className="flex items-center gap-1.5">
+          <ListTodo size={15} className="text-sky-600 dark:text-sky-400" />
+          <span>今日清单</span>
         </div>
-        <span className="text-xs text-slate-500 dark:text-slate-400">
-          已完成 {completedCount} / {tasks.length} 项
+        <span className="font-mono text-slate-500 dark:text-slate-400 font-normal">
+          {completedCount} / {tasks.length}
         </span>
       </div>
 
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         {tasks.map((task) => (
           <div
             key={task.id}
-            className={`flex items-start justify-between gap-3 p-3.5 rounded-xl border transition ${
+            className={`p-2.5 rounded-xl border transition flex items-center justify-between gap-2.5 ${
               task.completed
-                ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/60'
-                : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80'
+                ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/60'
+                : 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-800 hover:border-slate-300'
             }`}
           >
-            <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div className="flex items-center gap-2.5 min-w-0">
               <button
                 onClick={() => toggleTask(task.id)}
-                className="mt-0.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition cursor-pointer active:scale-90 shrink-0"
+                type="button"
+                className="text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition cursor-pointer shrink-0"
               >
                 {task.completed ? (
-                  <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400 fill-emerald-100 dark:fill-emerald-950" />
+                  <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 fill-emerald-100 dark:fill-emerald-950" />
                 ) : (
-                  <Circle size={18} />
+                  <Circle size={16} />
                 )}
               </button>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h4
-                    className={`font-semibold text-sm ${
-                      task.completed
-                        ? 'text-slate-500 line-through'
-                        : 'text-slate-900 dark:text-white'
-                    }`}
-                  >
-                    {task.title}
-                  </h4>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
-                    {task.estimatedMinutes} 分钟
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                    {task.priority} 级
-                  </span>
+              <div className="min-w-0">
+                <div
+                  className={`text-xs font-medium truncate ${
+                    task.completed ? 'text-slate-400 line-through' : 'text-slate-800 dark:text-slate-200'
+                  }`}
+                >
+                  {task.title}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  {task.focusPoint}
-                </p>
+                <div className="text-[10px] text-slate-400 font-mono">
+                  {task.estimatedMinutes} 分钟
+                </div>
               </div>
             </div>
 
             {task.linkTab && (
               <button
                 onClick={() => onNavigateTab(task.linkTab!)}
-                className="flex items-center gap-1 text-xs text-sky-600 dark:text-sky-400 hover:underline shrink-0 font-medium cursor-pointer self-center"
+                type="button"
+                className="flex items-center gap-0.5 text-[11px] text-sky-600 dark:text-sky-400 hover:underline shrink-0 font-medium cursor-pointer"
               >
                 <span>直达</span>
-                <ArrowRight size={13} />
+                <ArrowRight size={11} />
               </button>
             )}
           </div>

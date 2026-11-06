@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { AlgoCard } from './AlgoCard';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { Search, CheckCircle2, Filter, Layers, Trophy, CheckSquare } from 'lucide-react';
+import { Search, CheckCircle2, CheckSquare, Dices, ExternalLink } from 'lucide-react';
 
 export const STANDARD_CATEGORIES = [
   '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列',
@@ -64,6 +64,20 @@ export const AlgoCatalog: React.FC = () => {
       default:
         return ALGORITHM_LAB_CATALOG;
     }
+  }, [viewTrack]);
+
+  const [randomProblem, setRandomProblem] = useState<typeof ALGORITHM_LAB_CATALOG[0] | null>(null);
+
+  const handlePickRandom = () => {
+    const uncompleted = trackProblems.filter(p => !isProblemDone(p));
+    const pool = uncompleted.length > 0 ? uncompleted : trackProblems;
+    if (pool.length === 0) return;
+    const picked = pool[Math.floor(Math.random() * pool.length)];
+    setRandomProblem(picked);
+  };
+
+  useEffect(() => {
+    handlePickRandom();
   }, [viewTrack]);
 
   // Categories list based on track
@@ -175,7 +189,7 @@ export const AlgoCatalog: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
               <CheckSquare size={16} className="text-sky-600 dark:text-sky-400" />
-              <span>算法专题分类</span>
+              <span>专题分类</span>
               <span className="text-xs text-slate-400 font-normal">({categories.length} 个专题)</span>
             </div>
           </div>
@@ -374,33 +388,35 @@ export const AlgoCatalog: React.FC = () => {
       </main>
 
       {/* ==================================================================== */}
-      {/* Right Column: Statistics & Difficulty Breakdown                      */}
+      {/* Right Column: Statistics, Random Pick & Technique Radar             */}
       {/* ==================================================================== */}
-      <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-5 select-none overflow-y-auto">
-        <div className="space-y-1">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            刷题数据总览
+      <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-4 select-none overflow-y-auto">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+          <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            数据总览
           </h3>
-          <p className="text-[11px] text-slate-400">双向状态自动持久化</p>
+          <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+            {trackCompletedCount} / {trackTotalCount} 题
+          </span>
         </div>
 
         {/* Difficulty Metrics */}
-        <div className="space-y-2 text-xs">
-          <div className="p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 flex items-center justify-between">
+        <div className="space-y-1.5 text-xs">
+          <div className="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 flex items-center justify-between">
             <span className="font-semibold text-emerald-800 dark:text-emerald-300">简单</span>
             <span className="font-bold font-mono text-emerald-700 dark:text-emerald-400">
               {diffCounts.easyDone} / {diffCounts.easyTot}
             </span>
           </div>
 
-          <div className="p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 flex items-center justify-between">
             <span className="font-semibold text-amber-800 dark:text-amber-300">中等</span>
             <span className="font-bold font-mono text-amber-700 dark:text-amber-400">
               {diffCounts.medDone} / {diffCounts.medTot}
             </span>
           </div>
 
-          <div className="p-3 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-900/40 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-900/40 flex items-center justify-between">
             <span className="font-semibold text-rose-800 dark:text-rose-300">困难</span>
             <span className="font-bold font-mono text-rose-700 dark:text-rose-400">
               {diffCounts.hardDone} / {diffCounts.hardTot}
@@ -408,22 +424,107 @@ export const AlgoCatalog: React.FC = () => {
           </div>
         </div>
 
-        {/* Hot 100 Focus */}
-        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2 text-xs">
+        {/* Hot 100 Card */}
+        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5 text-xs">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-slate-800 dark:text-slate-200">LeetCode Hot 100</span>
-            <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-50 text-amber-700 border border-amber-200 font-bold">
-              核心题单
+            <span className="font-semibold text-slate-800 dark:text-slate-200">Hot 100</span>
+            <span className="text-xs text-amber-600 dark:text-amber-400 font-semibold font-mono">
+              {Math.round((ALGORITHM_LAB_CATALOG.filter(p => p.isHot100 && isProblemDone(p)).length / 100) * 100)}%
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-slate-900 dark:text-white font-mono">
+            <span className="text-xl font-black text-slate-900 dark:text-white font-mono">
               {ALGORITHM_LAB_CATALOG.filter(p => p.isHot100 && isProblemDone(p)).length}
-              <span className="text-xs text-slate-400 font-normal"> / 100</span>
+              <span className="text-xs text-slate-400 font-normal"> / 100 题</span>
             </span>
-            <span className="text-xs text-amber-600 font-semibold">
-              {Math.round((ALGORITHM_LAB_CATALOG.filter(p => p.isHot100 && isProblemDone(p)).length / 100) * 100)}%
+          </div>
+          <div className="w-full bg-slate-200 dark:bg-slate-700 h-1 rounded-full overflow-hidden">
+            <div
+              className="bg-amber-500 h-full rounded-full transition-all duration-300"
+              style={{
+                width: `${Math.round((ALGORITHM_LAB_CATALOG.filter(p => p.isHot100 && isProblemDone(p)).length / 100) * 100)}%`
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Random Problem Generator */}
+        <div className="p-3 rounded-xl bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200/60 dark:border-sky-900/40 space-y-2 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-sky-900 dark:text-sky-200 flex items-center gap-1.5">
+              <Dices size={14} className="text-sky-600 dark:text-sky-400" />
+              <span>随机刷题</span>
             </span>
+            <button
+              onClick={handlePickRandom}
+              className="px-2 py-0.5 rounded text-[11px] bg-sky-100 hover:bg-sky-200 dark:bg-sky-900/60 dark:hover:bg-sky-800 text-sky-700 dark:text-sky-300 font-medium transition cursor-pointer"
+            >
+              换一题
+            </button>
+          </div>
+
+          {randomProblem ? (
+            <div className="space-y-2 pt-1">
+              <div>
+                <div className="flex items-center gap-1.5 font-medium text-slate-900 dark:text-white truncate">
+                  {randomProblem.num && <span className="font-mono text-sky-600">#{randomProblem.num}</span>}
+                  <span className="truncate">{randomProblem.title}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                  <span>{randomProblem.difficulty}</span>
+                  <span>•</span>
+                  <span>{randomProblem.category || randomProblem.hot100Chapter || '算法'}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  onClick={() => handleToggleDone(randomProblem)}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium transition cursor-pointer text-center ${
+                    isProblemDone(randomProblem)
+                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-emerald-500'
+                  }`}
+                >
+                  {isProblemDone(randomProblem) ? '✓ 已完成' : '标记完成'}
+                </button>
+                {randomProblem.leetcodeUrl && (
+                  <a
+                    href={randomProblem.leetcodeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition"
+                    title="在 LeetCode 打开"
+                  >
+                    <ExternalLink size={13} />
+                  </a>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-slate-400 text-center py-2">暂无推荐题目</p>
+          )}
+        </div>
+
+        {/* Quick Category Jump */}
+        <div className="space-y-1.5 text-xs pt-1">
+          <div className="font-semibold text-slate-600 dark:text-slate-400 text-[11px]">
+            常用专题速览
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {categories.slice(0, 8).map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-2 py-1 rounded-md text-[11px] transition cursor-pointer ${
+                  selectedCategory === cat
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
       </aside>

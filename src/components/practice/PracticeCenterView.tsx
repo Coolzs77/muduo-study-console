@@ -80,14 +80,11 @@ export const PracticeCenterView: React.FC<PracticeCenterViewProps> = ({
       {/* LEFT COLUMN: Sub-Module Directory & Contextual Navigation  */}
       {/* ========================================================= */}
       <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
-        <div>
+        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <Layers size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>综合实践与自测</span>
+            <span>实践目录</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            代码映射、面试问答、踩坑避险与归档
-          </p>
         </div>
 
         {/* 5 Sub-Modules Nav */}
@@ -161,14 +158,11 @@ export const PracticeCenterView: React.FC<PracticeCenterViewProps> = ({
       {/* RIGHT COLUMN: Quick Actions & Reference Tips              */}
       {/* ========================================================= */}
       <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden xl:block">
-        <div>
+        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <Sparkles size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>自测与能力诊断</span>
+            <span>自测中心</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            求职对标与实战验证
-          </p>
         </div>
 
         {/* Module Status Card */}
