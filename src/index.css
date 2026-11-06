@@ -184,7 +184,45 @@
 }
 
 /* ========================================================================== */
-/* LeetCode 语法高亮自适应 (白天模式 & 夜间模式) */
+/* Emil Kowalski 动画工程规范与全局缓动 Token */
+/* ========================================================================== */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.active-press {
+  transition: transform 160ms var(--ease-out);
+}
+.active-press:active {
+  transform: scale(0.97);
+}
+
+.smooth-hover {
+  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+.smooth-hover:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger {
+  animation: staggerFadeIn 250ms var(--ease-out) both;
+}
+
+/* ========================================================================== */
+/* VSCode 2026 官方标准语法高亮自适应 (Light Modern & Dark Modern) */
 /* ========================================================================== */
 .hljs {
   background: transparent !important;
@@ -192,23 +230,27 @@
   border-radius: 0 !important;
 }
 
-/* 白天模式 (LeetCode 浅色语法高亮) */
-.hljs-keyword, .hljs-selector-tag { color: #d73a49 !important; font-weight: 600; }
-.hljs-built_in, .hljs-type { color: #005cc5 !important; }
-.hljs-string, .hljs-title { color: #22863a !important; }
-.hljs-comment, .hljs-quote { color: #6a737d !important; font-style: italic; }
-.hljs-number, .hljs-literal { color: #005cc5 !important; }
-.hljs-function { color: #6f42c1 !important; }
-.hljs-attr, .hljs-variable, .hljs-template-variable { color: #e36209 !important; }
-.hljs-params { color: #24292e !important; }
+/* 白天模式: VSCode 2026 现代浅色 (Light Modern) */
+.hljs-keyword, .hljs-selector-tag { color: #0000ff !important; font-weight: 600; }
+.hljs-type, .hljs-class { color: #267f99 !important; }
+.hljs-built_in { color: #af00db !important; }
+.hljs-title.function_, .hljs-function { color: #795e26 !important; }
+.hljs-string, .hljs-title { color: #a31515 !important; }
+.hljs-comment, .hljs-quote { color: #008000 !important; font-style: italic; }
+.hljs-number, .hljs-literal { color: #098658 !important; }
+.hljs-variable, .hljs-params { color: #001080 !important; }
+.hljs-meta, .hljs-meta-keyword { color: #af00db !important; }
+.hljs-attr { color: #e50000 !important; }
 
-/* 夜间模式 (LeetCode 深色语法高亮) */
-.dark .hljs-keyword, .dark .hljs-selector-tag { color: #c678dd !important; font-weight: 600; }
-.dark .hljs-built_in, .dark .hljs-type { color: #e5c07b !important; }
-.dark .hljs-string, .dark .hljs-title { color: #98c379 !important; }
-.dark .hljs-comment, .dark .hljs-quote { color: #7f848e !important; font-style: italic; }
-.dark .hljs-number, .dark .hljs-literal { color: #d19a66 !important; }
-.dark .hljs-function { color: #61afef !important; }
-.dark .hljs-attr, .dark .hljs-variable, .dark .hljs-template-variable { color: #e06c75 !important; }
-.dark .hljs-params { color: #abb2bf !important; }
+/* 夜间模式: VSCode 2026 现代深色 (Dark Modern) */
+.dark .hljs-keyword, .dark .hljs-selector-tag { color: #569cd6 !important; font-weight: 600; }
+.dark .hljs-type, .dark .hljs-class { color: #4ec9b0 !important; }
+.dark .hljs-built_in { color: #4ec9b0 !important; }
+.dark .hljs-title.function_, .dark .hljs-function { color: #dcdcaa !important; }
+.dark .hljs-string, .dark .hljs-title { color: #ce9178 !important; }
+.dark .hljs-comment, .dark .hljs-quote { color: #6a9955 !important; font-style: italic; }
+.dark .hljs-number, .dark .hljs-literal { color: #b5cea8 !important; }
+.dark .hljs-variable, .dark .hljs-params { color: #9cdcfe !important; }
+.dark .hljs-meta, .dark .hljs-meta-keyword { color: #c586c0 !important; }
+.dark .hljs-attr { color: #9cdcfe !important; }
 

@@ -9,6 +9,37 @@ import { DayCurriculumItem } from "../types";
 // Week 4 (Day 22~28): CppAIService 全栈 AI 平台实战 (yq_14 ~ yq_17)
 // ============================================================================
 
+export const SHORT_DAY_TITLES: Record<number, string> = {
+  1: 'KamaServer 定位与架构',
+  2: 'HTTP 框架与四层辨析',
+  3: 'Linux/Docker 编译链环境',
+  4: 'HttpServer 与 Muduo Reactor',
+  5: 'HttpRequest/Response 报文',
+  6: 'HttpContext 有限状态机',
+  7: 'TCP 粘包拆包与零拷贝',
+  8: 'RouteKey 静态路由注册',
+  9: 'std::regex 动态正则路由',
+  10: '动态路由参数陷阱排查',
+  11: 'Cookie/SESSIONID 会话管理',
+  12: 'MemorySession 存储与淘汰',
+  13: '洋葱模型责任链中间件',
+  14: 'Cors 跨域与 OPTIONS 拦截',
+  15: 'MySQL 单连接 RAII 封装',
+  16: 'MySQL 连接池动态复用',
+  17: '预编译防 SQL 注入实践',
+  18: 'HTTPS/TLS 握手与证书',
+  19: '非阻塞 SSL 握手集成',
+  20: '零拷贝与 Buffer 性能调优',
+  21: '五子棋 GomokuServer 实战',
+  22: 'CppAIService 三层架构演进',
+  23: '通义千问大模型 HTTP 调用',
+  24: 'RabbitMQ 异步队列解耦',
+  25: '消费者线程池与批量 Ack',
+  26: 'OpenCV 预处理与 ONNX 部署',
+  27: '用户会话与架构高并发复盘',
+  28: 'STAR 法则简历与面试突破'
+};
+
 export const DAYS_DATASET: DayCurriculumItem[] = [
   {
     "day": 1,

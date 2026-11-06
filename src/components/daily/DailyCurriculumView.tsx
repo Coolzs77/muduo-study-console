@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { DAYS_DATASET } from '../../data/daysDataset';
+import { DAYS_DATASET, SHORT_DAY_TITLES } from '../../data/daysDataset';
 import { DayCurriculumItem } from '../../types';
 import { CodeBlock } from '../common/CodeBlock';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
@@ -224,7 +224,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
                     <span className="font-semibold truncate leading-snug" title={item.title}>
-                      {item.title}
+                      {SHORT_DAY_TITLES[item.day] || item.title}
                     </span>
                     {isMastered && (
                       <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
@@ -438,7 +438,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
       {/* ==================================================================== */}
       {/* Right Column: Mastery Rating, Quiz Launcher & Daily Notes             */}
       {/* ==================================================================== */}
-      <aside className="w-72 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-4 select-none overflow-y-auto">
+      <aside className="w-80 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-3.5 select-none overflow-y-auto">
         {/* Mastery Rating */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
@@ -463,11 +463,11 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   key={tier.lvl}
                   onClick={() => setMasteryLevel(tier.lvl)}
                   type="button"
-                  className={`flex items-center justify-between px-2 py-1.5 rounded-lg text-xs transition cursor-pointer text-left border ${
+                  className={`flex items-center justify-between px-2 py-1.5 rounded-lg text-xs transition cursor-pointer text-left border active-press smooth-hover ${
                     isSelected
                       ? tier.lvl >= 4
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold border-emerald-300 dark:border-emerald-800'
-                        : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border-sky-300 dark:border-sky-800'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold border-emerald-300 dark:border-emerald-800 shadow-2xs'
+                        : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border-sky-300 dark:border-sky-800 shadow-2xs'
                       : 'border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
@@ -490,12 +490,54 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           </p>
         </div>
 
+        {/* Core Concepts */}
+        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5 text-xs">
+          <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <BookOpen size={13} className="text-sky-500" />
+              <span>今日核心概念</span>
+            </div>
+            <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono font-semibold">{currentDay.module}</span>
+          </div>
+          <div className="flex flex-wrap gap-1 pt-1">
+            {(currentDay.tags || []).map((tag, idx) => (
+              <span
+                key={idx}
+                className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-700/80 border border-slate-200/70 dark:border-slate-600/60 text-slate-700 dark:text-slate-200 text-[11px] font-medium"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Build / Test Command */}
+        <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5 text-xs">
+          <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 font-semibold">
+            <span className="flex items-center gap-1.5">
+              <Terminal size={12} className="text-sky-500" />
+              <span>快速测试命令</span>
+            </span>
+            <button
+              onClick={() => handleCopyBuild(currentDay.buildCmd || 'cmake -B build && cmake --build build')}
+              type="button"
+              className="text-[11px] text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer active-press"
+            >
+              {copiedCmd ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+              <span>{copiedCmd ? '已复制' : '复制'}</span>
+            </button>
+          </div>
+          <code className="block p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 font-mono text-[10px] text-slate-800 dark:text-slate-200 truncate">
+            {currentDay.buildCmd || 'cmake -B build && cmake --build build'}
+          </code>
+        </div>
+
         {/* Quiz Launcher */}
         {onJumpToQuiz && (
           <button
             onClick={() => onJumpToQuiz(currentDay.day)}
             type="button"
-            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold transition cursor-pointer"
+            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold transition cursor-pointer active-press smooth-hover"
           >
             <HelpCircle size={13} />
             <span>Day {currentDay.day} 自测</span>
@@ -503,7 +545,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         )}
 
         {/* Daily Notes Scratchpad - Fills the vertical space naturally */}
-        <div className="flex-1 flex flex-col space-y-1.5 min-h-[180px]">
+        <div className="flex-1 flex flex-col space-y-1.5 min-h-[220px]">
           <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
             <div className="flex items-center gap-1">
               <FileEdit size={13} />

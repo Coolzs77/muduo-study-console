@@ -54,23 +54,26 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
   };
 
   return (
-    <div className={`my-3 rounded-xl overflow-hidden border border-slate-200 dark:border-[#334155] bg-[#f8fafc] dark:bg-[#1e1e1e] text-[#1f2937] dark:text-[#f1f5f9] shadow-2xs text-[13px] font-mono ${className}`}>
-      <div className="flex items-center justify-between px-3.5 py-2 bg-slate-100/90 dark:bg-[#252526] border-b border-slate-200 dark:border-[#334155] text-xs text-slate-500 dark:text-slate-400 select-none">
+    <div className={`my-3 rounded-xl overflow-hidden border border-slate-200 dark:border-[#2b2b2b] bg-white dark:bg-[#1f1f1f] text-slate-800 dark:text-[#cccccc] shadow-2xs text-[13px] font-mono ${className}`}>
+      <div className="flex items-center justify-between px-3.5 py-2 bg-slate-50 dark:bg-[#181818] border-b border-slate-200 dark:border-[#2b2b2b] text-xs text-slate-500 dark:text-slate-400 select-none">
         <div className="flex items-center gap-2">
           <Terminal size={14} className="text-sky-600 dark:text-sky-400" />
-          <span className="font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <span className="font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 font-mono text-[11px]">
             {title || cleanLang}
+          </span>
+          <span className="text-[10px] text-slate-400 font-normal">
+            ({code.split('\n').length} 行)
           </span>
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-[#333333] hover:bg-slate-200 dark:hover:bg-[#3f3f46] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-transparent transition text-xs cursor-pointer active:scale-95"
+          className="active-press flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-[#252526] hover:bg-slate-100 dark:hover:bg-[#2d2d2d] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-[#333333] transition text-xs cursor-pointer"
           title="复制代码"
           type="button"
         >
           {copied ? (
             <>
-              <Check size={13} className="text-emerald-500 dark:text-emerald-400" />
+              <Check size={13} className="text-emerald-500 dark:text-emerald-400 transition-transform scale-110" />
               <span className="text-emerald-600 dark:text-emerald-400 font-medium">已复制</span>
             </>
           ) : (
