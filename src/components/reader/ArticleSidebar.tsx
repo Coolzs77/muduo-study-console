@@ -1,6 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { YuqueArticle } from '../../types';
-import { Search, BookOpen, Layers, CheckCircle, ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import {
+  Search,
+  BookOpen,
+  Layers,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  PanelLeftClose,
+  PanelLeftOpen
+} from 'lucide-react';
 
 interface ArticleSidebarProps {
   articles: YuqueArticle[];
@@ -64,13 +74,13 @@ export const ArticleSidebar: React.FC<ArticleSidebarProps> = ({
 
   if (isCollapsed) {
     return (
-      <aside className="w-12 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center py-4 select-none">
+      <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center py-4 select-none">
         <button
           onClick={onToggleCollapse}
-          className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 transition cursor-pointer"
+          className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 transition cursor-pointer"
           title="展开专栏目录"
         >
-          <ChevronRight size={18} />
+          <PanelLeftOpen size={18} />
         </button>
       </aside>
     );
@@ -91,7 +101,7 @@ export const ArticleSidebar: React.FC<ArticleSidebarProps> = ({
             className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition cursor-pointer"
             title="收起目录"
           >
-            <ChevronLeft size={16} />
+            <PanelLeftClose size={16} />
           </button>
         </div>
 

@@ -74,7 +74,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased w-full">
       {/* 2.5px Top Reading Progress Bar (active during reading) */}
       <ReadingProgressBar />
 
@@ -87,8 +87,8 @@ export const App: React.FC = () => {
         onOpenEnvGuide={() => setIsEnvGuideOpen(true)}
       />
 
-      {/* Main View Matrix */}
-      <main className="flex-1 w-full">
+      {/* Main View Matrix - Fluid full-screen container with no max-w bottlenecks */}
+      <main className="flex-1 w-full min-w-0">
         {activeTab === 'dashboard' && (
           <DashboardView
             onNavigateTab={setActiveTab}

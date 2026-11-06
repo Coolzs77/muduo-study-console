@@ -21,7 +21,9 @@ import {
   Cpu,
   Layers,
   ArrowRight,
-  Check
+  Check,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 interface DailyCurriculumViewProps {
@@ -38,6 +40,11 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
   const [selectedDayNum, setSelectedDayNum] = useLocalStorage<number>(
     'curriculum_active_day',
     selectedDayHighlight || 1
+  );
+
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
+    'sidebar_collapsed_daily',
+    false
   );
 
   const [selectedWeek, setSelectedWeek] = useState<number | 'all'>('all');
@@ -117,18 +124,78 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
   return (
     <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       {/* ==================================================================== */}
-      {/* Left Column: 4-Week & 28-Day Task Directory Tree                     */}
+      {/* Left Column: 4-Week & 28-Day Task Directory Tree (Collapsible)       */}
       {/* ==================================================================== */}
-      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-[calc(100vh-4rem)] sticky top-16 select-none">
-        {/* Top Header & Search */}
-        <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
-              <Calendar size={16} className="text-sky-600 dark:text-sky-400" />
-              <span>任务目录</span>
-              <span className="text-xs text-slate-400 font-normal">({filteredDays.length}/28)</span>
-            </div>
+      {isSidebarCollapsed ? (
+        <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center py-3.5 space-y-3 h-[calc(100vh-4rem)] sticky top-16 select-none transition-all duration-300">
+          <button
+            onClick={() => setIsSidebarCollapsed(false)}
+            className="p-2 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+            title="展开任务目录"
+          >
+            <PanelLeftOpen size={18} />
+          </button>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800" />
+
+          {/* Quick Week Selectors in collapsed state */}
+          <div className="flex flex-col items-center space-y-1.5 text-[11px] font-bold">
+            <button
+              onClick={() => { setSelectedWeek('all'); setIsSidebarCollapsed(false); }}
+              className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+                selectedWeek === 'all'
+                  ? 'bg-sky-600 text-white shadow-2xs'
+                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+              title="全部 28 天任务"
+            >
+              全
+            </button>
+            {[1, 2, 3, 4].map(w => (
+              <button
+                key={w}
+                onClick={() => { setSelectedWeek(w); setIsSidebarCollapsed(false); }}
+                className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer font-mono ${
+                  selectedWeek === w
+                    ? 'bg-sky-600 text-white shadow-2xs font-bold'
+                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+                title={`第 ${w} 周任务`}
+              >
+                W{w}
+              </button>
+            ))}
           </div>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 mt-auto" />
+
+          {/* Current Day indicator badge */}
+          <div
+            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400 cursor-pointer"
+            onClick={() => setIsSidebarCollapsed(false)}
+            title={`当前正在学习: Day ${currentDay.day}`}
+          >
+            D{currentDay.day < 10 ? `0${currentDay.day}` : currentDay.day}
+          </div>
+        </aside>
+      ) : (
+        <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-[calc(100vh-4rem)] sticky top-16 select-none transition-all duration-300">
+          {/* Top Header & Search */}
+          <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
+                <Calendar size={16} className="text-sky-600 dark:text-sky-400" />
+                <span>任务目录</span>
+                <span className="text-xs text-slate-400 font-normal">({filteredDays.length}/28)</span>
+              </div>
+              <button
+                onClick={() => setIsSidebarCollapsed(true)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+                title="收起任务目录"
+              >
+                <PanelLeftClose size={16} />
+              </button>
+            </div>
 
           {/* Week Selector */}
           <div className="grid grid-cols-5 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-lg text-xs font-medium text-center">
@@ -258,11 +325,12 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           )}
         </div>
       </aside>
+      )}
 
       {/* ==================================================================== */}
-      {/* Middle Column: Core Task Workspace Canvas                            */}
+      {/* Middle Column: Core Task Workspace Canvas (Fluid Full Width)         */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-6">
+      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-6 w-full">
         {/* Task Header */}
         <div className="border-b border-slate-200 dark:border-slate-800 pb-5 space-y-3">
           <div className="flex flex-wrap items-center gap-2">

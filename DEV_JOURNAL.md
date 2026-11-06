@@ -2449,3 +2449,179 @@ git push origin main
   [BUILD SUCCESS] Production ready static build in dist/
   ```
 - **Git 提交与远端推送**：成功同步至 `origin/main`。
+
+
+---
+
+## 第 16 轮 [2026-11-06 23:50]：全站大屏流式全宽自适应、7 大业务模块左侧导航折叠与高分辨率视觉消白
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与背景**：
+  1. **高分辨率下右侧大面积空白未铺满问题**：在大屏或高分辨率显示器下，页面中间主工作区与右侧辅助侧栏未能自适应铺满整个视口，最右侧残留大片深灰蓝色未铺满区域；
+  2. **全栏目左侧导航折叠功能**：用户提出“每个栏目的左侧导航栏都增加折叠的按钮”，要求涵盖系统的全部 7 大业务模块（仪表盘、任务攻坚、专栏项目、算法题库、学习系统、源码路线及其他/实践中心），在展开（`w-80`）与迷你紧凑（`w-14`）状态之间平滑切换；
+  3. **自动化部署至 GitHub 闭环**：要求无需人工督促，每次更新后在本地生成静态制品、推送到 `main` 分支并同步部署到 `origin/gh-pages` 分支。
+- **预期达成指标**：
+  1. 根容器与所有业务模块去除任何固定像素或 `max-w-*` 瓶颈，采用 `flex-1 w-full min-w-0` 弹性流式拉伸，右侧栏 100% 紧贴视口右边缘；
+  2. 7 个模块的左侧导航均配置 `PanelLeftClose`/`PanelLeftOpen` 交互，折叠状态保持 `w-14` 迷你 Dock，展示核心微标/快捷图标，展开状态恢复完整树形目录；
+  3. 静态类型检查退出码为 0，生产环境打包成功，自动推送到 `origin/main` 与 `origin/gh-pages`。
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及文件**：
+  - [`src/App.tsx`](file:///e:/workspace/muduo-study-console/src/App.tsx)：将根布局 `<div className="min-h-screen ... w-full">` 与主视口 `<main className="flex-1 w-full min-w-0">` 统一为流式自适应全宽容器；
+  - [`src/components/daily/DailyCurriculumView.tsx`](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)：新增 `isSidebarCollapsed` 本地持久化状态，实现 `w-14`（保留 `全`/`W1`~`W4` 周微标与当前学习 Day 胶囊）与 `w-80`（完整 28 天任务树）折叠切换，中间 `<main>` 设定为 `flex-1 min-w-0 w-full`；
+  - [`src/components/algorithm/AlgoCatalog.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoCatalog.tsx)：新增左侧分类侧栏折叠状态，折叠为 `w-14`（保留 `全`/`Hot`/`录` 题单快捷切换），`<main>` 设定为 `flex-1 min-w-0 w-full`，右侧数据栏贴边拉伸；
+  - [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：左侧 6 大导航增加折叠切换，折叠为 `w-14` 纵向 Dock，中心主画板采用 `flex-1 min-w-0 w-full`；
+  - [`src/components/learning/LearningSystemView.tsx`](file:///e:/workspace/muduo-study-console/src/components/learning/LearningSystemView.tsx)：左侧学习子目录增加折叠交互，折叠为 `w-14` 微标 Dock，中间画布设为 `w-full`；
+  - [`src/components/source/SourceRoadmapView.tsx`](file:///e:/workspace/muduo-study-console/src/components/source/SourceRoadmapView.tsx)：左侧组件架构目录增加折叠，折叠为 `w-14` 包含 8 核心组件进度徽标的 Dock；
+  - [`src/components/practice/PracticeCenterView.tsx`](file:///e:/workspace/muduo-study-console/src/components/practice/PracticeCenterView.tsx)：左侧实践目录增加折叠，折叠为 `w-14`，5 个子模块图标保留快速切换；
+  - [`src/components/reader/ArticleSidebar.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/ArticleSidebar.tsx)：规范折叠宽度为 `w-14`，图标统一为 `PanelLeftClose`/`PanelLeftOpen`；
+  - `package.json` & `README.md`：版本正式升级至 `v6.3.0`。
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+- **问题现象 1：在大分辨率显示器下页面右侧有大面积空白留白**：
+  - **根本原因 (RCA)**：三栏工作台在不同组件内部使用了固定的容器限制，例如部分内层使用了包含预设最大宽度的类名，导致 Flex 布局在计算中间主工作区时没有将可用宽度全部拉伸给 `flex-1`，使得右侧固定宽度的辅助栏无法推移到屏幕最右边，进而形成明显的视觉断层。
+  - **具体解法**：在所有三栏布局的父容器统一加上 `w-full min-h-[calc(100vh-4rem)]`，中间主工作区统一声明 `flex-1 min-w-0 w-full`，右侧辅助侧栏固定声明 `shrink-0 sticky top-16`，由 Flex 弹性盒子将剩余水平空间完全吸收分配给中间正文，使右侧面板 100% 紧贴屏幕右边界。
+- **问题现象 2：侧边栏折叠后页面宽度跳变与状态丢失**：
+  - **根本原因 (RCA)**：如果直接将折叠后的侧边栏设为 `display: none`，中间的主内容区会瞬间向左跳跃，且用户在折叠状态下完全丧失了切换当前模块的能力。
+  - **具体解法**：设计轻量化的 `w-14` (56px) 迷你 Dock，折叠时保留顶部的展开触发器与各子分类的精简高频图标，并使用 `useLocalStorage` 将每个模块的折叠状态独立持久化，刷新页面后依然保持用户习惯。
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 架构图 1：大屏流式自适应弹性布局拓扑图 (Fluid Fullscreen Layout Topology)
+```mermaid
+flowchart TD
+    subgraph Viewport ["浏览器视口 (100vw × 100vh)"]
+        TopNav["顶部全局导航栏 (w-full h-16 sticky top-0)"]
+        
+        subgraph MainWorkstation ["全景流式工作台 (flex w-full min-h-[calc(100vh-4rem)])"]
+            direction LR
+            
+            subgraph LeftCol ["左侧导航区 (可折叠)"]
+                ExpandedNav["展开状态 (w-80 shrink-0)\n• 完整分类/任务树\n• 收起按钮 (PanelLeftClose)"]
+                CollapsedNav["折叠状态 (w-14 shrink-0)\n• 迷你微标 / 图标\n• 展开按钮 (PanelLeftOpen)"]
+            end
+            
+            subgraph MidCol ["中间核心工作区 (自适应拉伸)"]
+                MainCanvas["核心画布 (flex-1 min-w-0 w-full)\n• 任务正文 / 代码块 / 算法列表\n• 自动吸收全屏剩余宽度\n• 消除 max-w 约束"]
+            end
+            
+            subgraph RightCol ["右侧辅助侧栏 (贴边停靠)"]
+                SidePanel["辅助面板 (w-80 / w-72 shrink-0 sticky top-16)\n• 学习掌握度 / 快速命令 / 笔记\n• 100% 紧贴视口右边缘"]
+            end
+        end
+        
+        TopNav --- MainWorkstation
+        LeftCol --- MidCol --- RightCol
+    end
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  1. 顶部导航栏占满全宽（`w-full`），固定在视口顶部；
+  2. 下方工作台采用 Flex 水平排列，左侧导航栏根据折叠状态在 `w-80` 与 `w-14` 之间切换；
+  3. 中间核心画布通过 `flex-1 min-w-0 w-full` 动态吸收屏幕上的全部剩余可用宽度；
+  4. 右侧辅助面板固定宽度并通过 Flex 自动推至屏幕最右端，彻底根除死角空白。
+- **底层架构收益**：
+  彻底解耦了视口分辨率与内容宽度的依赖关系，在 1080P、2K、4K 等各类分辨率下均呈现均匀贴合的工控台视觉效果。
+
+---
+
+#### 架构图 2：7 大业务模块左侧导航折叠与状态机模型 (Collapsible Sidebar State Machine)
+```mermaid
+stateDiagram-v2
+    [*] --> Expanded: 初始进入 (默认展开)
+    
+    state Expanded {
+        [*] --> FullTree
+        FullTree: 显示模块完整目录树 (w-80)
+        FullTree: 包含搜索输入框与统计信息
+        FullTree: 显示 PanelLeftClose 收起图标
+    }
+    
+    Expanded --> Collapsing: 用户点击 PanelLeftClose
+    Collapsing --> Collapsed: 切换样式为 w-14 并写入 LocalStorage
+    
+    state Collapsed {
+        [*] --> MiniDock
+        MiniDock: 显示紧凑图标 Dock (w-14)
+        MiniDock: 保留分类快捷切换按钮与 Tooltip
+        MiniDock: 显示 PanelLeftOpen 展开图标
+    }
+    
+    Collapsed --> Expanding: 用户点击 PanelLeftOpen
+    Expanding --> Expanded: 恢复宽度为 w-80 并同步 LocalStorage
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  1. 初始状态读取本地存储（`useLocalStorage`），若无记录则默认为展开（`Expanded`）；
+  2. 点击收起按钮时，侧边栏宽度平滑缩短为 56px（`w-14`），隐藏文字标签与过滤控件，仅展示迷你图标；
+  3. 点击展开按钮时，侧边栏恢复 320px（`w-80`），恢复完整目录结构；
+  4. 状态变更实时同步到本地缓存，跨页面切换时状态保持一致。
+- **底层架构收益**：
+  让用户根据注意力需求自由调节屏幕视野，在需要大屏沉浸阅读或查看代码时，一键释放水平工作空间。
+
+---
+
+#### 架构图 3：自动持续构建与 GitHub 部署管道图 (Automated Continuous Deployment Pipeline)
+```mermaid
+flowchart LR
+    Edit["1. 代码编写与规范审查\n(全宽自适应 + 折叠导航)"] --> TSC["2. TypeScript 严格类型检查\n(npx tsc --noEmit: 0 错误)"]
+    TSC --> Build["3. Vite 生产构建打包\n(node scripts/build_static.cjs -> dist/)"]
+    Build --> GitPush["4. 主分支同步提交\n(git commit & git push origin main)"]
+    GitPush --> GHPages["5. 自动部署至 gh-pages\n(node scripts/deploy_gh_pages.cjs)"]
+    GHPages --> Live["6. 全球 GitHub Pages 产物上线\n(coolzs77.github.io/muduo-study-console)"]
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  1. 修改完成后由 AI 自动运行 TypeScript 语法与类型校验；
+  2. 本地执行 Vite 打包生成高压缩静态制品（HTML、CSS、JS、资源图片及 `.nojekyll` 文件）；
+  3. 主分支提交源码变更并推送；
+  4. 执行自动化脚本将静态制品推送到 `gh-pages` 分支；
+  5. GitHub Pages 全球 CDN 即刻承载最新版本并向用户交付。
+- **底层架构收益**：
+  实现代码落地即部署，杜绝等待 Actions 队列排队的互锁风险，交付链路完全闭环。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **消灭大屏边缘视觉断层**：中间内容区域在 1920×1080 及更高分辨率下平滑展开，右侧面板贴边对齐，没有任何脱节的深蓝底色留白；
+- **7 大业务模块体验统一**：全部 7 个功能区统一具备折叠操作，按钮位置、图标符号及快捷微标规范一致；
+- **折叠状态可用性保障**：折叠后仍可通过图标与周次微标进行快速切换，兼顾极简视觉与操作便捷性。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 切换至项目目录
+cd e:\workspace\muduo-study-console
+
+# 2. 验证 TypeScript 类型检查 (退出码 0)
+npx tsc --noEmit
+
+# 3. 验证 Vite 生产打包 (退出码 0，生成 dist/ 目录)
+npm run build
+
+# 4. 执行 Git 提交并推送至 origin/main
+git add .
+git commit -m "feat: 全站大屏流式全宽自适应与全栏目左侧导航折叠 (v6.3.0)"
+git push origin main
+
+# 5. 执行自动部署至 origin/gh-pages 分支
+node scripts/deploy_gh_pages.cjs
+```
+
+#### (2) 实际运行结果断言
+- **`npx tsc --noEmit`**：执行成功，退出码 `0`，无任何类型错误；
+- **`npm run build`**：
+  ```
+  ✓ 1824 modules transformed.
+  dist/index.html                     1.12 kB │ gzip:   0.62 kB
+  dist/assets/index-D_LAkqa4.css     79.28 kB │ gzip:  12.67 kB
+  dist/assets/index-DG8opkDP.js   2,522.01 kB │ gzip: 759.77 kB
+  [BUILD SUCCESS] Production ready static build in dist/
+  ```
+- **部署状态**：主分支与 `gh-pages` 分支均已同步至最新提交。

@@ -17,7 +17,9 @@ import {
   Code2,
   Sparkles,
   ArrowRight,
-  Bookmark
+  Bookmark,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 export const SourceRoadmapView: React.FC = () => {
@@ -33,6 +35,10 @@ export const SourceRoadmapView: React.FC = () => {
     {}
   );
   const [selectedCompId, setSelectedCompId] = useState<string>(SOURCE_ROADMAP[0]?.id || 'channel');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
+    'sidebar_collapsed_source',
+    false
+  );
 
   // File browser state
   const fileKeys = useMemo(() => Object.keys(CPPAI_SOURCES_MAP), []);
@@ -102,15 +108,72 @@ export const SourceRoadmapView: React.FC = () => {
   return (
     <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950">
       {/* ========================================================= */}
-      {/* LEFT COLUMN: Roadmap Components & Source Files Directory  */}
+      {/* LEFT COLUMN: Roadmap & Files Directory (Collapsible)       */}
       {/* ========================================================= */}
-      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-4 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
-        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Code2 size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>源码路线</span>
-          </h2>
-        </div>
+      {isSidebarCollapsed ? (
+        <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 py-3.5 flex flex-col items-center space-y-3 sticky top-16 h-[calc(100vh-4rem)] hidden md:flex select-none transition-all duration-300">
+          <button
+            onClick={() => setIsSidebarCollapsed(false)}
+            className="p-2 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+            title="展开源码路线"
+          >
+            <PanelLeftOpen size={18} />
+          </button>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800" />
+
+          {/* Mini Tab Switchers */}
+          <div className="flex flex-col items-center space-y-2 text-slate-600 dark:text-slate-400">
+            <button
+              onClick={() => { setActiveTab('roadmap'); setIsSidebarCollapsed(false); }}
+              className={`p-2 rounded-xl transition cursor-pointer active-press ${
+                activeTab === 'roadmap'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+              }`}
+              title="组件路线图 (8)"
+            >
+              <Layers size={18} />
+            </button>
+            <button
+              onClick={() => { setActiveTab('files'); setIsSidebarCollapsed(false); }}
+              className={`p-2 rounded-xl transition cursor-pointer active-press ${
+                activeTab === 'files'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+              }`}
+              title="源码文件浏览 (11)"
+            >
+              <FileCode size={18} />
+            </button>
+          </div>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 mt-auto" />
+
+          {/* Mastered Count Pill */}
+          <div
+            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400 cursor-pointer"
+            onClick={() => setIsSidebarCollapsed(false)}
+            title={`已吃透组件: ${masteredCompCount}/8`}
+          >
+            {masteredCompCount}/8
+          </div>
+        </aside>
+      ) : (
+        <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-4 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block transition-all duration-300">
+          <div className="pb-2 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Code2 size={16} className="text-sky-600 dark:text-sky-400" />
+              <span>源码路线</span>
+            </h2>
+            <button
+              onClick={() => setIsSidebarCollapsed(true)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+              title="收起源码路线"
+            >
+              <PanelLeftClose size={16} />
+            </button>
+          </div>
 
         {/* View Switcher Pills */}
         <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-200/60 dark:bg-slate-800/80 rounded-xl text-xs font-semibold">
@@ -245,11 +308,12 @@ export const SourceRoadmapView: React.FC = () => {
           </div>
         )}
       </aside>
+      )}
 
       {/* ========================================================= */}
-      {/* CENTER COLUMN: Component Deep-Dive or LeetCode Code View  */}
+      {/* CENTER COLUMN: Component Deep-Dive or Code (Fluid Full)   */}
       {/* ========================================================= */}
-      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto">
+      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto w-full">
         {activeTab === 'roadmap' && currentComp && (
           <div className="space-y-6">
             {/* Component Header */}

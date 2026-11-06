@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { AlgoCard } from './AlgoCard';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { Search, CheckCircle2, CheckSquare, Dices, ExternalLink } from 'lucide-react';
+import { Search, CheckCircle2, CheckSquare, Dices, ExternalLink, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 export const STANDARD_CATEGORIES = [
   '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列',
@@ -20,6 +20,10 @@ export const AlgoCatalog: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [diffFilter, setDiffFilter] = useState<'all' | 'Easy' | 'Medium' | 'Hard'>('all');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
+    'sidebar_collapsed_algo',
+    false
+  );
 
   const [completedMap, setCompletedMap] = useLocalStorage<Record<string | number, boolean>>(
     'completedAlgos',
@@ -181,18 +185,86 @@ export const AlgoCatalog: React.FC = () => {
   return (
     <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       {/* ==================================================================== */}
-      {/* Left Column: Track Switcher & Category Directory Tree with Progress  */}
+      {/* Left Column: Track Switcher & Category Directory Tree (Collapsible)   */}
       {/* ==================================================================== */}
-      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-[calc(100vh-4rem)] sticky top-16 select-none">
-        {/* Header & Track Selector */}
-        <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
-              <CheckSquare size={16} className="text-sky-600 dark:text-sky-400" />
-              <span>专题分类</span>
-              <span className="text-xs text-slate-400 font-normal">({categories.length} 个专题)</span>
-            </div>
+      {isSidebarCollapsed ? (
+        <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center py-3.5 space-y-3 h-[calc(100vh-4rem)] sticky top-16 select-none transition-all duration-300">
+          <button
+            onClick={() => setIsSidebarCollapsed(false)}
+            className="p-2 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+            title="展开专题分类"
+          >
+            <PanelLeftOpen size={18} />
+          </button>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800" />
+
+          {/* Quick Track Switcher */}
+          <div className="flex flex-col items-center space-y-1 text-[11px] font-bold">
+            <button
+              onClick={() => { setViewTrack('all'); setSelectedCategory('all'); setIsSidebarCollapsed(false); }}
+              className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+                viewTrack === 'all'
+                  ? 'bg-sky-600 text-white shadow-2xs'
+                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+              title="全部题目 (234)"
+            >
+              全
+            </button>
+            <button
+              onClick={() => { setViewTrack('hot100'); setSelectedCategory('all'); setIsSidebarCollapsed(false); }}
+              className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+                viewTrack === 'hot100'
+                  ? 'bg-amber-600 text-white shadow-2xs'
+                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+              title="Hot 100 精选题 (100)"
+            >
+              Hot
+            </button>
+            <button
+              onClick={() => { setViewTrack('carl'); setSelectedCategory('all'); setIsSidebarCollapsed(false); }}
+              className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+                viewTrack === 'carl'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+              title="代码随想录经典 (179)"
+            >
+              录
+            </button>
           </div>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 mt-auto" />
+
+          {/* Current Category Pill */}
+          <div
+            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center text-[10px] font-bold text-sky-600 dark:text-sky-400 cursor-pointer text-center px-1 truncate"
+            onClick={() => setIsSidebarCollapsed(false)}
+            title={`当前分类: ${selectedCategory === 'all' ? '全部专题' : selectedCategory}`}
+          >
+            {selectedCategory === 'all' ? '全部' : selectedCategory.slice(0, 2)}
+          </div>
+        </aside>
+      ) : (
+        <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-[calc(100vh-4rem)] sticky top-16 select-none transition-all duration-300">
+          {/* Header & Track Selector */}
+          <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
+                <CheckSquare size={16} className="text-sky-600 dark:text-sky-400" />
+                <span>专题分类</span>
+                <span className="text-xs text-slate-400 font-normal">({categories.length} 个专题)</span>
+              </div>
+              <button
+                onClick={() => setIsSidebarCollapsed(true)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+                title="收起专题分类"
+              >
+                <PanelLeftClose size={16} />
+              </button>
+            </div>
 
           {/* Track Switcher */}
           <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-lg text-xs font-medium text-center">
@@ -324,11 +396,12 @@ export const AlgoCatalog: React.FC = () => {
           })}
         </div>
       </aside>
+      )}
 
       {/* ==================================================================== */}
-      {/* Middle Column: LeetCode-style Problem List                           */}
+      {/* Middle Column: LeetCode-style Problem List (Fluid Full Width)        */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-4">
+      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-4 w-full">
         {/* Search & Filter Toolbar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-2 border-b border-slate-200 dark:border-slate-800">
           {/* Difficulty Chips */}

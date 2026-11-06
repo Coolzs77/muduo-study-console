@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PracticeSubTab } from '../../types';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { CodeMappingView } from '../mapping/CodeMappingView';
 import { CareerSystemView } from '../career/CareerSystemView';
 import { PitfallsView } from '../pitfalls/PitfallsView';
@@ -14,7 +15,9 @@ import {
   Layers,
   Sparkles,
   ChevronRight,
-  BookOpen
+  BookOpen,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 export interface PracticeCenterViewProps {
@@ -32,6 +35,10 @@ export const PracticeCenterView: React.FC<PracticeCenterViewProps> = ({
 }) => {
   const [internalSubTab, setInternalSubTab] = useState<PracticeSubTab>(initialSubTab);
   const currentSubTab = controlledSubTab ?? internalSubTab;
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
+    'sidebar_collapsed_practice',
+    false
+  );
 
   const handleTabChange = (tab: PracticeSubTab) => {
     if (onSelectSubTab) {
@@ -79,72 +86,111 @@ export const PracticeCenterView: React.FC<PracticeCenterViewProps> = ({
       {/* ========================================================= */}
       {/* LEFT COLUMN: Sub-Module Directory & Contextual Navigation  */}
       {/* ========================================================= */}
-      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
-        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Layers size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>实践目录</span>
-          </h2>
-        </div>
-
-        {/* 5 Sub-Modules Nav */}
-        <div className="space-y-1">
-          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
-            实践子模块
+      {isSidebarCollapsed ? (
+        <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 py-4 flex flex-col items-center gap-3 sticky top-16 h-[calc(100vh-4rem)] hidden md:flex z-10">
+          <button
+            onClick={() => setIsSidebarCollapsed(false)}
+            title="展开实践目录"
+            className="p-2 rounded-lg text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition"
+          >
+            <PanelLeftOpen size={18} />
+          </button>
+          <div className="w-8 h-[1px] bg-slate-200 dark:bg-slate-800 my-1" />
+          <div className="flex flex-col items-center gap-2 w-full px-2">
+            {subTabs.map(tab => {
+              const isActive = currentSubTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  title={`${tab.label}: ${tab.desc}`}
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition ${
+                    isActive
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
+                  }`}
+                >
+                  {tab.icon}
+                </button>
+              );
+            })}
           </div>
-          {subTabs.map(tab => {
-            const isActive = currentSubTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                type="button"
-                className={`w-full text-left p-2.5 rounded-xl transition cursor-pointer flex items-start justify-between gap-2 border ${
-                  isActive
-                    ? 'bg-sky-600 text-white shadow-xs border-transparent'
-                    : 'bg-white dark:bg-slate-900/50 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/50'
-                }`}
-              >
-                <div className="min-w-0">
-                  <div className="font-bold text-xs flex items-center gap-2">
-                    <span className={isActive ? 'text-white' : 'text-sky-600 dark:text-sky-400'}>
-                      {tab.icon}
-                    </span>
-                    <span>{tab.label}</span>
-                  </div>
-                  <div
-                    className={`text-[11px] truncate mt-0.5 ${
-                      isActive ? 'text-sky-100' : 'text-slate-500 dark:text-slate-400'
-                    }`}
-                  >
-                    {tab.desc}
-                  </div>
-                </div>
-                <ChevronRight
-                  size={14}
-                  className={`shrink-0 mt-1 ${isActive ? 'text-white' : 'text-slate-400'}`}
-                />
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Muduo Archive Notice */}
-        <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-xs space-y-1.5">
-          <div className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-            <Archive size={14} className="text-amber-500" />
-            <span>架构分层与历史解耦</span>
+        </aside>
+      ) : (
+        <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
+          <div className="pb-2 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Layers size={16} className="text-sky-600 dark:text-sky-400" />
+              <span>实践目录</span>
+            </h2>
+            <button
+              onClick={() => setIsSidebarCollapsed(true)}
+              title="收起侧边栏"
+              className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition"
+            >
+              <PanelLeftClose size={16} />
+            </button>
           </div>
-          <p className="text-[11px] text-amber-800 dark:text-amber-300/80 leading-relaxed">
-            本项目已全面实施 Muduo 底层网络库与 CppAIService 智能推理服务的解耦，原版 Muduo 28 天课程已完整归入本模块的历史归档子项，主任务完全聚焦于 Kama-HTTPServer 与 CppAIService。
-          </p>
-        </div>
-      </aside>
+
+          {/* 5 Sub-Modules Nav */}
+          <div className="space-y-1">
+            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
+              实践子模块
+            </div>
+            {subTabs.map(tab => {
+              const isActive = currentSubTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  type="button"
+                  className={`w-full text-left p-2.5 rounded-xl transition cursor-pointer flex items-start justify-between gap-2 border ${
+                    isActive
+                      ? 'bg-sky-600 text-white shadow-xs border-transparent'
+                      : 'bg-white dark:bg-slate-900/50 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/50'
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <div className="font-bold text-xs flex items-center gap-2">
+                      <span className={isActive ? 'text-white' : 'text-sky-600 dark:text-sky-400'}>
+                        {tab.icon}
+                      </span>
+                      <span>{tab.label}</span>
+                    </div>
+                    <div
+                      className={`text-[11px] truncate mt-0.5 ${
+                        isActive ? 'text-sky-100' : 'text-slate-500 dark:text-slate-400'
+                      }`}
+                    >
+                      {tab.desc}
+                    </div>
+                  </div>
+                  <ChevronRight
+                    size={14}
+                    className={`shrink-0 mt-1 ${isActive ? 'text-white' : 'text-slate-400'}`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Muduo Archive Notice */}
+          <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-xs space-y-1.5">
+            <div className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+              <Archive size={14} className="text-amber-500" />
+              <span>架构分层与历史解耦</span>
+            </div>
+            <p className="text-[11px] text-amber-800 dark:text-amber-300/80 leading-relaxed">
+              本项目已全面实施 Muduo 底层网络库与 CppAIService 智能推理服务的解耦，原版 Muduo 28 天课程已完整归入本模块的历史归档子项，主任务完全聚焦于 Kama-HTTPServer 与 CppAIService。
+            </p>
+          </div>
+        </aside>
+      )}
 
       {/* ========================================================= */}
       {/* CENTER COLUMN: Clean Workspace (Sub-module canvas)        */}
       {/* ========================================================= */}
-      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto">
+      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto w-full">
         {currentSubTab === 'mapping' && <CodeMappingView />}
         {currentSubTab === 'career' && <CareerSystemView />}
         {currentSubTab === 'pitfalls' && <PitfallsView />}

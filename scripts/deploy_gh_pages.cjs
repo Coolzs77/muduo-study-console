@@ -17,7 +17,9 @@ try {
   execSync('git init', { cwd: distDir, stdio: 'inherit' });
   execSync('git checkout -b gh-pages', { cwd: distDir, stdio: 'inherit' });
   execSync('git add -A', { cwd: distDir, stdio: 'inherit' });
-  execSync('git commit -m "deploy: update production build on gh-pages (v6.2.2)"', { cwd: distDir, stdio: 'inherit' });
+  const pkg = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf8'));
+  const version = pkg.version || 'v6.3.0';
+  execSync(`git commit -m "deploy: update production build on gh-pages (v${version})"`, { cwd: distDir, stdio: 'inherit' });
   
   const remoteUrl = execSync('git config --get remote.origin.url', { cwd: rootDir }).toString().trim();
   console.log('[GH-PAGES] Remote URL:', remoteUrl);

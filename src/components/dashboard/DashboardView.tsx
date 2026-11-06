@@ -17,7 +17,9 @@ import {
   BookOpen,
   Bookmark,
   Briefcase,
-  Activity
+  Activity,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -35,6 +37,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [completedMap] = useLocalStorage<Record<string | number, boolean>>('completedAlgos', {});
   const [todayMins] = useLocalStorage<number>('todayStudyMinutes', 0);
   const [dayMastery] = useLocalStorage<Record<number, number>>('muduo_day_mastery', {});
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
+    'sidebar_collapsed_dashboard',
+    false
+  );
 
   // Stats calculation
   const totalArticles = YUQUE_DATASET.length;
@@ -99,15 +105,81 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950">
       {/* ========================================================= */}
-      {/* LEFT COLUMN: Concise Overview & Navigation                */}
+      {/* LEFT COLUMN: Concise Overview & Navigation (Collapsible)   */}
       {/* ========================================================= */}
-      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
-        <div>
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Activity size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>仪表盘</span>
-          </h2>
-        </div>
+      {isSidebarCollapsed ? (
+        <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 py-3.5 flex flex-col items-center space-y-3 sticky top-16 h-[calc(100vh-4rem)] hidden md:flex select-none transition-all duration-300">
+          <button
+            onClick={() => setIsSidebarCollapsed(false)}
+            className="p-2 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+            title="展开仪表盘导航"
+          >
+            <PanelLeftOpen size={18} />
+          </button>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800" />
+
+          {/* Quick Nav Dock */}
+          <div className="flex flex-col items-center space-y-2 text-slate-600 dark:text-slate-400">
+            <button
+              onClick={() => onNavigateTab('daily')}
+              className="p-2 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-950/60 hover:text-sky-600 dark:hover:text-sky-400 transition cursor-pointer active-press"
+              title={`任务 (${masteredDaysCount}/28)`}
+            >
+              <Calendar size={18} />
+            </button>
+            <button
+              onClick={() => onNavigateTab('reader')}
+              className="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/60 hover:text-emerald-600 dark:hover:text-emerald-400 transition cursor-pointer active-press"
+              title={`项目 (${masteredArticles}/${totalArticles})`}
+            >
+              <BookOpen size={18} />
+            </button>
+            <button
+              onClick={() => onNavigateTab('algo')}
+              className="p-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-950/60 hover:text-purple-600 dark:hover:text-purple-400 transition cursor-pointer active-press"
+              title={`算法 (${completedAlgos}/${totalAlgos})`}
+            >
+              <CheckSquare size={18} />
+            </button>
+            <button
+              onClick={() => onNavigateTab('learning')}
+              className="p-2 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer active-press"
+              title="学习系统"
+            >
+              <Bookmark size={18} />
+            </button>
+            <button
+              onClick={() => onNavigateTab('source')}
+              className="p-2 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/60 hover:text-amber-600 dark:hover:text-amber-400 transition cursor-pointer active-press"
+              title="源码路线"
+            >
+              <Layers size={18} />
+            </button>
+            <button
+              onClick={() => onNavigateTab('practice')}
+              className="p-2 rounded-xl hover:bg-cyan-50 dark:hover:bg-cyan-950/60 hover:text-cyan-600 dark:hover:text-cyan-400 transition cursor-pointer active-press"
+              title="其他 / 归档"
+            >
+              <Briefcase size={18} />
+            </button>
+          </div>
+        </aside>
+      ) : (
+        <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block transition-all duration-300">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Activity size={16} className="text-sky-600 dark:text-sky-400" />
+              <span>仪表盘</span>
+            </h2>
+            <button
+              onClick={() => setIsSidebarCollapsed(true)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+              title="收起仪表盘导航"
+            >
+              <PanelLeftClose size={16} />
+            </button>
+          </div>
 
         {/* Quick Nav Shortcuts - Matching exact Header order: 任务, 项目, 算法, 学习系统, 源码路线, 其他 */}
         <div className="space-y-1.5">
@@ -247,11 +319,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </span>
         </div>
       </aside>
+      )}
 
       {/* ========================================================= */}
-      {/* CENTER COLUMN: Calendar Matrix & Topology                 */}
+      {/* CENTER COLUMN: Calendar Matrix & Topology (Fluid Full)    */}
       {/* ========================================================= */}
-      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-8 overflow-y-auto">
+      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-8 overflow-y-auto w-full">
         {/* Workspace Header */}
         <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">

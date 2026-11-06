@@ -23,7 +23,9 @@ import {
   Check,
   BookMarked,
   Layers,
-  Sparkles
+  Sparkles,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 type SubTab = 'cpp' | 'linux' | 'books' | 'qa' | 'general';
@@ -32,6 +34,10 @@ export const LearningSystemView: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('cpp');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChapter, setSelectedChapter] = useState<string>('all');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
+    'sidebar_collapsed_learning',
+    false
+  );
 
   // Persisted state
   const [cppChecks, setCppChecks] = useLocalStorage<Record<string, boolean>>('muduo_cpp_checks', {});
@@ -124,15 +130,94 @@ export const LearningSystemView: React.FC = () => {
   return (
     <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950">
       {/* ========================================================= */}
-      {/* LEFT COLUMN: Sub-Tab Directory & Chapter Navigation Tree  */}
+      {/* LEFT COLUMN: Sub-Tab Directory & Chapter Tree (Collapsible)*/}
       {/* ========================================================= */}
-      <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block">
-        <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <BookMarked size={16} className="text-sky-600 dark:text-sky-400" />
-            <span>系统目录</span>
-          </h2>
-        </div>
+      {isSidebarCollapsed ? (
+        <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 py-3.5 flex flex-col items-center space-y-3 sticky top-16 h-[calc(100vh-4rem)] hidden md:flex select-none transition-all duration-300">
+          <button
+            onClick={() => setIsSidebarCollapsed(false)}
+            className="p-2 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+            title="展开系统目录"
+          >
+            <PanelLeftOpen size={18} />
+          </button>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800" />
+
+          {/* Mini Subtab Icons */}
+          <div className="flex flex-col items-center space-y-2 text-slate-600 dark:text-slate-400">
+            <button
+              onClick={() => { setActiveSubTab('cpp'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
+              className={`p-2 rounded-xl transition cursor-pointer active-press ${
+                activeSubTab === 'cpp'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+              }`}
+              title={`C++ 知识 (${cppMasteredCount}/${CPP_KNOWLEDGE_SYSTEM.length})`}
+            >
+              <Bookmark size={18} />
+            </button>
+            <button
+              onClick={() => { setActiveSubTab('linux'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
+              className={`p-2 rounded-xl transition cursor-pointer active-press ${
+                activeSubTab === 'linux'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+              }`}
+              title={`Linux 编程 (${linuxMasteredCount}/${LINUX_SYSTEM_KNOWLEDGE.length})`}
+            >
+              <Terminal size={18} />
+            </button>
+            <button
+              onClick={() => { setActiveSubTab('books'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
+              className={`p-2 rounded-xl transition cursor-pointer active-press ${
+                activeSubTab === 'books'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+              }`}
+              title="经典书目伴读"
+            >
+              <BookOpen size={18} />
+            </button>
+            <button
+              onClick={() => { setActiveSubTab('qa'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
+              className={`p-2 rounded-xl transition cursor-pointer active-press ${
+                activeSubTab === 'qa'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+              }`}
+              title={`问答与面试 (${PROJECT_QA_CATALOG.length} 题)`}
+            >
+              <HelpCircle size={18} />
+            </button>
+            <button
+              onClick={() => { setActiveSubTab('general'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
+              className={`p-2 rounded-xl transition cursor-pointer active-press ${
+                activeSubTab === 'general'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'hover:bg-slate-200/60 dark:hover:bg-slate-800'
+              }`}
+              title={`通识文献 (${GENERAL_READING_CATALOG.length} 篇)`}
+            >
+              <Lightbulb size={18} />
+            </button>
+          </div>
+        </aside>
+      ) : (
+        <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden md:block transition-all duration-300">
+          <div className="pb-2 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <BookMarked size={16} className="text-sky-600 dark:text-sky-400" />
+              <span>系统目录</span>
+            </h2>
+            <button
+              onClick={() => setIsSidebarCollapsed(true)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+              title="收起系统目录"
+            >
+              <PanelLeftClose size={16} />
+            </button>
+          </div>
 
         {/* 5 Sub-Modules Nav */}
         <div className="space-y-1">
@@ -278,11 +363,12 @@ export const LearningSystemView: React.FC = () => {
           </div>
         )}
       </aside>
+      )}
 
       {/* ========================================================= */}
-      {/* CENTER COLUMN: Clean Documentation Workbench              */}
+      {/* CENTER COLUMN: Clean Documentation Workbench (Fluid Full) */}
       {/* ========================================================= */}
-      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto">
+      <main className="flex-1 min-w-0 p-6 lg:p-8 space-y-6 overflow-y-auto w-full">
         {/* Module Header */}
         <div className="border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center justify-between">
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">
