@@ -25,4 +25,8 @@ if (fs.existsSync(path.join(rootDir, 'classic.html'))) {
   console.log('✓ Copied classic.html -> dist/classic.html');
 }
 
+// Ensure .nojekyll exists in dist for GitHub Pages SPA routing
+fs.writeFileSync(path.join(distDir, '.nojekyll'), '');
+console.log('✓ Created dist/.nojekyll');
+
 console.log('[BUILD SUCCESS] Production ready static build in dist/');

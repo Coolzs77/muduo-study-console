@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build_static.cjs",
+    "deploy:gh-pages": "node scripts/deploy_gh_pages.cjs",
     "preview": "vite preview"
   },
   "dependencies": {
