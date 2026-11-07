@@ -20,7 +20,9 @@ import {
   Briefcase,
   Activity,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Play,
+  Pause
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -36,7 +38,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const [masteryMap] = useLocalStorage<Record<string, number>>('knowledgeMastery', {});
   const [completedMap] = useLocalStorage<Record<string | number, boolean>>('completedAlgos', {});
-  const { todayMins, isRunning: isFocusRunning, formattedTime: focusFormattedTime } = useFocusTimer();
+  const {
+    todayMins,
+    isRunning: isFocusRunning,
+    formattedTime: focusFormattedTime,
+    toggle: toggleFocus
+  } = useFocusTimer();
   const [dayMastery] = useLocalStorage<Record<number, number>>('muduo_day_mastery', {});
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
     'sidebar_collapsed_dashboard',
@@ -333,128 +340,263 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </h1>
         </div>
 
-        {/* 4 Bento KPI Metric Cards - Dedicated Four-Color Palette & Micro-Interactions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {/* 1. 任务 (天蓝) */}
+        {/* Telemetry Segmented Ribbon (一体化分段遥测条带) - 现代工程工具风格与新拟物微触感 */}
+        <div className="w-full bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xs border border-slate-200/80 dark:border-slate-800/80 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)] overflow-hidden grid grid-cols-2 md:grid-cols-4 md:h-16 divide-y md:divide-y-0 md:divide-x divide-slate-200/80 dark:divide-slate-800/80">
+          
+          {/* 1. 任务指标 */}
           <div
             onClick={() => onNavigateTab('daily')}
-            className="p-4 rounded-2xl bg-gradient-to-br from-sky-500/10 via-sky-500/5 to-blue-600/10 dark:from-sky-950/60 dark:via-sky-900/30 dark:to-slate-900/80 border border-sky-300/80 dark:border-sky-800/70 hover:border-sky-500 dark:hover:border-sky-400 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group smooth-hover active-press"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onNavigateTab('daily');
+              }
+            }}
+            className="group px-4 py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+            title="点击切换至 28 天任务体系"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-sky-950 dark:text-sky-200">任务</span>
-              <div className="p-2.5 rounded-xl bg-sky-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
-                <Calendar size={16} />
+            <div className="flex flex-col justify-center min-w-0 pr-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
+                <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
+                  任务进度
+                </span>
+              </div>
+              <div className="flex items-baseline mt-0.5">
+                <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
+                  {masteredDaysCount}
+                </span>
+                <span className="text-xs font-mono text-slate-400 dark:text-slate-500 ml-1">
+                  / 28 天
+                </span>
               </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {masteredDaysCount} <span className="text-xs font-normal text-slate-500 dark:text-slate-400 font-mono">/ 28 天</span>
-            </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
-              <span>已吃透 {masteredDaysCount} 天</span>
-              <span className="font-mono font-bold text-sky-600 dark:text-sky-400">
+
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <span className="text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400 tabular-nums">
                 {Math.round((masteredDaysCount / 28) * 100)}%
               </span>
-            </div>
-            <div className="w-full h-1.5 bg-sky-100 dark:bg-sky-950/80 rounded-full mt-2 overflow-hidden">
+              {/* 新拟物凹槽微段刻度 (7 个刻度代表 4 周进阶) */}
               <div
-                className="h-full bg-sky-500 rounded-full transition-all duration-300"
-                style={{ width: `${Math.round((masteredDaysCount / 28) * 100)}%` }}
-              />
+                className="flex items-center gap-0.5 p-0.5 rounded-[3px] bg-slate-200/60 dark:bg-slate-950/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.12),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6),inset_-1px_-1px_1px_rgba(255,255,255,0.04)]"
+                title={`吃透进度: ${masteredDaysCount}/28 天 (${Math.round((masteredDaysCount / 28) * 100)}%)`}
+              >
+                {[0, 1, 2, 3, 4, 5, 6].map((tickIdx) => {
+                  const filled = tickIdx < Math.round((masteredDaysCount / 28) * 7);
+                  return (
+                    <span
+                      key={tickIdx}
+                      className={`w-1.5 h-2 rounded-[1px] transition-colors duration-150 ${
+                        filled
+                          ? 'bg-slate-700 dark:bg-slate-200 shadow-2xs'
+                          : 'bg-slate-300/50 dark:bg-slate-800/60'
+                      }`}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* 2. 项目 (翡翠绿) */}
+          {/* 2. 项目指标 */}
           <div
             onClick={() => onNavigateTab('reader')}
-            className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-teal-600/10 dark:from-emerald-950/60 dark:via-emerald-900/30 dark:to-slate-900/80 border border-emerald-300/80 dark:border-emerald-800/70 hover:border-emerald-500 dark:hover:border-emerald-400 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group smooth-hover active-press"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onNavigateTab('reader');
+              }
+            }}
+            className="group px-4 py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+            title="点击切换至项目专栏精读"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-emerald-950 dark:text-emerald-200">项目</span>
-              <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
-                <BookOpen size={16} />
+            <div className="flex flex-col justify-center min-w-0 pr-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
+                <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
+                  项目剖析
+                </span>
+              </div>
+              <div className="flex items-baseline mt-0.5">
+                <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
+                  {masteredArticles}
+                </span>
+                <span className="text-xs font-mono text-slate-400 dark:text-slate-500 ml-1">
+                  / {totalArticles} 篇
+                </span>
               </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {masteredArticles} <span className="text-xs font-normal text-slate-500 dark:text-slate-400 font-mono">/ {totalArticles} 篇</span>
-            </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
-              <span>专栏架构剖析</span>
-              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <span className="text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400 tabular-nums">
                 {Math.round((masteredArticles / totalArticles) * 100)}%
               </span>
-            </div>
-            <div className="w-full h-1.5 bg-emerald-100 dark:bg-emerald-950/80 rounded-full mt-2 overflow-hidden">
+              {/* 新拟物凹槽微段刻度 */}
               <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-300"
-                style={{ width: `${Math.round((masteredArticles / totalArticles) * 100)}%` }}
-              />
-            </div>
-          </div>
-
-          {/* 3. 算法 (紫罗兰) */}
-          <div
-            onClick={() => onNavigateTab('algo')}
-            className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-indigo-600/10 dark:from-purple-950/60 dark:via-purple-900/30 dark:to-slate-900/80 border border-purple-300/80 dark:border-purple-800/70 hover:border-purple-500 dark:hover:border-purple-400 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group smooth-hover active-press"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-purple-950 dark:text-purple-200">算法</span>
-              <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
-                <CheckSquare size={16} />
+                className="flex items-center gap-0.5 p-0.5 rounded-[3px] bg-slate-200/60 dark:bg-slate-950/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.12),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6),inset_-1px_-1px_1px_rgba(255,255,255,0.04)]"
+                title={`精读进度: ${masteredArticles}/${totalArticles} 篇 (${Math.round((masteredArticles / totalArticles) * 100)}%)`}
+              >
+                {[0, 1, 2, 3, 4, 5, 6].map((tickIdx) => {
+                  const filled = tickIdx < Math.round((masteredArticles / totalArticles) * 7);
+                  return (
+                    <span
+                      key={tickIdx}
+                      className={`w-1.5 h-2 rounded-[1px] transition-colors duration-150 ${
+                        filled
+                          ? 'bg-slate-700 dark:bg-slate-200 shadow-2xs'
+                          : 'bg-slate-300/50 dark:bg-slate-800/60'
+                      }`}
+                    />
+                  );
+                })}
               </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {completedAlgos} <span className="text-xs font-normal text-slate-500 dark:text-slate-400 font-mono">/ {totalAlgos} 题</span>
+          </div>
+
+          {/* 3. 算法指标 */}
+          <div
+            onClick={() => onNavigateTab('algo')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onNavigateTab('algo');
+              }
+            }}
+            className="group px-4 py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+            title="点击切换至算法与网络考点题库"
+          >
+            <div className="flex flex-col justify-center min-w-0 pr-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
+                <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
+                  算法题库
+                </span>
+              </div>
+              <div className="flex items-baseline mt-0.5">
+                <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
+                  {completedAlgos}
+                </span>
+                <span className="text-xs font-mono text-slate-400 dark:text-slate-500 ml-1">
+                  / {totalAlgos} 题
+                </span>
+              </div>
             </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
-              <span>Hot 100 & 随想录</span>
-              <span className="font-mono font-bold text-purple-600 dark:text-purple-400">
+
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <span className="text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400 tabular-nums">
                 {Math.round((completedAlgos / totalAlgos) * 100)}%
               </span>
-            </div>
-            <div className="w-full h-1.5 bg-purple-100 dark:bg-purple-950/80 rounded-full mt-2 overflow-hidden">
+              {/* 新拟物凹槽微段刻度 */}
               <div
-                className="h-full bg-purple-500 rounded-full transition-all duration-300"
-                style={{ width: `${Math.round((completedAlgos / totalAlgos) * 100)}%` }}
-              />
+                className="flex items-center gap-0.5 p-0.5 rounded-[3px] bg-slate-200/60 dark:bg-slate-950/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.12),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6),inset_-1px_-1px_1px_rgba(255,255,255,0.04)]"
+                title={`完成进度: ${completedAlgos}/${totalAlgos} 题 (${Math.round((completedAlgos / totalAlgos) * 100)}%)`}
+              >
+                {[0, 1, 2, 3, 4, 5, 6].map((tickIdx) => {
+                  const filled = tickIdx < Math.round((completedAlgos / totalAlgos) * 7);
+                  return (
+                    <span
+                      key={tickIdx}
+                      className={`w-1.5 h-2 rounded-[1px] transition-colors duration-150 ${
+                        filled
+                          ? 'bg-slate-700 dark:bg-slate-200 shadow-2xs'
+                          : 'bg-slate-300/50 dark:bg-slate-800/60'
+                      }`}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* 4. 专注 (琥珀暖金) */}
+          {/* 4. 专注指标 (原生集成一键快速开始/暂停与时间流逝显示) */}
           <div
             onClick={() => {
               const el = document.getElementById('dashboard-focus-timer') || document.getElementById('dashboard-focus-timer-mobile');
               if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.classList.add('ring-2', 'ring-amber-500');
-                setTimeout(() => el.classList.remove('ring-2', 'ring-amber-500'), 1500);
+                el.classList.add('ring-2', 'ring-slate-400');
+                setTimeout(() => el.classList.remove('ring-2', 'ring-slate-400'), 1500);
               }
             }}
-            className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-orange-600/10 dark:from-amber-950/60 dark:via-amber-900/30 dark:to-slate-900/80 border border-amber-300/80 dark:border-amber-800/70 hover:border-amber-500 dark:hover:border-amber-400 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group smooth-hover active-press"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleFocus();
+              }
+            }}
+            className="group px-4 py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+            title="点击滚动至专注面板，或点击右侧按钮直接启停计时"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-amber-950 dark:text-amber-200">专注</span>
-              <div className="p-2.5 rounded-xl bg-amber-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
-                <Clock size={16} />
+            <div className="flex flex-col justify-center min-w-0 pr-2">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                    isFocusRunning
+                      ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)] animate-pulse'
+                      : 'bg-slate-400 dark:bg-slate-500'
+                  }`}
+                />
+                <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
+                  专注遥测
+                </span>
+                {isFocusRunning && (
+                  <span className="text-[9px] font-mono px-1 py-0.5 rounded-[2px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
+                    LIVE
+                  </span>
+                )}
+              </div>
+              <div className="flex items-baseline mt-0.5">
+                {isFocusRunning ? (
+                  <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400 tabular-nums">
+                    {focusFormattedTime}
+                  </span>
+                ) : (
+                  <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
+                    {todayMins}
+                    <span className="text-xs font-mono font-normal text-slate-400 dark:text-slate-500 ml-1">
+                      分钟
+                    </span>
+                  </span>
+                )}
+                {isFocusRunning && (
+                  <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 ml-1.5 truncate">
+                    (今日 {todayMins}m)
+                  </span>
+                )}
               </div>
             </div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {todayMins} <span className="text-xs font-normal text-slate-500 dark:text-slate-400 font-mono">分钟</span>
-            </div>
-            <div className="mt-2 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
-              <span>今日累计沉浸学习</span>
-              {isFocusRunning && (
-                <span className="font-mono text-amber-600 dark:text-amber-400 font-bold animate-pulse">
-                  {focusFormattedTime}
-                </span>
+
+            {/* 新拟物微触感快速启停按钮 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFocus();
+              }}
+              type="button"
+              className={`p-2 rounded-lg transition-all duration-150 ease-out flex items-center justify-center shrink-0 cursor-pointer active:scale-[0.92] ${
+                isFocusRunning
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.5),inset_-1px_-1px_1px_rgba(255,255,255,0.04)]'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 shadow-[2px_2px_4px_rgba(0,0,0,0.06),-2px_-2px_4px_rgba(255,255,255,0.9)] dark:shadow-[2px_2px_5px_rgba(0,0,0,0.4),-2px_-2px_4px_rgba(255,255,255,0.04)] hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title={isFocusRunning ? '暂停专注计时' : '一键开启专注计时'}
+              aria-label={isFocusRunning ? '暂停专注计时' : '一键开启专注计时'}
+            >
+              {isFocusRunning ? (
+                <Pause size={14} className="fill-current" />
+              ) : (
+                <Play size={14} className="fill-current ml-0.5" />
               )}
-            </div>
-            <div className="w-full h-1.5 bg-amber-100 dark:bg-amber-950/80 rounded-full mt-2 overflow-hidden">
-              <div
-                className="h-full bg-amber-500 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min(100, Math.round((todayMins / 120) * 100))}%` }}
-              />
-            </div>
+            </button>
           </div>
+
         </div>
 
         {/* 28-Day Task Calendar: 任务日历 (4 Rows x 7 Columns with concise task names and direct 1-click jump) */}
