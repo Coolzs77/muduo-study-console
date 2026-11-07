@@ -56,6 +56,7 @@ export interface AlgoProblem {
   category: string;
   topic?: string;
   leetcodeUrl?: string;
+  carlUrl?: string;
   pattern: string;
   timeComp: string;
   spaceComp: string;

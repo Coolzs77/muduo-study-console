@@ -1,8 +1,20 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { AlgoCard } from './AlgoCard';
+import { CarlReaderDrawer } from './CarlReaderDrawer';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { Search, CheckCircle2, CheckSquare, Dices, ExternalLink, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import {
+  Search,
+  CheckCircle2,
+  CheckSquare,
+  Dices,
+  ExternalLink,
+  PanelLeftClose,
+  PanelLeftOpen,
+  BookOpen,
+  Compass,
+  Code2
+} from 'lucide-react';
 
 export const STANDARD_CATEGORIES = [
   '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列',
@@ -16,6 +28,7 @@ export const CARL_HOT100_CHAPTERS = [
 ] as const;
 
 export const AlgoCatalog: React.FC = () => {
+  const [carlReaderProblem, setCarlReaderProblem] = useState<typeof ALGORITHM_LAB_CATALOG[0] | null>(null);
   const [viewTrack, setViewTrack] = useState<'all' | 'hot100' | 'carl'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -197,6 +210,17 @@ export const AlgoCatalog: React.FC = () => {
             <PanelLeftOpen size={18} />
           </button>
 
+          {/* Quick Master Roadmap Link (Collapsed) */}
+          <a
+            href="https://programmercarl.com/algo/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-10 h-9 rounded-2xl flex items-center justify-center bg-white/80 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+            title="代码随想录总路线 (programmercarl.com/algo/)"
+          >
+            <Compass size={17} />
+          </a>
+
           <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]" />
 
           {/* Quick Track Switcher (Clay Pills) */}
@@ -256,6 +280,23 @@ export const AlgoCatalog: React.FC = () => {
                 <PanelLeftClose size={16} />
               </button>
             </div>
+
+            {/* Quick Master Roadmap Link (Top of Left Sidebar) */}
+            <a
+              href="https://programmercarl.com/algo/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between px-3 py-2 rounded-2xl bg-gradient-to-r from-sky-500/10 via-blue-500/10 to-indigo-500/10 dark:from-sky-950/50 dark:via-blue-950/40 dark:to-indigo-950/50 border border-sky-200/60 dark:border-sky-800/40 text-sky-800 dark:text-sky-300 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group"
+              title="打开代码随想录算法学习总路线 (programmercarl.com/algo/)"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100 dark:bg-sky-900/80 text-sky-600 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.08)]">
+                  <Compass size={13} />
+                </div>
+                <span className="text-xs font-bold">代码随想录总路线</span>
+              </div>
+              <ExternalLink size={13} className="text-sky-500/70 group-hover:text-sky-600 transition-colors" />
+            </a>
 
             {/* Track Switcher (Clay recessed groove) */}
             <div className="grid grid-cols-3 gap-1 p-1 bg-slate-200/50 dark:bg-slate-900/60 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs font-semibold text-center">
@@ -442,6 +483,7 @@ export const AlgoCatalog: React.FC = () => {
               problem={problem}
               isDone={isProblemDone(problem)}
               onToggleDone={() => handleToggleDone(problem)}
+              onOpenCarlReader={(p) => setCarlReaderProblem(p)}
             />
           ))}
 
@@ -545,10 +587,10 @@ export const AlgoCatalog: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-1">
+              <div className="flex items-center gap-1.5 pt-1">
                 <button
                   onClick={() => handleToggleDone(randomProblem)}
-                  className={`flex-1 py-2 px-3 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-center active:scale-x-105 active:scale-y-90 ${
+                  className={`flex-1 min-w-0 py-2 px-3 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-center active:scale-x-105 active:scale-y-90 truncate ${
                     isProblemDone(randomProblem)
                       ? 'bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/70 dark:to-teal-900/70 text-teal-900 dark:text-teal-100 shadow-[3px_3px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9)]'
                       : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-[3px_3px_8px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
@@ -556,15 +598,36 @@ export const AlgoCatalog: React.FC = () => {
                 >
                   {isProblemDone(randomProblem) ? '✓ 已完成' : '标记完成'}
                 </button>
+                {randomProblem.carlUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setCarlReaderProblem(randomProblem)}
+                    className="p-2.5 rounded-2xl bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-sky-900 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer shrink-0"
+                    title="应用内抽屉阅读随想录精讲"
+                  >
+                    <BookOpen size={14} />
+                  </button>
+                )}
+                {randomProblem.carlUrl && (
+                  <a
+                    href={randomProblem.carlUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer shrink-0"
+                    title="在新标签页打开随想录题解"
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                )}
                 {randomProblem.leetcodeUrl && (
                   <a
                     href={randomProblem.leetcodeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white shadow-[3px_3px_8px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
-                    title="在 LeetCode 打开"
+                    className="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer shrink-0"
+                    title="打开 LeetCode 原题"
                   >
-                    <ExternalLink size={14} />
+                    <Code2 size={14} />
                   </a>
                 )}
               </div>
@@ -596,6 +659,13 @@ export const AlgoCatalog: React.FC = () => {
           </div>
         </div>
       </aside>
+
+      {/* Slide-over Reader Drawer */}
+      <CarlReaderDrawer
+        problem={carlReaderProblem}
+        isOpen={!!carlReaderProblem}
+        onClose={() => setCarlReaderProblem(null)}
+      />
     </div>
   );
 };

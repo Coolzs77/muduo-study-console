@@ -1,14 +1,15 @@
 import React from 'react';
 import { AlgoProblem } from '../../types';
-import { CheckCircle2, Circle, ExternalLink } from 'lucide-react';
+import { CheckCircle2, Circle, ExternalLink, BookOpen, Code2 } from 'lucide-react';
 
 interface AlgoCardProps {
   problem: AlgoProblem;
   isDone: boolean;
   onToggleDone: () => void;
+  onOpenCarlReader?: (problem: AlgoProblem) => void;
 }
 
-export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDone }) => {
+export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDone, onOpenCarlReader }) => {
   const getDifficultyBadge = (diff: string) => {
     switch (diff.toLowerCase()) {
       case 'easy':
@@ -120,17 +121,44 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
           </div>
         </div>
 
-        {/* Right: LeetCode External Link */}
-        <div className="flex items-center gap-1 shrink-0">
+        {/* Right: Actions */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {problem.carlUrl && (
+            <>
+              {/* In-app reader drawer button */}
+              <button
+                type="button"
+                onClick={() => onOpenCarlReader?.(problem)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-[11px] font-bold"
+                title="应用内抽屉阅读随想录精讲"
+              >
+                <BookOpen size={13} />
+                <span className="hidden sm:inline">精讲</span>
+              </button>
+
+              {/* Direct external link to Carl solution */}
+              <a
+                href={problem.carlUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                title="在新标签页打开随想录题解"
+              >
+                <ExternalLink size={14} />
+              </a>
+            </>
+          )}
+
+          {/* LeetCode External Link */}
           {problem.leetcodeUrl && (
             <a
               href={problem.leetcodeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+              className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               title="打开 LeetCode 原题"
             >
-              <ExternalLink size={15} />
+              <Code2 size={14} />
             </a>
           )}
         </div>

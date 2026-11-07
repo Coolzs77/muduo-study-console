@@ -16,7 +16,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/array/0704-binary-search.html"
   },
   {
     "id": "algo_27",
@@ -33,7 +34,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/array/0027-remove-element.html"
   },
   {
     "id": "algo_977",
@@ -50,7 +52,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/array/0977-squares-of-a-sorted-array.html"
   },
   {
     "id": "algo_209",
@@ -67,7 +70,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/array/0209-minimum-size-subarray-sum.html"
   },
   {
     "id": "algo_58",
@@ -84,7 +88,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/array/kamacoder-0058-range-sum.html"
   },
   {
     "id": "algo_44",
@@ -101,7 +106,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/array/kamacoder-0044-land-purchase.html"
   },
   {
     "id": "algo_54",
@@ -120,7 +126,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "矩阵",
-    "hot100Order": 19
+    "hot100Order": 19,
+    "carlUrl": "https://programmercarl.com/algo/other/0054-spiral-matrix.html"
   },
   {
     "id": "algo_203",
@@ -137,7 +144,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/0203-remove-linked-list-elements.html"
   },
   {
     "id": "algo_707",
@@ -154,7 +162,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/0707-design-linked-list.html"
   },
   {
     "id": "algo_206",
@@ -173,7 +182,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 23
+    "hot100Order": 23,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/0206-reverse-linked-list.html"
   },
   {
     "id": "algo_24",
@@ -192,7 +202,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 30
+    "hot100Order": 30,
+    "carlUrl": "https://programmercarl.com/algo/other/0024-swap-nodes-in-pairs.html"
   },
   {
     "id": "algo_19",
@@ -211,7 +222,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 29
+    "hot100Order": 29,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/0019-remove-nth-node-from-end-of-list.html"
   },
   {
     "id": "algo_02.07",
@@ -228,7 +240,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/interview-02-07-linked-list-intersection.html"
   },
   {
     "id": "algo_142",
@@ -247,7 +260,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 26
+    "hot100Order": 26,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/0142-linked-list-cycle-ii.html"
   },
   {
     "id": "algo_242",
@@ -264,7 +278,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0242-valid-anagram.html"
   },
   {
     "id": "algo_1002",
@@ -281,7 +296,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/other/1002-find-common-characters.html"
   },
   {
     "id": "algo_349",
@@ -298,7 +314,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0349-intersection-of-two-arrays.html"
   },
   {
     "id": "algo_202",
@@ -315,7 +332,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0202-happy-number.html"
   },
   {
     "id": "algo_1",
@@ -334,7 +352,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "哈希",
-    "hot100Order": 1
+    "hot100Order": 1,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0001-two-sum.html"
   },
   {
     "id": "algo_454",
@@ -351,7 +370,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0454-4sum-ii.html"
   },
   {
     "id": "algo_383",
@@ -368,7 +388,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0383-ransom-note.html"
   },
   {
     "id": "algo_15",
@@ -385,7 +406,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0015-3sum.html"
   },
   {
     "id": "algo_18",
@@ -402,7 +424,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0018-4sum.html"
   },
   {
     "id": "algo_146",
@@ -438,7 +461,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/0344-reverse-string.html"
   },
   {
     "id": "algo_541",
@@ -455,7 +479,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/0541-reverse-string-ii.html"
   },
   {
     "id": "algo_kc_54",
@@ -472,7 +497,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "从后向前遍历填充，避免每次插入导致的 O(n^2) 元素整体搬移。",
     "projectLink": "对应服务端协议解析中 URL 解码、转义字符扩充与字节流重组。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/kamacoder-0054-replace-digits.html"
   },
   {
     "id": "algo_151",
@@ -489,7 +515,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/0151-reverse-words-in-a-string.html"
   },
   {
     "id": "algo_kc_55",
@@ -506,7 +533,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/kamacoder-0055-right-rotate-string.html"
   },
   {
     "id": "algo_28",
@@ -523,7 +551,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/0028-find-the-index-of-the-first-occurrence-in-a-string.html"
   },
   {
     "id": "algo_459",
@@ -540,7 +569,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/0459-repeated-substring-pattern.html"
   },
   {
     "id": "algo_dptr_27",
@@ -557,7 +587,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/array/0027-remove-element.html"
   },
   {
     "id": "algo_dptr_344",
@@ -574,7 +605,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/0344-reverse-string.html"
   },
   {
     "id": "algo_dptr_54",
@@ -591,7 +623,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/kamacoder-0054-replace-digits.html"
   },
   {
     "id": "algo_dptr_151",
@@ -608,7 +641,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/string/0151-reverse-words-in-a-string.html"
   },
   {
     "id": "algo_dptr_206",
@@ -625,7 +659,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/0206-reverse-linked-list.html"
   },
   {
     "id": "algo_dptr_19",
@@ -642,7 +677,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/0019-remove-nth-node-from-end-of-list.html"
   },
   {
     "id": "algo_dptr_02_07",
@@ -659,7 +695,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/interview-02-07-linked-list-intersection.html"
   },
   {
     "id": "algo_dptr_142",
@@ -676,7 +713,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/linked-list/0142-linked-list-cycle-ii.html"
   },
   {
     "id": "algo_dptr_15",
@@ -695,7 +733,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "双指针",
-    "hot100Order": 6
+    "hot100Order": 6,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0015-3sum.html"
   },
   {
     "id": "algo_dptr_18",
@@ -712,7 +751,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/hash-table/0018-4sum.html"
   },
   {
     "id": "algo_232",
@@ -729,7 +769,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/stack-queue/0232-implement-queue-using-stacks.html"
   },
   {
     "id": "algo_225",
@@ -746,7 +787,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/stack-queue/0225-implement-stack-using-queues.html"
   },
   {
     "id": "algo_20",
@@ -765,7 +807,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "栈",
-    "hot100Order": 69
+    "hot100Order": 69,
+    "carlUrl": "https://programmercarl.com/algo/stack-queue/0020-valid-parentheses.html"
   },
   {
     "id": "algo_1047",
@@ -782,7 +825,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/stack-queue/1047-remove-all-adjacent-duplicates-in-string.html"
   },
   {
     "id": "algo_150",
@@ -799,7 +843,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/stack-queue/0150-evaluate-reverse-polish-notation.html"
   },
   {
     "id": "algo_239",
@@ -818,7 +863,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "子串",
-    "hot100Order": 11
+    "hot100Order": 11,
+    "carlUrl": "https://programmercarl.com/algo/stack-queue/0239-sliding-window-maximum.html"
   },
   {
     "id": "algo_347",
@@ -837,7 +883,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "堆",
-    "hot100Order": 75
+    "hot100Order": 75,
+    "carlUrl": "https://programmercarl.com/algo/stack-queue/0347-top-k-frequent-elements.html"
   },
   {
     "id": "algo_94",
@@ -856,7 +903,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 36
+    "hot100Order": 36,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/recursive-binary-tree-traversal.html"
   },
   {
     "id": "algo_105",
@@ -875,7 +923,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 47
+    "hot100Order": 47,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0106-construct-binary-tree-from-inorder-and-postorder-traversal.html"
   },
   {
     "id": "algo_50",
@@ -892,7 +941,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/unified-iterative-binary-tree-traversal.html"
   },
   {
     "id": "algo_102",
@@ -911,7 +961,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 41
+    "hot100Order": 41,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0102-binary-tree-level-order-traversal.html"
   },
   {
     "id": "algo_226",
@@ -930,7 +981,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 38
+    "hot100Order": 38,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0226-invert-binary-tree.html"
   },
   {
     "id": "algo_101",
@@ -949,7 +1001,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 39
+    "hot100Order": 39,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0101-symmetric-tree.html"
   },
   {
     "id": "algo_104",
@@ -968,7 +1021,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 37
+    "hot100Order": 37,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0104-maximum-depth-of-binary-tree.html"
   },
   {
     "id": "algo_111",
@@ -985,7 +1039,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0111-minimum-depth-of-binary-tree.html"
   },
   {
     "id": "algo_222",
@@ -1002,7 +1057,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0222-count-complete-tree-nodes.html"
   },
   {
     "id": "algo_110",
@@ -1019,7 +1075,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0110-balanced-binary-tree.html"
   },
   {
     "id": "algo_257",
@@ -1036,7 +1093,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0257-binary-tree-paths.html"
   },
   {
     "id": "algo_404",
@@ -1053,7 +1111,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0404-sum-of-left-leaves.html"
   },
   {
     "id": "algo_513",
@@ -1070,7 +1129,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0513-find-bottom-left-tree-value.html"
   },
   {
     "id": "algo_112",
@@ -1087,7 +1147,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0112-path-sum.html"
   },
   {
     "id": "algo_106",
@@ -1104,7 +1165,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0106-construct-binary-tree-from-inorder-and-postorder-traversal.html"
   },
   {
     "id": "algo_654",
@@ -1121,7 +1183,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0654-maximum-binary-tree.html"
   },
   {
     "id": "algo_617",
@@ -1138,7 +1201,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0617-merge-two-binary-trees.html"
   },
   {
     "id": "algo_700",
@@ -1155,7 +1219,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0700-search-in-a-binary-search-tree.html"
   },
   {
     "id": "algo_98",
@@ -1174,7 +1239,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 43
+    "hot100Order": 43,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0098-validate-binary-search-tree.html"
   },
   {
     "id": "algo_530",
@@ -1191,7 +1257,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0530-minimum-absolute-difference-in-bst.html"
   },
   {
     "id": "algo_501",
@@ -1208,7 +1275,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0501-find-mode-in-binary-search-tree.html"
   },
   {
     "id": "algo_236",
@@ -1227,7 +1295,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 49
+    "hot100Order": 49,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0236-lowest-common-ancestor-of-a-binary-tree.html"
   },
   {
     "id": "algo_235",
@@ -1244,7 +1313,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0235-lowest-common-ancestor-of-a-binary-search-tree.html"
   },
   {
     "id": "algo_701",
@@ -1261,7 +1331,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0701-insert-into-a-binary-search-tree.html"
   },
   {
     "id": "algo_450",
@@ -1278,7 +1349,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0450-delete-node-in-a-bst.html"
   },
   {
     "id": "algo_669",
@@ -1295,7 +1367,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0669-trim-a-binary-search-tree.html"
   },
   {
     "id": "algo_108",
@@ -1314,7 +1387,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 42
+    "hot100Order": 42,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0108-convert-sorted-array-to-binary-search-tree.html"
   },
   {
     "id": "algo_538",
@@ -1331,7 +1405,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/binary-tree/0538-convert-bst-to-greater-tree.html"
   },
   {
     "id": "algo_77",
@@ -1348,7 +1423,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0077-combinations.html"
   },
   {
     "id": "algo_77_opt",
@@ -1365,7 +1441,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0077-combinations-optimized.html"
   },
   {
     "id": "algo_216",
@@ -1382,7 +1459,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0216-combination-sum-iii.html"
   },
   {
     "id": "algo_17",
@@ -1401,7 +1479,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "回溯",
-    "hot100Order": 57
+    "hot100Order": 57,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0017-letter-combinations-of-a-phone-number.html"
   },
   {
     "id": "algo_39",
@@ -1420,7 +1499,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "回溯",
-    "hot100Order": 58
+    "hot100Order": 58,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0039-combination-sum.html"
   },
   {
     "id": "algo_40",
@@ -1437,7 +1517,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0040-combination-sum-ii.html"
   },
   {
     "id": "algo_131",
@@ -1456,7 +1537,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "回溯",
-    "hot100Order": 61
+    "hot100Order": 61,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0131-palindrome-partitioning.html"
   },
   {
     "id": "algo_93",
@@ -1473,7 +1555,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0093-restore-ip-addresses.html"
   },
   {
     "id": "algo_78",
@@ -1492,7 +1575,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "回溯",
-    "hot100Order": 56
+    "hot100Order": 56,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0078-subsets.html"
   },
   {
     "id": "algo_90",
@@ -1509,7 +1593,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0090-subsets-ii.html"
   },
   {
     "id": "algo_491",
@@ -1526,7 +1611,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0491-non-decreasing-subsequences.html"
   },
   {
     "id": "algo_46",
@@ -1545,7 +1631,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "回溯",
-    "hot100Order": 55
+    "hot100Order": 55,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0046-permutations.html"
   },
   {
     "id": "algo_47",
@@ -1562,7 +1649,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0047-permutations-ii.html"
   },
   {
     "id": "algo_89",
@@ -1579,7 +1667,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/alternative-backtracking-deduplication.html"
   },
   {
     "id": "algo_332",
@@ -1596,7 +1685,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/other/0332-reconstruct-itinerary.html"
   },
   {
     "id": "algo_51",
@@ -1615,7 +1705,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "回溯",
-    "hot100Order": 62
+    "hot100Order": 62,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0051-n-queens.html"
   },
   {
     "id": "algo_37",
@@ -1632,7 +1723,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/backtracking/0037-sudoku-solver.html"
   },
   {
     "id": "algo_455",
@@ -1649,7 +1741,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0455-assign-cookies.html"
   },
   {
     "id": "algo_376",
@@ -1666,7 +1759,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0376-wiggle-subsequence.html"
   },
   {
     "id": "algo_53",
@@ -1685,7 +1779,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "普通数组",
-    "hot100Order": 13
+    "hot100Order": 13,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0053-maximum-subarray.html"
   },
   {
     "id": "algo_122",
@@ -1702,7 +1797,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0122-best-time-to-buy-and-sell-stock-ii.html"
   },
   {
     "id": "algo_55",
@@ -1721,7 +1817,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "贪心算法",
-    "hot100Order": 78
+    "hot100Order": 78,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0055-jump-game.html"
   },
   {
     "id": "algo_45",
@@ -1740,7 +1837,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "贪心算法",
-    "hot100Order": 79
+    "hot100Order": 79,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0045-jump-game-ii.html"
   },
   {
     "id": "algo_1005",
@@ -1757,7 +1855,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/1005-maximize-sum-of-array-after-k-negations.html"
   },
   {
     "id": "algo_134",
@@ -1774,7 +1873,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0134-gas-station.html"
   },
   {
     "id": "algo_135",
@@ -1791,7 +1891,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0135-candy.html"
   },
   {
     "id": "algo_860",
@@ -1808,7 +1909,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0860-lemonade-change.html"
   },
   {
     "id": "algo_406",
@@ -1825,7 +1927,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0406-queue-reconstruction-by-height.html"
   },
   {
     "id": "algo_406_seq",
@@ -1842,7 +1945,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0406-queue-reconstruction-by-height.html"
   },
   {
     "id": "algo_452",
@@ -1859,7 +1963,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0452-minimum-number-of-arrows-to-burst-balloons.html"
   },
   {
     "id": "algo_435",
@@ -1876,7 +1981,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0435-non-overlapping-intervals.html"
   },
   {
     "id": "algo_763",
@@ -1895,7 +2001,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "贪心算法",
-    "hot100Order": 80
+    "hot100Order": 80,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0763-partition-labels.html"
   },
   {
     "id": "algo_56",
@@ -1914,7 +2021,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "普通数组",
-    "hot100Order": 14
+    "hot100Order": 14,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0056-merge-intervals.html"
   },
   {
     "id": "algo_738",
@@ -1931,7 +2039,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0738-monotone-increasing-digits.html"
   },
   {
     "id": "algo_968",
@@ -1948,7 +2057,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/greedy/0968-binary-tree-cameras.html"
   },
   {
     "id": "algo_509",
@@ -1965,7 +2075,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0509-fibonacci-number.html"
   },
   {
     "id": "algo_70",
@@ -1984,7 +2095,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 81
+    "hot100Order": 81,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0070-climbing-stairs.html"
   },
   {
     "id": "algo_746",
@@ -2001,7 +2113,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0746-min-cost-climbing-stairs.html"
   },
   {
     "id": "algo_62",
@@ -2020,7 +2133,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "多维动态规划",
-    "hot100Order": 91
+    "hot100Order": 91,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0062-unique-paths.html"
   },
   {
     "id": "algo_63",
@@ -2037,7 +2151,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0063-unique-paths-ii.html"
   },
   {
     "id": "algo_343",
@@ -2054,7 +2169,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0343-integer-break.html"
   },
   {
     "id": "algo_96",
@@ -2071,7 +2187,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0096-unique-binary-search-trees.html"
   },
   {
     "id": "algo_416",
@@ -2090,7 +2207,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 89
+    "hot100Order": 89,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0416-partition-equal-subset-sum.html"
   },
   {
     "id": "algo_1049",
@@ -2107,7 +2225,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/1049-last-stone-weight-ii.html"
   },
   {
     "id": "algo_494",
@@ -2124,7 +2243,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0494-target-sum.html"
   },
   {
     "id": "algo_474",
@@ -2141,7 +2261,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0474-ones-and-zeroes.html"
   },
   {
     "id": "algo_518",
@@ -2158,7 +2279,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0518-coin-change-ii.html"
   },
   {
     "id": "algo_377",
@@ -2175,7 +2297,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0377-combination-sum-iv.html"
   },
   {
     "id": "algo_70_knapsack",
@@ -2192,7 +2315,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0070-climbing-stairs-complete-knapsack.html"
   },
   {
     "id": "algo_322",
@@ -2211,7 +2335,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 85
+    "hot100Order": 85,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0322-coin-change.html"
   },
   {
     "id": "algo_279",
@@ -2230,7 +2355,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 84
+    "hot100Order": 84,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0279-perfect-squares.html"
   },
   {
     "id": "algo_139",
@@ -2249,7 +2375,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 86
+    "hot100Order": 86,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0139-word-break.html"
   },
   {
     "id": "algo_198",
@@ -2268,7 +2395,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 83
+    "hot100Order": 83,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0198-house-robber.html"
   },
   {
     "id": "algo_213",
@@ -2285,7 +2413,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0213-house-robber-ii.html"
   },
   {
     "id": "algo_337",
@@ -2302,7 +2431,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0337-house-robber-iii.html"
   },
   {
     "id": "algo_121",
@@ -2321,7 +2451,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "贪心算法",
-    "hot100Order": 77
+    "hot100Order": 77,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0121-best-time-to-buy-and-sell-stock.html"
   },
   {
     "id": "algo_122_dp",
@@ -2338,7 +2469,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0122-best-time-to-buy-and-sell-stock-ii-dynamic-programming.html"
   },
   {
     "id": "algo_123",
@@ -2355,7 +2487,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0123-best-time-to-buy-and-sell-stock-iii.html"
   },
   {
     "id": "algo_188",
@@ -2372,7 +2505,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0188-best-time-to-buy-and-sell-stock-iv.html"
   },
   {
     "id": "algo_309",
@@ -2389,7 +2523,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0309-best-time-to-buy-and-sell-stock-with-cooldown.html"
   },
   {
     "id": "algo_714",
@@ -2406,7 +2541,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0714-best-time-to-buy-and-sell-stock-with-transaction-fee-dynamic-programming.html"
   },
   {
     "id": "algo_300",
@@ -2425,7 +2561,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 87
+    "hot100Order": 87,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0300-longest-increasing-subsequence.html"
   },
   {
     "id": "algo_674",
@@ -2442,7 +2579,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0674-longest-continuous-increasing-subsequence.html"
   },
   {
     "id": "algo_718",
@@ -2459,7 +2597,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0718-maximum-length-of-repeated-subarray.html"
   },
   {
     "id": "algo_1143",
@@ -2478,7 +2617,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "多维动态规划",
-    "hot100Order": 94
+    "hot100Order": 94,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/1143-longest-common-subsequence.html"
   },
   {
     "id": "algo_1035",
@@ -2495,7 +2635,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/1035-uncrossed-lines.html"
   },
   {
     "id": "algo_53_dp",
@@ -2512,7 +2653,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0053-maximum-subarray-dynamic-programming.html"
   },
   {
     "id": "algo_392",
@@ -2529,7 +2671,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0392-is-subsequence.html"
   },
   {
     "id": "algo_115",
@@ -2546,7 +2689,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0115-distinct-subsequences.html"
   },
   {
     "id": "algo_583",
@@ -2563,7 +2707,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0583-delete-operation-for-two-strings.html"
   },
   {
     "id": "algo_72",
@@ -2582,7 +2727,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "多维动态规划",
-    "hot100Order": 95
+    "hot100Order": 95,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0072-edit-distance.html"
   },
   {
     "id": "algo_647",
@@ -2599,7 +2745,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0647-palindromic-substrings.html"
   },
   {
     "id": "algo_516",
@@ -2616,7 +2763,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/dynamic-programming/0516-longest-palindromic-subsequence.html"
   },
   {
     "id": "algo_739",
@@ -2635,7 +2783,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "栈",
-    "hot100Order": 72
+    "hot100Order": 72,
+    "carlUrl": "https://programmercarl.com/algo/monotonic-stack/0739-daily-temperatures.html"
   },
   {
     "id": "algo_496",
@@ -2652,7 +2801,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/monotonic-stack/0496-next-greater-element-i.html"
   },
   {
     "id": "algo_503",
@@ -2669,7 +2819,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/monotonic-stack/0503-next-greater-element-ii.html"
   },
   {
     "id": "algo_42",
@@ -2688,7 +2839,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "双指针",
-    "hot100Order": 7
+    "hot100Order": 7,
+    "carlUrl": "https://programmercarl.com/algo/monotonic-stack/0042-trapping-rain-water.html"
   },
   {
     "id": "algo_84",
@@ -2707,7 +2859,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": true,
     "isHot100": true,
     "hot100Chapter": "栈",
-    "hot100Order": 73
+    "hot100Order": 73,
+    "carlUrl": "https://programmercarl.com/algo/monotonic-stack/0084-largest-rectangle-in-histogram.html"
   },
   {
     "id": "algo_kama_98",
@@ -2724,7 +2877,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0098-all-paths.html"
   },
   {
     "id": "algo_kama_99_dfs",
@@ -2741,7 +2895,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0099-number-of-islands-dfs.html"
   },
   {
     "id": "algo_kama_99_bfs",
@@ -2758,7 +2913,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0099-number-of-islands-bfs.html"
   },
   {
     "id": "algo_kama_100",
@@ -2775,7 +2931,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0100-maximum-island-area.html"
   },
   {
     "id": "algo_kama_101",
@@ -2792,7 +2949,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0101-isolated-island-area.html"
   },
   {
     "id": "algo_kama_102",
@@ -2809,7 +2967,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0102-sink-isolated-islands.html"
   },
   {
     "id": "algo_kama_103",
@@ -2826,7 +2985,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0103-water-flow.html"
   },
   {
     "id": "algo_kama_104",
@@ -2843,7 +3003,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0104-make-largest-island.html"
   },
   {
     "id": "algo_kama_106",
@@ -2860,7 +3021,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0106-island-perimeter.html"
   },
   {
     "id": "algo_kama_110",
@@ -2877,7 +3039,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0110-word-ladder.html"
   },
   {
     "id": "algo_kama_105",
@@ -2894,7 +3057,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意有向边的单向性，从节点 1 开始遍历并使用 visited 数组统计遍历节点数。",
     "projectLink": "对应分布式微服务拓扑可达性检测与强连通分支健康检查。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0105-directed-graph-reachability.html"
   },
   {
     "id": "algo_kama_107",
@@ -2911,7 +3075,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0107-path-existence.html"
   },
   {
     "id": "algo_kama_108",
@@ -2928,7 +3093,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0108-redundant-connection.html"
   },
   {
     "id": "algo_kama_109",
@@ -2945,7 +3111,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0109-redundant-connection-ii.html"
   },
   {
     "id": "algo_kama_53_prim",
@@ -2962,7 +3129,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0053-treasure-prim.html"
   },
   {
     "id": "algo_kama_53_kruskal",
@@ -2979,7 +3147,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0053-treasure-kruskal.html"
   },
   {
     "id": "algo_kama_117",
@@ -2996,7 +3165,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0117-software-build.html"
   },
   {
     "id": "algo_kama_47_naive",
@@ -3013,7 +3183,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0047-meeting-dijkstra-naive.html"
   },
   {
     "id": "algo_kama_47_heap",
@@ -3030,7 +3201,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0047-meeting-dijkstra-heap.html"
   },
   {
     "id": "algo_kama_94",
@@ -3047,7 +3219,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "每轮对所有边松弛时必须使用上一轮 minDist 数组的副本，防止单轮多次松弛发生级联串通。",
     "projectLink": "对应带负权指标的网络链路时延计算与动态路由协议收敛。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0094-city-goods-transportation-i.html"
   },
   {
     "id": "algo_kama_94_spfa",
@@ -3064,7 +3237,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0094-city-goods-transportation-i-spfa.html"
   },
   {
     "id": "algo_kama_95",
@@ -3081,7 +3255,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0095-city-goods-transportation-ii.html"
   },
   {
     "id": "algo_kama_96",
@@ -3098,7 +3273,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0096-city-goods-transportation-iii.html"
   },
   {
     "id": "algo_kama_97",
@@ -3115,7 +3291,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0097-xiaoming-visits-park.html"
   },
   {
     "id": "algo_kama_126",
@@ -3132,7 +3309,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "mistakes": "注意边界条件校验、防空指针或下标越界、特判特殊输入。",
     "projectLink": "对应高性能服务端中缓冲区切片、状态转移或连接路由树索引。",
     "isCarl": true,
-    "isHot100": false
+    "isHot100": false,
+    "carlUrl": "https://programmercarl.com/algo/graph/kamacoder-0126-knight-attack-a-star.html"
   },
   {
     "id": "algo_hot_49",
@@ -3151,7 +3329,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "哈希",
-    "hot100Order": 2
+    "hot100Order": 2,
+    "carlUrl": "https://programmercarl.com/hot100/0049.group-anagrams.html"
   },
   {
     "id": "algo_hot_128",
@@ -3170,7 +3349,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "哈希",
-    "hot100Order": 3
+    "hot100Order": 3,
+    "carlUrl": "https://programmercarl.com/hot100/0128.longest-consecutive-sequence.html"
   },
   {
     "id": "algo_hot_283",
@@ -3189,7 +3369,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "双指针",
-    "hot100Order": 4
+    "hot100Order": 4,
+    "carlUrl": "https://programmercarl.com/algo/other/0283-move-zeroes.html"
   },
   {
     "id": "algo_hot_11",
@@ -3208,7 +3389,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "双指针",
-    "hot100Order": 5
+    "hot100Order": 5,
+    "carlUrl": "https://programmercarl.com/hot100/0011.container-with-most-water.html"
   },
   {
     "id": "algo_hot_3",
@@ -3227,7 +3409,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "滑动窗口",
-    "hot100Order": 8
+    "hot100Order": 8,
+    "carlUrl": "https://programmercarl.com/hot100/0003.longest-substring-without-repeating-characters.html"
   },
   {
     "id": "algo_hot_438",
@@ -3246,7 +3429,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "滑动窗口",
-    "hot100Order": 9
+    "hot100Order": 9,
+    "carlUrl": "https://programmercarl.com/hot100/0438.find-all-anagrams-in-a-string.html"
   },
   {
     "id": "algo_hot_560",
@@ -3265,7 +3449,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "子串",
-    "hot100Order": 10
+    "hot100Order": 10,
+    "carlUrl": "https://programmercarl.com/hot100/0560.subarray-sum-equals-k.html"
   },
   {
     "id": "algo_hot_76",
@@ -3284,7 +3469,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "子串",
-    "hot100Order": 12
+    "hot100Order": 12,
+    "carlUrl": "https://programmercarl.com/hot100/0076.minimum-window-substring.html"
   },
   {
     "id": "algo_hot_189",
@@ -3303,7 +3489,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "普通数组",
-    "hot100Order": 15
+    "hot100Order": 15,
+    "carlUrl": "https://programmercarl.com/algo/other/0189-rotate-array.html"
   },
   {
     "id": "algo_hot_238",
@@ -3322,7 +3509,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "普通数组",
-    "hot100Order": 16
+    "hot100Order": 16,
+    "carlUrl": "https://programmercarl.com/hot100/0238.product-of-array-except-self.html"
   },
   {
     "id": "algo_hot_41",
@@ -3360,7 +3548,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "矩阵",
-    "hot100Order": 18
+    "hot100Order": 18,
+    "carlUrl": "https://programmercarl.com/hot100/0073.set-matrix-zeroes.html"
   },
   {
     "id": "algo_hot_48",
@@ -3379,7 +3568,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "矩阵",
-    "hot100Order": 20
+    "hot100Order": 20,
+    "carlUrl": "https://programmercarl.com/hot100/0048.rotate-image.html"
   },
   {
     "id": "algo_hot_240",
@@ -3417,7 +3607,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 22
+    "hot100Order": 22,
+    "carlUrl": "https://programmercarl.com/algo/other/0160-intersection-of-two-linked-lists.html"
   },
   {
     "id": "algo_hot_234",
@@ -3436,7 +3627,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 24
+    "hot100Order": 24,
+    "carlUrl": "https://programmercarl.com/algo/other/0234-palindrome-linked-list.html"
   },
   {
     "id": "algo_hot_141",
@@ -3455,7 +3647,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 25
+    "hot100Order": 25,
+    "carlUrl": "https://programmercarl.com/algo/other/0141-linked-list-cycle.html"
   },
   {
     "id": "algo_hot_21",
@@ -3474,7 +3667,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 27
+    "hot100Order": 27,
+    "carlUrl": "https://programmercarl.com/hot100/0021.merge-two-sorted-lists.html"
   },
   {
     "id": "algo_hot_2",
@@ -3493,7 +3687,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "链表",
-    "hot100Order": 28
+    "hot100Order": 28,
+    "carlUrl": "https://programmercarl.com/hot100/0002.add-two-numbers.html"
   },
   {
     "id": "algo_hot_25",
@@ -3587,7 +3782,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 40
+    "hot100Order": 40,
+    "carlUrl": "https://programmercarl.com/hot100/0543.diameter-of-binary-tree.html"
   },
   {
     "id": "algo_hot_230",
@@ -3625,7 +3821,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 45
+    "hot100Order": 45,
+    "carlUrl": "https://programmercarl.com/hot100/0199.binary-tree-right-side-view.html"
   },
   {
     "id": "algo_hot_114",
@@ -3644,7 +3841,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "二叉树",
-    "hot100Order": 46
+    "hot100Order": 46,
+    "carlUrl": "https://programmercarl.com/hot100/0114.flatten-binary-tree-to-linked-list.html"
   },
   {
     "id": "algo_hot_437",
@@ -3701,7 +3899,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "图论",
-    "hot100Order": 51
+    "hot100Order": 51,
+    "carlUrl": "https://programmercarl.com/algo/other/0200-number-of-islands-bfs.html"
   },
   {
     "id": "algo_hot_994",
@@ -3720,7 +3919,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "图论",
-    "hot100Order": 52
+    "hot100Order": 52,
+    "carlUrl": "https://programmercarl.com/hot100/0994.rotting-oranges.html"
   },
   {
     "id": "algo_hot_207",
@@ -3739,7 +3939,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "图论",
-    "hot100Order": 53
+    "hot100Order": 53,
+    "carlUrl": "https://programmercarl.com/algo/other/0207-course-schedule.html"
   },
   {
     "id": "algo_hot_208",
@@ -3777,7 +3978,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "回溯",
-    "hot100Order": 59
+    "hot100Order": 59,
+    "carlUrl": "https://programmercarl.com/hot100/0022.generate-parentheses.html"
   },
   {
     "id": "algo_hot_79",
@@ -3796,7 +3998,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "回溯",
-    "hot100Order": 60
+    "hot100Order": 60,
+    "carlUrl": "https://programmercarl.com/hot100/0079.word-search.html"
   },
   {
     "id": "algo_hot_35",
@@ -3814,7 +4017,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "二分查找",
-    "hot100Order": 63
+    "hot100Order": 63,
+    "carlUrl": "https://programmercarl.com/algo/other/0035-search-insert-position.html"
   },
   {
     "id": "algo_hot_74",
@@ -3833,7 +4037,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "二分查找",
-    "hot100Order": 64
+    "hot100Order": 64,
+    "carlUrl": "https://programmercarl.com/hot100/0074.search-a-2d-matrix.html"
   },
   {
     "id": "algo_hot_34",
@@ -3852,7 +4057,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "二分查找",
-    "hot100Order": 65
+    "hot100Order": 65,
+    "carlUrl": "https://programmercarl.com/algo/other/0034-find-first-and-last-position-of-element-in-sorted-array.html"
   },
   {
     "id": "algo_hot_33",
@@ -3871,7 +4077,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "二分查找",
-    "hot100Order": 66
+    "hot100Order": 66,
+    "carlUrl": "https://programmercarl.com/hot100/0033.search-in-rotated-sorted-array.html"
   },
   {
     "id": "algo_hot_153",
@@ -3890,7 +4097,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "二分查找",
-    "hot100Order": 67
+    "hot100Order": 67,
+    "carlUrl": "https://programmercarl.com/hot100/0153.find-minimum-in-rotated-sorted-array.html"
   },
   {
     "id": "algo_hot_4",
@@ -3928,7 +4136,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "栈",
-    "hot100Order": 70
+    "hot100Order": 70,
+    "carlUrl": "https://programmercarl.com/hot100/0155.min-stack.html"
   },
   {
     "id": "algo_hot_394",
@@ -3947,7 +4156,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "栈",
-    "hot100Order": 71
+    "hot100Order": 71,
+    "carlUrl": "https://programmercarl.com/hot100/0394.decode-string.html"
   },
   {
     "id": "algo_hot_215",
@@ -3966,7 +4176,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "堆",
-    "hot100Order": 74
+    "hot100Order": 74,
+    "carlUrl": "https://programmercarl.com/hot100/0215.kth-largest-element-in-an-array.html"
   },
   {
     "id": "algo_hot_295",
@@ -4003,7 +4214,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 82
+    "hot100Order": 82,
+    "carlUrl": "https://programmercarl.com/hot100/0118.pascals-triangle.html"
   },
   {
     "id": "algo_hot_152",
@@ -4022,7 +4234,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "动态规划",
-    "hot100Order": 88
+    "hot100Order": 88,
+    "carlUrl": "https://programmercarl.com/hot100/0152.maximum-product-subarray.html"
   },
   {
     "id": "algo_hot_32",
@@ -4060,7 +4273,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "多维动态规划",
-    "hot100Order": 92
+    "hot100Order": 92,
+    "carlUrl": "https://programmercarl.com/hot100/0064.minimum-path-sum.html"
   },
   {
     "id": "algo_hot_5",
@@ -4079,7 +4293,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "多维动态规划",
-    "hot100Order": 93
+    "hot100Order": 93,
+    "carlUrl": "https://programmercarl.com/algo/other/0005-longest-palindromic-substring.html"
   },
   {
     "id": "algo_hot_136",
@@ -4098,7 +4313,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "技巧",
-    "hot100Order": 96
+    "hot100Order": 96,
+    "carlUrl": "https://programmercarl.com/hot100/0136.single-number.html"
   },
   {
     "id": "algo_hot_169",
@@ -4117,7 +4333,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "技巧",
-    "hot100Order": 97
+    "hot100Order": 97,
+    "carlUrl": "https://programmercarl.com/hot100/0169.majority-element.html"
   },
   {
     "id": "algo_hot_75",
@@ -4136,7 +4353,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "技巧",
-    "hot100Order": 98
+    "hot100Order": 98,
+    "carlUrl": "https://programmercarl.com/hot100/0075.sort-colors.html"
   },
   {
     "id": "algo_hot_31",
@@ -4155,7 +4373,8 @@ export const ALGORITHM_LAB_CATALOG: AlgoProblem[] = [
     "isCarl": false,
     "isHot100": true,
     "hot100Chapter": "技巧",
-    "hot100Order": 99
+    "hot100Order": 99,
+    "carlUrl": "https://programmercarl.com/algo/other/0031-next-permutation.html"
   },
   {
     "id": "algo_hot_287",
