@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AlgoProblem } from '../../types';
+import { formatComplexity } from '../../utils/formatters';
+
+export { formatComplexity };
 import {
   X,
   BookOpen,
@@ -137,7 +140,7 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
                     <span>代码随想录精讲</span>
                     {problem.pattern && <span>• 解法: {problem.pattern}</span>}
                     <span className="font-mono text-slate-400">
-                      • O({problem.timeComp}) / O({problem.spaceComp})
+                      • {formatComplexity(problem.timeComp)} / {formatComplexity(problem.spaceComp)}
                     </span>
                   </div>
                 </div>

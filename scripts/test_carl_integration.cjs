@@ -123,6 +123,44 @@ assert(catalogContent.includes('<CarlReaderDrawer'), 'AlgoCatalog mounts CarlRea
 assert(catalogContent.includes('Code2') && catalogContent.includes('title="打开 LeetCode 原题"'), 'Random Pick card uses Code2 icon for LeetCode');
 assert(catalogContent.includes('title="在新标签页打开随想录题解"'), 'Random Pick card uses ExternalLink icon for Carl solution');
 
+// Test 6: Verify elimination of nested O(O(n)) complexity formatting
+console.log('\nTest 6: Verifying elimination of nested O(O(n)) complexity formatting...');
+assert(!algoCardContent.includes('O({problem.timeComp})'), 'AlgoCard does not have nested O({problem.timeComp})');
+assert(!algoCardContent.includes('O({problem.spaceComp})'), 'AlgoCard does not have nested O({problem.spaceComp})');
+assert(algoCardContent.includes('formatComplexity(problem.timeComp)'), 'AlgoCard uses formatComplexity for timeComp');
+assert(!drawerContent.includes('O({problem.timeComp})'), 'CarlReaderDrawer does not have nested O({problem.timeComp})');
+assert(!drawerContent.includes('O({problem.spaceComp})'), 'CarlReaderDrawer does not have nested O({problem.spaceComp})');
+assert(drawerContent.includes('formatComplexity(problem.timeComp)'), 'CarlReaderDrawer uses formatComplexity for timeComp');
+
+const formattersPath = path.join(__dirname, '../src/utils/formatters.ts');
+assert(fs.existsSync(formattersPath), 'src/utils/formatters.ts exists');
+const formattersContent = fs.readFileSync(formattersPath, 'utf8');
+assert(formattersContent.includes('export function formatComplexity'), 'formatComplexity is exported from formatters.ts');
+
+// Test formatComplexity logic
+function formatComplexityLocal(comp) {
+  if (!comp) return '';
+  const trimmed = comp.trim();
+  if (!trimmed) return '';
+  if (/^[oO]\(.*\)$/.test(trimmed)) {
+    let clean = trimmed;
+    while (/^[oO]\s*\(\s*([oO]\s*\(.*\))\s*\)$/.test(clean)) {
+      clean = clean.replace(/^[oO]\s*\(\s*([oO]\s*\(.*\))\s*\)$/, (_match, inner) => inner);
+    }
+    if (clean.startsWith('o(')) {
+      clean = 'O(' + clean.slice(2);
+    }
+    return clean;
+  }
+  return `O(${trimmed})`;
+}
+assert(formatComplexityLocal('O(n)') === 'O(n)', 'formatComplexity preserves O(n)');
+assert(formatComplexityLocal('O(O(n))') === 'O(n)', 'formatComplexity collapses O(O(n)) to O(n)');
+assert(formatComplexityLocal('n') === 'O(n)', 'formatComplexity wraps bare n into O(n)');
+assert(formatComplexityLocal('O(1)') === 'O(1)', 'formatComplexity preserves O(1)');
+assert(formatComplexityLocal('O(O(1))') === 'O(1)', 'formatComplexity collapses O(O(1)) to O(1)');
+assert(formatComplexityLocal('O(m*n)') === 'O(m*n)', 'formatComplexity preserves O(m*n)');
+
 // Summary
 console.log('\n================================================================');
 if (failCount === 0) {

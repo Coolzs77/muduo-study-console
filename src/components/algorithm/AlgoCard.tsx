@@ -1,6 +1,9 @@
 import React from 'react';
 import { AlgoProblem } from '../../types';
 import { CheckCircle2, Circle, ExternalLink, BookOpen, Code2 } from 'lucide-react';
+import { formatComplexity } from '../../utils/formatters';
+
+export { formatComplexity };
 
 interface AlgoCardProps {
   problem: AlgoProblem;
@@ -115,7 +118,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
               {problem.pattern && <span>解法: {problem.pattern}</span>}
               {problem.pattern && <span>•</span>}
               <span className="font-mono text-slate-400">
-                O({problem.timeComp}) / O({problem.spaceComp})
+                {formatComplexity(problem.timeComp)} / {formatComplexity(problem.spaceComp)}
               </span>
             </div>
           </div>
