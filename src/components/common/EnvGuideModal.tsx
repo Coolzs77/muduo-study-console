@@ -58,7 +58,7 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
 
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 flex items-center justify-center shadow-[2px_2px_6px_rgba(0,0,0,0.05),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-95 transition-all duration-300 cursor-pointer"
+            className="w-9 h-9 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 flex items-center justify-center shadow-[2px_2px_6px_rgba(0,0,0,0.05),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             aria-label="关闭指引"
           >
             <X size={18} />
@@ -69,7 +69,7 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
         <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] text-xs font-bold shrink-0">
           <button
             onClick={() => setActiveTab('concept')}
-            className={`px-3.5 py-2 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
+            className={`px-3.5 py-2 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'concept'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -80,7 +80,7 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
           </button>
           <button
             onClick={() => setActiveTab('steps')}
-            className={`px-3.5 py-2 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
+            className={`px-3.5 py-2 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'steps'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -91,7 +91,7 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
           </button>
           <button
             onClick={() => setActiveTab('matrix')}
-            className={`px-3.5 py-2 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
+            className={`px-3.5 py-2 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'matrix'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -102,7 +102,7 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
           </button>
           <button
             onClick={() => setActiveTab('debug')}
-            className={`px-3.5 py-2 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
+            className={`px-3.5 py-2 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'debug'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -113,7 +113,7 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
           </button>
           <button
             onClick={() => setActiveTab('cmake')}
-            className={`px-3.5 py-2 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
+            className={`px-3.5 py-2 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'cmake'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -129,27 +129,33 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
           {/* Tab 1: Concept */}
           {activeTab === 'concept' && (
             <div className="space-y-4">
-              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 rounded-xl p-4">
-                <div className="font-bold text-amber-900 dark:text-amber-200 text-sm mb-1.5 flex items-center gap-1.5">
-                  <Lightbulb size={16} className="text-amber-600" />
-                  开发模式说明：“Windows 编辑与远程 Linux 执行”
+              <div className="bg-gradient-to-br from-amber-100/70 via-orange-50/70 to-yellow-100/70 dark:from-amber-950/40 dark:via-orange-900/30 dark:to-yellow-900/40 border border-white/70 dark:border-white/10 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08)] rounded-3xl p-5 sm:p-6 space-y-3">
+                <div className="font-bold text-amber-900 dark:text-amber-200 text-sm mb-1.5 flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-200/80 dark:bg-amber-900/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-amber-700 dark:text-amber-300">
+                    <Lightbulb size={14} />
+                  </div>
+                  <span>开发模式说明：“Windows 编辑与远程 Linux 执行”</span>
                 </div>
-                <p className="text-xs text-amber-950/80 dark:text-amber-300/80 leading-relaxed">
+                <p className="text-xs text-amber-950/80 dark:text-amber-300/80 leading-relaxed font-medium">
                   初学远程开发容易产生误区：以为要在本地保存 <code>main.cpp</code>，再通过文件传输复制到远程机器编译。
                   <strong>实际开发中通常采用基于 SSH 协议的远程编辑工作流。</strong>
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 text-xs">
-                  <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40">
-                    <div className="font-bold text-rose-800 dark:text-rose-300 mb-1">✕ 繁琐低效做法</div>
-                    <p className="text-rose-700 dark:text-rose-400">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-3 text-xs">
+                  <div className="p-4 rounded-2xl bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/60 dark:border-rose-900/40 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] space-y-1.5">
+                    <div className="font-bold text-rose-800 dark:text-rose-300 mb-1 flex items-center gap-1.5">
+                      <span>✕ 繁琐低效做法</span>
+                    </div>
+                    <p className="text-rose-700 dark:text-rose-400 leading-relaxed">
                       在 Windows 写好代码 ➔ 用 Xftp 传到服务器 ➔ Xshell 敲命令编译 ➔ 报错再回 Windows 改。链路割裂，无法使用断点调试。
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40">
-                    <div className="font-bold text-emerald-800 dark:text-emerald-300 mb-1">✓ 工业标准做法</div>
-                    <p className="text-emerald-700 dark:text-emerald-400">
+                  <div className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] space-y-1.5">
+                    <div className="font-bold text-emerald-800 dark:text-emerald-300 mb-1 flex items-center gap-1.5">
+                      <span>✓ 工业标准做法</span>
+                    </div>
+                    <p className="text-emerald-700 dark:text-emerald-400 leading-relaxed">
                       代码物理存放在云服务器 <code>~/projects</code> 目录下。Windows VS Code 通过 Remote-SSH 打开该目录，按 <code>Ctrl+S</code> 直接保存至云端，并在集成终端即时编译运行。
                     </p>
                   </div>
@@ -209,11 +215,11 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
               ].map(s => (
                 <div
                   key={s.step}
-                  className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-1.5"
+                  className="p-4 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-white/70 dark:border-white/10 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
-                      <span className="w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[11px] shrink-0">
+                    <div className="flex items-center gap-2.5 font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
+                      <span className="w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[11px] shrink-0 shadow-[1px_1px_3px_rgba(2,132,199,0.3)]">
                         {s.step}
                       </span>
                       <span>{s.title}</span>
@@ -221,7 +227,7 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
                     {s.cmd && (
                       <button
                         onClick={() => handleCopyCmd(s.cmd!)}
-                        className="p-1 text-slate-400 hover:text-sky-600 cursor-pointer"
+                        className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                         title="复制命令"
                       >
                         <Copy size={12} />
@@ -235,7 +241,7 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
                     </div>
                   )}
                   {s.cmd && (
-                    <div className="ml-7 bg-slate-900 text-emerald-400 font-mono text-xs px-2.5 py-1.5 rounded-lg border border-slate-800">
+                    <div className="ml-7 bg-slate-900 text-emerald-400 font-mono text-xs px-3 py-2 rounded-2xl border border-slate-800 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.4)]">
                       $ {s.cmd}
                     </div>
                   )}
@@ -247,12 +253,12 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
           {/* Tab 3: Matrix */}
           {activeTab === 'matrix' && (
             <div className="space-y-3">
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 font-medium">
                 当你坐在电脑前操作时，Windows 本地与云服务器各自的职责边界对照表：
               </p>
-              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+              <div className="overflow-x-auto rounded-2xl border border-slate-200/60 dark:border-slate-700 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]">
                 <table className="w-full text-left text-xs font-mono">
-                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700">
+                  <thead className="bg-slate-100/80 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 border-b border-slate-200/60 dark:border-slate-700">
                     <tr>
                       <th className="p-3">开发环节</th>
                       <th className="p-3 text-sky-700 dark:text-sky-300">你的电脑 (Windows)</th>
@@ -300,51 +306,55 @@ export const EnvGuideModal: React.FC<EnvGuideModalProps> = ({ isOpen, onClose })
           {/* Tab 4: Debug & ASan */}
           {activeTab === 'debug' && (
             <div className="space-y-4">
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-                <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <Bug size={16} className="text-sky-600" />
-                  AddressSanitizer (ASan) 编译期内存检测神器
+              <div className="bg-white/80 dark:bg-slate-800/80 p-5 rounded-3xl border border-white/70 dark:border-white/10 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2.5">
+                <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-sky-600 dark:text-sky-400">
+                    <Bug size={14} />
+                  </div>
+                  <span>AddressSanitizer (ASan) 编译期内存检测神器</span>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                   这是排查 C++ 野指针、Double Free、堆越界的最强利器。编译时加上：
                 </p>
-                <div className="bg-slate-900 text-emerald-400 font-mono text-xs p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
-                  <span>g++ -std=c++17 -fsanitize=address -g -O1 main.cpp -o main && ./main</span>
+                <div className="bg-slate-900 text-emerald-400 font-mono text-xs p-3 rounded-2xl border border-slate-800 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.4)] flex items-center justify-between">
+                  <span className="overflow-x-auto select-all">g++ -std=c++17 -fsanitize=address -g -O1 main.cpp -o main && ./main</span>
                   <button
                     onClick={() =>
                       handleCopyCmd(
                         'g++ -std=c++17 -fsanitize=address -g -O1 main.cpp -o main && ./main'
                       )
                     }
-                    className="p-1 text-slate-400 hover:text-emerald-400 cursor-pointer"
+                    className="p-1 text-slate-400 hover:text-emerald-400 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                   >
                     <Copy size={13} />
                   </button>
                 </div>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-                <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <Terminal size={16} className="text-purple-600" />
-                  GDB 常用命令行速查表
+              <div className="bg-white/80 dark:bg-slate-800/80 p-5 rounded-3xl border border-white/70 dark:border-white/10 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2.5">
+                <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-purple-100/90 dark:bg-purple-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-purple-600 dark:text-purple-400">
+                    <Terminal size={14} />
+                  </div>
+                  <span>GDB 常用命令行速查表</span>
                 </div>
                 <ul className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <li className="p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <li className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]">
                     <span className="font-bold text-sky-600">b main</span> : 在 main 函数打断点
                   </li>
-                  <li className="p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <li className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]">
                     <span className="font-bold text-sky-600">r</span> : 运行程序 (Run)
                   </li>
-                  <li className="p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <li className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]">
                     <span className="font-bold text-sky-600">n</span> : 单步步过 (Next)
                   </li>
-                  <li className="p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <li className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]">
                     <span className="font-bold text-sky-600">s</span> : 单步步入 (Step into)
                   </li>
-                  <li className="p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <li className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]">
                     <span className="font-bold text-sky-600">p var</span> : 打印变量当前值
                   </li>
-                  <li className="p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <li className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]">
                     <span className="font-bold text-sky-600">bt</span> : 打印崩溃调用栈 (Backtrace)
                   </li>
                 </ul>
@@ -378,11 +388,11 @@ target_link_libraries(muduo_server pthread)`}
                 />
               </div>
 
-              <div className="p-3.5 rounded-xl bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/40 text-xs">
+              <div className="p-4 rounded-2xl bg-sky-50/80 dark:bg-sky-950/30 border border-sky-100/60 dark:border-sky-900/40 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] text-xs">
                 <div className="font-bold text-sky-900 dark:text-sky-200 mb-1">
                   WSL2 (Windows Subsystem for Linux) 备选方案说明
                 </div>
-                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
                   如果你不想购买云服务器，可以在 Windows 开启 WSL2 安装 Ubuntu 22.04 LTS。VS Code 原生支持 WSL 扩展，工作原理与 Remote-SSH 几乎完全相同，同样具备 Linux 内核的完整 epoll 网络栈。
                 </p>
               </div>

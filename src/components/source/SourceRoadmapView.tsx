@@ -185,7 +185,7 @@ export const SourceRoadmapView: React.FC = () => {
                 setSearchQuery('');
               }}
               type="button"
-              className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex items-center justify-center gap-1.5 active:scale-x-105 active:scale-y-90 ${
+              className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex items-center justify-center gap-1.5 active:scale-x-105 active:scale-y-90 ${
                 activeTab === 'roadmap'
                   ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] -translate-y-0.5'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -200,7 +200,7 @@ export const SourceRoadmapView: React.FC = () => {
                 setSearchQuery('');
               }}
               type="button"
-              className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex items-center justify-center gap-1.5 active:scale-x-105 active:scale-y-90 ${
+              className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex items-center justify-center gap-1.5 active:scale-x-105 active:scale-y-90 ${
                 activeTab === 'files'
                   ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] -translate-y-0.5'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -348,7 +348,7 @@ export const SourceRoadmapView: React.FC = () => {
             {/* Core Member Variables */}
             <div className="space-y-2.5">
               <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-lg flex items-center justify-center bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
+                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
                   <Cpu size={12} />
                 </div>
                 <span>成员变量</span>
@@ -368,7 +368,7 @@ export const SourceRoadmapView: React.FC = () => {
             {/* Key Methods */}
             <div className="space-y-2.5">
               <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-lg flex items-center justify-center bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
+                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
                   <FileCode size={12} />
                 </div>
                 <span>核心函数</span>
@@ -388,7 +388,7 @@ export const SourceRoadmapView: React.FC = () => {
             {/* C++ Features Used */}
             <div className="space-y-2.5">
               <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-lg flex items-center justify-center bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
+                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
                   <Sparkles size={12} />
                 </div>
                 <span>所涉及现代 C++ 语法机制</span>
@@ -487,7 +487,7 @@ export const SourceRoadmapView: React.FC = () => {
                     key={st}
                     onClick={() => handleStatusChange(currentComp.id, st)}
                     type="button"
-                    className={`py-1.5 rounded-xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                    className={`py-1.5 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                       isCur
                         ? st === '已吃透'
                           ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[2px_2px_6px_rgba(16,185,129,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
@@ -526,7 +526,7 @@ export const SourceRoadmapView: React.FC = () => {
         {/* Call Chain Topology Guidance */}
         <div className="p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] text-xs space-y-2.5">
           <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-lg flex items-center justify-center bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
+            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
               <Layers size={12} />
             </div>
             <span>核心调用时序</span>

@@ -286,14 +286,14 @@ export const PitfallsView: React.FC = () => {
           <div className="bg-white dark:bg-[#1a1f2c] rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-7 border border-white/80 dark:border-white/10 shadow-[12px_12px_32px_rgba(0,0,0,0.2),inset_2px_2px_4px_rgba(255,255,255,0.7)] space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-3.5">
               <h3 className="font-black text-lg text-slate-900 dark:text-white flex items-center gap-2.5">
-                <span className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
+                <span className="p-2 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 shadow-[inset_1px_1px_2px_rgba(14,165,233,0.15)]">
                   <Plus size={18} />
                 </span>
                 新增问题记录
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 active:scale-95 transition cursor-pointer"
+                className="p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               >
                 <X size={18} />
               </button>

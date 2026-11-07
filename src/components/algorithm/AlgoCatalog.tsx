@@ -264,7 +264,7 @@ export const AlgoCatalog: React.FC = () => {
                   setViewTrack('all');
                   setSelectedCategory('all');
                 }}
-                className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   viewTrack === 'all'
                     ? 'bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -277,7 +277,7 @@ export const AlgoCatalog: React.FC = () => {
                   setViewTrack('hot100');
                   setSelectedCategory('all');
                 }}
-                className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   viewTrack === 'hot100'
                     ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -290,7 +290,7 @@ export const AlgoCatalog: React.FC = () => {
                   setViewTrack('carl');
                   setSelectedCategory('all');
                 }}
-                className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   viewTrack === 'carl'
                     ? 'bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -523,7 +523,7 @@ export const AlgoCatalog: React.FC = () => {
             </span>
             <button
               onClick={handlePickRandom}
-              className="px-3 py-1 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-200 font-bold shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+              className="px-3 py-1 rounded-2xl bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-200 font-bold shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             >
               换一题
             </button>
@@ -582,7 +582,7 @@ export const AlgoCatalog: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                className={`px-2.5 py-1 rounded-2xl text-[11px] font-semibold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   selectedCategory === cat
                     ? 'bg-purple-600 text-white shadow-[2px_2px_5px_rgba(147,51,234,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
                     : 'bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 shadow-[2px_2px_4px_rgba(0,0,0,0.04),inset_1px_1px_2px_rgba(255,255,255,0.8)] hover:-translate-y-0.5'

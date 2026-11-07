@@ -96,7 +96,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => 
                     setActiveId(h.id);
                   }
                 }}
-                className={`block py-1.5 px-2.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] leading-snug truncate cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                className={`block py-1.5 px-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] leading-snug truncate cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   isActive
                     ? 'bg-white/90 dark:bg-slate-800/90 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] -translate-y-0.5'
                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50'

@@ -88,7 +88,7 @@ export const CareerSystemView: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2 mt-6 p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
           <button
             onClick={() => setActiveTab('evidence')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'evidence'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -99,7 +99,7 @@ export const CareerSystemView: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('radar')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'radar'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -110,7 +110,7 @@ export const CareerSystemView: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('interview')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'interview'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -121,7 +121,7 @@ export const CareerSystemView: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('star')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'star'
                 ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
@@ -218,7 +218,7 @@ export const CareerSystemView: React.FC = () => {
                       </h4>
                       <div className="text-xs text-slate-400 mt-0.5">{dim.description}</div>
                     </div>
-                    <span className="font-mono font-black text-sm text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-xl shadow-[inset_1px_1px_2px_rgba(14,165,233,0.2)]">
+                    <span className="font-mono font-black text-sm text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-2xl shadow-[inset_1px_1px_2px_rgba(14,165,233,0.2)]">
                       L{currentLvl}
                     </span>
                   </div>
@@ -229,7 +229,7 @@ export const CareerSystemView: React.FC = () => {
                       <button
                         key={lvl}
                         onClick={() => setLevel(key, lvl)}
-                        className={`flex-1 py-1.5 text-xs font-mono font-bold rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer ${
+                        className={`flex-1 py-1.5 text-xs font-mono font-bold rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer ${
                           lvl <= currentLvl
                             ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
                             : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
@@ -304,7 +304,7 @@ export const CareerSystemView: React.FC = () => {
                     '陈述文本已复制'
                   )
                 }
-                className="absolute top-3 right-3 p-2 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="absolute top-3 right-3 p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 title="复制陈述"
                 type="button"
               >
@@ -333,7 +333,7 @@ export const CareerSystemView: React.FC = () => {
                       className="p-4 sm:p-5 cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition flex items-center justify-between gap-4 select-none"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_5px_rgba(245,158,11,0.25),inset_1px_1px_2px_rgba(255,255,255,0.6)]">
+                        <span className="w-7 h-7 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_5px_rgba(245,158,11,0.25),inset_1px_1px_2px_rgba(255,255,255,0.6)]">
                           Q
                         </span>
                         <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
@@ -425,7 +425,7 @@ export const CareerSystemView: React.FC = () => {
                   </div>
                   <button
                     onClick={() => handleCopy(rb.text, '简历要点已复制')}
-                    className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0 cursor-pointer"
+                    className="p-2 rounded-2xl bg-white dark:bg-slate-800 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0 cursor-pointer"
                     title="复制要点"
                     type="button"
                   >

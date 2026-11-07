@@ -207,7 +207,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({ content }) => {
         return (
           <code
             key={idx}
-            className="inline-code font-mono text-[13px] bg-slate-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700"
+            className="inline-code font-mono text-[13px] bg-slate-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 px-1.5 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]"
           >
             {part.slice(1, -1)}
           </code>
@@ -317,7 +317,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({ content }) => {
               return 'text-left';
             };
             return (
-              <div key={idx} className="my-6 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div key={idx} className="my-6 overflow-x-auto rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-[4px_4px_12px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.7)] dark:shadow-[4px_4px_12px_rgba(0,0,0,0.3)]">
                 <table className="w-full text-left text-xs border-collapse">
                   {headers.length > 0 && (
                     <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 font-semibold">
@@ -360,7 +360,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({ content }) => {
                 <img
                   src={block.src}
                   alt={block.text || '架构与技术图'}
-                  className="rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs max-w-full mx-auto"
+                  className="rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-[4px_4px_12px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.7)] max-w-full mx-auto"
                   loading="lazy"
                 />
                 {block.text && (

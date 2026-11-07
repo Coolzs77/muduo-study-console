@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer shrink-0 active:scale-x-105 active:scale-y-90 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer shrink-0 active:scale-x-105 active:scale-y-90 ${
                   isActive
                     ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-300 shadow-[3px_3px_8px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] font-bold -translate-y-0.5'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-800/60'

@@ -192,7 +192,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               </div>
               <button
                 onClick={() => setIsSidebarCollapsed(true)}
-                className="p-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="p-1.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 title="收起任务目录"
               >
                 <PanelLeftClose size={16} />
@@ -203,7 +203,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             <div className="grid grid-cols-5 gap-1 p-1 bg-slate-200/50 dark:bg-slate-900/60 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs font-semibold text-center">
               <button
                 onClick={() => setSelectedWeek('all')}
-                className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   selectedWeek === 'all'
                     ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -215,7 +215,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                 <button
                   key={w}
                   onClick={() => setSelectedWeek(w)}
-                  className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 font-mono ${
+                  className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 font-mono ${
                     selectedWeek === w
                       ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -471,7 +471,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   <span>编译运行命令:</span>
                   <button
                     onClick={() => handleCopyBuild(currentDay.experiment!.buildCommand!)}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 dark:bg-slate-800/80 text-sky-700 dark:text-sky-300 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-sky-700 dark:text-sky-300 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                   >
                     {copiedCmd ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
                     <span>{copiedCmd ? '已复制' : '复制命令'}</span>
@@ -647,7 +647,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               <span>{copiedCmd ? '已复制' : '复制'}</span>
             </button>
           </div>
-          <div className="p-2 rounded-xl bg-slate-900 text-sky-300 font-mono text-[10px] truncate shadow-[inset_2px_2px_4px_rgba(0,0,0,0.4)]">
+          <div className="p-2 rounded-2xl bg-slate-900 text-sky-300 font-mono text-[10px] truncate shadow-[inset_2px_2px_4px_rgba(0,0,0,0.4)]">
             {currentDay.buildCmd || 'cmake -B build && cmake --build build'}
           </div>
         </div>

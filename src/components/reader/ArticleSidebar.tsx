@@ -271,7 +271,7 @@ export const ArticleSidebar: React.FC<ArticleSidebarProps> = ({
                         e.stopPropagation();
                         onToggleFavorite(art.id);
                       }}
-                      className="p-1 rounded-lg text-slate-300 hover:text-amber-500 dark:text-slate-600 dark:hover:text-amber-400 transition cursor-pointer active:scale-125"
+                      className="p-1 rounded-xl text-slate-300 hover:text-amber-500 dark:text-slate-600 dark:hover:text-amber-400 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                       title={isFav ? '取消收藏' : '收藏'}
                     >
                       <Star

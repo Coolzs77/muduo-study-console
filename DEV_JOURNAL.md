@@ -4741,6 +4741,17 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language = 'cpp', ti
 - **解法**：
   将内部轨道内凹阴影约束为微刻槽级别：`shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]`，不仅减小了黑色扩散范围，同时增强了右下角的白色内高光反光，使轨道既有明确的凹陷感，又保持了干净清爽的视觉边缘。
 
+#### (3) 问题：复审发现多组件残留微小圆角（rounded-lg / rounded-md / bare rounded）、rounded-xl 按钮及弹窗单轴缩放 (active:scale-95)
+- **现象**：前序实现虽然消除了 `rounded-none` 与 `border-2`，但仍残留局部小圆角（如 InlineMarkdown / MarkdownView 的内联代码、DashboardView 的天数徽标使用了 `rounded-lg`/`rounded-md`/bare `rounded`），且 Header 导航、CodeBlock 复制代码、AlgoCatalog 分类、DailyCurriculumView 周切换、CareerSystemView 子页签、QuizCenterView 题目编号及展开按键等仍使用较生硬的 `rounded-xl`；PitfallsView 新增弹窗关闭按键与 Footer 导入弹窗仍保留了旧版单轴缩放 `active:scale-95`。
+- **根本原因 (RCA)**：
+  1. 初版重构在全局大容器视角（`rounded-3xl`）与通用外凸立体阴影上完成度高，但局部弹窗、辅助按钮与内嵌富文本渲染组件（Markdown / InlineMarkdown）因代码行数多或作为叶子节点，未被全量严格覆盖；
+  2. 初版测试套件 `test_v6_10_full_claymorphism.cjs` 仅断言了 `!code.includes('rounded-none')` 与 `!code.includes('border-2')`，未防御性检测 `rounded-sm`、`rounded-md`、bare 4px `rounded` 及 `active:scale-95`，导致测试出现假阳性“全绿通过”。
+- **解法**：
+  1. 将 Header、DailyCurriculumView、AlgoCatalog、AlgoCard、MasterySelector、TableOfContents、CareerSystemView、QuizCenterView、Footer、CodeBlock、EnvGuideModal、TopologyDrawer、PitfallsView 等组件的交互按钮/微砖全面升级为符合规范的 `rounded-2xl` 软胶药丸，统一配备真实受力形变（`active:scale-x-105 active:scale-y-90`）与弹簧超调回弹；
+  2. 将内联代码与徽标提升为 `rounded-lg`/`rounded-xl` 并配备微内凹阴影（`shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]`），彻底消灭裸露的 4px 直角；
+  3. 为 `PracticeCenterView` 右侧边栏补齐深色模式粘土阴影；
+  4. 重写强化 `test_v6_10_full_claymorphism.cjs`，加入对 `rounded-sm`、`rounded-md`、裸 `rounded`、`active:scale-95` 的零容忍正则断言，并增加 Header 导航按键、EnvGuideModal / TopologyDrawer 关闭键物理受力形变与 PracticeCenterView 双深色阴影的断言。
+
 ---
 
 ### 4. 架构与机制演进图 (Architectural Evolution Diagram)

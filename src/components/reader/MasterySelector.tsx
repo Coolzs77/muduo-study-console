@@ -34,7 +34,7 @@ export const MasterySelector: React.FC<MasterySelectorProps> = ({
               key={tier.level}
               onClick={() => onSelectLevel(tier.level)}
               title={tier.desc}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+              className={`px-3 py-1.5 rounded-2xl text-xs font-semibold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 isSelected
                   ? tier.level >= 4
                     ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'

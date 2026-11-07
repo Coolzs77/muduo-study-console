@@ -224,7 +224,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                   className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="w-7 h-7 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-[2px_2px_5px_rgba(59,130,246,0.3),inset_1px_1px_2px_rgba(255,255,255,0.6)]">
+                    <span className="w-7 h-7 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-[2px_2px_5px_rgba(59,130,246,0.3),inset_1px_1px_2px_rgba(255,255,255,0.6)]">
                       {qIdx + 1}
                     </span>
                     <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-relaxed">
@@ -400,7 +400,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 <div className="pt-2">
                   <button
                     onClick={() => toggleReveal('why')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] transition-all duration-300 cursor-pointer"
                     type="button"
                   >
                     <Eye size={14} />
@@ -439,7 +439,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 <div className="pt-2">
                   <button
                     onClick={() => toggleReveal('muduo')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] transition-all duration-300 cursor-pointer"
                     type="button"
                   >
                     <Eye size={14} />

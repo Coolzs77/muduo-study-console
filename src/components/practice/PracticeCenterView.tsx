@@ -205,7 +205,7 @@ export const PracticeCenterView: React.FC<PracticeCenterViewProps> = ({
       {/* ========================================================= */}
       {/* RIGHT COLUMN: Quick Actions & Reference Tips              */}
       {/* ========================================================= */}
-      <aside className="w-72 shrink-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden xl:flex flex-col space-y-4 select-none overflow-y-auto">
+      <aside className="w-72 shrink-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden xl:flex flex-col space-y-4 select-none overflow-y-auto">
         <div className="pb-2 border-b border-slate-200/60 dark:border-slate-800/60">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-cyan-100/90 dark:bg-cyan-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-cyan-600 dark:text-cyan-400">

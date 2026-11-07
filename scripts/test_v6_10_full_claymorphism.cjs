@@ -43,8 +43,14 @@ targets.forEach(relPath => {
   assert(fs.existsSync(fullPath), `Target file must exist: ${relPath}`);
   const code = fs.readFileSync(fullPath, 'utf-8');
 
-  // Check no sharp corners
+  // Check no sharp corners or improper small radius
   assert(!code.includes('rounded-none'), `${relPath} must NOT contain rounded-none`);
+  assert(!/\brounded-sm\b/.test(code), `${relPath} must NOT contain rounded-sm`);
+  assert(!/\brounded-md\b/.test(code), `${relPath} must NOT contain rounded-md`);
+  assert(!/["'\s]rounded["'\s]/.test(code), `${relPath} must NOT contain bare 4px rounded`);
+
+  // Check no flat active:scale-95 or non-squash active states
+  assert(!/\bactive:scale-95\b/.test(code), `${relPath} must NOT contain flat active:scale-95`);
 
   // Check no heavy borders
   assert(!code.includes('border-2 '), `${relPath} must NOT contain border-2`);
@@ -63,6 +69,7 @@ console.log('-> Verifying Header navigation recessed groove and squash buttons..
 const headerCode = fs.readFileSync(path.join(projectRoot, 'src/components/layout/Header.tsx'), 'utf-8');
 assert(headerCode.includes('shadow-[inset_2px_2px_4px'), 'Header must contain recessed groove shadow');
 assert(headerCode.includes('active:scale-x-105 active:scale-y-90'), 'Header buttons must use squash & stretch');
+assert(headerCode.includes('rounded-2xl transition-all'), 'Header nav buttons must be rounded-2xl pills');
 
 console.log('-> Verifying DailyCurriculumView 3-column claymorphism layout...');
 const dailyCode = fs.readFileSync(path.join(projectRoot, 'src/components/daily/DailyCurriculumView.tsx'), 'utf-8');
@@ -78,5 +85,15 @@ console.log('-> Verifying CodeBlock rounded-2xl container & copy squash button..
 const codeBlockCode = fs.readFileSync(path.join(projectRoot, 'src/components/common/CodeBlock.tsx'), 'utf-8');
 assert(codeBlockCode.includes('rounded-2xl'), 'CodeBlock must be rounded-2xl');
 assert(codeBlockCode.includes('active:scale-x-105 active:scale-y-90'), 'CodeBlock copy button must have squash deformation');
+
+console.log('-> Verifying EnvGuideModal & TopologyDrawer claymorphism upgrades...');
+const envGuideCode = fs.readFileSync(path.join(projectRoot, 'src/components/common/EnvGuideModal.tsx'), 'utf-8');
+assert(envGuideCode.includes('active:scale-x-105 active:scale-y-90'), 'EnvGuideModal close button must have squash physics');
+const drawerCode = fs.readFileSync(path.join(projectRoot, 'src/components/common/TopologyDrawer.tsx'), 'utf-8');
+assert(drawerCode.includes('active:scale-x-105 active:scale-y-90'), 'TopologyDrawer close button must have squash physics');
+
+console.log('-> Verifying PracticeCenterView dual dark-mode clay shadow...');
+const practiceCode = fs.readFileSync(path.join(projectRoot, 'src/components/practice/PracticeCenterView.tsx'), 'utf-8');
+assert(practiceCode.includes('dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3)'), 'PracticeCenterView aside must have dark mode clay shadow');
 
 console.log('[TEST SUCCESS] All v6.10.0 Global StyleKit Claymorphism assertions PASSED cleanly!');

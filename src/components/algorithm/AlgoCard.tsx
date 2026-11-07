@@ -127,7 +127,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
               href={problem.leetcodeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+              className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               title="打开 LeetCode 原题"
             >
               <ExternalLink size={15} />

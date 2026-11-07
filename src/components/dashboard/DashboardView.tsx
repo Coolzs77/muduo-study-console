@@ -585,7 +585,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       >
                         <div className="flex items-center justify-between w-full">
                           <span
-                            className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold ${
+                            className={`px-2 py-0.5 rounded-xl text-[10px] font-mono font-bold ${
                               isMastered
                                 ? 'bg-white/80 dark:bg-emerald-900/60 text-teal-800 dark:text-teal-200 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]'
                                 : isLearning
