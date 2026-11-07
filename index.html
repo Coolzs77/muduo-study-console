@@ -114,6 +114,44 @@
         </div>
       </div>
     </div>
-    <script type="module" src="/src/main.tsx"></script>
+    <!-- 双模自愈引导器：支持本地 Vite 开发与生产静态托管 (GitHub Pages 多通道自适应) -->
+    <script>
+      window.__BOOTSTRAP_PRODUCTION__ = function() {
+        if (window.__MUDUO_BOOTSTRAPPED__) return;
+        window.__MUDUO_BOOTSTRAPPED__ = true;
+        
+        // 动态加载生产样式表
+        if (!document.querySelector('link[href*="assets/index.css"]')) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = './assets/index.css';
+          document.head.appendChild(link);
+        }
+        
+        // 动态加载生产入口脚本
+        if (!document.querySelector('script[src*="assets/index.js"]')) {
+          const script = document.createElement('script');
+          script.type = 'module';
+          script.crossOrigin = '';
+          script.src = './assets/index.js';
+          document.body.appendChild(script);
+        }
+      };
+    </script>
+    <script 
+      type="module" 
+      src="./src/main.tsx"
+      onerror="window.__BOOTSTRAP_PRODUCTION__ && window.__BOOTSTRAP_PRODUCTION__()"
+    ></script>
+    <script>
+      // 守护看门狗：若 400ms 内 React 未成功挂载，立即无条件触发生产自愈加载
+      setTimeout(function() {
+        if (!window.__MUDUO_APP_MOUNTED__) {
+          if (window.__BOOTSTRAP_PRODUCTION__) {
+            window.__BOOTSTRAP_PRODUCTION__();
+          }
+        }
+      }, 400);
+    </script>
   </body>
 </html>

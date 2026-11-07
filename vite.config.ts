@@ -5,7 +5,7 @@ import path from 'path';
 
 function copyImagesPlugin(): Plugin {
   return {
-    name: 'copy-images',
+    name: 'copy-images-and-sync-assets',
     closeBundle() {
       const srcImages = path.resolve(__dirname, 'images');
       const destImages = path.resolve(__dirname, 'dist/images');
@@ -13,6 +13,18 @@ function copyImagesPlugin(): Plugin {
         fs.cpSync(srcImages, destImages, { recursive: true });
         console.log('✓ Copied images/ to dist/images/');
       }
+
+      // Sync dist/assets to root assets/ for multi-channel GitHub Pages hosting
+      const distAssets = path.resolve(__dirname, 'dist/assets');
+      const rootAssets = path.resolve(__dirname, 'assets');
+      if (fs.existsSync(distAssets)) {
+        fs.cpSync(distAssets, rootAssets, { recursive: true });
+        console.log('✓ Synced dist/assets/ to root assets/ for dual-channel static hosting');
+      }
+
+      // Ensure root .nojekyll
+      fs.writeFileSync(path.resolve(__dirname, '.nojekyll'), '');
+      fs.writeFileSync(path.resolve(__dirname, 'dist/.nojekyll'), '');
     }
   };
 }
@@ -28,6 +40,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name].[ext]',
         manualChunks(id) {
           if (id.includes('node_modules')) {
             if (id.includes('highlight.js')) {

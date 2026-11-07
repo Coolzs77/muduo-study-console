@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Allow production static assets on root for multi-channel GitHub Pages hosting
+!assets/
+!images/
+!.nojekyll
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
