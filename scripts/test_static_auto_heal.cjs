@@ -64,14 +64,14 @@ async function runTest() {
 
     console.log('✓ React successfully mounted and replaced initial loader in static environment!');
     
-    const hasNeumorphicCards = await page.evaluate(() => {
+    const hasClayCards = await page.evaluate(() => {
       const text = document.body.innerText;
-      return text.includes('任务体系') && text.includes('专注沉浸');
+      return text.includes('任务体系') && text.includes('项目剖析') && text.includes('算法题库') && text.includes('专注计时');
     });
-    console.log(`✓ Has Neumorphic Metric Cards: ${hasNeumorphicCards}`);
+    console.log(`✓ Has Claymorphism Metric Cards & Focus Timer: ${hasClayCards}`);
 
-    if (!hasNeumorphicCards) {
-      throw new Error('Neumorphic Metric Cards not found in rendered DOM!');
+    if (!hasClayCards) {
+      throw new Error('Claymorphism Metric Cards not found in rendered DOM!');
     }
 
     console.log('🎉 STATIC AUTO-HEAL TEST PASSED 100%! The page loads flawlessly in pure static root hosting!');

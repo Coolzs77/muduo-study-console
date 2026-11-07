@@ -162,6 +162,9 @@ export function useFocusTimer() {
     ? timerState.accumulatedSeconds + Math.max(0, Math.floor((Date.now() - timerState.startTimestamp) / 1000))
     : timerState.accumulatedSeconds;
 
+  // Real-time dynamic today study minutes: persisted base + current session accrued minutes
+  const effectiveTodayMins = todayMins + Math.floor(currentSeconds / 60);
+
   const toggle = useCallback(() => {
     const currentState = readTimerState();
     const now = Date.now();
@@ -171,15 +174,16 @@ export function useFocusTimer() {
       const elapsed = currentState.startTimestamp
         ? Math.max(0, Math.floor((now - currentState.startTimestamp) / 1000))
         : 0;
+      const nextAcc = currentState.accumulatedSeconds + elapsed;
       const nextState: FocusTimerState = {
         isRunning: false,
         startTimestamp: null,
-        accumulatedSeconds: currentState.accumulatedSeconds + elapsed
+        accumulatedSeconds: nextAcc
       };
       writeTimerState(nextState);
       setTimerState(nextState);
       ensureClockRunning(false);
-      showToast('专注计时已暂停', 'info');
+      showToast('专注计时已暂停，时长已安全暂存', 'info');
     } else {
       // Resume / Start
       const nextState: FocusTimerState = {
@@ -236,7 +240,7 @@ export function useFocusTimer() {
     isRunning: timerState.isRunning,
     seconds: currentSeconds,
     formattedTime: formatFocusTime(currentSeconds),
-    todayMins,
+    todayMins: effectiveTodayMins,
     toggle,
     reset
   };

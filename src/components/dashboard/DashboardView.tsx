@@ -5,13 +5,11 @@ import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { DAYS_DATASET, SHORT_DAY_TITLES } from '../../data/daysDataset';
 import { DOMAIN_MODULES } from '../../data/domainDataset';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { useFocusTimer } from '../../hooks/useFocusTimer';
 import { FocusTimer } from './FocusTimer';
 import { TaskRoutineList } from './TaskRoutineList';
 import {
   Calendar,
   CheckSquare,
-  Clock,
   Layers,
   Archive,
   ChevronRight,
@@ -20,9 +18,7 @@ import {
   Briefcase,
   Activity,
   PanelLeftClose,
-  PanelLeftOpen,
-  Play,
-  Pause
+  PanelLeftOpen
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -31,15 +27,6 @@ interface DashboardViewProps {
   onSelectTopologyModule: (module: DomainModule) => void;
 }
 
-// 新拟物微段刻度准确状态推导：消除 1/28 零刻度与 27/28 满刻度提前虚假完成的极端边界缺陷
-const getTickState = (current: number, total: number, tickIdx: number, numTicks = 7): boolean => {
-  if (total <= 0 || current <= 0) return false;
-  if (current >= total) return true;
-  const raw = Math.floor((current / total) * numTicks);
-  const filledCount = Math.min(numTicks - 1, Math.max(1, raw));
-  return tickIdx < filledCount;
-};
-
 export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigateTab,
   onNavigateToDay,
@@ -47,12 +34,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const [masteryMap] = useLocalStorage<Record<string, number>>('knowledgeMastery', {});
   const [completedMap] = useLocalStorage<Record<string | number, boolean>>('completedAlgos', {});
-  const {
-    todayMins,
-    isRunning: isFocusRunning,
-    formattedTime: focusFormattedTime,
-    toggle: toggleFocus
-  } = useFocusTimer();
   const [dayMastery] = useLocalStorage<Record<number, number>>('muduo_day_mastery', {});
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
     'sidebar_collapsed_dashboard',
@@ -120,7 +101,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   }, []);
 
   return (
-    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-[#e0e5ec] dark:bg-[#1e2024] transition-colors duration-300">
+    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-slate-50/70 dark:bg-[#121417] transition-colors duration-300">
       {/* ========================================================= */}
       {/* LEFT COLUMN: Concise Overview & Navigation (Collapsible)   */}
       {/* ========================================================= */}
@@ -349,9 +330,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </h1>
         </div>
 
-        {/* StyleKit Neumorphic 4 Distinct Metric Cards (新拟物派 4 独立卡片) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {/* 1. 任务指标卡 */}
+        {/* StyleKit Claymorphism 3 Distinct Metric Cards (粘土拟态 3 独立糖果色卡片) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* 1. 任务体系 (Mint Clay 薄荷绿) */}
           <div
             onClick={() => onNavigateTab('daily')}
             role="button"
@@ -362,48 +343,48 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onNavigateTab('daily');
               }
             }}
-            className="bg-[#e0e5ec] dark:bg-[#1e2024] rounded-2xl p-4 sm:p-5 flex flex-col justify-between select-none cursor-pointer border-0 border-transparent shadow-[6px_6px_14px_#b8bcc2,-6px_-6px_14px_#ffffff] md:shadow-[8px_8px_18px_#b8bcc2,-8px_-8px_18px_#ffffff] dark:shadow-[6px_6px_14px_#141618,-6px_-6px_14px_#282c30] dark:md:shadow-[8px_8px_18px_#141618,-8px_-8px_18px_#282c30] hover:shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff] dark:hover:shadow-[3px_3px_6px_#141618,-3px_-3px_6px_#282c30] active:shadow-[inset_4px_4px_8px_#b8bcc2,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#141618,inset_-4px_-4px_8px_#282c30] transition-all duration-300 ease-in-out group"
+            className="bg-gradient-to-br from-emerald-100 via-teal-50 to-green-100 dark:from-emerald-950/40 dark:via-teal-900/30 dark:to-green-900/40 rounded-3xl p-6 flex flex-col justify-between border-0 border-transparent shadow-[8px_8px_16px_rgba(0,0,0,0.08),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.06)] dark:shadow-[8px_8px_16px_rgba(0,0,0,0.3),inset_4px_4px_8px_rgba(255,255,255,0.1),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] hover:-translate-y-1 hover:shadow-[12px_12px_24px_rgba(0,0,0,0.12),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.08)] active:scale-x-105 active:scale-y-90 active:shadow-[2px_2px_4px_rgba(0,0,0,0.05),inset_8px_8px_16px_rgba(0,0,0,0.15),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer select-none group"
             title="点击进入任务体系"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+              <span className="text-xs font-bold text-teal-800 dark:text-teal-200 uppercase tracking-wider">
                 任务体系
               </span>
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[#e0e5ec] dark:bg-[#1e2024] shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] text-gray-700 dark:text-gray-300">
-                <Calendar size={15} />
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center bg-white/70 dark:bg-emerald-900/40 shadow-[inset_3px_3px_6px_rgba(0,0,0,0.08),inset_-3px_-3px_6px_rgba(255,255,255,0.9)] text-teal-700 dark:text-teal-300">
+                <Calendar size={17} />
               </div>
             </div>
 
-            <div className="my-3">
-              <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-gray-800 dark:text-gray-100 tabular-nums">
+            <div className="my-4">
+              <div className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-teal-900 dark:text-teal-100 tabular-nums">
                 {masteredDaysCount}
-                <span className="text-xs font-normal font-mono text-gray-500 dark:text-gray-400 ml-1">
+                <span className="text-sm font-semibold font-mono text-teal-700/80 dark:text-teal-300/80 ml-1.5">
                   / 28 天
                 </span>
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-gray-500 dark:text-gray-400">吃透进度</span>
-                <span className="font-mono font-semibold text-gray-700 dark:text-gray-300">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-teal-700 dark:text-teal-300 font-medium">吃透进度</span>
+                <span className="font-mono font-bold text-teal-900 dark:text-teal-100">
                   {Math.round((masteredDaysCount / 28) * 100)}%
                 </span>
               </div>
-              {/* 内凹微进度槽 */}
+              {/* 粘土内凹微进度槽 */}
               <div
-                className="w-full h-2 rounded-full bg-[#e0e5ec] dark:bg-[#1e2024] shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] overflow-hidden p-0.5"
+                className="w-full h-2.5 rounded-full bg-emerald-200/50 dark:bg-emerald-950/60 shadow-[inset_3px_3px_6px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] overflow-hidden p-0.5"
                 title={`任务吃透率: ${Math.round((masteredDaysCount / 28) * 100)}%`}
               >
                 <div
-                  className="h-full rounded-full bg-[#6d5dfc] transition-all duration-300 ease-in-out"
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 shadow-xs transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   style={{ width: `${Math.round((masteredDaysCount / 28) * 100)}%` }}
                 />
               </div>
             </div>
           </div>
 
-          {/* 2. 项目指标卡 */}
+          {/* 2. 项目剖析 (Amber/Cream Clay 奶油暖橙) */}
           <div
             onClick={() => onNavigateTab('reader')}
             role="button"
@@ -414,47 +395,47 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onNavigateTab('reader');
               }
             }}
-            className="bg-[#e0e5ec] dark:bg-[#1e2024] rounded-2xl p-4 sm:p-5 flex flex-col justify-between select-none cursor-pointer border-0 border-transparent shadow-[6px_6px_14px_#b8bcc2,-6px_-6px_14px_#ffffff] md:shadow-[8px_8px_18px_#b8bcc2,-8px_-8px_18px_#ffffff] dark:shadow-[6px_6px_14px_#141618,-6px_-6px_14px_#282c30] dark:md:shadow-[8px_8px_18px_#141618,-8px_-8px_18px_#282c30] hover:shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff] dark:hover:shadow-[3px_3px_6px_#141618,-3px_-3px_6px_#282c30] active:shadow-[inset_4px_4px_8px_#b8bcc2,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#141618,inset_-4px_-4px_8px_#282c30] transition-all duration-300 ease-in-out group"
+            className="bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 dark:from-amber-950/40 dark:via-orange-900/30 dark:to-yellow-900/40 rounded-3xl p-6 flex flex-col justify-between border-0 border-transparent shadow-[8px_8px_16px_rgba(0,0,0,0.08),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.06)] dark:shadow-[8px_8px_16px_rgba(0,0,0,0.3),inset_4px_4px_8px_rgba(255,255,255,0.1),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] hover:-translate-y-1 hover:shadow-[12px_12px_24px_rgba(0,0,0,0.12),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.08)] active:scale-x-105 active:scale-y-90 active:shadow-[2px_2px_4px_rgba(0,0,0,0.05),inset_8px_8px_16px_rgba(0,0,0,0.15),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer select-none group"
             title="点击进入项目专栏"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+              <span className="text-xs font-bold text-amber-800 dark:text-amber-200 uppercase tracking-wider">
                 项目剖析
               </span>
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[#e0e5ec] dark:bg-[#1e2024] shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] text-gray-700 dark:text-gray-300">
-                <BookOpen size={15} />
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center bg-white/70 dark:bg-amber-900/40 shadow-[inset_3px_3px_6px_rgba(0,0,0,0.08),inset_-3px_-3px_6px_rgba(255,255,255,0.9)] text-amber-700 dark:text-amber-300">
+                <BookOpen size={17} />
               </div>
             </div>
 
-            <div className="my-3">
-              <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-gray-800 dark:text-gray-100 tabular-nums">
+            <div className="my-4">
+              <div className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-amber-900 dark:text-amber-100 tabular-nums">
                 {masteredArticles}
-                <span className="text-xs font-normal font-mono text-gray-500 dark:text-gray-400 ml-1">
+                <span className="text-sm font-semibold font-mono text-amber-700/80 dark:text-amber-300/80 ml-1.5">
                   / {totalArticles} 篇
                 </span>
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-gray-500 dark:text-gray-400">专栏精读</span>
-                <span className="font-mono font-semibold text-gray-700 dark:text-gray-300">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-amber-700 dark:text-amber-300 font-medium">专栏精读</span>
+                <span className="font-mono font-bold text-amber-900 dark:text-amber-100">
                   {Math.round((masteredArticles / totalArticles) * 100)}%
                 </span>
               </div>
               <div
-                className="w-full h-2 rounded-full bg-[#e0e5ec] dark:bg-[#1e2024] shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] overflow-hidden p-0.5"
+                className="w-full h-2.5 rounded-full bg-amber-200/50 dark:bg-amber-950/60 shadow-[inset_3px_3px_6px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] overflow-hidden p-0.5"
                 title={`项目专栏精读进度: ${Math.round((masteredArticles / totalArticles) * 100)}%`}
               >
                 <div
-                  className="h-full rounded-full bg-[#6d5dfc] transition-all duration-300 ease-in-out"
+                  className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 shadow-xs transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   style={{ width: `${Math.round((masteredArticles / totalArticles) * 100)}%` }}
                 />
               </div>
             </div>
           </div>
 
-          {/* 3. 算法指标卡 */}
+          {/* 3. 算法题库 (Lilac/Purple Clay 丁香淡紫) */}
           <div
             onClick={() => onNavigateTab('algo')}
             role="button"
@@ -465,127 +446,44 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onNavigateTab('algo');
               }
             }}
-            className="bg-[#e0e5ec] dark:bg-[#1e2024] rounded-2xl p-4 sm:p-5 flex flex-col justify-between select-none cursor-pointer border-0 border-transparent shadow-[6px_6px_14px_#b8bcc2,-6px_-6px_14px_#ffffff] md:shadow-[8px_8px_18px_#b8bcc2,-8px_-8px_18px_#ffffff] dark:shadow-[6px_6px_14px_#141618,-6px_-6px_14px_#282c30] dark:md:shadow-[8px_8px_18px_#141618,-8px_-8px_18px_#282c30] hover:shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff] dark:hover:shadow-[3px_3px_6px_#141618,-3px_-3px_6px_#282c30] active:shadow-[inset_4px_4px_8px_#b8bcc2,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#141618,inset_-4px_-4px_8px_#282c30] transition-all duration-300 ease-in-out group"
+            className="bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 dark:from-purple-950/40 dark:via-pink-900/30 dark:to-indigo-900/40 rounded-3xl p-6 flex flex-col justify-between border-0 border-transparent shadow-[8px_8px_16px_rgba(0,0,0,0.08),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.06)] dark:shadow-[8px_8px_16px_rgba(0,0,0,0.3),inset_4px_4px_8px_rgba(255,255,255,0.1),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] hover:-translate-y-1 hover:shadow-[12px_12px_24px_rgba(0,0,0,0.12),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.08)] active:scale-x-105 active:scale-y-90 active:shadow-[2px_2px_4px_rgba(0,0,0,0.05),inset_8px_8px_16px_rgba(0,0,0,0.15),inset_-4px_-4px_8px_rgba(255,255,255,0.5)] transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer select-none group"
             title="点击进入算法题库"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+              <span className="text-xs font-bold text-purple-800 dark:text-purple-200 uppercase tracking-wider">
                 算法题库
               </span>
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[#e0e5ec] dark:bg-[#1e2024] shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] text-gray-700 dark:text-gray-300">
-                <CheckSquare size={15} />
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center bg-white/70 dark:bg-purple-900/40 shadow-[inset_3px_3px_6px_rgba(0,0,0,0.08),inset_-3px_-3px_6px_rgba(255,255,255,0.9)] text-purple-700 dark:text-purple-300">
+                <CheckSquare size={17} />
               </div>
             </div>
 
-            <div className="my-3">
-              <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-gray-800 dark:text-gray-100 tabular-nums">
+            <div className="my-4">
+              <div className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-purple-900 dark:text-purple-100 tabular-nums">
                 {completedAlgos}
-                <span className="text-xs font-normal font-mono text-gray-500 dark:text-gray-400 ml-1">
+                <span className="text-sm font-semibold font-mono text-purple-700/80 dark:text-purple-300/80 ml-1.5">
                   / {totalAlgos} 题
                 </span>
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-gray-500 dark:text-gray-400">Hot 100 & 随想录</span>
-                <span className="font-mono font-semibold text-gray-700 dark:text-gray-300">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-purple-700 dark:text-purple-300 font-medium">Hot 100 & 随想录</span>
+                <span className="font-mono font-bold text-purple-900 dark:text-purple-100">
                   {Math.round((completedAlgos / totalAlgos) * 100)}%
                 </span>
               </div>
               <div
-                className="w-full h-2 rounded-full bg-[#e0e5ec] dark:bg-[#1e2024] shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] overflow-hidden p-0.5"
+                className="w-full h-2.5 rounded-full bg-purple-200/50 dark:bg-purple-950/60 shadow-[inset_3px_3px_6px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] overflow-hidden p-0.5"
                 title={`算法题库完成率: ${Math.round((completedAlgos / totalAlgos) * 100)}%`}
               >
                 <div
-                  className="h-full rounded-full bg-[#6d5dfc] transition-all duration-300 ease-in-out"
+                  className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-xs transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   style={{ width: `${Math.round((completedAlgos / totalAlgos) * 100)}%` }}
                 />
               </div>
             </div>
-          </div>
-
-          {/* 4. 专注指标卡 (独立集成新拟物软触感起停按键) */}
-          <div
-            onClick={() => {
-              const el = document.getElementById('dashboard-focus-timer') || document.getElementById('dashboard-focus-timer-mobile');
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.classList.add('ring-2', 'ring-[#6d5dfc]');
-                setTimeout(() => el.classList.remove('ring-2', 'ring-[#6d5dfc]'), 1500);
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                const el = document.getElementById('dashboard-focus-timer') || document.getElementById('dashboard-focus-timer-mobile');
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  el.classList.add('ring-2', 'ring-[#6d5dfc]');
-                  setTimeout(() => el.classList.remove('ring-2', 'ring-[#6d5dfc]'), 1500);
-                }
-              }
-            }}
-            className="bg-[#e0e5ec] dark:bg-[#1e2024] rounded-2xl p-4 sm:p-5 flex flex-col justify-between select-none cursor-pointer border-0 border-transparent shadow-[6px_6px_14px_#b8bcc2,-6px_-6px_14px_#ffffff] md:shadow-[8px_8px_18px_#b8bcc2,-8px_-8px_18px_#ffffff] dark:shadow-[6px_6px_14px_#141618,-6px_-6px_14px_#282c30] dark:md:shadow-[8px_8px_18px_#141618,-8px_-8px_18px_#282c30] hover:shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff] dark:hover:shadow-[3px_3px_6px_#141618,-3px_-3px_6px_#282c30] active:shadow-[inset_4px_4px_8px_#b8bcc2,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#141618,inset_-4px_-4px_8px_#282c30] transition-all duration-300 ease-in-out group"
-            title="点击滚动至专注面板，或点击下方按键起停"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                专注沉浸
-              </span>
-              <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center bg-[#e0e5ec] dark:bg-[#1e2024] transition-colors duration-300 ${
-                  isFocusRunning
-                    ? 'shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] text-[#6d5dfc]'
-                    : 'shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <Clock size={15} className={isFocusRunning ? 'animate-pulse' : ''} />
-              </div>
-            </div>
-
-            <div className="my-2.5">
-              {isFocusRunning ? (
-                <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-[#6d5dfc] tabular-nums flex items-baseline gap-1.5">
-                  <span>{focusFormattedTime}</span>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-[#6d5dfc]/10 text-[#6d5dfc]">
-                    LIVE
-                  </span>
-                </div>
-              ) : (
-                <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-gray-800 dark:text-gray-100 tabular-nums">
-                  {todayMins}
-                  <span className="text-xs font-normal font-mono text-gray-500 dark:text-gray-400 ml-1">
-                    / 180 分
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* 新拟物软触感按键 (Extrude to Intrude) */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFocus();
-              }}
-              type="button"
-              className={`w-full py-1.5 px-3 rounded-xl font-semibold text-xs transition-all duration-300 ease-in-out flex items-center justify-center gap-1.5 cursor-pointer border-0 ${
-                isFocusRunning
-                  ? 'bg-[#e0e5ec] dark:bg-[#1e2024] text-[#6d5dfc] shadow-[inset_3px_3px_6px_#b8bcc2,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#141618,inset_-3px_-3px_6px_#282c30]'
-                  : 'bg-[#e0e5ec] dark:bg-[#1e2024] text-gray-700 dark:text-gray-200 shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#141618,-3px_-3px_6px_#282c30] hover:shadow-[1px_1px_3px_#b8bcc2,-1px_-1px_3px_#ffffff] dark:hover:shadow-[1px_1px_3px_#141618,-1px_-1px_3px_#282c30] active:shadow-[inset_3px_3px_6px_#b8bcc2,inset_-3px_-3px_6px_#ffffff] dark:active:shadow-[inset_3px_3px_6px_#141618,inset_-3px_-3px_6px_#282c30]'
-              }`}
-              title={isFocusRunning ? '暂停专注计时' : '一键开启专注计时'}
-              aria-label={isFocusRunning ? '暂停专注计时' : '一键开启专注计时'}
-            >
-              {isFocusRunning ? (
-                <Pause size={13} className="fill-current" />
-              ) : (
-                <Play size={13} className="fill-current ml-0.5" />
-              )}
-              <span>{isFocusRunning ? '专注进行中' : '快速开启专注'}</span>
-            </button>
           </div>
         </div>
 
