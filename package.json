@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build_static.cjs",
+    "test": "node scripts/inspect_dark_shadows.cjs && node scripts/test_carl_integration.cjs && node scripts/test_v6_11_sticky_and_dark_mode.cjs",
     "deploy:gh-pages": "node scripts/deploy_gh_pages.cjs",
     "preview": "vite preview"
   },

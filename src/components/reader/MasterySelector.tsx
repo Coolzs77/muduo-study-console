@@ -21,7 +21,7 @@ export const MasterySelector: React.FC<MasterySelectorProps> = ({
   onSelectLevel,
 }) => {
   return (
-    <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-2xl bg-slate-200/50 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs">
+    <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-2xl bg-slate-200/50 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] text-xs">
       <span className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 mr-1 shrink-0 select-none">
         <Award size={15} className="text-amber-500" />
         <span>掌握度评级:</span>

@@ -178,7 +178,7 @@ export const SourceRoadmapView: React.FC = () => {
           </div>
 
           {/* View Switcher Pills (Clay recessed groove) */}
-          <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-200/50 dark:bg-slate-900/60 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs font-semibold">
+          <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-200/50 dark:bg-slate-900/60 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] text-xs font-semibold">
             <button
               onClick={() => {
                 setActiveTab('roadmap');

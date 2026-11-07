@@ -45,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#f4f7fb]/90 dark:bg-[#151922]/90 backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_2px_rgba(255,255,255,0.05)] border-0 select-none transition-colors duration-300">
+    <header className="sticky top-0 z-40 w-full bg-[#f4f7fb]/90 dark:bg-[#151922]/90 backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.06)] border-0 select-none transition-colors duration-300">
       <div className="w-full px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand Logo & Title */}
         <div
@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center Nav Tabs (Clay recessed slot with candy pill buttons) */}
-        <nav className="flex items-center gap-1 bg-slate-200/50 dark:bg-slate-900/60 p-1.5 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.4),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs font-semibold overflow-x-auto max-w-full">
+        <nav className="flex items-center gap-1 bg-slate-200/50 dark:bg-slate-900/60 p-1.5 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] text-xs font-semibold overflow-x-auto max-w-full">
           {navItems.map(item => {
             const isActive = activeTab === item.id;
             return (
