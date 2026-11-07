@@ -107,7 +107,7 @@
 }
 
 .dark .reading-content blockquote {
-  background: #082f49/40;
+  background: rgba(8, 47, 73, 0.45);
   border-left-color: #38bdf8;
   color: #bae6fd;
 }

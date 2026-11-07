@@ -390,50 +390,52 @@ export const AlgoCatalog: React.FC = () => {
       )}
 
       {/* ==================================================================== */}
-      {/* Middle Column: Problem List Canvas (Fluid Full Width)                */}
+      {/* Middle Column: Problem List Canvas with Scroll Container (Workbench) */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-6 sm:p-8 space-y-5 overflow-y-auto w-full">
-        {/* Search & Filter Toolbar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/60 dark:border-slate-800/60">
-          {/* Difficulty Chips (Clay Candy Pills) */}
-          <div className="flex items-center gap-2 text-xs">
-            {(['all', 'Easy', 'Medium', 'Hard'] as const).map(df => (
-              <button
-                key={df}
-                onClick={() => setDiffFilter(df)}
-                className={`px-3 py-1.5 rounded-2xl font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
-                  diffFilter === df
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(147,51,234,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] -translate-y-0.5'
-                    : 'bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
-                }`}
-              >
-                {df === 'all' ? '全部难度' : df === 'Easy' ? '简单' : df === 'Medium' ? '中等' : '困难'}
-              </button>
-            ))}
+      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-6 sm:p-8 flex flex-col h-[calc(100vh-5.5rem)] w-full overflow-hidden">
+        {/* Search & Filter Toolbar (Fixed Header) */}
+        <div className="shrink-0 space-y-3 pb-3 border-b border-slate-200/60 dark:border-slate-800/60">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            {/* Difficulty Chips (Clay Candy Pills) */}
+            <div className="flex items-center gap-2 text-xs">
+              {(['all', 'Easy', 'Medium', 'Hard'] as const).map(df => (
+                <button
+                  key={df}
+                  onClick={() => setDiffFilter(df)}
+                  className={`px-3 py-1.5 rounded-2xl font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                    diffFilter === df
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(147,51,234,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] -translate-y-0.5'
+                      : 'bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
+                  }`}
+                >
+                  {df === 'all' ? '全部难度' : df === 'Easy' ? '简单' : df === 'Medium' ? '中等' : '困难'}
+                </button>
+              ))}
+            </div>
+
+            {/* Search Box (Clay recessed input) */}
+            <div className="relative w-full sm:w-72 shrink-0">
+              <Search size={14} className="absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="搜索题号、题名或解法..."
+                className="w-full bg-white/80 dark:bg-slate-900/70 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)] rounded-2xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden transition-all"
+              />
+            </div>
           </div>
 
-          {/* Search Box (Clay recessed input) */}
-          <div className="relative w-full sm:w-72 shrink-0">
-            <Search size={14} className="absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜索题号、题名或解法..."
-              className="w-full bg-white/80 dark:bg-slate-900/70 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)] rounded-2xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden transition-all"
-            />
+          {/* Current Active Category Title */}
+          <div className="flex items-center justify-between text-xs text-slate-500 pt-1 font-medium">
+            <span>
+              当前展示: <strong className="text-slate-900 dark:text-white font-bold">{selectedCategory === 'all' ? '全部专题' : selectedCategory}</strong> ({displayedProblems.length} 道题目)
+            </span>
           </div>
         </div>
 
-        {/* Current Active Category Title */}
-        <div className="flex items-center justify-between text-xs text-slate-500 pt-1 font-medium">
-          <span>
-            当前展示: <strong className="text-slate-900 dark:text-white font-bold">{selectedCategory === 'all' ? '全部专题' : selectedCategory}</strong> ({displayedProblems.length} 道题目)
-          </span>
-        </div>
-
-        {/* Problems List */}
-        <div className="space-y-3">
+        {/* Problems List (Independent Smooth Scroll Container) */}
+        <div className="flex-1 min-h-0 overflow-y-auto pr-2 pt-4 space-y-3 scrollbar-thin">
           {displayedProblems.map((problem) => (
             <AlgoCard
               key={problem.id}

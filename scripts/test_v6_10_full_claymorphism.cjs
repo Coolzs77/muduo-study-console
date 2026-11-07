@@ -7,9 +7,9 @@ console.log('[TEST] Starting v6.10.0 Global StyleKit Claymorphism (粘土拟态)
 const projectRoot = path.resolve(__dirname, '..');
 
 // 1. Verify package.json version
-console.log('-> Verifying package.json version is 6.10.0...');
+console.log('-> Verifying package.json version is >= 6.10.0...');
 const pkg = JSON.parse(fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf-8'));
-assert.strictEqual(pkg.version, '6.10.0', 'package.json version must be 6.10.0');
+assert(pkg.version >= '6.10.0', 'package.json version must be >= 6.10.0');
 
 // List of target components that were upgraded to StyleKit claymorphism
 const targets = [

@@ -579,7 +579,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             ? 'bg-gradient-to-br from-emerald-100 via-teal-50 to-green-100 dark:from-emerald-950/60 dark:via-teal-900/50 dark:to-green-900/60 text-teal-950 dark:text-teal-100 shadow-[6px_6px_14px_rgba(16,185,129,0.12),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.06)] hover:shadow-[8px_8px_18px_rgba(16,185,129,0.2),inset_3px_3px_6px_rgba(255,255,255,0.9)] active:shadow-[2px_2px_4px_rgba(0,0,0,0.08),inset_6px_6px_12px_rgba(0,0,0,0.15)]'
                             : isLearning
                             ? 'bg-gradient-to-br from-sky-100 via-blue-50 to-cyan-100 dark:from-sky-950/60 dark:via-blue-900/50 dark:to-cyan-900/60 text-sky-950 dark:text-sky-100 shadow-[6px_6px_14px_rgba(14,165,233,0.12),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.06)] hover:shadow-[8px_8px_18px_rgba(14,165,233,0.2),inset_3px_3px_6px_rgba(255,255,255,0.9)] active:shadow-[2px_2px_4px_rgba(0,0,0,0.08),inset_6px_6px_12px_rgba(0,0,0,0.15)]'
-                            : 'bg-gradient-to-br from-white via-[#f8fafc] to-[#edf1f7] dark:from-slate-800/90 dark:via-slate-800/70 dark:to-slate-850/90 text-slate-800 dark:text-slate-200 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:shadow-[8px_8px_18px_rgba(0,0,0,0.08),inset_3px_3px_6px_rgba(255,255,255,0.95)] active:shadow-[2px_2px_4px_rgba(0,0,0,0.08),inset_6px_6px_12px_rgba(0,0,0,0.1)]'
+                            : 'bg-gradient-to-br from-white via-[#f8fafc] to-[#edf1f7] dark:from-slate-800/90 dark:via-slate-800/70 dark:to-slate-900/90 text-slate-800 dark:text-slate-200 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:shadow-[8px_8px_18px_rgba(0,0,0,0.08),inset_3px_3px_6px_rgba(255,255,255,0.95)] active:shadow-[2px_2px_4px_rgba(0,0,0,0.08),inset_6px_6px_12px_rgba(0,0,0,0.1)]'
                         }`}
                         title={`Day ${d.day}: ${d.title} (点击直达攻坚)`}
                       >
@@ -668,7 +668,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   key={item.id}
                   onClick={() => onSelectTopologyModule(matchedModule)}
                   type="button"
-                  className="p-3.5 rounded-2xl bg-gradient-to-br from-white via-[#f8fafc] to-[#edf1f7] dark:from-slate-800/90 dark:via-slate-800/70 dark:to-slate-850/90 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:shadow-[8px_8px_18px_rgba(0,0,0,0.08)] hover:-translate-y-1 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] text-left cursor-pointer group select-none"
+                  className="p-3.5 rounded-2xl bg-gradient-to-br from-white via-[#f8fafc] to-[#edf1f7] dark:from-slate-800/90 dark:via-slate-800/70 dark:to-slate-900/90 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:shadow-[8px_8px_18px_rgba(0,0,0,0.08)] hover:-translate-y-1 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] text-left cursor-pointer group select-none"
                 >
                   <div className="font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 flex items-center justify-between">
                     <span className="truncate">{item.name}</span>
@@ -688,10 +688,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Responsive Fallback: On screens < xl, show Focus Timer & Routine List in Clay Cards at the bottom */}
         <div className="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200/60 dark:border-slate-800/60">
-          <div id="dashboard-focus-timer-mobile" className="rounded-3xl p-5 bg-[#f8fafc]/90 dark:bg-slate-850/80 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.25),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]">
+          <div id="dashboard-focus-timer-mobile" className="rounded-3xl p-5 bg-[#f8fafc]/90 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.25),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]">
             <FocusTimer />
           </div>
-          <div className="rounded-3xl p-5 bg-[#f8fafc]/90 dark:bg-slate-850/80 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.25),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]">
+          <div className="rounded-3xl p-5 bg-[#f8fafc]/90 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.25),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]">
             <TaskRoutineList onNavigateTab={onNavigateTab} />
           </div>
         </div>

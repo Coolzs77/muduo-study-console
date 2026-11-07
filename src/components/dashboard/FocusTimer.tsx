@@ -21,7 +21,7 @@ export const FocusTimer: React.FC = () => {
       </div>
 
       {/* Deep Inset Clay Display Screen (粘土深内凹屏幕) */}
-      <div className="p-5 rounded-2xl bg-gradient-to-b from-slate-100 via-[#eef2f7] to-slate-50 dark:from-slate-900/90 dark:via-slate-900/70 dark:to-slate-850/80 shadow-[inset_4px_4px_8px_rgba(0,0,0,0.09),inset_-4px_-4px_8px_rgba(255,255,255,0.9)] dark:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.06)] space-y-4 text-center">
+      <div className="p-5 rounded-2xl bg-gradient-to-b from-slate-100 via-[#eef2f7] to-slate-50 dark:from-slate-900/90 dark:via-slate-900/70 dark:to-slate-900/90 shadow-[inset_4px_4px_8px_rgba(0,0,0,0.09),inset_-4px_-4px_8px_rgba(255,255,255,0.9)] dark:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.06)] space-y-4 text-center">
         {/* Large Monospaced Time Display */}
         <div className="font-mono text-4xl sm:text-4xl font-black tracking-wider text-slate-800 dark:text-slate-100 py-1 tabular-nums drop-shadow-xs">
           {formattedTime}
