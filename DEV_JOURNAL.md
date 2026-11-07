@@ -3229,16 +3229,51 @@ node scripts/deploy_all.cjs
   ```
 
 ### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
-- **问题 1：事件穿透与双重交互冲突**
-  - **现象**：在专注指标单元内点击快速启动/暂停按钮时，本意是仅控制计时器开始或暂停，但由于外层单元绑定了“平滑滚动至页面下方完整专注模块”的点击事件，导致页面视口发生非预期的自动向下位移抖动。
-  - **根本原因 (RCA)**：DOM 事件冒泡机制（Event Bubbling）默认向上逐级传递至父容器，未对内层 `<button>` 的 `click` 事件进行截断阻断。
-  - **具体解法**：在 `<button onClick={(e) => ...}>` 回调中显式调用 `e.stopPropagation()`，彻底切断事件冒泡链条，使点击按钮仅触发 `toggleFocus()`，点击单元背景其余区域才平滑导向完整面板，二者各司其职。
-- **问题 2：垂直高度挤占与多端自适应协调**
-  - **现象**：原先 4 张 Bento 卡片高度在 140px~180px 之间，严重挤占了 28 天任务日历工作区的首屏可视区域；若直接强行限制为单个横向 flex 容器，在移动设备（<768px）宽度下文字与刻度会发生挤压重叠甚至溢出。
-  - **根本原因 (RCA)**：卡片垂直堆叠了标题、大号图标、数值、辅助描述和长条进度条 5 层元素；直接单行排列在窄屏下没有足够的横向物理像素容纳 4 段指标。
+- **问题 1：嵌套可交互元素 (Nested Interactive Elements) 与键盘操作歧义**
+  - **现象**：在专注指标单元内，外层容器被赋予 `role="button"`，而内部又放置了一个原生 `<button>`；并且外层容器的 `onClick` 执行平滑滚动，而 `onKeyDown` 却执行了 `toggleFocus()`。这导致键盘用户聚焦容器按下回车键会触发计时启停而非滚动，且造成 WCAG 4.1.2 规范关于“禁止在 button 内部嵌套可交互子元素”的合规冲突。
+  - **根本原因 (RCA)**：DOM 可交互结构混淆。试图在一个统一容器内同时响应“点击跳转”与“按键启停”，导致事件冒泡处理脆弱、键盘聚焦与屏幕阅读器语义混乱。
   - **具体解法**：
-    1. 在桌面端（`md:` 及以上）严格采用 `md:h-16`（64px，处于 56px~72px 黄金区间），内部采用左右紧凑布局（左侧上下两行紧凑标签+数值，右侧放置百分比+微段刻度或控制按钮）；
-    2. 在移动端使用 `grid grid-cols-2 md:grid-cols-4`，以 2 列 2 行优雅折叠，行间与列间配合 `divide-y md:divide-y-0 md:divide-x` 保持 1px 细线分隔，兼顾极小高度开销与多端高可读性。
+    1. 将外层单元降级为纯结构性容器 `div`；
+    2. 将指标信息文本与状态徽标封装为独立的平级跳转块，配置 `role="button"` 与语义一致的 `onClick` / `onKeyDown`；
+    3. 将新拟物快速启停按钮作为平级同胞节点（Sibling Node），配有 `e.stopPropagation()` 防御性截断，彻底消除嵌套交互冲突与键盘行为不一致。
+
+- **问题 2：移动端 2×2 网格与 Tailwind `divide-y` 的不对称边框异常**
+  - **现象**：在屏幕宽度 < 768px 的移动端，指标条带折叠为 2 列 2 行（`grid-cols-2`）。此时容器使用 `divide-y` 导致第二项（第一行右侧单元）被强制附加了 1px 的上边框，而第一项（第一行左侧单元）没有上边框；且列与列之间完全缺少垂直分割线，整个 2×2 网格呈现明显的视觉不对称与割裂。
+  - **根本原因 (RCA)**：Tailwind 的 `divide-y` 编译为 `> :not([hidden]) ~ :not([hidden]) { border-top-width: 1px }` 选择器，专用于单列 Flex 或单列 Grid，当作用于多列 Grid 时，只要属于非首项的兄弟节点就会被附加 `border-top`，从而使第一行右侧单元出现怪异的上边框，且无法自动生成列分割线。
+  - **具体解法**：
+    1. 容器在移动端禁用 `divide-y`（改用 `divide-y-0 md:divide-x`）；
+    2. 为 4 个单元精准配置响应式边框：段 1（左上）附加 `border-r border-b md:border-r-0 md:border-b-0`，段 2（右上）附加 `border-b md:border-b-0`，段 3（左下）附加 `border-r md:border-r-0`，段 4（右下）保持无边框；
+    3. 在移动端呈现标准的十字符号（+）中心交叉对称分割线，桌面端（`md:`）恢复为 1px 水平垂直分割线（`md:divide-x`）。
+
+- **问题 3：微段刻度 (Micro-Ticks) 朴素四舍五入计算导致的极端边界缺陷**
+  - **现象**：原计算逻辑直接采用 `Math.round((current / total) * 7)`：
+    1. 当学习者完成第 1 天任务（1/28）时，`Math.round(1/28 * 7) = Math.round(0.25) = 0`，刻度全灰，挫伤用户完成起步任务的正向反馈；
+    2. 当学习者完成 27 天任务（27/28）时，`Math.round(27/28 * 7) = Math.round(6.75) = 7`，7 格刻度全部点亮，向用户传达了“100% 已全部通关”的虚假进度。
+  - **根本原因 (RCA)**：连续浮点数到离散 7 级阶梯的非线性映射缺乏区间夹逼（Clamping）与边界诚实性保护。
+  - **具体解法**：编写纯函数 `getTickState(current, total, tickIdx, numTicks = 7)`：
+    ```ts
+    const getTickState = (current: number, total: number, tickIdx: number, numTicks = 7): boolean => {
+      if (total <= 0 || current <= 0) return false;
+      if (current >= total) return true;
+      const raw = Math.floor((current / total) * numTicks);
+      // 只要 current > 0 则至少点亮 1 格；只要 current < total 则最多点亮 (numTicks - 1) 格
+      const filledCount = Math.min(numTicks - 1, Math.max(1, raw));
+      return tickIdx < filledCount;
+    };
+    ```
+    使得 1/28 即刻点亮第 1 格给予正向鼓励，27/28 严格保留最后 1 格提醒尚未完全通关，28/28 庆祝式全部点亮。
+
+- **问题 4：专注遥测指标目标基准缺位与左右视觉失衡**
+  - **现象**：前 3 个指标单元均采用清晰的 `当前值 / 目标总量`（如 `5 / 28 天`、`18 / 52 篇`、`30 / 49 题`）以及对应的右侧百分比与 7 级微刻度；而第 4 单元在非运行状态下仅孤零零展示 `XX 分钟`，缺乏目标对照，且右侧仅有启停按钮，与其他 3 个单元的节奏感明显不一致。
+  - **根本原因 (RCA)**：专注单元在重构初期仅关注了计时器的交互绑定，忽视了与全站日常 3 小时（180 分钟）专注基准的对齐。
+  - **具体解法**：
+    1. 空闲态显示 `{todayMins} / 180 分`，与前三项的度量单位与总量对照完美对齐；
+    2. 在大屏环境（`lg:flex`）联动展示今日 180 分钟专注目标的达成率与 7 级新拟物凹槽微刻度，同时保持平级快速启停按钮的轻快触感，达成全条带统一的精密工程节奏。
+
+- **问题 5：历史版本测试套件回归断言阻断**
+  - **现象**：上一轮测试脚本 `scripts/test_v6_5_features.cjs` 曾硬编码断言必须包含 `from-sky-500/10` 等 4 色卡片，在移除彩色卡片后运行该历史脚本会报 `AssertionError`。
+  - **根本原因 (RCA)**：测试脚本与设计规范演进解耦，未考虑架构迭代过程中的向后兼容机制。
+  - **具体解法**：优化 `test_v6_5_features.cjs` 的 Test 4 断言分支，使其能够自适应识别 v6.5 旧版或 v6.6 新版 Telemetry Ribbon 架构，并在 `test_v6_6_features.cjs` 中扩充 10 组涵盖移动端十字分割、刻度夹逼边界及无障碍语义的深度断言，保证仓库所有测试套件 100% 顺畅执行。
 
 ---
 
@@ -3251,32 +3286,33 @@ flowchart TD
         direction LR
         
         subgraph Seg1 ["段 1: 任务遥测"]
-            S1_Left["状态点 (中性冷灰) + 标签\n数值: masteredDaysCount / 28"]
+            S1_Left["状态点 (Sky 微光晕) + 标签\n数值: masteredDaysCount / 28 天"]
             S1_Right["吃透率百分比 (font-mono)\n凹槽刻度槽: 7 级微段 ticks"]
             S1_Left --- S1_Right
         end
 
         subgraph Seg2 ["段 2: 项目剖析"]
-            S2_Left["状态点 (中性冷灰) + 标签\n数值: masteredArticles / 27 篇"]
+            S2_Left["状态点 (Indigo 微光晕) + 标签\n数值: masteredArticles / 52 篇"]
             S2_Right["精读率百分比 (font-mono)\n凹槽刻度槽: 7 级微段 ticks"]
             S2_Left --- S2_Right
         end
 
         subgraph Seg3 ["段 3: 算法题库"]
-            S3_Left["状态点 (中性冷灰) + 标签\n数值: completedAlgos / 234 题"]
+            S3_Left["状态点 (Violet 微光晕) + 标签\n数值: completedAlgos / 49 题"]
             S3_Right["达成率百分比 (font-mono)\n凹槽刻度槽: 7 级微段 ticks"]
             S3_Left --- S3_Right
         end
 
-        subgraph Seg4 ["段 4: 专注遥测 (集成控制)"]
-            S4_Left["动态状态点 (运行绿色呼吸/空闲冷灰)\n实时流逝时间或今日累计学时"]
-            S4_Right["新拟物软触感按键\n[▶ 开始] / [⏸ 暂停]\ne.stopPropagation 独立控制"]
-            S4_Left --- S4_Right
+        subgraph Seg4 ["段 4: 专注遥测 (平级解耦架构)"]
+            direction LR
+            S4_Nav["可点击看板跳转区\n状态点 (运行绿色呼吸/空闲冷灰)\n实时分秒或今日累计 / 180 分\n目标达成百分比 + 7 级刻度"]
+            S4_Btn["平级新拟物软触感按键\n[▶ 开始] / [⏸ 暂停]\ne.stopPropagation 截断冒泡"]
+            S4_Nav --- S4_Btn
         end
 
-        Seg1 -->|1px divide-x 细线分割| Seg2
-        Seg2 -->|1px divide-x 细线分割| Seg3
-        Seg3 -->|1px divide-x 细线分割| Seg4
+        Seg1 -->|1px divide-x| Seg2
+        Seg2 -->|1px divide-x| Seg3
+        Seg3 -->|1px divide-x| Seg4
     end
 
     subgraph NeumorphicShader ["新拟物 (Neumorphism) 双重阴影系统"]
@@ -3292,11 +3328,10 @@ flowchart TD
 
 ##### 机制解析 (Diagram Walkthrough & Analysis)
 - **核心流向与节点拆解**：
-  1. 彻底淘汰旧版 4 张独立浮空的彩色 Bento 方块，将所有关键遥测数据收拢进单一横向容器（桌面端高 64px `md:h-16`），以 1px 细线（`divide-x`）划分为 4 个对等遥测段；
-  2. 每个指标段内部解构为“左侧度量轴”（微状态点、标签与高对比度等宽数字）与“右侧表现轴”（百分比与新拟物刻度或交互按键）；
-  3. 引入新拟物柔和光影体系：外层容器呈现高光微凸浮雕感，微段刻度下沉为内凹嵌槽，第四单元启停按键具备物理按压态由凸变凹的触觉反馈。
-- **条件决策与异常分支**：
-  第四单元自动根据 `isFocusRunning` 状态在“今日累计学时（静态冷灰）”与“实时分秒递增（动态翡翠绿+LIVE 标识）”之间平滑切换；点击按键触发 `e.stopPropagation()` 阻断父级跳转。
+  1. 彻底淘汰旧版 4 张独立浮空的彩色 Bento 方块，将所有关键遥测数据收拢进单一横向容器（桌面端固定 64px `md:h-16`），以 1px 细线（`divide-x`）划分为 4 个对等遥测段；
+  2. 每个指标段内部解构为“左侧度量轴”（微状态点、次级冷灰标签与高对比度等宽数字）与“右侧表现轴”（百分比与新拟物刻度或交互按键）；
+  3. 引入新拟物柔和光影体系：外层容器呈现高光微凸浮雕感，微段刻度下沉为内凹嵌槽，第四单元启停按键具备物理按压态由凸变凹的触觉反馈；
+  4. 第四段彻底解耦为平级的看板跳转块与独立按键，从结构上杜绝嵌套交互。
 - **底层架构收益**：
   减少了 60% 以上的垂直空间浪费，将注意力还给 28 天核心任务与代码画布；中性冷灰配色消除视疲劳，信息呈现精密内敛。
 
@@ -3307,22 +3342,22 @@ flowchart TD
 sequenceDiagram
     autonumber
     actor User as 学习者
-    participant QuickBtn as 遥测条带快速按键 (Seg 4 Button)
-    participant Segment as 遥测条带外层 (Seg 4 Container)
+    participant QuickBtn as 遥测条带快速按键 (Seg 4 Sibling Button)
+    participant NavZone as 遥测条带跳转区 (Seg 4 Sibling Nav)
     participant Hook as useFocusTimer Hook
     participant Storage as 浏览器 localStorage
     participant EventBus as 全局 Window 事件总线
     participant HeaderPill as 顶栏实时专注胶囊 (Header)
 
     User->>QuickBtn: 点击 [▶ 开始] 按钮
-    QuickBtn->>QuickBtn: e.stopPropagation() (阻止冒泡穿透)
+    QuickBtn->>QuickBtn: e.stopPropagation() (阻止向外层冒泡)
     QuickBtn->>Hook: toggleFocus()
     Hook->>Storage: 保存 startTimestamp = Date.now(), isRunning = true
     Hook->>EventBus: dispatchEvent('muduo_focus_timer_change')
     EventBus-->>HeaderPill: 接收事件，同步开启呼吸动效与计时
     EventBus-->>Hook: 唤醒全局 1000ms 定时器
-    Hook-->>QuickBtn: 状态翻转为 [⏸ 暂停]，按键呈现凹陷激活态
-    Hook-->>Segment: 指标数字切换为实时分秒 (如 00:01) + LIVE 标签
+    Hook-->>QuickBtn: 状态翻转为 [⏸ 暂停]，呈现凹陷激活态
+    Hook-->>NavZone: 指标数字切换为实时分秒 (如 00:01) + LIVE 标签
     
     Note over User, QuickBtn: 用户再次点击暂停
     User->>QuickBtn: 点击 [⏸ 暂停]
@@ -3332,44 +3367,30 @@ sequenceDiagram
     Hook->>EventBus: dispatchEvent('muduo_focus_timer_change')
     EventBus-->>HeaderPill: 恢复空闲态
     Hook-->>QuickBtn: 恢复 [▶ 开始] 外凸形态
+    
+    Note over User, NavZone: 用户点击或回车文本区域
+    User->>NavZone: 点击或按回车键
+    NavZone->>NavZone: scrollIntoView({ behavior: 'smooth' })
+    NavZone-->>User: 视口平滑滚动至专注计时面板并高亮提示
 ```
 
 ##### 机制解析 (Diagram Walkthrough & Analysis)
 - **核心流向与节点拆解**：
-  1. 遥测条带内的快速按键捕获用户点击，首先执行 `e.stopPropagation()` 阻断向父容器的冒泡传递；
+  1. 遥测条带内的快速按键捕获用户点击，执行 `e.stopPropagation()` 阻断向父容器的冒泡传递；
   2. 调用 `useFocusTimer` 内部的 `toggleFocus()`，将当前时间戳 `Date.now()` 作为起点持久化至 `localStorage`；
   3. 触发全局 `muduo_focus_timer_change` 自定义事件，使包括顶栏（Header）在内的所有观察者组件同步更新；
-  4. 专注指示段根据最新状态将按键由微凸形态变为微凹激活态，数值即时转换为实时分秒递增。
-- **条件决策与异常分支**：
-  如果用户点击按键外部的指标空白区域，事件不受拦截，自然触发对页面下方详细专注计时器面板（`#dashboard-focus-timer`）的平滑居中滚动与高亮闪烁提示。
+  4. 专注指示段根据最新状态将按键由微凸形态变为微凹激活态，数值即时转换为实时分秒递增；
+  5. 点击或键盘回车跳转区域平滑导航至页面底部详细看板，二者互不干扰。
 - **底层架构收益**：
-  将高频的“即时启停”操作前置到首屏黄金位置，用户无需下翻页面即可随手控制专注节拍，交互链路大幅缩短。
+  将高频的“即时启停”操作前置到首屏黄金位置，用户无需下翻页面即可随手控制专注节拍，交互链路大幅缩短且符合无障碍规范。
 
 ---
 
-#### 架构图 3：指标模块演进对比与多端响应式形态迁移状态机
+#### 架构图 3：多端响应式形态迁移与十字交叉分割拓扑图
 ```mermaid
 stateDiagram-v2
-    [*] --> LegacyBento: 历史形态 (v6.5.0)
+    [*] --> TelemetryRibbon: 响应式视口检测
     
-    state LegacyBento {
-        [*] --> FourColoredCards
-        FourColoredCards: 4 个独立大号方块 (160px~180px)
-        FourColoredCards: 饱和度红/绿/紫/黄调色盘
-        FourColoredCards: 粗笨横向进度条与大色块图标
-    }
-
-    LegacyBento --> Refactoring: 用户提出消除玩具感与收敛垂直高度
-    
-    state Refactoring {
-        [*] --> DesignTokens
-        DesignTokens: 确立中性冷灰 (Slate/Zinc) 为基调
-        DesignTokens: 确立 56px~72px 紧凑高度边界
-        DesignTokens: 注入新拟物 (Neumorphism) 双重阴影
-    }
-
-    Refactoring --> TelemetryRibbon: 交付形态 (v6.6.0)
-
     state TelemetryRibbon {
         state ScreenWidth <<choice>>
         [*] --> ScreenWidth
@@ -3378,23 +3399,28 @@ stateDiagram-v2
         state DesktopState {
             DesktopState: 单行 4 分段 (1x4) 一体化水平条带
             DesktopState: 物理高度严格锁定 64px (md:h-16)
-            DesktopState: 1px 细线 divide-x 水平逻辑分隔
+            DesktopState: 容器 divide-x 1px 水平垂直分割
+            DesktopState: 4 单元均为 border-0 清爽无冗余线
         }
         
         ScreenWidth --> MobileState: 视口宽度 < 768px
         state MobileState {
-            MobileState: 2 列 2 行 (2x2) 网格优雅自适应
-            MobileState: 行间与列间自动施加细线分割
-            MobileState: 元素尺寸与间距紧凑微调 (px-3.5 py-2)
+            MobileState: 2 列 2 行 (2x2) 网格优雅折叠自适应
+            MobileState: 禁用容器 divide-y 避免不对称顶边缺陷
+            MobileState: 段1: 右边框 + 底边框 (border-r border-b)
+            MobileState: 段2: 底边框 (border-b)
+            MobileState: 段3: 右边框 (border-r)
+            MobileState: 段4: 纯净无边框
+            MobileState: 呈现完美十字交叉中心分割线 (+)
         }
     }
 ```
 
 ##### 机制解析 (Diagram Walkthrough & Analysis)
 - **核心流向与节点拆解**：
-  1. 状态机直观展示了从历史形态（v6.5.0 的 4 个独立彩色 Bento 方块）到重构阶段，再到最终交付形态（v6.6.0 一体化分段遥测条带）的完整演进路径；
-  2. 在交付形态内部，根据宿主视口断点（768px）进行自适应形态迁移；
-  3. 桌面端锁定 64px 单行 4 分段水平条带，移动端自适应为 2×2 网格布局。
+  1. 状态机展示了在桌面端与移动端断点（768px）之间的精准几何拓扑迁移；
+  2. 桌面端锁定 64px 单行 4 分段水平条带，使用 `md:divide-x` 形成均匀垂直分隔；
+  3. 移动端自适应为 2×2 网格，通过对段 1、段 2、段 3 的精确边框组合，构建出像素级对称的十字交叉分割线（+），彻底消除了多列网格使用 `divide-y` 产生的不对称边框缺陷。
 - **底层架构收益**：
   实现了高信息密度、高视觉秩序与跨终端自洽，彻底解决了在大屏与小屏设备上的视觉失衡与留白浪费问题。
 
@@ -3403,8 +3429,8 @@ stateDiagram-v2
 ### 5. 优化改进与体验打磨 (Improvements & Enhancements)
 - **垂直空间显著释放**：指标栏由原先的 180px 压缩至固定的 64px，首屏有效学习任务可视面积提升约 35%；
 - **新拟物触感精准把控**：严格克制新拟物的使用边界，避免老式拟物化（Skeuomorphism）的复杂材质堆砌，仅保留双重微阴影、内凹槽刻度与按压凹陷，与现代冷灰工程质感融为一体；
-- **微段进度刻度取代粗笨单色条**：28 天体系以 7 级微段 ticks 优雅量化，既保持了像素级的紧凑，又提供了直观的进阶反馈；
-- **无障碍访问与键盘交互完备**：所有指标分段均配置了 `role="button"`、`tabIndex={0}` 与 `onKeyDown`（支持 Enter 与空格键触发），符合 WCAG AA 标准。
+- **微段进度刻度取代粗笨单色条**：28 天体系以 7 级微段 ticks 优雅量化，并通过 `getTickState` 边界夹逼算法，确保起步有反馈、未完不虚夸；
+- **无障碍访问与键盘交互完备**：彻底解除按钮嵌套，分离可点击信息区与独立操作按键，`onClick` 与 `onKeyDown` 严格一致，符合 WCAG AA 标准。
 
 ---
 
@@ -3418,41 +3444,23 @@ cd e:\workspace\muduo-study-console
 # 2. 执行 TypeScript 静态类型无错误验证
 npx tsc --noEmit
 
-# 3. 执行 v6.6.0 专项深度自动化断言测试集
+# 3. 执行 v6.6.0 专项深度自动化断言测试集 (包含 10 项深度断言)
 node scripts/test_v6_6_features.cjs
 
-# 4. 执行 Vite 生产环境打包构建
+# 4. 执行 v6.5.0 历史回归套件验证
+node scripts/test_v6_5_features.cjs
+
+# 5. 执行 Vite 生产环境打包构建
 npm run build
 
-# 5. 执行主分支代码提交与 GitHub Pages 远端部署流水线
+# 6. 执行全流程代码提交与 GitHub Pages 远端部署流水线
 node scripts/deploy_all.cjs
 ```
 
 #### (2) 实际运行结果断言
 - **`npx tsc --noEmit`**：执行成功，退出码 `0`，0 个 TypeScript 编译错误；
-- **`node scripts/test_v6_6_features.cjs`**：
-  ```
-  🧪 Starting deep verification suite for v6.6.0 features...
-
-  --- Test 1: Elimination of 4-Color Bento Box Cards ---
-  ✓ Successfully eliminated all 4 toy-like independent colored Bento cards.
-
-  --- Test 2: Telemetry Segmented Ribbon Layout & Dimensions ---
-  ✓ Segmented Ribbon layout, divide-x structure, and 64px height strictly confirmed.
-
-  --- Test 3: Neumorphism Dual-Shadows & Inset Micro-Tick Grooves ---
-  ✓ Neumorphic dual shadows and inset tick grooves verified.
-
-  --- Test 4: Focus Timer Native Integration in Segment 4 ---
-  ✓ Focus timer native 1-click toggle and live telemetry verified.
-
-  --- Test 5: Emil Kowalski Micro-Interactions & Accessible Colors ---
-  ✓ Emil Kowalski interaction and motion standards strictly confirmed.
-
-  --- Test 6: Production Build Files & .nojekyll ---
-  ✓ Production distribution files verified.
-
-  🎉 ALL 6 VERIFICATION TEST SUITES PASSED WITH 100% ACCURACY!
-  ```
+- **`node scripts/test_v6_6_features.cjs`**：10 个专项断言套件 100% 通过；
+- **`node scripts/test_v6_5_features.cjs`**：6 个回归断言套件 100% 通过；
 - **生产构建产物**：成功生成 `dist/`，包含 `.nojekyll` 与静态资源；
 - **代码提交与部署**：成功同步至 `origin/main` 与 `origin/gh-pages`。
+

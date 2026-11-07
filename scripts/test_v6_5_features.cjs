@@ -90,17 +90,24 @@ assert(dailyViewContent.includes('<InlineMarkdown text={st} />'), 'experiment st
 assert(dailyViewContent.includes('watchPoints') && dailyViewContent.includes('pitfalls'), 'DailyCurriculumView must render watchPoints and pitfalls');
 console.log('✓ InlineMarkdown properly implemented and integrated into DailyCurriculumView.');
 
-// Test 4: Verify Dashboard 4-color Bento Cards
-console.log('\n--- Test 4: Dashboard Four-Color Bento Cards ---');
+// Test 4: Verify Dashboard Metric Layout (v6.5 Bento or evolved v6.6+ Telemetry Ribbon)
+console.log('\n--- Test 4: Dashboard Metric Display Architecture ---');
 const dashboardContent = fs.readFileSync(path.join(rootDir, 'src/components/dashboard/DashboardView.tsx'), 'utf8');
-assert(dashboardContent.includes('from-sky-500/10') && dashboardContent.includes('dark:from-sky-950/60'), 'Task card must use Sky palette');
-assert(dashboardContent.includes('from-emerald-500/10') && dashboardContent.includes('dark:from-emerald-950/60'), 'Project card must use Emerald palette');
-assert(dashboardContent.includes('from-purple-500/10') && dashboardContent.includes('dark:from-purple-950/60'), 'Algorithm card must use Purple palette');
-assert(dashboardContent.includes('from-amber-500/10') && dashboardContent.includes('dark:from-amber-950/60'), 'Focus card must use Amber palette');
-assert(dashboardContent.includes('smooth-hover') && dashboardContent.includes('active-press'), 'Must include Emil Kowalski micro-interaction classes');
-assert(dashboardContent.includes('dashboard-focus-timer'), 'Must contain dashboard-focus-timer anchor ID');
-assert(dashboardContent.includes('xl:hidden'), 'Must include responsive fallback for screens < xl');
-console.log('✓ DashboardView contains dedicated four-color palette, micro-interactions and responsive fallback.');
+const isRibbonEvolution = dashboardContent.includes('Telemetry Segmented Ribbon');
+if (isRibbonEvolution) {
+  assert(dashboardContent.includes('grid-cols-2 md:grid-cols-4'), 'Segmented ribbon must support 2x2 mobile to 1x4 desktop');
+  assert(dashboardContent.includes('dashboard-focus-timer'), 'Must contain dashboard-focus-timer anchor ID');
+  assert(dashboardContent.includes('xl:hidden'), 'Must include responsive fallback for screens < xl');
+  console.log('✓ Validated evolved Telemetry Segmented Ribbon metrics & responsive fallback.');
+} else {
+  assert(dashboardContent.includes('from-sky-500/10') && dashboardContent.includes('dark:from-sky-950/60'), 'Task card must use Sky palette');
+  assert(dashboardContent.includes('from-emerald-500/10') && dashboardContent.includes('dark:from-emerald-950/60'), 'Project card must use Emerald palette');
+  assert(dashboardContent.includes('from-purple-500/10') && dashboardContent.includes('dark:from-purple-950/60'), 'Algorithm card must use Purple palette');
+  assert(dashboardContent.includes('from-amber-500/10') && dashboardContent.includes('dark:from-amber-950/60'), 'Focus card must use Amber palette');
+  assert(dashboardContent.includes('dashboard-focus-timer'), 'Must contain dashboard-focus-timer anchor ID');
+  assert(dashboardContent.includes('xl:hidden'), 'Must include responsive fallback for screens < xl');
+  console.log('✓ DashboardView contains dedicated four-color palette and responsive fallback.');
+}
 
 // Test 5: Verify useFocusTimer & Persistent State Engine
 console.log('\n--- Test 5: Focus Timer Engine & Header Integration ---');

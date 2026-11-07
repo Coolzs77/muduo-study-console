@@ -31,6 +31,15 @@ interface DashboardViewProps {
   onSelectTopologyModule: (module: DomainModule) => void;
 }
 
+// 新拟物微段刻度准确状态推导：消除 1/28 零刻度与 27/28 满刻度提前虚假完成的极端边界缺陷
+const getTickState = (current: number, total: number, tickIdx: number, numTicks = 7): boolean => {
+  if (total <= 0 || current <= 0) return false;
+  if (current >= total) return true;
+  const raw = Math.floor((current / total) * numTicks);
+  const filledCount = Math.min(numTicks - 1, Math.max(1, raw));
+  return tickIdx < filledCount;
+};
+
 export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigateTab,
   onNavigateToDay,
@@ -341,7 +350,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Telemetry Segmented Ribbon (一体化分段遥测条带) - 现代工程工具风格与新拟物微触感 */}
-        <div className="w-full bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xs border border-slate-200/80 dark:border-slate-800/80 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)] overflow-hidden grid grid-cols-2 md:grid-cols-4 md:h-16 divide-y md:divide-y-0 md:divide-x divide-slate-200/80 dark:divide-slate-800/80">
+        <div className="w-full bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xs border border-slate-200/80 dark:border-slate-800/80 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.05)] overflow-hidden grid grid-cols-2 md:grid-cols-4 md:h-16 divide-y-0 md:divide-x divide-slate-200/80 dark:divide-slate-800/80">
           
           {/* 1. 任务指标 */}
           <div
@@ -354,12 +363,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onNavigateTab('daily');
               }
             }}
-            className="group px-4 py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+            className="group px-3.5 sm:px-4 py-2 sm:py-2.5 h-full flex items-center justify-between border-r border-b md:border-r-0 md:border-b-0 border-slate-200/80 dark:border-slate-800/80 hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
             title="点击切换至 28 天任务体系"
           >
             <div className="flex flex-col justify-center min-w-0 pr-2">
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
+                <span
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                    masteredDaysCount > 0
+                      ? 'bg-sky-500 shadow-[0_0_4px_rgba(14,165,233,0.5)]'
+                      : 'bg-slate-400 dark:bg-slate-500'
+                  }`}
+                />
                 <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
                   任务进度
                 </span>
@@ -384,7 +399,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 title={`吃透进度: ${masteredDaysCount}/28 天 (${Math.round((masteredDaysCount / 28) * 100)}%)`}
               >
                 {[0, 1, 2, 3, 4, 5, 6].map((tickIdx) => {
-                  const filled = tickIdx < Math.round((masteredDaysCount / 28) * 7);
+                  const filled = getTickState(masteredDaysCount, 28, tickIdx);
                   return (
                     <span
                       key={tickIdx}
@@ -411,12 +426,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onNavigateTab('reader');
               }
             }}
-            className="group px-4 py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+            className="group px-3.5 sm:px-4 py-2 sm:py-2.5 h-full flex items-center justify-between border-b md:border-b-0 border-slate-200/80 dark:border-slate-800/80 hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
             title="点击切换至项目专栏精读"
           >
             <div className="flex flex-col justify-center min-w-0 pr-2">
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
+                <span
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                    masteredArticles > 0
+                      ? 'bg-indigo-500 shadow-[0_0_4px_rgba(99,102,241,0.5)]'
+                      : 'bg-slate-400 dark:bg-slate-500'
+                  }`}
+                />
                 <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
                   项目剖析
                 </span>
@@ -441,7 +462,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 title={`精读进度: ${masteredArticles}/${totalArticles} 篇 (${Math.round((masteredArticles / totalArticles) * 100)}%)`}
               >
                 {[0, 1, 2, 3, 4, 5, 6].map((tickIdx) => {
-                  const filled = tickIdx < Math.round((masteredArticles / totalArticles) * 7);
+                  const filled = getTickState(masteredArticles, totalArticles, tickIdx);
                   return (
                     <span
                       key={tickIdx}
@@ -468,12 +489,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onNavigateTab('algo');
               }
             }}
-            className="group px-4 py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
+            className="group px-3.5 sm:px-4 py-2 sm:py-2.5 h-full flex items-center justify-between border-r md:border-r-0 border-slate-200/80 dark:border-slate-800/80 hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
             title="点击切换至算法与网络考点题库"
           >
             <div className="flex flex-col justify-center min-w-0 pr-2">
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
+                <span
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                    completedAlgos > 0
+                      ? 'bg-violet-500 shadow-[0_0_4px_rgba(139,92,246,0.5)]'
+                      : 'bg-slate-400 dark:bg-slate-500'
+                  }`}
+                />
                 <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
                   算法题库
                 </span>
@@ -498,7 +525,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 title={`完成进度: ${completedAlgos}/${totalAlgos} 题 (${Math.round((completedAlgos / totalAlgos) * 100)}%)`}
               >
                 {[0, 1, 2, 3, 4, 5, 6].map((tickIdx) => {
-                  const filled = tickIdx < Math.round((completedAlgos / totalAlgos) * 7);
+                  const filled = getTickState(completedAlgos, totalAlgos, tickIdx);
                   return (
                     <span
                       key={tickIdx}
@@ -515,66 +542,101 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {/* 4. 专注指标 (原生集成一键快速开始/暂停与时间流逝显示) */}
-          <div
-            onClick={() => {
-              const el = document.getElementById('dashboard-focus-timer') || document.getElementById('dashboard-focus-timer-mobile');
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.classList.add('ring-2', 'ring-slate-400');
-                setTimeout(() => el.classList.remove('ring-2', 'ring-slate-400'), 1500);
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleFocus();
-              }
-            }}
-            className="group px-4 py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 active:scale-[0.98] transition-all duration-150 ease-out cursor-pointer select-none"
-            title="点击滚动至专注面板，或点击右侧按钮直接启停计时"
-          >
-            <div className="flex flex-col justify-center min-w-0 pr-2">
-              <div className="flex items-center gap-1.5">
-                <span
-                  className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
-                    isFocusRunning
-                      ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)] animate-pulse'
-                      : 'bg-slate-400 dark:bg-slate-500'
-                  }`}
-                />
-                <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
-                  专注遥测
-                </span>
-                {isFocusRunning && (
-                  <span className="text-[9px] font-mono px-1 py-0.5 rounded-[2px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
-                    LIVE
+          <div className="group px-3.5 sm:px-4 py-2 sm:py-2.5 h-full flex items-center justify-between hover:bg-slate-500/5 transition-all duration-150 ease-out select-none">
+            {/* 可点击跳转专注看板区域 (平级结构，消除内嵌按钮与键盘事件冲突) */}
+            <div
+              onClick={() => {
+                const el = document.getElementById('dashboard-focus-timer') || document.getElementById('dashboard-focus-timer-mobile');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  el.classList.add('ring-2', 'ring-slate-400');
+                  setTimeout(() => el.classList.remove('ring-2', 'ring-slate-400'), 1500);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  const el = document.getElementById('dashboard-focus-timer') || document.getElementById('dashboard-focus-timer-mobile');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('ring-2', 'ring-slate-400');
+                    setTimeout(() => el.classList.remove('ring-2', 'ring-slate-400'), 1500);
+                  }
+                }
+              }}
+              className="flex items-center justify-between min-w-0 flex-1 pr-2 cursor-pointer active:scale-[0.98] transition-transform duration-150"
+              title="点击滚动至专注面板，或点击右侧按键直接启停计时"
+            >
+              <div className="flex flex-col justify-center min-w-0 pr-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                      isFocusRunning
+                        ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)] animate-pulse'
+                        : todayMins > 0
+                        ? 'bg-emerald-500/70'
+                        : 'bg-slate-400 dark:bg-slate-500'
+                    }`}
+                  />
+                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
+                    专注遥测
                   </span>
-                )}
-              </div>
-              <div className="flex items-baseline mt-0.5">
-                {isFocusRunning ? (
-                  <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400 tabular-nums">
-                    {focusFormattedTime}
-                  </span>
-                ) : (
-                  <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
-                    {todayMins}
-                    <span className="text-xs font-mono font-normal text-slate-400 dark:text-slate-500 ml-1">
-                      分钟
+                  {isFocusRunning && (
+                    <span className="text-[9px] font-mono px-1 py-0.5 rounded-[2px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
+                      LIVE
                     </span>
-                  </span>
-                )}
-                {isFocusRunning && (
-                  <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 ml-1.5 truncate">
-                    (今日 {todayMins}m)
-                  </span>
-                )}
+                  )}
+                </div>
+                <div className="flex items-baseline mt-0.5">
+                  {isFocusRunning ? (
+                    <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400 tabular-nums">
+                      {focusFormattedTime}
+                    </span>
+                  ) : (
+                    <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
+                      {todayMins}
+                      <span className="text-xs font-mono font-normal text-slate-400 dark:text-slate-500 ml-1">
+                        / 180 分
+                      </span>
+                    </span>
+                  )}
+                  {isFocusRunning && (
+                    <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 ml-1.5 truncate">
+                      (今日 {todayMins}m)
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* 大屏专注目标微刻度联动 (今日 180 分钟基准) */}
+              <div className="hidden lg:flex flex-col items-end gap-1 shrink-0 pr-1">
+                <span className="text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400 tabular-nums">
+                  {Math.min(100, Math.round((todayMins / 180) * 100))}%
+                </span>
+                <div
+                  className="flex items-center gap-0.5 p-0.5 rounded-[3px] bg-slate-200/60 dark:bg-slate-950/60 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.12),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6),inset_-1px_-1px_1px_rgba(255,255,255,0.04)]"
+                  title={`今日专注目标: ${todayMins}/180分钟 (${Math.min(100, Math.round((todayMins / 180) * 100))}%)`}
+                >
+                  {[0, 1, 2, 3, 4, 5, 6].map((tickIdx) => {
+                    const filled = getTickState(todayMins, 180, tickIdx);
+                    return (
+                      <span
+                        key={tickIdx}
+                        className={`w-1.5 h-2 rounded-[1px] transition-colors duration-150 ${
+                          filled
+                            ? 'bg-slate-700 dark:bg-slate-200 shadow-2xs'
+                            : 'bg-slate-300/50 dark:bg-slate-800/60'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* 新拟物微触感快速启停按钮 */}
+            {/* 新拟物微触感快速启停独立按键 (平级结构，无内嵌按钮冲突) */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
