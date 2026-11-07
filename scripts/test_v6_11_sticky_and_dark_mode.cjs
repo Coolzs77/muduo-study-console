@@ -137,7 +137,34 @@ for (const { file, name } of viewsToCheck) {
     content.includes('h-[calc(100vh-5.5rem)]') || content.includes('h-[calc(100vh-6rem)]'),
     `${name} must bound sidebar height to viewport`
   );
-  console.log(`  ✅ [PASS] ${name} sidebar sticky top-18 & viewport height verified.`);
+  assert(
+    content.includes('self-start'),
+    `${name} sidebars must have self-start to avoid flex-stretch breaking CSS sticky`
+  );
+  console.log(`  ✅ [PASS] ${name} sidebar sticky top-18, viewport height & self-start verified.`);
+}
+
+// -----------------------------------------------------------------------------
+// Test 7: Flex parent containers must use items-start
+// -----------------------------------------------------------------------------
+console.log('\nTest 7: Verifying flex parent containers use items-start to enable sticky...');
+const parentViewsToCheck = [
+  'src/components/daily/DailyCurriculumView.tsx',
+  'src/components/reader/KnowledgeReader.tsx',
+  'src/components/algorithm/AlgoCatalog.tsx',
+  'src/components/learning/LearningSystemView.tsx',
+  'src/components/source/SourceRoadmapView.tsx',
+  'src/components/practice/PracticeCenterView.tsx',
+  'src/components/dashboard/DashboardView.tsx'
+];
+
+for (const file of parentViewsToCheck) {
+  const content = fs.readFileSync(path.join(projectRoot, file), 'utf-8');
+  assert(
+    content.includes('flex items-start'),
+    `${file} must have flex items-start to allow child sidebars to stick without stretch`
+  );
+  console.log(`  ✅ [PASS] ${file} flex parent has items-start.`);
 }
 
 console.log('\n================================================================');

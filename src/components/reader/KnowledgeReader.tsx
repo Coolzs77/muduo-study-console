@@ -54,7 +54,7 @@ export const KnowledgeReader: React.FC = () => {
   }, [currentArticleId]);
 
   return (
-    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-[#eef2f7] dark:bg-[#11141a] transition-colors duration-300 p-3 sm:p-4 gap-4">
+    <div className="flex items-start w-full min-h-[calc(100vh-4rem)] bg-[#eef2f7] dark:bg-[#11141a] transition-colors duration-300 p-3 sm:p-4 gap-4">
       {/* Left Article Directory */}
       <ArticleSidebar
         articles={YUQUE_DATASET}
