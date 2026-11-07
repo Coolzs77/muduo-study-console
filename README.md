@@ -1,6 +1,6 @@
 # Muduo & CppAIService 学习与训练控制台 (Muduo Study Console)
 
-![Version](https://img.shields.io/badge/version-v6.8.0-blue.svg)
+![Version](https://img.shields.io/badge/version-v6.9.0-blue.svg)
 ![React](https://img.shields.io/badge/React-18-cyan.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6.svg)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-38B2AC.svg)
@@ -85,6 +85,7 @@ npm run build
 
 | 版本 | 发布日期 | 更新重点与改动说明 |
 | :--- | :--- | :--- |
+| **v6.9.0** | 2026-11-07 | **仪表盘全景 StyleKit 粘土拟态 (Claymorphism) 彻底重构与触觉物理系统**：<br/>• **全局粘土拟态设计语言统一**：响应用户对粘土拟态的喜爱，将仪表盘从局部卡片全面拓展至整页视图（左侧导航 Dock、中央 3 大糖果指标卡、28 天任务日历矩阵、CppAIService 架构芯片、右侧专注计时与每日清单工作台），彻底消除残留的尖锐直角与生硬扁平边框；<br/>• **28 天任务日历微砖矩阵 (Clay Bricks)**：4 行 7 列日历格全量升级为温润圆角 `rounded-2xl` 粘土微方砖，已吃透（薄荷绿微渐变 + 白色内嵌高光 + ✓ 标记）、学习中（天蓝糖果微渐变）、未开始（柔白/冷灰粘土砖），文字严格保持 5 字以内，单击一键直达攻坚工作台；<br/>• **专注计时粘土深内凹屏幕 (Deep Inset Screen)**：重构计时器为 `shadow-[inset_4px_4px_8px...]` 粘土深刻槽屏幕，搭配大号等宽数码字体与饱满糖果色软胶立体按键；<br/>• **每日清单粘土药丸条带 (Clay Pill Strips)**：清单项支持未完成柔白微凸与已完成薄荷微凹槽平滑切换，内嵌微凹复选圆钮，点击触发果冻弹性回弹；<br/>• **系统级 Squash & Stretch 物理受力形变**：全盘注入真实的粘土按压物理机制（`active:scale-x-105 active:scale-y-90`）与 `ease-[cubic-bezier(0.34,1.56,0.64,1)]` 弹簧超调缓动，悬停轻柔上浮（`hover:-translate-y-1`）。 |
 | **v6.8.0** | 2026-11-07 | **StyleKit 粘土拟态 (Claymorphism) 3 独立糖果色卡片重构与专注计时稳固化**：<br/>• **中央指标区精炼为 3 张独立粘土卡片**：彻底从中央网格剔除「专注沉浸」，收敛为 3 核心指标（任务体系、项目剖析、算法题库，自适应 `grid-cols-1 md:grid-cols-3`），专注计时纯粹收敛至右侧控制台与顶栏胶囊；<br/>• **StyleKit 粘土拟态 (Claymorphism) 落地**：各卡片赋予独立柔和糖果渐变色系（任务体系·薄荷绿、项目剖析·奶油橙、算法题库·丁香紫），配备 `rounded-3xl` 超大圆角与内外立体组合阴影，彻底告别视觉单一与审美疲劳；<br/>• **Squash & Stretch Q 弹形变与弹簧缓动**：悬停时上浮 1px（`hover:-translate-y-1`），点击按压时触发真实粘土受力挤压形变（`active:scale-x-105 active:scale-y-90`）与内凹阴影加深，搭配 `ease-[cubic-bezier(0.34,1.56,0.64,1)]` 弹簧超调回弹；<br/>• **彻底根除专注计时暂停跳变为 0 与数据防丢**：重塑底层计时累加模型，今日学时实时折算（已结算 + 累计秒数折算分钟），暂停时长安全留存并持久化，永不跳变清零；彻底剔除狭窄栏下折行超出的 `LIVE` 徽标。 |
 | **v6.7.0** | 2026-11-07 | **StyleKit 新拟物派 (Neumorphism) 4 独立指标卡重构与软触感交互**：<br/>• **彻底恢复 4 个独立指标卡**：响应用户“不要四合一，还是分开”的明确设计诉求，摒弃上一轮的一体化单条带，重塑为网格排列的 4 张独立指标卡片（任务体系、项目剖析、算法题库、专注沉浸）；<br/>• **严格遵守 StyleKit 新拟物派规范 (Hard Prompt)**：统一采用浅灰单色 `#e0e5ec`（暗色 `#1e2024`）基准基底，杜绝纯黑/纯白底色与任何渐变（`bg-gradient-*`），杜绝粗边框与直角，外凸卡片应用双光源立体阴影（左上 `-X/-Y #ffffff` 亮光、右下 `+X/+Y #b8bcc2` 暗阴影）；<br/>• **光学规律与触觉物理动效**：严禁任何 `translate` 浮起位移（元素生长于基底），Hover 时外阴影由 `8px` 缩小至 `4px`（模拟手指靠近遮光效应），Active 点击时由外凸切换为内凹（Extrude to Intrude）；<br/>• **内凹微进度槽与专注软触感按键**：图标与进度槽均采用 `shadow-[inset...]` 凹陷设计并以 `#6d5dfc` 点缀，第 4 张卡片独立嵌入 Neumorphic 软触感起停按键，点击阻止事件冒泡并无缝驱动跨 Tab 绝对时间戳计时器。 |
 | **v6.6.1** | 2026-11-07 | **消除启动白屏卡顿、静态多通道双模自愈引导与生产资源根同步**：<br/>• **根除首屏卡死在启动动画的根因**：定位由于 GitHub Pages 绑定 `main` 分支根目录，静态服务器无法执行开发环境 `/src/main.tsx` 脚本导致 React 无法挂载的物理缺陷；<br/>• **双模自愈引导器与看门狗机制**：在 `index.html` 注入 `window.__BOOTSTRAP_PRODUCTION__` 瞬时自愈脚本与 400ms 看门狗，一旦探测到静态环境 404，立即静默自动载入生产 CSS 与 JS，彻底告别卡顿；<br/>• **根目录静态生产资源双轨同步**：配置 Vite 构建流水线自动将 `dist/assets` 同步至根目录 `assets/`，并采用稳定的入口命名规范（`assets/index.js`、`assets/index.css`），使无论 GitHub Pages 配置为 `main` 根目录、`gh-pages` 分支还是 Actions 部署均能 100% 秒级启动。 |

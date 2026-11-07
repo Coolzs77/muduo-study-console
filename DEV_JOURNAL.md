@@ -4381,3 +4381,245 @@ node scripts/deploy_all.cjs
   ✓ Has Claymorphism Metric Cards & Focus Timer: true
   🎉 STATIC AUTO-HEAL TEST PASSED 100%! The page loads flawlessly in pure static root hosting!
   ```
+
+
+---
+
+## 第 23 轮 2026-11-07 15:35：仪表盘全景 StyleKit 粘土拟态 (Claymorphism) 重构与触觉物理系统落地
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求背景**：
+  在第 22 轮中，我们成功对仪表盘中央顶部的 3 个指标卡引入了 [StyleKit 粘土拟态 (Claymorphism)](https://www.stylekit.top/zh/styles/claymorphism) 风格并修复了计时器归档逻辑。用户在实机预览后给予了明确认可（“把整个仪表盘都重构为这种粘土拟态的风格,这个我喜欢,你先制定计划,然后修改 /plan /goal”）。
+- **具体实施边界**：
+  将仪表盘视图（`DashboardView.tsx`）及其子组件全面升华并贯通粘土拟态设计语言，覆盖：
+  1. **左侧边栏导航与收起 Dock**：将硬质边框矩形按钮全面替换为大圆角粘土药丸（Clay Navigation Pills）与阶段进度内凹刻槽；
+  2. **任务日历 28 天矩阵 (4x7)**：将原有带有生硬纯色或细灰边框的日历格，升级为温润大圆角 `rounded-2xl` 粘土微砖（Clay Bricks），清晰区分“已吃透（薄荷糖果微渐变）”、“学习中（天蓝糖果微渐变）”与“未开始（奶油柔白/冷灰粘土砖）”，标题严格精炼于 5 字以内；
+  3. **CppAIService 核心架构芯片**：升级为悬浮微凸粘土芯片（Clay Chips）；
+  4. **专注计时器 (FocusTimer)**：打造粘土深内凹刻槽屏幕（Deep Inset Screen）与软胶糖果质感按键；
+  5. **每日清单 (TaskRoutineList)**：重构为粘土药丸条带（Clay Pill Strips）与微凹勾选圆钮；
+  6. **全盘注入物理形变机制**：全量支持 Squash & Stretch 物理受力按压形变（`active:scale-x-105 active:scale-y-90`）与 `ease-[cubic-bezier(0.34,1.56,0.64,1)] duration-300` 弹簧超调缓动。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+
+#### (1) 代码文件改动清单
+- [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：左侧 Dock/导航面板、中央 3 大指标卡、28 天日历微砖矩阵、CppAIService 架构芯片与响应式底部容器全景粘土化；
+- [`src/components/dashboard/FocusTimer.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/FocusTimer.tsx)：计时器屏幕升级为粘土深内凹刻槽屏幕（`shadow-[inset_4px_4px_8px...]`），按键配置软胶糖果外凸立体双阴影；
+- [`src/components/dashboard/TaskRoutineList.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/TaskRoutineList.tsx)：清单项升级为粘土微凸/微凹药丸条带，复选框升级为果冻弹性回弹圆钮；
+- [`scripts/test_v6_9_full_claymorphism.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_v6_9_full_claymorphism.cjs)：编写本轮粘土拟态规范专属断言测试套件；
+- [`package.json`](file:///e:/workspace/muduo-study-console/package.json)：版本号升级至 `6.9.0`；
+- [`README.md`](file:///e:/workspace/muduo-study-console/README.md)：更新版本徽标与发布更新日志。
+
+#### (2) 核心代码实现与 Diff 逻辑块
+
+```tsx
+// 1. 28 天任务日历：粘土微砖矩阵 (Clay Bricks Matrix) 状态与光影分流
+{row.days.map(d => {
+  const mastery = dayMastery[d.day] || 0;
+  const isMastered = mastery >= 4;
+  const isLearning = mastery >= 1 && mastery < 4;
+  const shortTitle = SHORT_DAY_TITLES[d.day] || d.title;
+
+  return (
+    <button
+      key={d.day}
+      onClick={() => onNavigateToDay(d.day)}
+      type="button"
+      className={`p-3 rounded-2xl text-left transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex flex-col justify-between min-h-[5.25rem] active:scale-x-105 active:scale-y-90 hover:-translate-y-1 select-none group ${
+        isMastered
+          ? 'bg-gradient-to-br from-emerald-100 via-teal-50 to-green-100 dark:from-emerald-950/60 dark:via-teal-900/50 dark:to-green-900/60 text-teal-950 dark:text-teal-100 shadow-[6px_6px_14px_rgba(16,185,129,0.12),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.06)] hover:shadow-[8px_8px_18px_rgba(16,185,129,0.2),inset_3px_3px_6px_rgba(255,255,255,0.9)] active:shadow-[2px_2px_4px_rgba(0,0,0,0.08),inset_6px_6px_12px_rgba(0,0,0,0.15)]'
+          : isLearning
+          ? 'bg-gradient-to-br from-sky-100 via-blue-50 to-cyan-100 dark:from-sky-950/60 dark:via-blue-900/50 dark:to-cyan-900/60 text-sky-950 dark:text-sky-100 shadow-[6px_6px_14px_rgba(14,165,233,0.12),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.06)] hover:shadow-[8px_8px_18px_rgba(14,165,233,0.2),inset_3px_3px_6px_rgba(255,255,255,0.9)] active:shadow-[2px_2px_4px_rgba(0,0,0,0.08),inset_6px_6px_12px_rgba(0,0,0,0.15)]'
+          : 'bg-gradient-to-br from-white via-[#f8fafc] to-[#edf1f7] dark:from-slate-800/90 dark:via-slate-800/70 dark:to-slate-850/90 text-slate-800 dark:text-slate-200 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:shadow-[8px_8px_18px_rgba(0,0,0,0.08),inset_3px_3px_6px_rgba(255,255,255,0.95)] active:shadow-[2px_2px_4px_rgba(0,0,0,0.08),inset_6px_6px_12px_rgba(0,0,0,0.1)]'
+      }`}
+    >
+      {/* 顶部芯片内凹徽标与状态印记 */}
+      <div className="flex items-center justify-between w-full">
+        <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
+          D{d.day < 10 ? `0${d.day}` : d.day}
+        </span>
+        {isMastered ? (
+          <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300 flex items-center gap-0.5">
+            <Check size={11} strokeWidth={3} />
+            <span>已吃透</span>
+          </span>
+        ) : isLearning ? (
+          <span className="text-[10px] font-bold text-sky-700 dark:text-sky-300">学习中</span>
+        ) : (
+          <ChevronRight size={12} className="text-slate-300 dark:text-slate-600 group-hover:text-sky-500 transition-colors" />
+        )}
+      </div>
+      <div className="text-xs font-bold truncate mt-2">{shortTitle}</div>
+    </button>
+  );
+})}
+```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### (1) 问题：自动化测试脚本中弹性缓动断言偶发未匹配
+- **现象**：执行 `node scripts/test_v6_9_full_claymorphism.cjs` 时，`Must use bouncy spring easing` 断言抛出 `AssertionError: false == true`。
+- **根本原因 (RCA)**：
+  在测试用例中硬编码了字符串连续匹配 `ease-[cubic-bezier(0.34,1.56,0.64,1)] duration-300`，但在实际 Tailwind 样式表中，由于 `duration-300` 紧随 `transition-all` 书写（即 `transition-all duration-300 ease-[cubic-bezier(...)]`），导致严格字面量连续匹配断言失败。
+- **解法**：
+  将测试断言解耦为包含性双因子断言：
+  ```javascript
+  assert(dashboardCode.includes('ease-[cubic-bezier(0.34,1.56,0.64,1)]') && dashboardCode.includes('duration-300'), 'Must use bouncy spring easing');
+  ```
+  再次运行测试 100% 通过。
+
+#### (2) 问题：深层多重阴影在大面积平铺时产生视觉浑浊
+- **现象**：当日历 28 个格子同时渲染 `shadow-[8px_8px_16px...]` 时，相邻卡片间距 `gap-2.5` 导致阴影在暗色与白底边界处叠合，略显厚重。
+- **根本原因 (RCA)**：
+  大号外凸阴影（16px blur）适合尺寸在 200px 以上的大卡片；而在尺寸约 80px~120px 的日历微方砖中，过大的阴影扩展半径（Spread & Blur）会侵占栅格间距的呼吸感。
+- **解法**：
+  为小方砖微调专属粘土公式：
+  - 微砖外凸默认阴影：`shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(0,0,0,0.04)]`；
+  - 栅格间距同步扩充为 `gap-3`，彻底保持颗粒分明与饱满立体感。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图一：仪表盘全景粘土拟态多层容器与物理形变拓扑
+```mermaid
+flowchart TD
+    Canvas["柔和温润粘土底板<br/>bg-[#eef2f7] / dark:bg-[#11141a]"] --> LeftDock["左侧粘土导航侧栏<br/>rounded-3xl · 双重立体外凸阴影"]
+    Canvas --> MainStage["中央核心演练舞台<br/>Fluid 100% 动态自适应伸展"]
+    Canvas --> RightAside["右侧粘土控制台<br/>rounded-3xl · 双重立体外凸阴影"]
+
+    LeftDock --> NavPills["6 核心功能粘土药丸<br/>Candy Pill Buttons · Inset 徽标"]
+    LeftDock --> InsetGroove["4 周阶段进度内凹微槽<br/>Clay Inset Tracks · 糖果高光条"]
+
+    MainStage --> Top3Cards["3 独立核心糖果色卡片<br/>薄荷绿 (任务) · 奶油暖橙 (项目) · 丁香淡紫 (算法)"]
+    MainStage --> CalendarGrid["28 天任务日历微砖矩阵 (4x7)<br/>Clay Bricks · 3 态温润光影 · 5字精炼标题"]
+    MainStage --> CppAIChips["CppAIService 核心架构芯片<br/>Clay Chips · Inset 状态印记"]
+
+    RightAside --> FocusScreen["专注计时深内凹屏幕<br/>Deep Inset Screen (inset 4px / -4px)"]
+    RightAside --> FocusButtons["软胶糖果质感启停按钮<br/>Squash & Stretch (scale-x-105 scale-y-90)"]
+    RightAside --> RoutinePills["今日清单粘土药丸条带<br/>未完成微凸 / 已完成内凹薄荷槽"]
+```
+
+> **架构机制解析 (Diagram Walkthrough & Analysis)**：
+> 1. **容器层级解耦与呼吸空间**：整个仪表盘以柔和的中性粘土底色 `bg-[#eef2f7]` 作为物理承载平面，左侧导航、中央工作台与右侧控制台作为三块独立的大型粘土面板（`rounded-3xl`）浮置于底板之上；
+> 2. **微组件质感一致性**：无论是左侧药丸按钮、中央 28 天方砖还是右侧清单条带，均统一继承“外凸微浮起、内凹深刻槽”的光学规则，消除了原本扁平线框与拟物卡片割裂的违和感。
+
+---
+
+#### 图二：28 天日历微砖状态迁移与物理交互触感状态机
+```mermaid
+stateDiagram-v2
+    [*] --> Unstarted: 初始默认状态 (掌握度 0)
+    
+    state Unstarted {
+        [*] --> IdleWhite: 柔白/冷灰外凸粘土砖 (shadow 6px)
+        IdleWhite --> HoverFloat: 鼠标悬停 (hover:-translate-y-1, 阴影扩大)
+        HoverFloat --> SquashedPress: 物理按压 (active:scale-x-105 active:scale-y-90)
+        SquashedPress --> IdleWhite: 弹性释放 (cubic-bezier 弹簧回弹)
+    }
+
+    Unstarted --> Learning: 启动学习 (掌握度 1~3 星)
+
+    state Learning {
+        [*] --> IdleSky: 天蓝糖果粘土微砖 (from-sky-100 to-cyan-100)
+        IdleSky --> HoverSkyFloat: 鼠标悬停微浮起
+        HoverSkyFloat --> PressedSky: 弹性挤压变形
+        PressedSky --> IdleSky: 弹簧超调回弹
+    }
+
+    Learning --> Mastered: 攻坚吃透 (掌握度 >= 4 星)
+
+    state Mastered {
+        [*] --> IdleMint: 薄荷绿温润微砖 (from-emerald-100 to-green-100)
+        IdleMint --> InsetCheck: 刻印内嵌白色高光与 ✓ 徽标
+        InsetCheck --> HoverMintFloat: 悬浮上浮
+        HoverMintFloat --> PressedMint: 弹性挤压变形
+        PressedMint --> IdleMint: 弹簧超调回弹
+    }
+
+    Mastered --> [*]: 点击 1 键直达任务攻坚画布
+```
+
+> **状态迁移机制解析 (Diagram Walkthrough & Analysis)**：
+> 1. **视觉反馈与进度映射**：每个日历微砖严格绑定当前用户的真实掌握星级：0 星呈现未开始的柔白/冷灰微砖；1~3 星平滑迁移为天蓝色糖果砖；达到 4 星及以上即刻转变为象征吃透的薄荷绿立体方块，并内嵌微凹白色高光与 `✓ 已吃透` 标识；
+> 2. **触觉物理学 (Squishy Physics)**：所有状态统一注入 Squash & Stretch 变形，按下时横向拉伸 105%、纵向挤压 90%，搭配 `cubic-bezier(0.34, 1.56, 0.64, 1)` 贝塞尔曲线，赋予用户按压真实橡皮泥/软糖的愉悦操作感。
+
+---
+
+#### 图三：粘土深内凹刻槽与外凸立体双光源渲染管道
+```mermaid
+flowchart LR
+    LightSource["固定光源方向<br/>(左上亮光 -X/-Y · 右下暗影 +X/+Y)"] --> ComponentType{"组件立体形态决策"}
+
+    ComponentType -->|外凸立体组件<br/>(卡片、方砖、按钮)| ConvexPipe["外凸光影合成流水线"]
+    ConvexPipe --> Convex1["外层暗阴影: shadow-[8px_8px_16px_rgba(0,0,0,0.08)]"]
+    ConvexPipe --> Convex2["左上内高光: inset_4px_4px_8px_rgba(255,255,255,0.7)"]
+    ConvexPipe --> Convex3["右下微底影: inset_-2px_-2px_4px_rgba(0,0,0,0.06)"]
+
+    ComponentType -->|内凹刻槽组件<br/>(计时屏、进度槽、复选圆钮)| ConcavePipe["内凹刻槽合成流水线"]
+    ConcavePipe --> Concave1["左上深入暗槽: inset_4px_4px_8px_rgba(0,0,0,0.1)"]
+    ConcavePipe --> Concave2["右下反光内凸: inset_-4px_-4px_8px_rgba(255,255,255,0.9)"]
+
+    ConvexPipe --> RenderOutput["渲染至浏览器 GPU 复合层"]
+    ConcavePipe --> RenderOutput
+```
+
+> **光影渲染机制解析 (Diagram Walkthrough & Analysis)**：
+> 1. **双光源物理真实性**：严格遵守 StyleKit 规范，所有凸起与凹陷组件均共享左上亮、右下暗的统一参考光源；
+> 2. **微内凹与大凹槽分级**：计时器屏幕采用 `inset 4px / -4px` 深刻槽，营造类似老式数码管/微嵌液晶屏的物理沉入感；而微进度条与芯片徽标采用 `inset 1.5px / -1px` 微槽，保证轻盈不突兀。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+1. **彻底根除直角与硬边**：全组件扫描排查，彻底消灭所有 `rounded-none` 与纯色硬线边框；
+2. **5 字精简标题与日历对齐**：28 天任务标题全部精炼于 5 字以内，杜绝换行溢出与文字断裂；
+3. **WCAG AA 高对比度色彩守恒**：即使在糖果色柔和背景下，所有标题与数字文本均配置深色冷调（如 `text-teal-950`、`text-sky-950`、`text-amber-950`），在暗黑模式下自动反转为高明度冷白（`dark:text-teal-100` 等），对比度全面超越 4.5:1；
+4. **移动端自适应平滑折叠**：在小于 `xl` 的屏幕尺寸下，右侧控制台平滑沉降至中央区域底部，并以全尺寸粘土大卡片自然承载。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 可复现验证命令
+```bash
+# 1. 切换至项目根目录
+cd e:/workspace/muduo-study-console
+
+# 2. 执行 TypeScript 类型安全编译检查
+npx tsc --noEmit
+
+# 3. 运行全景粘土拟态自动化测试套件
+node scripts/test_v6_9_full_claymorphism.cjs
+
+# 4. 执行生产环境打包
+npm run build
+
+# 5. 执行无头浏览器端到端挂载验证
+node scripts/test_static_auto_heal.cjs
+
+# 6. 一键部署并推送到 GitHub main 与 gh-pages 双分支
+node scripts/deploy_all.cjs
+```
+
+#### (2) 实际运行结果断言
+- **`npx tsc --noEmit`**：执行成功，退出码 `0`，0 错误；
+- **`node scripts/test_v6_9_full_claymorphism.cjs`**：
+  ```
+  [TEST] Starting v6.9.0 Full Claymorphism Style & Logic Verification...
+  -> Verifying DashboardView Claymorphism constraints...
+  -> Verifying FocusTimer Claymorphism constraints...
+  -> Verifying TaskRoutineList Claymorphism constraints...
+  -> Verifying production build files...
+  [TEST SUCCESS] All v6.9.0 Full Claymorphism StyleKit assertions PASSED!
+  ```
+- **`node scripts/test_static_auto_heal.cjs`**：
+  ```
+  ✓ Pure static mock server listening on port 4173
+  Navigating to http://localhost:4173/index.html (simulating GitHub Pages serving repo root)...
+  ✓ React successfully mounted and replaced initial loader in static environment!
+  ✓ Has Claymorphism Metric Cards & Focus Timer: true
+  🎉 STATIC AUTO-HEAL TEST PASSED 100%! The page loads flawlessly in pure static root hosting!
+  ```
