@@ -85,7 +85,17 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-1.5 shrink-0">
           {isRunning && (
             <button
-              onClick={() => onSelectTab('dashboard')}
+              onClick={() => {
+                onSelectTab('dashboard');
+                setTimeout(() => {
+                  const el = document.getElementById('dashboard-focus-timer') || document.getElementById('dashboard-focus-timer-mobile');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('ring-2', 'ring-amber-500');
+                    setTimeout(() => el.classList.remove('ring-2', 'ring-amber-500'), 1500);
+                  }
+                }, 80);
+              }}
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/80 dark:border-amber-700/80 text-xs font-mono font-bold hover:bg-amber-500/20 transition cursor-pointer active-press shadow-2xs"
               title="专注计时进行中，点击返回仪表盘"
             >

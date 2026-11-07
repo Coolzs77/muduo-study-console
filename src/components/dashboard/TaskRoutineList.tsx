@@ -22,7 +22,7 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
         needsUpdate = true;
         return { ...t, estimatedMinutes: 180 };
       }
-      if (t.id === 'task_ai_inference' && t.estimatedMinutes !== 180) {
+      if ((t.id === 'task_ai_inference' || t.id === 'task_project') && t.estimatedMinutes !== 180) {
         needsUpdate = true;
         return { ...t, estimatedMinutes: 180 };
       }

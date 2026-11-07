@@ -430,6 +430,32 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               </div>
             )}
 
+            {currentDay.experiment.watchPoints && (
+              <div className="text-xs pt-1 text-slate-600 dark:text-slate-400">
+                <span className="font-semibold text-amber-700 dark:text-amber-400">关注重点: </span>
+                <InlineMarkdown
+                  text={
+                    Array.isArray(currentDay.experiment.watchPoints)
+                      ? currentDay.experiment.watchPoints.join('；')
+                      : String(currentDay.experiment.watchPoints)
+                  }
+                />
+              </div>
+            )}
+
+            {currentDay.experiment.pitfalls && (
+              <div className="text-xs pt-1 text-slate-600 dark:text-slate-400">
+                <span className="font-semibold text-rose-700 dark:text-rose-400">避坑陷阱: </span>
+                <InlineMarkdown
+                  text={
+                    Array.isArray(currentDay.experiment.pitfalls)
+                      ? currentDay.experiment.pitfalls.join('；')
+                      : String(currentDay.experiment.pitfalls)
+                  }
+                />
+              </div>
+            )}
+
             {currentDay.experiment.buildCommand && (
               <div className="pt-2">
                 <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1">

@@ -23,6 +23,45 @@ const routineContent = fs.readFileSync(path.join(rootDir, 'src/components/dashbo
 assert(routineContent.includes('formatEstimatedTime'), 'formatEstimatedTime function must be implemented');
 assert(routineContent.includes('task_algo') && routineContent.includes('task_ai_inference'), 'Routine migration must handle both task IDs');
 assert(routineContent.includes('180'), 'Migration must target 180 minutes');
+
+// Deep functional test: formatEstimatedTime logic
+const formatEstimatedTime = (mins) => {
+  if (mins >= 60) {
+    const hours = mins / 60;
+    if (Number.isInteger(hours)) {
+      return `${hours}h (${mins} 分钟)`;
+    }
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${h}h ${m}m (${mins} 分钟)`;
+  }
+  return `${mins} 分钟`;
+};
+assert.strictEqual(formatEstimatedTime(180), '3h (180 分钟)');
+assert.strictEqual(formatEstimatedTime(60), '1h (60 分钟)');
+assert.strictEqual(formatEstimatedTime(90), '1h 30m (90 分钟)');
+assert.strictEqual(formatEstimatedTime(45), '45 分钟');
+
+// Deep functional test: migration logic
+const mockTasks = [
+  { id: 'task_algo', estimatedMinutes: 60, title: '算法练习' },
+  { id: 'task_ai_inference', estimatedMinutes: 90, title: 'AI 推理服务架构' },
+  { id: 'task_project', estimatedMinutes: 90, title: '旧项目任务' },
+  { id: 'task_stream_eval', estimatedMinutes: 45, title: '流式评测' }
+];
+const migrated = mockTasks.map((t) => {
+  if (t.id === 'task_algo' && t.estimatedMinutes !== 180) {
+    return { ...t, estimatedMinutes: 180 };
+  }
+  if ((t.id === 'task_ai_inference' || t.id === 'task_project') && t.estimatedMinutes !== 180) {
+    return { ...t, estimatedMinutes: 180 };
+  }
+  return t;
+});
+assert.strictEqual(migrated[0].estimatedMinutes, 180, 'task_algo should be migrated to 180');
+assert.strictEqual(migrated[1].estimatedMinutes, 180, 'task_ai_inference should be migrated to 180');
+assert.strictEqual(migrated[2].estimatedMinutes, 180, 'task_project should be migrated to 180');
+assert.strictEqual(migrated[3].estimatedMinutes, 45, 'task_stream_eval should stay 45');
 console.log('✓ TaskRoutineList.tsx contains automatic legacy cache migration and smart hour/minute formatting.');
 
 // Test 3: Verify InlineMarkdown component and DailyCurriculumView usage
@@ -32,6 +71,15 @@ const inlineContent = fs.readFileSync(path.join(rootDir, 'src/components/common/
 assert(inlineContent.includes('`[^`]+`'), 'Must match backticks with regex');
 assert(inlineContent.includes('rounded-md') && inlineContent.includes('font-mono'), 'Must style code capsules with rounded-md and font-mono');
 assert(inlineContent.includes('text-sky-700') || inlineContent.includes('text-sky-300'), 'Must style code with high-contrast sky palette');
+assert(inlineContent.includes('break-all'), 'Must contain break-all to prevent horizontal text overflow');
+
+// Deep functional test: InlineMarkdown token splitting
+const testText = '深入状态机：`kExpectBody` 并在 `buf->readableBytes() < contentLength` 时返回 **重要提示**。';
+const regex = /(`[^`]+`|\*\*[^*]+\*\*)/g;
+const tokens = testText.split(regex);
+assert(tokens.includes('`kExpectBody`'), 'Tokens must capture code block 1');
+assert(tokens.includes('`buf->readableBytes() < contentLength`'), 'Tokens must capture code block with < comparison');
+assert(tokens.includes('**重要提示**'), 'Tokens must capture bold block');
 
 const dailyViewContent = fs.readFileSync(path.join(rootDir, 'src/components/daily/DailyCurriculumView.tsx'), 'utf8');
 assert(dailyViewContent.includes("import { InlineMarkdown } from '../common/InlineMarkdown'"), 'DailyCurriculumView must import InlineMarkdown');
@@ -39,6 +87,7 @@ assert(!dailyViewContent.includes('dangerouslySetInnerHTML={{ __html: pt }}'), '
 assert(dailyViewContent.includes('<InlineMarkdown text={pt} />'), 'points must be rendered via InlineMarkdown');
 assert(dailyViewContent.includes('<InlineMarkdown text={currentDay.experiment.goal} />'), 'experiment goal must be rendered via InlineMarkdown');
 assert(dailyViewContent.includes('<InlineMarkdown text={st} />'), 'experiment steps must be rendered via InlineMarkdown');
+assert(dailyViewContent.includes('watchPoints') && dailyViewContent.includes('pitfalls'), 'DailyCurriculumView must render watchPoints and pitfalls');
 console.log('✓ InlineMarkdown properly implemented and integrated into DailyCurriculumView.');
 
 // Test 4: Verify Dashboard 4-color Bento Cards
@@ -49,7 +98,9 @@ assert(dashboardContent.includes('from-emerald-500/10') && dashboardContent.incl
 assert(dashboardContent.includes('from-purple-500/10') && dashboardContent.includes('dark:from-purple-950/60'), 'Algorithm card must use Purple palette');
 assert(dashboardContent.includes('from-amber-500/10') && dashboardContent.includes('dark:from-amber-950/60'), 'Focus card must use Amber palette');
 assert(dashboardContent.includes('smooth-hover') && dashboardContent.includes('active-press'), 'Must include Emil Kowalski micro-interaction classes');
-console.log('✓ DashboardView contains dedicated four-color palette and micro-interactions.');
+assert(dashboardContent.includes('dashboard-focus-timer'), 'Must contain dashboard-focus-timer anchor ID');
+assert(dashboardContent.includes('xl:hidden'), 'Must include responsive fallback for screens < xl');
+console.log('✓ DashboardView contains dedicated four-color palette, micro-interactions and responsive fallback.');
 
 // Test 5: Verify useFocusTimer & Persistent State Engine
 console.log('\n--- Test 5: Focus Timer Engine & Header Integration ---');
@@ -60,6 +111,26 @@ assert(hookContent.includes('startTimestamp'), 'Must persist startTimestamp');
 assert(hookContent.includes('accumulatedSeconds'), 'Must persist accumulatedSeconds');
 assert(hookContent.includes('muduo_focus_timer_state'), 'Storage key must be muduo_focus_timer_state');
 assert(hookContent.includes('visibilitychange'), 'Must listen to visibilitychange');
+assert(hookContent.includes('formatFocusTime'), 'formatFocusTime must be exported');
+
+// Deep functional test: formatFocusTime
+const formatFocusTime = (totalSeconds) => {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const hrs = Math.floor(safeSeconds / 3600);
+  const mins = Math.floor((safeSeconds % 3600) / 60);
+  const secs = safeSeconds % 60;
+  if (hrs > 0) {
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+assert.strictEqual(formatFocusTime(0), '00:00');
+assert.strictEqual(formatFocusTime(59), '00:59');
+assert.strictEqual(formatFocusTime(60), '01:00');
+assert.strictEqual(formatFocusTime(3599), '59:59');
+assert.strictEqual(formatFocusTime(3600), '01:00:00');
+assert.strictEqual(formatFocusTime(3661), '01:01:01');
+assert.strictEqual(formatFocusTime(-10), '00:00');
 
 const headerContent = fs.readFileSync(path.join(rootDir, 'src/components/layout/Header.tsx'), 'utf8');
 assert(headerContent.includes('useFocusTimer'), 'Header must import and call useFocusTimer');

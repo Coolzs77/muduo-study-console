@@ -2852,13 +2852,13 @@ node scripts/deploy_gh_pages.cjs
 ### 2. 核心技术实现与代码改动 (Implementation & Changes)
 - **涉及文件清单与点击链接**：
   - [`src/components/common/InlineMarkdown.tsx`](file:///e:/workspace/muduo-study-console/src/components/common/InlineMarkdown.tsx)：封装轻量、零外部依赖的行内 Markdown 解析器，通过正则表达式流式拆分 `` `code` `` 与 `**bold**`，将行内代码映射为现代、高对比度的双模式代码胶囊；
-  - [`src/components/daily/DailyCurriculumView.tsx`](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)：全面移除脆弱的 `dangerouslySetInnerHTML`，在核心技术要点、实验目标、实操步骤、细微辨析（快速表面认知 vs 严谨工程认知）以及达标标准中全量替换为 `<InlineMarkdown />`；
-  - [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：重构 4 张 Bento KPI 指标卡，消除纯白底色，注入天蓝（任务）、翡翠绿（项目）、紫罗兰（算法）、琥珀暖金（专注）四色微渐变底色，挂载 Emil Kowalski 悬浮微浮起与弹性按压动效，并将专注卡片与全局实时计时器状态联动；
-  - [`src/hooks/useFocusTimer.ts`](file:///e:/workspace/muduo-study-console/src/hooks/useFocusTimer.ts)：封装基于系统绝对时间戳的持久化计时引擎，使用结构体 `{ isRunning, startTimestamp, accumulatedSeconds }` 存入 `localStorage`，兼顾跨 Tab 事件广播与页面可见性监听；
-  - [`src/components/dashboard/FocusTimer.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/FocusTimer.tsx)：接入 `useFocusTimer`，移除本地有状态 `useState(0)`，实现无损持久计时与满 60 秒自动记入今日学时；
-  - [`src/components/layout/Header.tsx`](file:///e:/workspace/muduo-study-console/src/components/layout/Header.tsx)：在顶栏右侧新增实时呼吸专注胶囊，计时运行时展示 `⏱ MM:SS`，支持点击直达仪表盘；
+  - [`src/components/daily/DailyCurriculumView.tsx`](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)：全面移除脆弱的 `dangerouslySetInnerHTML`，在核心技术要点、实验目标、实操步骤、关注重点、避坑指南、细微辨析（快速表面认知 vs 严谨工程认知）以及达标标准中全量接入 `<InlineMarkdown />`；
+  - [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：重构 4 张 Bento KPI 指标卡，消除纯白底色，注入天蓝（任务）、翡翠绿（项目）、紫罗兰（算法）、琥珀暖金（专注）四色微渐变底色，挂载 Emil Kowalski 悬浮微浮起与弹性按压动效，联动全局计时器与平滑滚动定位，并为 <xl 小屏与分屏增加响应式底栏兜底；
+  - [`src/hooks/useFocusTimer.ts`](file:///e:/workspace/muduo-study-console/src/hooks/useFocusTimer.ts)：封装基于系统绝对时间戳的持久化计时引擎，使用结构体 `{ isRunning, startTimestamp, accumulatedSeconds }` 存入 `localStorage`，采用模块级单实例时钟消除组件多定时器相位差，并实现原子化结算归档；
+  - [`src/components/dashboard/FocusTimer.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/FocusTimer.tsx)：接入 `useFocusTimer`，移除本地有状态 `useState(0)`，实现无损持久计时，切页刷新不归零，满 60 秒点击重置即可一键结算并归档至今日学时；
+  - [`src/components/layout/Header.tsx`](file:///e:/workspace/muduo-study-console/src/components/layout/Header.tsx)：在顶栏右侧新增实时呼吸专注胶囊，计时运行时展示 `⏱ MM:SS`，支持点击平滑直达仪表盘专注计时器；
   - [`src/data/tasksDataset.ts`](file:///e:/workspace/muduo-study-console/src/data/tasksDataset.ts)：将 `task_algo` 与 `task_ai_inference` 的预计时长均由原设定调整为 `180` 分钟；
-  - [`src/components/dashboard/TaskRoutineList.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/TaskRoutineList.tsx)：增加本地旧缓存自动升阶迁移（60/90m -> 180m）与 `3h (180 分钟)` 智能格式化函数；
+  - [`src/components/dashboard/TaskRoutineList.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/TaskRoutineList.tsx)：增加本地旧缓存自动升阶迁移（60/90m -> 180m，兼容 task_algo、task_ai_inference 与历史 task_project）与 `3h (180 分钟)` 智能格式化函数；
   - [`package.json`](file:///e:/workspace/muduo-study-console/package.json) & [`README.md`](file:///e:/workspace/muduo-study-console/README.md)：版本正式递增至 `v6.5.0`，联动更新徽标与更新日志；
   - [`scripts/deploy_all.cjs`](file:///e:/workspace/muduo-study-console/scripts/deploy_all.cjs)：更新发布脚本的提交信息与自动化部署逻辑；
   - [`scripts/test_v6_5_features.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_v6_5_features.cjs)：编写针对本次 4 大核心特性的 6 组自动化验证测试用例。

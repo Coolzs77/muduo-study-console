@@ -22,7 +22,7 @@ export const InlineMarkdown: React.FC<InlineMarkdownProps> = ({ text, className 
           return (
             <code
               key={idx}
-              className="px-1.5 py-0.5 mx-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 font-mono text-[12px] font-semibold border border-slate-200/90 dark:border-slate-700/80 shadow-2xs inline-block align-baseline transition-colors"
+              className="px-1.5 py-0.5 mx-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 font-mono text-[12px] font-semibold border border-slate-200/90 dark:border-slate-700/80 shadow-2xs inline-block align-baseline break-all transition-colors"
             >
               {codeContent}
             </code>
@@ -33,7 +33,7 @@ export const InlineMarkdown: React.FC<InlineMarkdownProps> = ({ text, className 
           const boldContent = part.slice(2, -2);
           return (
             <strong key={idx} className="font-bold text-slate-900 dark:text-slate-100">
-              {boldContent}
+              <InlineMarkdown text={boldContent} />
             </strong>
           );
         }

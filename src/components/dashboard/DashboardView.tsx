@@ -420,7 +420,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {/* 4. 专注 (琥珀暖金) */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-orange-600/10 dark:from-amber-950/60 dark:via-amber-900/30 dark:to-slate-900/80 border border-amber-300/80 dark:border-amber-800/70 hover:border-amber-500 dark:hover:border-amber-400 shadow-2xs hover:shadow-md transition-all duration-200 group smooth-hover">
+          <div
+            onClick={() => {
+              const el = document.getElementById('dashboard-focus-timer') || document.getElementById('dashboard-focus-timer-mobile');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('ring-2', 'ring-amber-500');
+                setTimeout(() => el.classList.remove('ring-2', 'ring-amber-500'), 1500);
+              }
+            }}
+            className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-orange-600/10 dark:from-amber-950/60 dark:via-amber-900/30 dark:to-slate-900/80 border border-amber-300/80 dark:border-amber-800/70 hover:border-amber-500 dark:hover:border-amber-400 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group smooth-hover active-press"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-amber-950 dark:text-amber-200">专注</span>
               <div className="p-2.5 rounded-xl bg-amber-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
@@ -588,6 +598,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             })}
           </div>
         </section>
+
+        {/* Responsive Fallback: On screens < xl, show Focus Timer & Routine List at the bottom */}
+        <div className="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <div id="dashboard-focus-timer-mobile" className="bg-white dark:bg-slate-900/80 rounded-xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
+            <FocusTimer />
+          </div>
+          <div className="bg-white dark:bg-slate-900/80 rounded-xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
+            <TaskRoutineList onNavigateTab={onNavigateTab} />
+          </div>
+        </div>
       </main>
 
       {/* ========================================================= */}
@@ -595,7 +615,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* ========================================================= */}
       <aside className="w-80 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4 space-y-5 overflow-y-auto sticky top-16 h-[calc(100vh-4rem)] hidden xl:block">
         {/* Real Focus Timer */}
-        <div className="bg-white dark:bg-slate-900/80 rounded-xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
+        <div id="dashboard-focus-timer" className="bg-white dark:bg-slate-900/80 rounded-xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs transition-all duration-300">
           <FocusTimer />
         </div>
 

@@ -71,15 +71,48 @@ export function formatFocusTime(totalSeconds: number): string {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
+// Module-level synchronized clock and subscribers
+const subscribers = new Set<() => void>();
+let globalIntervalId: number | null = null;
+
+function notifySubscribers() {
+  subscribers.forEach((cb) => {
+    try {
+      cb();
+    } catch (e) {
+      console.warn('Error in focus timer subscriber:', e);
+    }
+  });
+}
+
+function ensureClockRunning(isRunning: boolean) {
+  if (isRunning) {
+    if (globalIntervalId === null && typeof window !== 'undefined') {
+      globalIntervalId = window.setInterval(() => {
+        notifySubscribers();
+      }, 1000);
+    }
+  } else {
+    if (globalIntervalId !== null) {
+      window.clearInterval(globalIntervalId);
+      globalIntervalId = null;
+    }
+  }
+}
+
 export function useFocusTimer() {
   const [timerState, setTimerState] = useState<FocusTimerState>(readTimerState);
   const [todayMins, setTodayMins] = useState<number>(readTodayMins);
   const [, setTick] = useState<number>(0);
 
-  // Sync state from storage / other components
+  // Sync state from storage
   const syncFromStorage = useCallback(() => {
-    setTimerState(readTimerState());
-    setTodayMins(readTodayMins());
+    const nextState = readTimerState();
+    const nextMins = readTodayMins();
+    setTimerState(nextState);
+    setTodayMins(nextMins);
+    ensureClockRunning(nextState.isRunning);
+    setTick((prev) => (prev + 1) % 1000000);
   }, []);
 
   useEffect(() => {
@@ -99,29 +132,30 @@ export function useFocusTimer() {
       }
     };
 
+    const onTick = () => {
+      setTick((prev) => (prev + 1) % 1000000);
+    };
+
+    subscribers.add(onTick);
     window.addEventListener('storage', handleStorage);
     window.addEventListener(TIMER_EVENT_NAME, handleCustomChange);
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
+    // Initial check for clock
+    const initial = readTimerState();
+    ensureClockRunning(initial.isRunning);
+
     return () => {
+      subscribers.delete(onTick);
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener(TIMER_EVENT_NAME, handleCustomChange);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (subscribers.size === 0 && globalIntervalId !== null) {
+        window.clearInterval(globalIntervalId);
+        globalIntervalId = null;
+      }
     };
   }, [syncFromStorage]);
-
-  // Interval ticking when running
-  useEffect(() => {
-    if (!timerState.isRunning) return;
-
-    const intervalId = window.setInterval(() => {
-      setTick((prev) => (prev + 1) % 1000000);
-    }, 1000);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [timerState.isRunning]);
 
   // Compute live elapsed seconds dynamically on every tick/render
   const currentSeconds = timerState.isRunning && timerState.startTimestamp
@@ -144,6 +178,7 @@ export function useFocusTimer() {
       };
       writeTimerState(nextState);
       setTimerState(nextState);
+      ensureClockRunning(false);
       showToast('专注计时已暂停', 'info');
     } else {
       // Resume / Start
@@ -154,6 +189,7 @@ export function useFocusTimer() {
       };
       writeTimerState(nextState);
       setTimerState(nextState);
+      ensureClockRunning(true);
       showToast('专注计时已开启', 'success');
     }
   }, []);
@@ -167,24 +203,33 @@ export function useFocusTimer() {
         : 0;
     const totalAccrued = currentState.accumulatedSeconds + elapsed;
 
-    if (totalAccrued >= 60) {
-      const addedMinutes = Math.floor(totalAccrued / 60);
-      const curToday = readTodayMins();
-      const newToday = curToday + addedMinutes;
-      writeTodayMins(newToday);
-      setTodayMins(newToday);
-      showToast(`本次专注结算: +${addedMinutes} 分钟，已记入今日学时`, 'success');
-    } else if (totalAccrued > 0) {
-      showToast('本次专注不足 1 分钟，已重置', 'info');
-    }
-
     const resetState: FocusTimerState = {
       isRunning: false,
       startTimestamp: null,
       accumulatedSeconds: 0
     };
-    writeTimerState(resetState);
-    setTimerState(resetState);
+
+    if (totalAccrued >= 60) {
+      const addedMinutes = Math.floor(totalAccrued / 60);
+      const curToday = readTodayMins();
+      const newToday = curToday + addedMinutes;
+      try {
+        window.localStorage.setItem(TODAY_MINS_KEY, JSON.stringify(newToday));
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(resetState));
+        window.dispatchEvent(new CustomEvent(TIMER_EVENT_NAME));
+      } catch (e) {}
+      setTodayMins(newToday);
+      setTimerState(resetState);
+      ensureClockRunning(false);
+      showToast(`本次专注结算: +${addedMinutes} 分钟，已记入今日学时`, 'success');
+    } else {
+      if (totalAccrued > 0) {
+        showToast('本次专注不足 1 分钟，已重置', 'info');
+      }
+      writeTimerState(resetState);
+      setTimerState(resetState);
+      ensureClockRunning(false);
+    }
   }, []);
 
   return {
