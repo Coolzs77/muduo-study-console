@@ -39,6 +39,12 @@ flowchart TD
 
 ---
 
+## 📸 实机界面预览 (Visual Proof)
+
+![StyleKit 粘土拟态全景仪表盘](docs/images/v6_9_full_claymorphism_dashboard.png)
+
+---
+
 ## 🌟 核心功能特性
 
 1. **全局统一三栏文档/清单工作台**：
