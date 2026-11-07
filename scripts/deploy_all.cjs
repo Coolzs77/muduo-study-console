@@ -7,8 +7,8 @@ try {
   execSync('git add .', { cwd: rootDir, stdio: 'inherit' });
   const fs = require('fs');
   const pkg = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf8'));
-  const version = pkg.version || '6.4.0';
-  execSync(`git commit -m "fix: 消除外网首屏阻塞、注入美观启动动画、清理侧栏备忘与任务日历精简 (v${version})"`, { cwd: rootDir, stdio: 'inherit' });
+  const version = pkg.version || '6.5.0';
+  execSync(`git commit -m "feat: 任务行内代码高亮、仪表盘四色卡片、专注计时跨Tab持久化与时长调整至3h (v${version})"`, { cwd: rootDir, stdio: 'inherit' });
   console.log('[DEPLOY-ALL] Pushing main branch to origin/main...');
   execSync('git push origin main', { cwd: rootDir, stdio: 'inherit' });
   console.log('✓ [DEPLOY-ALL] Pushed main successfully!');

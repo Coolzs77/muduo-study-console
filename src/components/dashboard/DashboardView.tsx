@@ -5,6 +5,7 @@ import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { DAYS_DATASET, SHORT_DAY_TITLES } from '../../data/daysDataset';
 import { DOMAIN_MODULES } from '../../data/domainDataset';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useFocusTimer } from '../../hooks/useFocusTimer';
 import { FocusTimer } from './FocusTimer';
 import { TaskRoutineList } from './TaskRoutineList';
 import {
@@ -35,7 +36,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const [masteryMap] = useLocalStorage<Record<string, number>>('knowledgeMastery', {});
   const [completedMap] = useLocalStorage<Record<string | number, boolean>>('completedAlgos', {});
-  const [todayMins] = useLocalStorage<number>('todayStudyMinutes', 0);
+  const { todayMins, isRunning: isFocusRunning, formattedTime: focusFormattedTime } = useFocusTimer();
   const [dayMastery] = useLocalStorage<Record<number, number>>('muduo_day_mastery', {});
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
     'sidebar_collapsed_dashboard',
@@ -332,29 +333,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </h1>
         </div>
 
-        {/* 4 Bento KPI Metric Cards */}
+        {/* 4 Bento KPI Metric Cards - Dedicated Four-Color Palette & Micro-Interactions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {/* 任务 */}
+          {/* 1. 任务 (天蓝) */}
           <div
             onClick={() => onNavigateTab('daily')}
-            className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 hover:border-sky-400 dark:hover:border-sky-600 transition-all cursor-pointer group shadow-2xs smooth-hover active-press"
+            className="p-4 rounded-2xl bg-gradient-to-br from-sky-500/10 via-sky-500/5 to-blue-600/10 dark:from-sky-950/60 dark:via-sky-900/30 dark:to-slate-900/80 border border-sky-300/80 dark:border-sky-800/70 hover:border-sky-500 dark:hover:border-sky-400 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group smooth-hover active-press"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">任务</span>
-              <div className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
+              <span className="text-xs font-bold text-sky-950 dark:text-sky-200">任务</span>
+              <div className="p-2.5 rounded-xl bg-sky-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
                 <Calendar size={16} />
               </div>
             </div>
             <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {masteredDaysCount} <span className="text-xs font-normal text-slate-400 font-mono">/ 28 天</span>
+              {masteredDaysCount} <span className="text-xs font-normal text-slate-500 dark:text-slate-400 font-mono">/ 28 天</span>
             </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
               <span>已吃透 {masteredDaysCount} 天</span>
               <span className="font-mono font-bold text-sky-600 dark:text-sky-400">
                 {Math.round((masteredDaysCount / 28) * 100)}%
               </span>
             </div>
-            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full mt-1.5 overflow-hidden">
+            <div className="w-full h-1.5 bg-sky-100 dark:bg-sky-950/80 rounded-full mt-2 overflow-hidden">
               <div
                 className="h-full bg-sky-500 rounded-full transition-all duration-300"
                 style={{ width: `${Math.round((masteredDaysCount / 28) * 100)}%` }}
@@ -362,27 +363,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          {/* 项目 */}
+          {/* 2. 项目 (翡翠绿) */}
           <div
             onClick={() => onNavigateTab('reader')}
-            className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-600 transition-all cursor-pointer group shadow-2xs smooth-hover active-press"
+            className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-teal-600/10 dark:from-emerald-950/60 dark:via-emerald-900/30 dark:to-slate-900/80 border border-emerald-300/80 dark:border-emerald-800/70 hover:border-emerald-500 dark:hover:border-emerald-400 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group smooth-hover active-press"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">项目</span>
-              <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+              <span className="text-xs font-bold text-emerald-950 dark:text-emerald-200">项目</span>
+              <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
                 <BookOpen size={16} />
               </div>
             </div>
             <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {masteredArticles} <span className="text-xs font-normal text-slate-400 font-mono">/ {totalArticles} 篇</span>
+              {masteredArticles} <span className="text-xs font-normal text-slate-500 dark:text-slate-400 font-mono">/ {totalArticles} 篇</span>
             </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
               <span>专栏架构剖析</span>
               <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
                 {Math.round((masteredArticles / totalArticles) * 100)}%
               </span>
             </div>
-            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full mt-1.5 overflow-hidden">
+            <div className="w-full h-1.5 bg-emerald-100 dark:bg-emerald-950/80 rounded-full mt-2 overflow-hidden">
               <div
                 className="h-full bg-emerald-500 rounded-full transition-all duration-300"
                 style={{ width: `${Math.round((masteredArticles / totalArticles) * 100)}%` }}
@@ -390,27 +391,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          {/* 算法 */}
+          {/* 3. 算法 (紫罗兰) */}
           <div
             onClick={() => onNavigateTab('algo')}
-            className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 hover:border-purple-400 dark:hover:border-purple-600 transition-all cursor-pointer group shadow-2xs smooth-hover active-press"
+            className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-indigo-600/10 dark:from-purple-950/60 dark:via-purple-900/30 dark:to-slate-900/80 border border-purple-300/80 dark:border-purple-800/70 hover:border-purple-500 dark:hover:border-purple-400 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group smooth-hover active-press"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">算法</span>
-              <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
+              <span className="text-xs font-bold text-purple-950 dark:text-purple-200">算法</span>
+              <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
                 <CheckSquare size={16} />
               </div>
             </div>
             <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {completedAlgos} <span className="text-xs font-normal text-slate-400 font-mono">/ {totalAlgos} 题</span>
+              {completedAlgos} <span className="text-xs font-normal text-slate-500 dark:text-slate-400 font-mono">/ {totalAlgos} 题</span>
             </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
               <span>Hot 100 & 随想录</span>
               <span className="font-mono font-bold text-purple-600 dark:text-purple-400">
                 {Math.round((completedAlgos / totalAlgos) * 100)}%
               </span>
             </div>
-            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full mt-1.5 overflow-hidden">
+            <div className="w-full h-1.5 bg-purple-100 dark:bg-purple-950/80 rounded-full mt-2 overflow-hidden">
               <div
                 className="h-full bg-purple-500 rounded-full transition-all duration-300"
                 style={{ width: `${Math.round((completedAlgos / totalAlgos) * 100)}%` }}
@@ -418,21 +419,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          {/* 专注 */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 shadow-2xs smooth-hover">
+          {/* 4. 专注 (琥珀暖金) */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-orange-600/10 dark:from-amber-950/60 dark:via-amber-900/30 dark:to-slate-900/80 border border-amber-300/80 dark:border-amber-800/70 hover:border-amber-500 dark:hover:border-amber-400 shadow-2xs hover:shadow-md transition-all duration-200 group smooth-hover">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">专注</span>
-              <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+              <span className="text-xs font-bold text-amber-950 dark:text-amber-200">专注</span>
+              <div className="p-2.5 rounded-xl bg-amber-600 text-white shadow-2xs group-hover:scale-110 transition-transform duration-200">
                 <Clock size={16} />
               </div>
             </div>
             <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {todayMins} <span className="text-xs font-normal text-slate-400 font-mono">分钟</span>
+              {todayMins} <span className="text-xs font-normal text-slate-500 dark:text-slate-400 font-mono">分钟</span>
             </div>
-            <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-              今日累计沉浸学习
+            <div className="mt-2 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
+              <span>今日累计沉浸学习</span>
+              {isFocusRunning && (
+                <span className="font-mono text-amber-600 dark:text-amber-400 font-bold animate-pulse">
+                  {focusFormattedTime}
+                </span>
+              )}
             </div>
-            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full mt-1.5 overflow-hidden">
+            <div className="w-full h-1.5 bg-amber-100 dark:bg-amber-950/80 rounded-full mt-2 overflow-hidden">
               <div
                 className="h-full bg-amber-500 rounded-full transition-all duration-300"
                 style={{ width: `${Math.min(100, Math.round((todayMins / 120) * 100))}%` }}

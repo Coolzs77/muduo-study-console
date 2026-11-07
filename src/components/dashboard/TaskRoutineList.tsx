@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DailyTask, ActiveTab } from '../../types';
 import { DEFAULT_ROUTINE_TASKS } from '../../data/tasksDataset';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
@@ -14,10 +14,42 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
     DEFAULT_ROUTINE_TASKS
   );
 
+  // Migrate legacy cached minutes in localStorage to updated 180m (3h)
+  useEffect(() => {
+    let needsUpdate = false;
+    const updated = tasks.map((t) => {
+      if (t.id === 'task_algo' && t.estimatedMinutes !== 180) {
+        needsUpdate = true;
+        return { ...t, estimatedMinutes: 180 };
+      }
+      if (t.id === 'task_ai_inference' && t.estimatedMinutes !== 180) {
+        needsUpdate = true;
+        return { ...t, estimatedMinutes: 180 };
+      }
+      return t;
+    });
+    if (needsUpdate) {
+      setTasks(updated);
+    }
+  }, [tasks, setTasks]);
+
   const toggleTask = (id: string) => {
     setTasks((prev) =>
       prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
     );
+  };
+
+  const formatEstimatedTime = (mins: number) => {
+    if (mins >= 60) {
+      const hours = mins / 60;
+      if (Number.isInteger(hours)) {
+        return `${hours}h (${mins} 分钟)`;
+      }
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      return `${h}h ${m}m (${mins} 分钟)`;
+    }
+    return `${mins} 分钟`;
   };
 
   const completedCount = tasks.filter((t) => t.completed).length;
@@ -65,7 +97,7 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
                   {task.title}
                 </div>
                 <div className="text-[10px] text-slate-400 font-mono">
-                  {task.estimatedMinutes} 分钟
+                  {formatEstimatedTime(task.estimatedMinutes)}
                 </div>
               </div>
             </div>

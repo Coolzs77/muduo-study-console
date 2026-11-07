@@ -12,8 +12,10 @@ import {
   Layers,
   Bookmark,
   Briefcase,
-  Server
+  Server,
+  Clock
 } from 'lucide-react';
+import { useFocusTimer } from '../../hooks/useFocusTimer';
 
 interface HeaderProps {
   activeTab: ActiveTab;
@@ -30,6 +32,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
   onOpenEnvGuide
 }) => {
+  const { isRunning, formattedTime } = useFocusTimer();
+
   const navItems: Array<{ id: ActiveTab; label: string; icon: React.ReactNode }> = [
     { id: 'dashboard', label: '仪表盘', icon: <LayoutDashboard size={14} /> },
     { id: 'daily', label: '任务', icon: <Calendar size={14} /> },
@@ -77,8 +81,23 @@ export const Header: React.FC<HeaderProps> = ({
           })}
         </nav>
 
-        {/* Right Actions: Linux Dev Guide + Theme Toggle */}
+        {/* Right Actions: Live Focus Pill + Linux Dev Guide + Theme Toggle */}
         <div className="flex items-center gap-1.5 shrink-0">
+          {isRunning && (
+            <button
+              onClick={() => onSelectTab('dashboard')}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/80 dark:border-amber-700/80 text-xs font-mono font-bold hover:bg-amber-500/20 transition cursor-pointer active-press shadow-2xs"
+              title="专注计时进行中，点击返回仪表盘"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+              </span>
+              <Clock size={13} className="text-amber-600 dark:text-amber-400" />
+              <span>{formattedTime}</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenEnvGuide}
             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800 text-xs font-semibold transition cursor-pointer"

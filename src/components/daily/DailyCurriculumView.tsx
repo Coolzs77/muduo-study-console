@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { DAYS_DATASET, SHORT_DAY_TITLES } from '../../data/daysDataset';
 import { DayCurriculumItem } from '../../types';
 import { CodeBlock } from '../common/CodeBlock';
+import { InlineMarkdown } from '../common/InlineMarkdown';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { showToast } from '../common/Toast';
 import {
@@ -376,7 +377,9 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             {currentDay.points.map((pt, idx) => (
               <div key={idx} className="flex items-start gap-2.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mt-2 shrink-0" />
-                <span dangerouslySetInnerHTML={{ __html: pt }} />
+                <div className="flex-1 min-w-0">
+                  <InlineMarkdown text={pt} />
+                </div>
               </div>
             ))}
           </div>
@@ -403,7 +406,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
 
             <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">
               <strong className="text-slate-800 dark:text-slate-200">实验目标: </strong>
-              {currentDay.experiment.goal}
+              <InlineMarkdown text={currentDay.experiment.goal} />
             </div>
 
             {currentDay.experiment.steps && currentDay.experiment.steps.length > 0 && (
@@ -412,7 +415,9 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                 {currentDay.experiment.steps.map((st, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <span className="font-mono text-sky-600 dark:text-sky-400 font-bold">{i + 1}.</span>
-                    <span>{st}</span>
+                    <div className="flex-1 min-w-0">
+                      <InlineMarkdown text={st} />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -455,21 +460,29 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
               <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50 space-y-1">
                 <div className="font-bold text-amber-800 dark:text-amber-300">常见表面理解:</div>
-                <p className="text-amber-900/80 dark:text-amber-200/80 leading-relaxed">
-                  {typeof currentDay.rigorousNuance === 'object' && currentDay.rigorousNuance !== null
-                    ? currentDay.rigorousNuance.quick
-                    : String(currentDay.rigorousNuance || '')}
-                </p>
+                <div className="text-amber-900/80 dark:text-amber-200/80 leading-relaxed">
+                  <InlineMarkdown
+                    text={
+                      typeof currentDay.rigorousNuance === 'object' && currentDay.rigorousNuance !== null
+                        ? currentDay.rigorousNuance.quick
+                        : String(currentDay.rigorousNuance || '')
+                    }
+                  />
+                </div>
               </div>
               <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 space-y-1">
                 <div className="font-bold text-emerald-800 dark:text-emerald-300">严谨底层机理:</div>
-                <p className="text-emerald-900/80 dark:text-emerald-200/80 leading-relaxed">
-                  {typeof currentDay.rigorousNuance === 'object' && currentDay.rigorousNuance !== null
-                    ? currentDay.rigorousNuance.strict
-                    : typeof currentDay.check === 'string'
-                    ? currentDay.check
-                    : ''}
-                </p>
+                <div className="text-emerald-900/80 dark:text-emerald-200/80 leading-relaxed">
+                  <InlineMarkdown
+                    text={
+                      typeof currentDay.rigorousNuance === 'object' && currentDay.rigorousNuance !== null
+                        ? currentDay.rigorousNuance.strict
+                        : typeof currentDay.check === 'string'
+                        ? currentDay.check
+                        : ''
+                    }
+                  />
+                </div>
               </div>
             </div>
           </section>
@@ -555,9 +568,9 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             <CheckCircle2 size={13} className="text-emerald-500" />
             <span>达标标准</span>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-            {typeof currentDay.check === 'object' ? currentDay.check.strict : currentDay.check}
-          </p>
+          <div className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+            <InlineMarkdown text={typeof currentDay.check === 'object' ? currentDay.check.strict : currentDay.check} />
+          </div>
         </div>
 
         {/* Core Concepts */}
