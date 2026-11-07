@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award } from 'lucide-react';
+import { Award, Check } from 'lucide-react';
 
 interface MasterySelectorProps {
   articleId: string;
@@ -21,12 +21,12 @@ export const MasterySelector: React.FC<MasterySelectorProps> = ({
   onSelectLevel,
 }) => {
   return (
-    <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-xs">
-      <span className="flex items-center gap-1 font-semibold text-slate-600 dark:text-slate-400 mr-1.5 shrink-0 select-none">
-        <Award size={14} className="text-amber-500" />
+    <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-2xl bg-slate-200/50 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs">
+      <span className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 mr-1 shrink-0 select-none">
+        <Award size={15} className="text-amber-500" />
         <span>掌握度评级:</span>
       </span>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1.5">
         {MASTERY_TIERS.map((tier) => {
           const isSelected = currentLevel === tier.level;
           return (
@@ -34,13 +34,18 @@ export const MasterySelector: React.FC<MasterySelectorProps> = ({
               key={tier.level}
               onClick={() => onSelectLevel(tier.level)}
               title={tier.desc}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer active:scale-95 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 isSelected
-                  ? 'bg-sky-600 text-white font-semibold shadow-xs'
-                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                  ? tier.level >= 4
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
+                    : 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
               }`}
             >
-              {tier.label}
+              <span className="flex items-center gap-1">
+                {tier.label}
+                {isSelected && <Check size={11} className="inline ml-0.5" />}
+              </span>
             </button>
           );
         })}

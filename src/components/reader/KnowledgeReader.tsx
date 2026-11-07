@@ -54,7 +54,7 @@ export const KnowledgeReader: React.FC = () => {
   }, [currentArticleId]);
 
   return (
-    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950">
+    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-[#eef2f7] dark:bg-[#11141a] transition-colors duration-300 p-3 sm:p-4 gap-4">
       {/* Left Article Directory */}
       <ArticleSidebar
         articles={YUQUE_DATASET}
@@ -78,7 +78,7 @@ export const KnowledgeReader: React.FC = () => {
           hasNext={hasNext}
         />
       ) : (
-        <div className="flex-1 flex items-center justify-center text-slate-400">
+        <div className="flex-1 flex items-center justify-center rounded-3xl bg-white/80 dark:bg-[#1e2433]/85 p-8 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7)] text-slate-400 font-bold text-sm">
           未找到对应文章
         </div>
       )}

@@ -23,7 +23,8 @@ import {
   ArrowRight,
   Check,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Activity
 } from 'lucide-react';
 
 interface DailyCurriculumViewProps {
@@ -121,30 +122,30 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
   };
 
   return (
-    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-[#eef2f7] dark:bg-[#11141a] transition-colors duration-300 p-3 sm:p-4 gap-4 text-slate-800 dark:text-slate-200">
       {/* ==================================================================== */}
       {/* Left Column: 4-Week & 28-Day Task Directory Tree (Collapsible)       */}
       {/* ==================================================================== */}
       {isSidebarCollapsed ? (
-        <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center py-3.5 space-y-3 h-[calc(100vh-4rem)] sticky top-16 select-none transition-all duration-300">
+        <aside className="w-16 shrink-0 rounded-3xl bg-[#f4f7fb]/90 dark:bg-[#151922]/90 shadow-[6px_6px_14px_rgba(0,0,0,0.06),inset_3px_3px_6px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] py-4 flex flex-col items-center space-y-3 sticky top-18 h-[calc(100vh-5.5rem)] hidden md:flex select-none transition-all duration-300">
           <button
             onClick={() => setIsSidebarCollapsed(false)}
-            className="p-2 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+            className="p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-sky-600 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             title="展开任务目录"
           >
             <PanelLeftOpen size={18} />
           </button>
 
-          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800" />
+          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]" />
 
-          {/* Quick Week Selectors in collapsed state */}
-          <div className="flex flex-col items-center space-y-1.5 text-[11px] font-bold">
+          {/* Quick Week Selectors in collapsed state (Clay Pills) */}
+          <div className="flex flex-col items-center space-y-2 text-[11px] font-bold">
             <button
               onClick={() => { setSelectedWeek('all'); setIsSidebarCollapsed(false); }}
-              className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+              className={`w-10 h-9 rounded-2xl flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 selectedWeek === 'all'
-                  ? 'bg-sky-600 text-white shadow-2xs'
-                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
               }`}
               title="全部 28 天任务"
             >
@@ -154,10 +155,10 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               <button
                 key={w}
                 onClick={() => { setSelectedWeek(w); setIsSidebarCollapsed(false); }}
-                className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer font-mono ${
+                className={`w-10 h-9 rounded-2xl flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer font-mono active:scale-x-105 active:scale-y-90 ${
                   selectedWeek === w
-                    ? 'bg-sky-600 text-white shadow-2xs font-bold'
-                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ? 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
+                    : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
                 }`}
                 title={`第 ${w} 周任务`}
               >
@@ -166,11 +167,11 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             ))}
           </div>
 
-          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 mt-auto" />
+          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] mt-auto" />
 
           {/* Current Day indicator badge */}
           <div
-            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400 cursor-pointer"
+            className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-950/60 dark:to-teal-900/60 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85)] flex flex-col items-center justify-center text-[10px] font-mono font-bold text-teal-700 dark:text-teal-300 cursor-pointer active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
             onClick={() => setIsSidebarCollapsed(false)}
             title={`当前正在学习: Day ${currentDay.day}`}
           >
@@ -178,168 +179,170 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           </div>
         </aside>
       ) : (
-        <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-[calc(100vh-4rem)] sticky top-16 select-none transition-all duration-300">
+        <aside className="w-80 shrink-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 flex flex-col h-[calc(100vh-5.5rem)] sticky top-18 select-none transition-all duration-300 overflow-hidden">
           {/* Top Header & Search */}
-          <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5">
+          <div className="pb-3 space-y-3 shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
-                <Calendar size={16} className="text-sky-600 dark:text-sky-400" />
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-teal-100/90 dark:bg-teal-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-teal-600 dark:text-teal-400">
+                  <Calendar size={14} />
+                </div>
                 <span>任务目录</span>
-                <span className="text-xs text-slate-400 font-normal">({filteredDays.length}/28)</span>
+                <span className="text-xs text-slate-400 font-mono">({filteredDays.length}/28)</span>
               </div>
               <button
                 onClick={() => setIsSidebarCollapsed(true)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+                className="p-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 title="收起任务目录"
               >
                 <PanelLeftClose size={16} />
               </button>
             </div>
 
-          {/* Week Selector */}
-          <div className="grid grid-cols-5 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-lg text-xs font-medium text-center">
-            <button
-              onClick={() => setSelectedWeek('all')}
-              className={`py-1 rounded-md transition cursor-pointer ${
-                selectedWeek === 'all'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-              }`}
-            >
-              全部
-            </button>
-            {[1, 2, 3, 4].map(w => (
+            {/* Week Selector (Clay recessed groove) */}
+            <div className="grid grid-cols-5 gap-1 p-1 bg-slate-200/50 dark:bg-slate-900/60 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs font-semibold text-center">
               <button
-                key={w}
-                onClick={() => setSelectedWeek(w)}
-                className={`py-1 rounded-md transition cursor-pointer ${
-                  selectedWeek === w
-                    ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-300 font-semibold shadow-2xs'
+                onClick={() => setSelectedWeek('all')}
+                className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                  selectedWeek === 'all'
+                    ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
-                W{w}
+                全部
               </button>
-            ))}
-          </div>
-
-          {/* Progress Header */}
-          <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
-                28天攻坚完成率: {stats.mastered} / {stats.total} 天
-              </span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                {stats.pct}%
-              </span>
+              {[1, 2, 3, 4].map(w => (
+                <button
+                  key={w}
+                  onClick={() => setSelectedWeek(w)}
+                  className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 font-mono ${
+                    selectedWeek === w
+                      ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  }`}
+                >
+                  W{w}
+                </button>
+              ))}
             </div>
-            <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-              <div
-                className="bg-emerald-500 h-full rounded-full transition-all duration-300"
-                style={{ width: `${stats.pct}%` }}
+
+            {/* Progress Header (Clay mint mini card) */}
+            <div className="bg-gradient-to-br from-emerald-100/70 via-teal-50 to-green-100/70 dark:from-emerald-950/40 dark:via-teal-900/30 dark:to-green-900/40 p-3 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-teal-900 dark:text-teal-100">
+                  吃透进度 ({stats.mastered}/{stats.total} 天)
+                </span>
+                <span className="font-mono font-bold text-teal-800 dark:text-teal-200">
+                  {stats.pct}%
+                </span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-emerald-200/50 dark:bg-emerald-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] overflow-hidden p-0.5">
+                <div
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                  style={{ width: `${stats.pct}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Search Box (Clay recessed input) */}
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="搜索天数（如 Day 4）、主题..."
+                className="w-full bg-white/80 dark:bg-slate-900/70 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)] rounded-2xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden transition-all"
               />
             </div>
           </div>
 
-          {/* Search Box */}
-          <div className="relative">
-            <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="搜索天数（如 Day 4）、主题..."
-              className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition"
-            />
-          </div>
-        </div>
+          {/* Task List (Clay pill strips) */}
+          <div className="flex-1 overflow-y-auto pr-1 space-y-2">
+            {filteredDays.map(item => {
+              const isSelected = item.day === selectedDayNum;
+              const mastery = dayMastery[item.day] || 0;
+              const isMastered = mastery >= 4;
+              const isLearning = mastery > 0 && mastery < 4;
 
-        {/* Task List */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {filteredDays.map(item => {
-            const isSelected = item.day === selectedDayNum;
-            const mastery = dayMastery[item.day] || 0;
-            const isMastered = mastery >= 4;
-            const isLearning = mastery > 0 && mastery < 4;
-
-            return (
-              <div
-                key={item.day}
-                id={`day-card-${item.day}`}
-                onClick={() => setSelectedDayNum(item.day)}
-                className={`group flex items-start gap-2.5 p-2.5 rounded-xl transition cursor-pointer text-xs ${
-                  isSelected
-                    ? 'bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-900 text-sky-900 dark:text-sky-100'
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent text-slate-700 dark:text-slate-300'
-                }`}
-              >
-                {/* Day Badge */}
-                <div className="flex flex-col items-center shrink-0 mt-0.5">
-                  <span
-                    className={`px-1.5 py-0.5 rounded-md flex items-center justify-center font-mono text-[10px] font-bold ${
-                      isMastered
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : isSelected
-                        ? 'bg-sky-600 text-white'
-                        : isLearning
-                        ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                    }`}
-                  >
-                    D{item.day < 10 ? `0${item.day}` : item.day}
-                  </span>
-                </div>
-
-                {/* Day Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="font-semibold truncate leading-snug" title={item.title}>
-                      {SHORT_DAY_TITLES[item.day] || item.title}
+              return (
+                <div
+                  key={item.day}
+                  id={`day-card-${item.day}`}
+                  onClick={() => setSelectedDayNum(item.day)}
+                  className={`group flex items-start gap-2.5 p-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-xs active:scale-x-105 active:scale-y-90 select-none ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-emerald-100 via-teal-50 to-green-100 dark:from-emerald-950/60 dark:via-teal-900/40 dark:to-green-950/60 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
+                      : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 hover:shadow-[5px_5px_12px_rgba(0,0,0,0.06)]'
+                  }`}
+                >
+                  {/* Day Badge */}
+                  <div className="flex flex-col items-center shrink-0 mt-0.5">
+                    <span
+                      className={`px-2 py-0.5 rounded-xl flex items-center justify-center font-mono text-[10px] font-bold ${
+                        isMastered
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[2px_2px_4px_rgba(16,185,129,0.3)]'
+                          : isSelected
+                          ? 'bg-sky-600 text-white shadow-[2px_2px_4px_rgba(2,132,199,0.3)]'
+                          : isLearning
+                          ? 'bg-teal-100 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.08)]'
+                          : 'bg-slate-100 dark:bg-slate-700/80 text-slate-500 dark:text-slate-400'
+                      }`}
+                    >
+                      D{item.day < 10 ? `0${item.day}` : item.day}
                     </span>
-                    {isMastered && (
-                      <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
-                        ✓ 已吃透
-                      </span>
-                    )}
-                    {isLearning && (
-                      <span className="px-1.5 py-0.2 rounded text-[10px] font-medium bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 shrink-0">
-                        学习中
-                      </span>
-                    )}
                   </div>
-                  <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-400">
-                    <span>W{item.week}</span>
-                    <span>•</span>
-                    <span className="truncate">{item.tags?.[0] || '核心实战'}</span>
+
+                  {/* Day Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold truncate leading-snug text-slate-800 dark:text-slate-100" title={item.title}>
+                        {SHORT_DAY_TITLES[item.day] || item.title}
+                      </span>
+                      {isMastered && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] shrink-0">
+                          ✓ 已吃透
+                        </span>
+                      )}
+                      {isLearning && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] shrink-0">
+                          学习中
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-400 font-medium">
+                      <span>W{item.week}</span>
+                      <span>•</span>
+                      <span className="truncate">{item.tags?.[0] || '核心实战'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
 
-          {filteredDays.length === 0 && (
-            <div className="py-12 text-center text-xs text-slate-400">
-              无匹配任务
-            </div>
-          )}
-        </div>
-      </aside>
+            {filteredDays.length === 0 && (
+              <div className="py-12 text-center text-xs text-slate-400">
+                无匹配任务
+              </div>
+            )}
+          </div>
+        </aside>
       )}
 
       {/* ==================================================================== */}
       {/* Middle Column: Core Task Workspace Canvas (Fluid Full Width)         */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-6 w-full">
+      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-6 sm:p-8 space-y-6 overflow-y-auto">
         {/* Task Header */}
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-5 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-lg bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 text-xs font-black font-mono">
+        <div className="border-b border-slate-200/60 dark:border-slate-800/60 pb-5 space-y-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="px-3 py-1 rounded-2xl bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-950/70 text-sky-800 dark:text-sky-300 text-xs font-black font-mono shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)]">
               第 {currentDay.week} 周 · Day {currentDay.day}
             </span>
-            <span className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-semibold">
+            <span className="px-2.5 py-1 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-[11px] font-bold">
               考点等级: Tier {currentDay.tier}
             </span>
-            <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[11px]">
+            <span className="px-2.5 py-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 text-[11px] font-semibold shadow-[2px_2px_4px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)]">
               预计 {currentDay.estimatedMinutes || 90} 分钟
             </span>
           </div>
@@ -348,17 +351,17 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             {currentDay.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 pt-1">
-            <span className="font-semibold text-slate-700 dark:text-slate-300">对照专栏:</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 pt-1 font-medium">
+            <span className="font-bold text-slate-700 dark:text-slate-300">对照专栏:</span>
             <span>{currentDay.bookRange}</span>
           </div>
 
           {currentDay.tags && currentDay.tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            <div className="flex flex-wrap items-center gap-2 pt-1">
               {currentDay.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-0.5 rounded text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                  className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]"
                 >
                   #{tag}
                 </span>
@@ -367,16 +370,18 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           )}
         </div>
 
-        {/* Section 1: 核心要点 (Key Technical Points) */}
-        <section className="space-y-3">
+        {/* Section 1: 核心要点 (Key Technical Points - Clay Card) */}
+        <section className="bg-white/70 dark:bg-slate-800/60 rounded-3xl p-6 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-1px_-1px_2px_rgba(0,0,0,0.3)] space-y-4">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Flame size={16} className="text-amber-500" />
+            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-100/90 dark:bg-amber-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-amber-600 dark:text-amber-400">
+              <Flame size={14} />
+            </div>
             <span>核心技术要点与设计意图</span>
           </h2>
-          <div className="space-y-2 text-[13.5px] leading-relaxed text-slate-700 dark:text-slate-300">
+          <div className="space-y-3 text-[13.5px] leading-relaxed text-slate-700 dark:text-slate-300">
             {currentDay.points.map((pt, idx) => (
-              <div key={idx} className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mt-2 shrink-0" />
+              <div key={idx} className="flex items-start gap-3">
+                <span className="w-2 h-2 rounded-full bg-teal-500 mt-2 shrink-0 shadow-[1px_1px_2px_rgba(0,0,0,0.1)]" />
                 <div className="flex-1 min-w-0">
                   <InlineMarkdown text={pt} />
                 </div>
@@ -389,32 +394,36 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         {currentDay.code && (
           <section className="space-y-2">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-              <Terminal size={16} className="text-sky-500" />
+              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-sky-600 dark:text-sky-400">
+                <Terminal size={14} />
+              </div>
               <span>核心 C++ 源码实现</span>
             </h2>
             <CodeBlock code={currentDay.code} language="cpp" title={`Day ${currentDay.day} - 核心源码`} />
           </section>
         )}
 
-        {/* Section 3: 架构深潜与实验步骤 (Experiment) */}
+        {/* Section 3: 架构深潜与实验步骤 (Experiment Clay Card) */}
         {currentDay.experiment && (
-          <section className="space-y-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
+          <section className="space-y-4 p-6 rounded-3xl bg-gradient-to-br from-indigo-50/70 via-white/80 to-blue-50/70 dark:from-indigo-950/40 dark:via-slate-800/50 dark:to-blue-950/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-1px_-1px_2px_rgba(0,0,0,0.3)]">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Cpu size={16} className="text-indigo-500" />
+              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-indigo-100/90 dark:bg-indigo-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-indigo-600 dark:text-indigo-400">
+                <Cpu size={14} />
+              </div>
               <span>实验验证与避坑指南</span>
             </h2>
 
-            <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-              <strong className="text-slate-800 dark:text-slate-200">实验目标: </strong>
+            <div className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+              <strong className="text-slate-900 dark:text-slate-100 font-bold">实验目标: </strong>
               <InlineMarkdown text={currentDay.experiment.goal} />
             </div>
 
             {currentDay.experiment.steps && currentDay.experiment.steps.length > 0 && (
-              <div className="space-y-1.5 pt-1 text-xs text-slate-600 dark:text-slate-400">
-                <div className="font-semibold text-slate-700 dark:text-slate-300">实操步骤:</div>
+              <div className="space-y-2 pt-1 text-xs text-slate-700 dark:text-slate-300">
+                <div className="font-bold text-slate-800 dark:text-slate-200">实操步骤:</div>
                 {currentDay.experiment.steps.map((st, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <span className="font-mono text-sky-600 dark:text-sky-400 font-bold">{i + 1}.</span>
+                  <div key={i} className="flex items-start gap-2.5">
+                    <span className="font-mono text-sky-600 dark:text-sky-400 font-black">{i + 1}.</span>
                     <div className="flex-1 min-w-0">
                       <InlineMarkdown text={st} />
                     </div>
@@ -424,15 +433,15 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             )}
 
             {currentDay.experiment.expectedOutput && (
-              <div className="text-xs pt-1 text-slate-600 dark:text-slate-400">
-                <span className="font-semibold text-slate-700 dark:text-slate-300">预期输出: </span>
-                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">{currentDay.experiment.expectedOutput}</span>
+              <div className="text-xs pt-1 text-slate-700 dark:text-slate-300">
+                <span className="font-bold text-slate-800 dark:text-slate-200">预期输出: </span>
+                <span className="font-mono text-emerald-700 dark:text-emerald-300 font-bold">{currentDay.experiment.expectedOutput}</span>
               </div>
             )}
 
             {currentDay.experiment.watchPoints && (
-              <div className="text-xs pt-1 text-slate-600 dark:text-slate-400">
-                <span className="font-semibold text-amber-700 dark:text-amber-400">关注重点: </span>
+              <div className="text-xs pt-1 text-slate-700 dark:text-slate-300">
+                <span className="font-bold text-amber-800 dark:text-amber-300">关注重点: </span>
                 <InlineMarkdown
                   text={
                     Array.isArray(currentDay.experiment.watchPoints)
@@ -444,8 +453,8 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             )}
 
             {currentDay.experiment.pitfalls && (
-              <div className="text-xs pt-1 text-slate-600 dark:text-slate-400">
-                <span className="font-semibold text-rose-700 dark:text-rose-400">避坑陷阱: </span>
+              <div className="text-xs pt-1 text-slate-700 dark:text-slate-300">
+                <span className="font-bold text-rose-800 dark:text-rose-300">避坑陷阱: </span>
                 <InlineMarkdown
                   text={
                     Array.isArray(currentDay.experiment.pitfalls)
@@ -458,17 +467,17 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
 
             {currentDay.experiment.buildCommand && (
               <div className="pt-2">
-                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1.5 font-semibold">
                   <span>编译运行命令:</span>
                   <button
                     onClick={() => handleCopyBuild(currentDay.experiment!.buildCommand!)}
-                    className="flex items-center gap-1 text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 dark:bg-slate-800/80 text-sky-700 dark:text-sky-300 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                   >
-                    {copiedCmd ? <Check size={11} /> : <Copy size={11} />}
+                    {copiedCmd ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
                     <span>{copiedCmd ? '已复制' : '复制命令'}</span>
                   </button>
                 </div>
-                <div className="p-2.5 rounded-lg bg-slate-900 text-sky-300 font-mono text-xs overflow-x-auto select-all">
+                <div className="p-3.5 rounded-2xl bg-slate-900 text-sky-300 font-mono text-xs overflow-x-auto select-all shadow-[inset_3px_3px_6px_rgba(0,0,0,0.5)]">
                   {currentDay.experiment.buildCommand}
                 </div>
               </div>
@@ -476,17 +485,19 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           </section>
         )}
 
-        {/* Section 4: 细微辨析 (Nuance) */}
+        {/* Section 4: 细微辨析 (Nuance - Dual Clay Candy Cards) */}
         {currentDay.rigorousNuance && (
-          <section className="space-y-2">
+          <section className="space-y-3">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-500" />
+              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-emerald-100/90 dark:bg-emerald-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck size={14} />
+              </div>
               <span>快速认知 vs 严谨工程认知</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50 space-y-1">
-                <div className="font-bold text-amber-800 dark:text-amber-300">常见表面理解:</div>
-                <div className="text-amber-900/80 dark:text-amber-200/80 leading-relaxed">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-100/80 via-orange-50/70 to-yellow-100/80 dark:from-amber-950/40 dark:via-orange-900/30 dark:to-yellow-900/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08)] space-y-2">
+                <div className="font-bold text-amber-900 dark:text-amber-200">常见表面理解:</div>
+                <div className="text-amber-950/90 dark:text-amber-100/90 leading-relaxed font-medium">
                   <InlineMarkdown
                     text={
                       typeof currentDay.rigorousNuance === 'object' && currentDay.rigorousNuance !== null
@@ -496,9 +507,9 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   />
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 space-y-1">
-                <div className="font-bold text-emerald-800 dark:text-emerald-300">严谨底层机理:</div>
-                <div className="text-emerald-900/80 dark:text-emerald-200/80 leading-relaxed">
+              <div className="p-4 rounded-3xl bg-gradient-to-br from-emerald-100/80 via-teal-50/70 to-green-100/80 dark:from-emerald-950/40 dark:via-teal-900/30 dark:to-green-900/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08)] space-y-2">
+                <div className="font-bold text-emerald-900 dark:text-emerald-200">严谨底层机理:</div>
+                <div className="text-emerald-950/90 dark:text-emerald-100/90 leading-relaxed font-medium">
                   <InlineMarkdown
                     text={
                       typeof currentDay.rigorousNuance === 'object' && currentDay.rigorousNuance !== null
@@ -514,32 +525,32 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           </section>
         )}
 
-        {/* Bottom Pagination */}
-        <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-slate-800 text-xs">
+        {/* Bottom Pagination (Clay Pill Buttons) */}
+        <div className="flex items-center justify-between pt-6 border-t border-slate-200/60 dark:border-slate-800/60 text-xs">
           <button
             onClick={() => hasPrev && setSelectedDayNum(DAYS_DATASET[currentIndex - 1].day)}
             disabled={!hasPrev}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer font-bold ${
               hasPrev
-                ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                : 'opacity-40 cursor-not-allowed text-slate-400'
+                ? 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[3px_3px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90'
+                : 'opacity-40 cursor-not-allowed text-slate-400 bg-slate-100 dark:bg-slate-800'
             }`}
           >
-            <ChevronLeft size={14} />
+            <ChevronLeft size={15} />
             <span>上一天 (Day {hasPrev ? DAYS_DATASET[currentIndex - 1].day : ''})</span>
           </button>
 
           <button
             onClick={() => hasNext && setSelectedDayNum(DAYS_DATASET[currentIndex + 1].day)}
             disabled={!hasNext}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer font-bold ${
               hasNext
-                ? 'bg-sky-600 text-white hover:bg-sky-700 shadow-xs'
-                : 'opacity-40 cursor-not-allowed text-slate-400'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[4px_4px_12px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90'
+                : 'opacity-40 cursor-not-allowed text-slate-400 bg-slate-100 dark:bg-slate-800'
             }`}
           >
             <span>下一天 (Day {hasNext ? DAYS_DATASET[currentIndex + 1].day : ''})</span>
-            <ChevronRight size={14} />
+            <ChevronRight size={15} />
           </button>
         </div>
       </main>
@@ -547,16 +558,16 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
       {/* ==================================================================== */}
       {/* Right Column: Mastery Rating, Quiz Launcher & Daily Notes             */}
       {/* ==================================================================== */}
-      <aside className="w-80 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-3.5 select-none overflow-y-auto">
+      <aside className="w-80 shrink-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden lg:flex flex-col space-y-4 select-none overflow-y-auto">
         {/* Mastery Rating */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
-            <span>掌握度</span>
-            <span className="font-mono text-[11px] text-sky-600 dark:text-sky-400 font-semibold">
-              {(dayMastery[currentDay.day] || 0) >= 4 ? '已吃透' : `${dayMastery[currentDay.day] || 0} 阶`}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-slate-100">
+            <span>掌握度评级</span>
+            <span className="font-mono text-[11px] text-teal-700 dark:text-teal-300 font-bold">
+              {(dayMastery[currentDay.day] || 0) >= 4 ? '✓ 已吃透' : `${dayMastery[currentDay.day] || 0} 阶`}
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-1">
+          <div className="grid grid-cols-2 gap-1.5">
             {[
               { lvl: 0, label: '0 未学' },
               { lvl: 1, label: '1 概念' },
@@ -572,47 +583,47 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   key={tier.lvl}
                   onClick={() => setMasteryLevel(tier.lvl)}
                   type="button"
-                  className={`flex items-center justify-between px-2 py-1.5 rounded-lg text-xs transition cursor-pointer text-left border active-press smooth-hover ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-2xl text-xs transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-left active:scale-x-105 active:scale-y-90 font-medium ${
                     isSelected
                       ? tier.lvl >= 4
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold border-emerald-300 dark:border-emerald-800 shadow-2xs'
-                        : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold border-sky-300 dark:border-sky-800 shadow-2xs'
-                      : 'border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                        ? 'bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/70 dark:to-teal-900/70 text-teal-900 dark:text-teal-100 font-bold shadow-[3px_3px_8px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
+                        : 'bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-900/70 text-sky-900 dark:text-sky-100 font-bold shadow-[3px_3px_8px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
+                      : 'bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
                   }`}
                 >
                   <span>{tier.label}</span>
-                  {isSelected && <Check size={11} className={tier.lvl >= 4 ? 'text-emerald-500' : 'text-sky-500'} />}
+                  {isSelected && <Check size={12} className={tier.lvl >= 4 ? 'text-emerald-600' : 'text-sky-600'} />}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Check Criteria */}
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1 text-xs">
-          <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+        {/* Check Criteria (Clay Card) */}
+        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-1.5 text-xs">
+          <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
             <CheckCircle2 size={13} className="text-emerald-500" />
             <span>达标标准</span>
           </div>
-          <div className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+          <div className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed font-medium">
             <InlineMarkdown text={typeof currentDay.check === 'object' ? currentDay.check.strict : currentDay.check} />
           </div>
         </div>
 
         {/* Core Concepts */}
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5 text-xs">
-          <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-1.5 text-xs">
+          <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <BookOpen size={13} className="text-sky-500" />
               <span>今日核心概念</span>
             </div>
-            <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono font-semibold">{currentDay.module}</span>
+            <span className="text-[10px] text-teal-700 dark:text-teal-300 font-mono font-bold">{currentDay.module}</span>
           </div>
-          <div className="flex flex-wrap gap-1 pt-1">
+          <div className="flex flex-wrap gap-1.5 pt-1">
             {(currentDay.tags || []).map((tag, idx) => (
               <span
                 key={idx}
-                className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-700/80 border border-slate-200/70 dark:border-slate-600/60 text-slate-700 dark:text-slate-200 text-[11px] font-medium"
+                className="px-2.5 py-0.5 rounded-full bg-slate-100/90 dark:bg-slate-700/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] text-slate-700 dark:text-slate-200 text-[11px] font-semibold"
               >
                 {tag}
               </span>
@@ -621,8 +632,8 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         </div>
 
         {/* Quick Build / Test Command */}
-        <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5 text-xs">
-          <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 font-semibold">
+        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2 text-xs">
+          <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 font-bold">
             <span className="flex items-center gap-1.5">
               <Terminal size={12} className="text-sky-500" />
               <span>快速测试命令</span>
@@ -630,26 +641,26 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             <button
               onClick={() => handleCopyBuild(currentDay.buildCmd || 'cmake -B build && cmake --build build')}
               type="button"
-              className="text-[11px] text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer active-press"
+              className="text-[11px] text-teal-700 dark:text-teal-300 hover:underline flex items-center gap-1 cursor-pointer active:scale-x-105 active:scale-y-90 transition-all"
             >
               {copiedCmd ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
               <span>{copiedCmd ? '已复制' : '复制'}</span>
             </button>
           </div>
-          <code className="block p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 font-mono text-[10px] text-slate-800 dark:text-slate-200 truncate">
+          <div className="p-2 rounded-xl bg-slate-900 text-sky-300 font-mono text-[10px] truncate shadow-[inset_2px_2px_4px_rgba(0,0,0,0.4)]">
             {currentDay.buildCmd || 'cmake -B build && cmake --build build'}
-          </code>
+          </div>
         </div>
 
-        {/* Quiz Launcher */}
+        {/* Quiz Launcher (Clay Pill Button) */}
         {onJumpToQuiz && (
           <button
             onClick={() => onJumpToQuiz(currentDay.day)}
             type="button"
-            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold transition cursor-pointer active-press smooth-hover"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-900/70 text-sky-800 dark:text-sky-200 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] font-bold text-xs cursor-pointer"
           >
-            <HelpCircle size={13} />
-            <span>Day {currentDay.day} 自测</span>
+            <HelpCircle size={14} />
+            <span>进入 Day {currentDay.day} 自测</span>
           </button>
         )}
       </aside>

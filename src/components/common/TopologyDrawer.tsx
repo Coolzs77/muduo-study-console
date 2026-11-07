@@ -24,19 +24,19 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto animate-in slide-in-from-right duration-300">
+        <div className="w-screen max-w-md bg-white dark:bg-[#1a1f2c] rounded-l-3xl border-l border-white/80 dark:border-white/10 shadow-[-8px_0_32px_rgba(0,0,0,0.15),inset_2px_2px_4px_rgba(255,255,255,0.7)] flex flex-col justify-between p-6 sm:p-7 overflow-y-auto animate-in slide-in-from-right duration-300">
           {/* Header */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-              <div className="flex items-center gap-2.5">
-                <span className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="p-2.5 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/60 dark:to-sky-800/40 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)]">
                   <Layers size={20} />
                 </span>
                 <div>
                   <h3 className="font-black text-lg text-slate-900 dark:text-white">
                     {module.name}
                   </h3>
-                  <div className="text-xs text-sky-600 dark:text-sky-400 font-semibold font-mono">
+                  <div className="text-xs text-sky-600 dark:text-sky-400 font-bold font-mono">
                     {module.layer}
                   </div>
                 </div>
@@ -44,7 +44,7 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
 
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"
+                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)] active:scale-95 transition-all duration-300 cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -55,7 +55,7 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
               <div className="font-bold text-xs text-slate-500 uppercase tracking-wider">
                 核心职责与架构定位
               </div>
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50/80 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-800 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)]">
                 {module.desc || module.responsibility || '高性能网络核心调度组件'}
               </p>
             </div>
@@ -67,14 +67,14 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
                   <Cpu size={14} className="text-emerald-500" />
                   并发线程模型
                 </div>
-                <div className="bg-emerald-50/60 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-300 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/40 font-mono">
+                <div className="bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-300 p-3.5 rounded-2xl border border-emerald-100/60 dark:border-emerald-900/40 font-mono shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)]">
                   {module.threadModel}
                 </div>
               </div>
             )}
 
             {/* Classes & Files */}
-            <div className="space-y-3 text-xs font-mono">
+            <div className="space-y-3.5 text-xs font-mono">
               {module.classes && module.classes.length > 0 && (
                 <div className="space-y-1.5">
                   <div className="font-sans font-bold text-slate-500 uppercase tracking-wider">
@@ -84,7 +84,7 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
                     {module.classes.map((cls, cIdx) => (
                       <span
                         key={cIdx}
-                        className="px-2 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/40"
+                        className="px-2.5 py-1 rounded-full bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(14,165,233,0.15)] font-bold"
                       >
                         {cls}
                       </span>
@@ -116,7 +116,7 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
                     {(module.sourceFiles || module.files || []).map((file, fIdx) => (
                       <span
                         key={fIdx}
-                        className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                        className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]"
                       >
                         {file}
                       </span>
@@ -134,7 +134,7 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
                     {module.keyConcepts.map((kc, kIdx) => (
                       <span
                         key={kIdx}
-                        className="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60"
+                        className="px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 shadow-[inset_1px_1px_2px_rgba(245,158,11,0.15)] font-bold"
                       >
                         #{kc}
                       </span>
@@ -146,10 +146,10 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
           </div>
 
           {/* Footer close */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80">
             <button
               onClick={onClose}
-              className="w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
+              className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-900 text-white font-bold text-xs shadow-[2px_2px_8px_rgba(0,0,0,0.2),inset_1px_1px_2px_rgba(255,255,255,0.3)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             >
               关闭架构详情
             </button>

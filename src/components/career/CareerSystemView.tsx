@@ -69,63 +69,65 @@ export const CareerSystemView: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Top Banner */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div className="flex items-center gap-2.5">
-          <span className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
+      <div className="bg-white/90 dark:bg-[#1a1f2c]/90 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)]">
+        <div className="flex items-center gap-3">
+          <span className="p-2.5 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/60 dark:to-sky-800/40 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)]">
             <Award size={22} />
           </span>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            面试题解
-          </h1>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              面试题解
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              整理工程实现、能力要点、面试题解与 STAR 经历。
+            </p>
+          </div>
         </div>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-          整理工程实现、能力要点、面试题解与 STAR 经历。
-        </p>
 
         {/* Sub-tab Navigation */}
-        <div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex flex-wrap items-center gap-2 mt-6 p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
           <button
             onClick={() => setActiveTab('evidence')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'evidence'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
             }`}
           >
-            <GitCommit size={14} />
+            <GitCommit size={15} />
             <span>工程凭证目录 (10)</span>
           </button>
           <button
             onClick={() => setActiveTab('radar')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'radar'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
             }`}
           >
-            <Activity size={14} />
+            <Activity size={15} />
             <span>14 维后端能力矩阵</span>
           </button>
           <button
             onClick={() => setActiveTab('interview')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'interview'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
             }`}
           >
-            <HelpCircle size={14} />
+            <HelpCircle size={15} />
             <span>项目面试真题与电梯演讲</span>
           </button>
           <button
             onClick={() => setActiveTab('star')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'star'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
             }`}
           >
-            <Briefcase size={14} />
+            <Briefcase size={15} />
             <span>STAR 法则实战库 & 简历</span>
           </button>
         </div>
@@ -143,27 +145,27 @@ export const CareerSystemView: React.FC = () => {
               return (
                 <div
                   key={ev.id}
-                  className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3 flex flex-col justify-between"
+                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5 flex flex-col justify-between"
                 >
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                         {ev.title}
                       </h4>
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/40 shrink-0">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(14,165,233,0.15)] shrink-0">
                         {typeMeta.name}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
-                      <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.05)]">
                         Commit: {ev.commitHash}
                       </span>
                       <span>·</span>
                       <span className="truncate">{ev.sourceLocation}</span>
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50/80 dark:bg-slate-900/40 p-3.5 rounded-2xl border border-slate-200/50 dark:border-slate-800 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)]">
                       {ev.details}
                     </p>
 
@@ -173,7 +175,7 @@ export const CareerSystemView: React.FC = () => {
                         {ev.capabilityTags.map((tag, tIdx) => (
                           <span
                             key={tIdx}
-                            className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                            className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]"
                           >
                             #{tag}
                           </span>
@@ -182,12 +184,12 @@ export const CareerSystemView: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                    <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-                      <CheckCircle2 size={13} />
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                    <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                      <CheckCircle2 size={14} />
                       真实工程实证已核验
                     </span>
-                    <span className="font-mono">Task #{ev.taskId}</span>
+                    <span className="font-mono font-semibold">Task #{ev.taskId}</span>
                   </div>
                 </div>
               );
@@ -207,7 +209,7 @@ export const CareerSystemView: React.FC = () => {
               return (
                 <div
                   key={key}
-                  className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3"
+                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -216,21 +218,21 @@ export const CareerSystemView: React.FC = () => {
                       </h4>
                       <div className="text-xs text-slate-400 mt-0.5">{dim.description}</div>
                     </div>
-                    <span className="font-mono font-bold text-base text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2 py-0.5 rounded-lg border border-sky-100 dark:border-sky-900/40">
+                    <span className="font-mono font-black text-sm text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-3 py-1 rounded-xl shadow-[inset_1px_1px_2px_rgba(14,165,233,0.2)]">
                       L{currentLvl}
                     </span>
                   </div>
 
                   {/* Level Selector Buttons */}
-                  <div className="flex items-center gap-1.5 pt-1">
+                  <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
                     {[1, 2, 3, 4, 5].map(lvl => (
                       <button
                         key={lvl}
                         onClick={() => setLevel(key, lvl)}
-                        className={`flex-1 py-1 text-xs font-mono font-bold rounded-lg transition cursor-pointer ${
+                        className={`flex-1 py-1.5 text-xs font-mono font-bold rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer ${
                           lvl <= currentLvl
-                            ? 'bg-sky-600 text-white'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200'
+                            ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                            : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                         title={`设置为 L${lvl}`}
                         type="button"
@@ -242,8 +244,8 @@ export const CareerSystemView: React.FC = () => {
 
                   {/* Current Level Description */}
                   {lvlDesc && (
-                    <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50/80 dark:bg-slate-900/40 p-3.5 rounded-2xl border border-slate-200/50 dark:border-slate-800 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)]">
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
                         L{currentLvl} 掌握标准:
                       </span>{' '}
                       {lvlDesc}
@@ -260,28 +262,28 @@ export const CareerSystemView: React.FC = () => {
       {activeTab === 'interview' && (
         <div className="space-y-6">
           {/* Elevator Pitch Card */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
+          <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-                  <Briefcase size={16} className="text-sky-600" />
+                  <Briefcase size={17} className="text-sky-600 dark:text-sky-400" />
                   项目 30 秒 / 1 分钟 / 3 分钟技术陈述 (Elevator Pitch)
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   面试开场向面试官精准汇报系统架构、并发模型、关键设计与实测指标。
                 </p>
               </div>
 
               {/* Pitch duration selector */}
-              <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+              <div className="flex items-center gap-1.5 bg-slate-100/90 dark:bg-slate-900/60 p-1.5 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06)]">
                 {(['30s', '1m', '3m'] as const).map(len => (
                   <button
                     key={len}
                     onClick={() => setElevatorPitchLen(len)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    className={`px-3.5 py-1 rounded-xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer ${
                       elevatorPitchLen === len
-                        ? 'bg-sky-600 text-white shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     {len}
@@ -291,7 +293,7 @@ export const CareerSystemView: React.FC = () => {
             </div>
 
             <div className="relative">
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line font-sans">
+              <div className="bg-slate-50/80 dark:bg-slate-900/50 p-4 sm:p-5 rounded-2xl border border-slate-200/50 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line font-sans shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)]">
                 {PROJECT_INTERVIEW_DATA.elevatorPitch?.[elevatorPitchLen] ||
                   PROJECT_INTERVIEW_DATA.elevatorPitch?.['1m']}
               </div>
@@ -302,11 +304,11 @@ export const CareerSystemView: React.FC = () => {
                     '陈述文本已复制'
                   )
                 }
-                className="absolute top-3 right-3 p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 hover:text-sky-600 transition cursor-pointer"
+                className="absolute top-3 right-3 p-2 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 title="复制陈述"
                 type="button"
               >
-                <Copy size={13} />
+                <Copy size={14} />
               </button>
             </div>
           </div>
@@ -314,7 +316,7 @@ export const CareerSystemView: React.FC = () => {
           {/* Reverse Questions */}
           <div className="space-y-4">
             <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-              <HelpCircle size={16} className="text-sky-600" />
+              <HelpCircle size={17} className="text-sky-600 dark:text-sky-400" />
               高频面试逆向深度攻防题
             </h3>
 
@@ -324,14 +326,14 @@ export const CareerSystemView: React.FC = () => {
                 return (
                   <div
                     key={q.id}
-                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden"
+                    className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   >
                     <div
                       onClick={() => toggleInterviewQ(q.id)}
-                      className="p-4 cursor-pointer hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition flex items-center justify-between gap-4 select-none"
+                      className="p-4 sm:p-5 cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition flex items-center justify-between gap-4 select-none"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                        <span className="w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_5px_rgba(245,158,11,0.25),inset_1px_1px_2px_rgba(255,255,255,0.6)]">
                           Q
                         </span>
                         <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
@@ -339,25 +341,27 @@ export const CareerSystemView: React.FC = () => {
                         </h4>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)]">
                           {q.category}
                         </span>
-                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        <div className="p-1 rounded-full text-slate-400 hover:text-slate-600">
+                          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </div>
                       </div>
                     </div>
 
                     {isExpanded && (
-                      <div className="px-5 pb-5 pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs sm:text-sm">
+                      <div className="px-5 pb-5 pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-3.5 text-xs sm:text-sm">
                         {q.source && (
                           <div>
-                            <div className="text-xs text-slate-400 font-mono mb-1">
+                            <div className="text-xs text-slate-400 font-mono mb-1.5">
                               源码位置: {q.source.file} ({q.source.line})
                             </div>
                             <CodeBlock code={q.source.snippet} language="cpp" maxHeight="max-h-[250px]" />
                           </div>
                         )}
 
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
+                        <div className="bg-slate-50/80 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-800 space-y-2 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)]">
                           <div className="font-bold text-xs text-slate-800 dark:text-slate-200">
                             答题思路:
                           </div>
@@ -367,9 +371,9 @@ export const CareerSystemView: React.FC = () => {
                         </div>
 
                         {q.followUp && (
-                          <div className="bg-sky-50 dark:bg-sky-950/30 p-3.5 rounded-xl border border-sky-100 dark:border-sky-900/40 text-xs">
+                          <div className="bg-sky-50/80 dark:bg-sky-950/30 p-3.5 rounded-2xl border border-sky-100/60 dark:border-sky-900/40 text-xs shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)]">
                             <span className="font-bold text-sky-800 dark:text-sky-300 flex items-center gap-1.5 mb-1">
-                              <Lightbulb size={13} />
+                              <Lightbulb size={14} />
                               面试官潜在追问:
                             </span>
                             <span className="text-slate-700 dark:text-slate-300">{q.followUp}</span>
@@ -377,9 +381,9 @@ export const CareerSystemView: React.FC = () => {
                         )}
 
                         {q.trap && (
-                          <div className="bg-rose-50 dark:bg-rose-950/30 p-3.5 rounded-xl border border-rose-100 dark:border-rose-900/40 text-xs">
+                          <div className="bg-rose-50/80 dark:bg-rose-950/30 p-3.5 rounded-2xl border border-rose-100/60 dark:border-rose-900/40 text-xs shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)]">
                             <span className="font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5 mb-1">
-                              <AlertTriangle size={13} />
+                              <AlertTriangle size={14} />
                               常见认知误区与答题陷阱:
                             </span>
                             <span className="text-rose-900 dark:text-rose-200">{q.trap}</span>
@@ -399,9 +403,9 @@ export const CareerSystemView: React.FC = () => {
       {activeTab === 'star' && (
         <div className="space-y-6">
           {/* Resume Bullets */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
+          <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4">
             <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-              <Award size={16} className="text-sky-600" />
+              <Award size={17} className="text-sky-600 dark:text-sky-400" />
               精炼简历要点库 (直接可用，带指标量化)
             </h3>
 
@@ -409,10 +413,10 @@ export const CareerSystemView: React.FC = () => {
               {RESUME_BULLETS.map((rb, idx) => (
                 <div
                   key={idx}
-                  className="flex items-start justify-between gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60"
+                  className="flex items-start justify-between gap-3 p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)]"
                 >
                   <div className="space-y-1">
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300">
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(14,165,233,0.1)]">
                       {rb.category}
                     </span>
                     <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed mt-1">
@@ -421,7 +425,7 @@ export const CareerSystemView: React.FC = () => {
                   </div>
                   <button
                     onClick={() => handleCopy(rb.text, '简历要点已复制')}
-                    className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 hover:text-sky-600 transition shrink-0 cursor-pointer"
+                    className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0 cursor-pointer"
                     title="复制要点"
                     type="button"
                   >
@@ -435,7 +439,7 @@ export const CareerSystemView: React.FC = () => {
           {/* STAR Stories */}
           <div className="space-y-4">
             <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-              <Briefcase size={16} className="text-sky-600" />
+              <Briefcase size={17} className="text-sky-600 dark:text-sky-400" />
               STAR 法则实战经历
             </h3>
 
@@ -443,9 +447,9 @@ export const CareerSystemView: React.FC = () => {
               {CAREER_STAR_STORIES.map(story => (
                 <div
                   key={story.id}
-                  className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3"
+                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5"
                 >
-                  <h4 className="font-bold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                  <h4 className="font-bold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800/80 pb-2.5">
                     {story.title}
                   </h4>
 
@@ -468,7 +472,7 @@ export const CareerSystemView: React.FC = () => {
                         {story.result}
                       </span>
                     </p>
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500">
+                    <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-slate-500">
                       <strong>收获与沉淀: </strong>
                       {story.takeaway}
                     </div>

@@ -183,30 +183,30 @@ export const AlgoCatalog: React.FC = () => {
   }, [trackProblems, completedMap]);
 
   return (
-    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+    <div className="flex w-full min-h-[calc(100vh-4rem)] bg-[#eef2f7] dark:bg-[#11141a] transition-colors duration-300 p-3 sm:p-4 gap-4 text-slate-800 dark:text-slate-200">
       {/* ==================================================================== */}
       {/* Left Column: Track Switcher & Category Directory Tree (Collapsible)   */}
       {/* ==================================================================== */}
       {isSidebarCollapsed ? (
-        <aside className="w-14 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center py-3.5 space-y-3 h-[calc(100vh-4rem)] sticky top-16 select-none transition-all duration-300">
+        <aside className="w-16 shrink-0 rounded-3xl bg-[#f4f7fb]/90 dark:bg-[#151922]/90 shadow-[6px_6px_14px_rgba(0,0,0,0.06),inset_3px_3px_6px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] py-4 flex flex-col items-center space-y-3 sticky top-18 h-[calc(100vh-5.5rem)] hidden md:flex select-none transition-all duration-300">
           <button
             onClick={() => setIsSidebarCollapsed(false)}
-            className="p-2 rounded-xl text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+            className="p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-sky-600 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             title="展开专题分类"
           >
             <PanelLeftOpen size={18} />
           </button>
 
-          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800" />
+          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]" />
 
-          {/* Quick Track Switcher */}
-          <div className="flex flex-col items-center space-y-1 text-[11px] font-bold">
+          {/* Quick Track Switcher (Clay Pills) */}
+          <div className="flex flex-col items-center space-y-2 text-[11px] font-bold">
             <button
               onClick={() => { setViewTrack('all'); setSelectedCategory('all'); setIsSidebarCollapsed(false); }}
-              className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+              className={`w-10 h-9 rounded-2xl flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 viewTrack === 'all'
-                  ? 'bg-sky-600 text-white shadow-2xs'
-                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(147,51,234,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
               }`}
               title="全部题目 (234)"
             >
@@ -214,10 +214,10 @@ export const AlgoCatalog: React.FC = () => {
             </button>
             <button
               onClick={() => { setViewTrack('hot100'); setSelectedCategory('all'); setIsSidebarCollapsed(false); }}
-              className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+              className={`w-10 h-9 rounded-2xl flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 viewTrack === 'hot100'
-                  ? 'bg-amber-600 text-white shadow-2xs'
-                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
               }`}
               title="Hot 100 精选题 (100)"
             >
@@ -225,195 +225,186 @@ export const AlgoCatalog: React.FC = () => {
             </button>
             <button
               onClick={() => { setViewTrack('carl'); setSelectedCategory('all'); setIsSidebarCollapsed(false); }}
-              className={`w-9 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+              className={`w-10 h-9 rounded-2xl flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 viewTrack === 'carl'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-[3px_3px_8px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
               }`}
               title="代码随想录经典 (179)"
             >
               录
             </button>
           </div>
-
-          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 mt-auto" />
-
-          {/* Current Category Pill */}
-          <div
-            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center text-[10px] font-bold text-sky-600 dark:text-sky-400 cursor-pointer text-center px-1 truncate"
-            onClick={() => setIsSidebarCollapsed(false)}
-            title={`当前分类: ${selectedCategory === 'all' ? '全部专题' : selectedCategory}`}
-          >
-            {selectedCategory === 'all' ? '全部' : selectedCategory.slice(0, 2)}
-          </div>
         </aside>
       ) : (
-        <aside className="w-80 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-[calc(100vh-4rem)] sticky top-16 select-none transition-all duration-300">
+        <aside className="w-80 shrink-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 flex flex-col h-[calc(100vh-5.5rem)] sticky top-18 select-none transition-all duration-300 overflow-hidden">
           {/* Header & Track Selector */}
-          <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5">
+          <div className="pb-3 space-y-3 shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
-                <CheckSquare size={16} className="text-sky-600 dark:text-sky-400" />
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-purple-100/90 dark:bg-purple-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-purple-600 dark:text-purple-400">
+                  <CheckSquare size={14} />
+                </div>
                 <span>专题分类</span>
-                <span className="text-xs text-slate-400 font-normal">({categories.length} 个专题)</span>
+                <span className="text-xs text-slate-400 font-mono">({categories.length} 个专题)</span>
               </div>
               <button
                 onClick={() => setIsSidebarCollapsed(true)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active-press"
+                className="p-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 title="收起专题分类"
               >
                 <PanelLeftClose size={16} />
               </button>
             </div>
 
-          {/* Track Switcher */}
-          <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-lg text-xs font-medium text-center">
-            <button
-              onClick={() => {
-                setViewTrack('all');
-                setSelectedCategory('all');
-              }}
-              className={`py-1 rounded-md transition cursor-pointer ${
-                viewTrack === 'all'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-              }`}
-            >
-              全部 (234)
-            </button>
-            <button
-              onClick={() => {
-                setViewTrack('hot100');
-                setSelectedCategory('all');
-              }}
-              className={`py-1 rounded-md transition cursor-pointer ${
-                viewTrack === 'hot100'
-                  ? 'bg-amber-600 text-white font-semibold shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-              }`}
-            >
-              Hot 100 (100)
-            </button>
-            <button
-              onClick={() => {
-                setViewTrack('carl');
-                setSelectedCategory('all');
-              }}
-              className={`py-1 rounded-md transition cursor-pointer ${
-                viewTrack === 'carl'
-                  ? 'bg-sky-600 text-white font-semibold shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-              }`}
-            >
-              随想录 (179)
-            </button>
-          </div>
-
-          {/* Progress Summary */}
-          <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
-                当前题单进度: {trackCompletedCount} / {trackTotalCount} 题
-              </span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                {trackPct}%
-              </span>
-            </div>
-            <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-              <div
-                className="bg-emerald-500 h-full rounded-full transition-all duration-300"
-                style={{ width: `${trackPct}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Category List with Individual Progress */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {/* 'All' Button */}
-          <div
-            onClick={() => setSelectedCategory('all')}
-            className={`flex items-center justify-between p-2.5 rounded-xl transition cursor-pointer text-xs ${
-              selectedCategory === 'all'
-                ? 'bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-900 text-sky-900 dark:text-sky-100 font-bold'
-                : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent text-slate-700 dark:text-slate-300'
-            }`}
-          >
-            <span>全部专题</span>
-            <span className="text-slate-400 font-normal">
-              {trackCompletedCount} / {trackTotalCount}
-            </span>
-          </div>
-
-          {/* Individual Category Items */}
-          {categories.map((cat) => {
-            const isSelected = selectedCategory === cat;
-            const cStat = categoryStats[cat] || { total: 0, completed: 0, pct: 0 };
-            const isAllDone = cStat.total > 0 && cStat.completed === cStat.total;
-
-            return (
-              <div
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`group p-2.5 rounded-xl transition cursor-pointer text-xs space-y-1.5 ${
-                  isSelected
-                    ? 'bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-900 text-sky-900 dark:text-sky-100 shadow-2xs font-semibold'
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent text-slate-700 dark:text-slate-300'
+            {/* Track Switcher (Clay recessed groove) */}
+            <div className="grid grid-cols-3 gap-1 p-1 bg-slate-200/50 dark:bg-slate-900/60 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs font-semibold text-center">
+              <button
+                onClick={() => {
+                  setViewTrack('all');
+                  setSelectedCategory('all');
+                }}
+                className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                  viewTrack === 'all'
+                    ? 'bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    {isAllDone ? (
-                      <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
-                    ) : (
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" />
-                    )}
-                    <span className="truncate">{cat}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-normal">
-                    <span className={isAllDone ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : ''}>
-                      {cStat.completed} / {cStat.total}
-                    </span>
-                    <span className="w-6 text-right font-mono">{cStat.pct}%</span>
-                  </div>
-                </div>
+                全部 (234)
+              </button>
+              <button
+                onClick={() => {
+                  setViewTrack('hot100');
+                  setSelectedCategory('all');
+                }}
+                className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                  viewTrack === 'hot100'
+                    ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                Hot 100
+              </button>
+              <button
+                onClick={() => {
+                  setViewTrack('carl');
+                  setSelectedCategory('all');
+                }}
+                className={`py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                  viewTrack === 'carl'
+                    ? 'bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                随想录
+              </button>
+            </div>
 
-                {/* Individual Mini Progress Bar */}
-                <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      isAllDone
-                        ? 'bg-emerald-500'
-                        : isSelected
-                        ? 'bg-sky-500'
-                        : 'bg-slate-400 dark:bg-slate-600'
-                    }`}
-                    style={{ width: `${cStat.pct}%` }}
-                  />
-                </div>
+            {/* Progress Summary (Clay lilac mini card) */}
+            <div className="bg-gradient-to-br from-purple-100/70 via-fuchsia-50 to-pink-100/70 dark:from-purple-950/40 dark:via-fuchsia-900/30 dark:to-pink-900/40 p-3 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-purple-900 dark:text-purple-100">
+                  当前题单进度 ({trackCompletedCount} / {trackTotalCount} 题)
+                </span>
+                <span className="font-mono font-bold text-purple-800 dark:text-purple-200">
+                  {trackPct}%
+                </span>
               </div>
-            );
-          })}
-        </div>
-      </aside>
+              <div className="w-full h-2 rounded-full bg-purple-200/50 dark:bg-purple-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] overflow-hidden p-0.5">
+                <div
+                  className="bg-gradient-to-r from-purple-500 to-indigo-600 h-full rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                  style={{ width: `${trackPct}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Category List with Individual Progress (Clay pill strips) */}
+          <div className="flex-1 overflow-y-auto pr-1 space-y-2">
+            {/* 'All' Button */}
+            <div
+              onClick={() => setSelectedCategory('all')}
+              className={`flex items-center justify-between p-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-xs active:scale-x-105 active:scale-y-90 ${
+                selectedCategory === 'all'
+                  ? 'bg-gradient-to-r from-purple-100 via-fuchsia-50 to-pink-100 dark:from-purple-950/60 dark:via-fuchsia-900/40 dark:to-pink-950/60 text-purple-950 dark:text-purple-100 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] font-bold -translate-y-0.5'
+                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <span className="font-bold">全部专题</span>
+              <span className="text-slate-400 font-mono font-semibold">
+                {trackCompletedCount} / {trackTotalCount}
+              </span>
+            </div>
+
+            {/* Individual Category Items */}
+            {categories.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              const cStat = categoryStats[cat] || { total: 0, completed: 0, pct: 0 };
+              const isAllDone = cStat.total > 0 && cStat.completed === cStat.total;
+
+              return (
+                <div
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`group p-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-xs space-y-1.5 active:scale-x-105 active:scale-y-90 select-none ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-purple-100 via-fuchsia-50 to-pink-100 dark:from-purple-950/60 dark:via-fuchsia-900/40 dark:to-pink-950/60 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
+                      : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {isAllDone ? (
+                        <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" />
+                      )}
+                      <span className="font-bold truncate text-slate-800 dark:text-slate-100">{cat}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                      <span className={isAllDone ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}>
+                        {cStat.completed} / {cStat.total}
+                      </span>
+                      <span className="w-7 text-right font-mono font-semibold">{cStat.pct}%</span>
+                    </div>
+                  </div>
+
+                  {/* Individual Mini Progress Bar */}
+                  <div className="w-full bg-slate-200/60 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden shadow-[inset_1px_1px_2px_rgba(0,0,0,0.08)]">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        isAllDone
+                          ? 'bg-emerald-500'
+                          : isSelected
+                          ? 'bg-purple-600'
+                          : 'bg-slate-400 dark:bg-slate-600'
+                      }`}
+                      style={{ width: `${cStat.pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </aside>
       )}
 
       {/* ==================================================================== */}
-      {/* Middle Column: LeetCode-style Problem List (Fluid Full Width)        */}
+      {/* Middle Column: Problem List Canvas (Fluid Full Width)                */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 overflow-y-auto px-6 py-6 sm:px-10 space-y-4 w-full">
+      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-6 sm:p-8 space-y-5 overflow-y-auto w-full">
         {/* Search & Filter Toolbar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-2 border-b border-slate-200 dark:border-slate-800">
-          {/* Difficulty Chips */}
-          <div className="flex items-center gap-1.5 text-xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/60 dark:border-slate-800/60">
+          {/* Difficulty Chips (Clay Candy Pills) */}
+          <div className="flex items-center gap-2 text-xs">
             {(['all', 'Easy', 'Medium', 'Hard'] as const).map(df => (
               <button
                 key={df}
                 onClick={() => setDiffFilter(df)}
-                className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer ${
+                className={`px-3 py-1.5 rounded-2xl font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   diffFilter === df
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold shadow-2xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(147,51,234,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] -translate-y-0.5'
+                    : 'bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
                 }`}
               >
                 {df === 'all' ? '全部难度' : df === 'Easy' ? '简单' : df === 'Medium' ? '中等' : '困难'}
@@ -421,28 +412,28 @@ export const AlgoCatalog: React.FC = () => {
             ))}
           </div>
 
-          {/* Search Box */}
-          <div className="relative w-full sm:w-64 shrink-0">
+          {/* Search Box (Clay recessed input) */}
+          <div className="relative w-full sm:w-72 shrink-0">
             <Search size={14} className="absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="搜索题号、题名或解法..."
-              className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition"
+              className="w-full bg-white/80 dark:bg-slate-900/70 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)] rounded-2xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden transition-all"
             />
           </div>
         </div>
 
         {/* Current Active Category Title */}
-        <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+        <div className="flex items-center justify-between text-xs text-slate-500 pt-1 font-medium">
           <span>
-            当前展示: <strong className="text-slate-900 dark:text-white">{selectedCategory === 'all' ? '全部专题' : selectedCategory}</strong> ({displayedProblems.length} 道题目)
+            当前展示: <strong className="text-slate-900 dark:text-white font-bold">{selectedCategory === 'all' ? '全部专题' : selectedCategory}</strong> ({displayedProblems.length} 道题目)
           </span>
         </div>
 
         {/* Problems List */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {displayedProblems.map((problem) => (
             <AlgoCard
               key={problem.id}
@@ -461,10 +452,10 @@ export const AlgoCatalog: React.FC = () => {
       </main>
 
       {/* ==================================================================== */}
-      {/* Right Column: Statistics, Random Pick & Technique Radar             */}
+      {/* Right Column: Statistics & Random Pick                               */}
       {/* ==================================================================== */}
-      <aside className="w-80 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 h-[calc(100vh-4rem)] sticky top-16 hidden lg:flex flex-col space-y-3.5 select-none overflow-y-auto">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+      <aside className="w-80 shrink-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden lg:flex flex-col space-y-4 select-none overflow-y-auto">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-slate-800/60">
           <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">
             数据总览
           </h3>
@@ -473,47 +464,47 @@ export const AlgoCatalog: React.FC = () => {
           </span>
         </div>
 
-        {/* Difficulty Metrics */}
-        <div className="space-y-1.5 text-xs">
-          <div className="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 flex items-center justify-between">
-            <span className="font-semibold text-emerald-800 dark:text-emerald-300">简单</span>
-            <span className="font-bold font-mono text-emerald-700 dark:text-emerald-400">
+        {/* Difficulty Metrics (Clay Candy Mini Cards) */}
+        <div className="space-y-2 text-xs">
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-100/70 to-teal-50/70 dark:from-emerald-950/40 dark:to-teal-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] flex items-center justify-between">
+            <span className="font-bold text-emerald-900 dark:text-emerald-200">简单</span>
+            <span className="font-bold font-mono text-emerald-800 dark:text-emerald-300">
               {diffCounts.easyDone} / {diffCounts.easyTot}
             </span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 flex items-center justify-between">
-            <span className="font-semibold text-amber-800 dark:text-amber-300">中等</span>
-            <span className="font-bold font-mono text-amber-700 dark:text-amber-400">
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-100/70 to-orange-50/70 dark:from-amber-950/40 dark:to-orange-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] flex items-center justify-between">
+            <span className="font-bold text-amber-900 dark:text-amber-200">中等</span>
+            <span className="font-bold font-mono text-amber-800 dark:text-amber-300">
               {diffCounts.medDone} / {diffCounts.medTot}
             </span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-900/40 flex items-center justify-between">
-            <span className="font-semibold text-rose-800 dark:text-rose-300">困难</span>
-            <span className="font-bold font-mono text-rose-700 dark:text-rose-400">
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-rose-100/70 to-pink-50/70 dark:from-rose-950/40 dark:to-pink-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] flex items-center justify-between">
+            <span className="font-bold text-rose-900 dark:text-rose-200">困难</span>
+            <span className="font-bold font-mono text-rose-800 dark:text-rose-300">
               {diffCounts.hardDone} / {diffCounts.hardTot}
             </span>
           </div>
         </div>
 
-        {/* Hot 100 Card */}
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5 text-xs">
+        {/* Hot 100 Card (Clay Amber Card) */}
+        <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-100/80 via-orange-50 to-yellow-100/80 dark:from-amber-950/40 dark:via-orange-900/30 dark:to-yellow-900/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8)] space-y-2 text-xs">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-slate-800 dark:text-slate-200">Hot 100</span>
-            <span className="text-xs text-amber-600 dark:text-amber-400 font-semibold font-mono">
+            <span className="font-bold text-amber-900 dark:text-amber-200">Hot 100 精选进度</span>
+            <span className="text-xs text-amber-800 dark:text-amber-300 font-bold font-mono">
               {Math.round((ALGORITHM_LAB_CATALOG.filter(p => p.isHot100 && isProblemDone(p)).length / 100) * 100)}%
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-black text-slate-900 dark:text-white font-mono">
+            <span className="text-2xl font-black text-amber-950 dark:text-amber-100 font-mono">
               {ALGORITHM_LAB_CATALOG.filter(p => p.isHot100 && isProblemDone(p)).length}
-              <span className="text-xs text-slate-400 font-normal"> / 100 题</span>
+              <span className="text-xs text-amber-700/80 dark:text-amber-300/80 font-normal"> / 100 题</span>
             </span>
           </div>
-          <div className="w-full bg-slate-200 dark:bg-slate-700 h-1 rounded-full overflow-hidden">
+          <div className="w-full h-2 rounded-full bg-amber-200/50 dark:bg-amber-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] overflow-hidden p-0.5">
             <div
-              className="bg-amber-500 h-full rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
               style={{
                 width: `${Math.round((ALGORITHM_LAB_CATALOG.filter(p => p.isHot100 && isProblemDone(p)).length / 100) * 100)}%`
               }}
@@ -521,29 +512,31 @@ export const AlgoCatalog: React.FC = () => {
           </div>
         </div>
 
-        {/* Random Problem Generator */}
-        <div className="p-3 rounded-xl bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200/60 dark:border-sky-900/40 space-y-2 text-xs">
+        {/* Random Problem Generator (Clay Card with squash button) */}
+        <div className="p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85)] space-y-3 text-xs">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-sky-900 dark:text-sky-200 flex items-center gap-1.5">
-              <Dices size={14} className="text-sky-600 dark:text-sky-400" />
+            <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-sky-600 dark:text-sky-400">
+                <Dices size={14} />
+              </div>
               <span>随机刷题</span>
             </span>
             <button
               onClick={handlePickRandom}
-              className="px-2 py-0.5 rounded text-[11px] bg-sky-100 hover:bg-sky-200 dark:bg-sky-900/60 dark:hover:bg-sky-800 text-sky-700 dark:text-sky-300 font-medium transition cursor-pointer active-press"
+              className="px-3 py-1 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-200 font-bold shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             >
               换一题
             </button>
           </div>
 
           {randomProblem ? (
-            <div className="space-y-2 pt-1">
+            <div className="space-y-3 pt-1">
               <div>
-                <div className="flex items-center gap-1.5 font-medium text-slate-900 dark:text-white truncate">
-                  {randomProblem.num && <span className="font-mono text-sky-600">#{randomProblem.num}</span>}
+                <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white truncate">
+                  {randomProblem.num && <span className="font-mono text-sky-600 dark:text-sky-400">#{randomProblem.num}</span>}
                   <span className="truncate">{randomProblem.title}</span>
                 </div>
-                <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                   <span>{randomProblem.difficulty}</span>
                   <span>•</span>
                   <span>{randomProblem.category || randomProblem.hot100Chapter || '算法'}</span>
@@ -553,10 +546,10 @@ export const AlgoCatalog: React.FC = () => {
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => handleToggleDone(randomProblem)}
-                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium transition cursor-pointer text-center active-press ${
+                  className={`flex-1 py-2 px-3 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-center active:scale-x-105 active:scale-y-90 ${
                     isProblemDone(randomProblem)
-                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold'
-                      : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-emerald-500'
+                      ? 'bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/70 dark:to-teal-900/70 text-teal-900 dark:text-teal-100 shadow-[3px_3px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9)]'
+                      : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-[3px_3px_8px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
                   }`}
                 >
                   {isProblemDone(randomProblem) ? '✓ 已完成' : '标记完成'}
@@ -566,10 +559,10 @@ export const AlgoCatalog: React.FC = () => {
                     href={randomProblem.leetcodeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-1.5 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition active-press"
+                    className="p-2.5 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white shadow-[3px_3px_8px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                     title="在 LeetCode 打开"
                   >
-                    <ExternalLink size={13} />
+                    <ExternalLink size={14} />
                   </a>
                 )}
               </div>
@@ -579,9 +572,9 @@ export const AlgoCatalog: React.FC = () => {
           )}
         </div>
 
-        {/* Quick Category Jump */}
-        <div className="space-y-1.5 text-xs pt-1">
-          <div className="font-semibold text-slate-600 dark:text-slate-400 text-[11px]">
+        {/* Quick Category Jump (Clay Pills) */}
+        <div className="space-y-2 text-xs pt-1">
+          <div className="font-bold text-slate-600 dark:text-slate-400 text-[11px]">
             常用专题速览
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -589,10 +582,10 @@ export const AlgoCatalog: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2 py-1 rounded-md text-[11px] transition cursor-pointer active-press ${
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   selectedCategory === cat
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    ? 'bg-purple-600 text-white shadow-[2px_2px_5px_rgba(147,51,234,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
+                    : 'bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 shadow-[2px_2px_4px_rgba(0,0,0,0.04),inset_1px_1px_2px_rgba(255,255,255,0.8)] hover:-translate-y-0.5'
                 }`}
               >
                 {cat}

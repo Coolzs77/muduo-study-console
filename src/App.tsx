@@ -96,7 +96,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased w-full">
+    <div className="min-h-screen bg-[#eef2f7] dark:bg-[#11141a] text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased w-full transition-colors duration-300">
       {/* 2.5px Top Reading Progress Bar (active during reading) */}
       <ReadingProgressBar />
 

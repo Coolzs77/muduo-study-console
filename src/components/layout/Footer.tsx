@@ -174,7 +174,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="mt-16 border-t border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md">
+    <footer className="mt-16 border-t border-white/60 dark:border-white/10 bg-white/80 dark:bg-[#1a1f2c]/80 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
           <span className="font-bold text-slate-700 dark:text-slate-300">
@@ -185,7 +185,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Global Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <input
             type="file"
             ref={fileInputRef}
@@ -196,37 +196,37 @@ export const Footer: React.FC = () => {
 
           <button
             onClick={handleExportMarkdown}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold transition cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-white/80 dark:border-white/10 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] font-bold cursor-pointer"
             title="导出结构化 Markdown 归档复盘文档"
           >
-            <FileText size={13} className="text-sky-600" />
+            <FileText size={14} className="text-sky-600" />
             <span>导出学习档案.md</span>
           </button>
 
           <button
             onClick={handleExportJSON}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold transition cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-white/80 dark:border-white/10 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] font-bold cursor-pointer"
             title="全量导出 JSON 备份"
           >
-            <Download size={13} className="text-emerald-600" />
+            <Download size={14} className="text-emerald-600" />
             <span>导出 JSON 备份</span>
           </button>
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold transition cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-white/80 dark:border-white/10 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] font-bold cursor-pointer"
             title="读取并恢复 JSON 备份"
           >
-            <Upload size={13} className="text-amber-600" />
+            <Upload size={14} className="text-amber-600" />
             <span>导入备份</span>
           </button>
 
           <button
             onClick={() => setIsResetConfirmOpen(true)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] font-bold cursor-pointer"
             title="重置系统"
           >
-            <RotateCcw size={13} />
+            <RotateCcw size={14} />
             <span>重置</span>
           </button>
         </div>
@@ -235,15 +235,15 @@ export const Footer: React.FC = () => {
       {/* Import Modal */}
       {isImportModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="bg-white dark:bg-[#1a1f2c] rounded-3xl max-w-md w-full p-6 sm:p-7 border border-white/80 dark:border-white/10 shadow-[12px_12px_32px_rgba(0,0,0,0.2),inset_2px_2px_4px_rgba(255,255,255,0.7)] space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-3">
               <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
                 <Upload size={16} className="text-sky-600" />
                 选择数据恢复模式
               </h3>
               <button
                 onClick={() => setIsImportModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400"
+                className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 active:scale-95 transition cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -256,14 +256,14 @@ export const Footer: React.FC = () => {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 onClick={() => applyImport('merge')}
-                className="p-3 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-800 dark:text-sky-200 font-bold text-xs hover:bg-sky-100 transition cursor-pointer"
+                className="p-3.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200/60 dark:border-sky-800 text-sky-800 dark:text-sky-200 font-bold text-xs hover:bg-sky-100 shadow-[2px_2px_6px_rgba(14,165,233,0.15),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               >
                 合并数据 (保留本地)
               </button>
 
               <button
                 onClick={() => applyImport('overwrite')}
-                className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 font-bold text-xs hover:bg-rose-100 transition cursor-pointer"
+                className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-800 text-rose-800 dark:text-rose-200 font-bold text-xs hover:bg-rose-100 shadow-[2px_2px_6px_rgba(244,63,94,0.15),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               >
                 完全覆盖 (以文件为准)
               </button>
@@ -275,10 +275,10 @@ export const Footer: React.FC = () => {
       {/* Reset Confirmation Modal */}
       {isResetConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-[#1a1f2c] rounded-3xl max-w-sm w-full p-6 sm:p-7 border border-white/80 dark:border-white/10 shadow-[12px_12px_32px_rgba(0,0,0,0.2),inset_2px_2px_4px_rgba(255,255,255,0.7)] space-y-4">
             <div className="flex items-center gap-3">
-              <span className="p-2.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600">
-                <AlertTriangle size={20} />
+              <span className="p-3 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8)]">
+                <AlertTriangle size={22} />
               </span>
               <div>
                 <h3 className="font-bold text-base text-slate-900 dark:text-white">
@@ -290,16 +290,16 @@ export const Footer: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100 dark:border-slate-800/80">
               <button
                 onClick={() => setIsResetConfirmOpen(false)}
-                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold"
+                className="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold active:scale-x-105 active:scale-y-90 transition-all duration-300 cursor-pointer"
               >
                 取消
               </button>
               <button
                 onClick={handleResetSystem}
-                className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-xs"
+                className="px-5 py-2 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold shadow-[2px_2px_8px_rgba(244,63,94,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               >
                 确认重置
               </button>

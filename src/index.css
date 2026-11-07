@@ -194,6 +194,7 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .active-press {
@@ -208,6 +209,31 @@
 }
 .smooth-hover:hover {
   transform: translateY(-2px);
+}
+
+/* StyleKit 粘土拟态 (Claymorphism) 全局弹簧超调与受力形变 */
+.clay-spring {
+  transition: all 300ms var(--ease-spring);
+}
+.clay-squash {
+  transition: transform 300ms var(--ease-spring);
+}
+.clay-squash:active {
+  transform: scaleX(1.05) scaleY(0.90);
+}
+
+.clay-card-shadow {
+  box-shadow: 8px 8px 18px rgba(0, 0, 0, 0.06), inset 4px 4px 8px rgba(255, 255, 255, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.04);
+}
+.dark .clay-card-shadow {
+  box-shadow: 8px 8px 18px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.08), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.clay-inset-groove {
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.08), inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+}
+.dark .clay-inset-groove {
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.3), inset -1px -1px 2px rgba(255, 255, 255, 0.06);
 }
 
 @keyframes staggerFadeIn {
