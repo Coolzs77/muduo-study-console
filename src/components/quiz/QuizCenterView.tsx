@@ -93,10 +93,10 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
   return (
     <div className="w-full space-y-6">
       {/* Top Banner */}
-      <div className="bg-white/90 dark:bg-[#1a1f2c]/90 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white/90 dark:bg-[#1a1f2c]/90 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/60 dark:to-sky-800/40 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)]">
+            <span className="p-2.5 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/60 dark:to-sky-800/40 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
               <HelpCircle size={22} />
             </span>
             <div>
@@ -130,7 +130,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
       </div>
 
       {/* Day Selector Pills */}
-      <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-3">
+      <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-3">
         <div className="text-xs font-bold text-slate-500 dark:text-slate-400">选择要测试的天数:</div>
         <div className="flex flex-wrap gap-2">
           {DAYS_DATASET.map(d => {
@@ -146,8 +146,8 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 }}
                 className={`px-3.5 py-1.5 rounded-2xl text-xs font-mono font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-1.5 ${
                   isSelected
-                    ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.05),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] hover:-translate-y-0.5'
+                    ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.05),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5'
                 }`}
               >
                 <span>D{d.day}</span>
@@ -168,13 +168,13 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
 
       {/* Main Quiz Area */}
       {!quiz ? (
-        <div className="text-center py-12 bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7)] text-slate-400">
+        <div className="text-center py-12 bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-slate-400">
           该天暂无自测题
         </div>
       ) : (
         <div className="space-y-6">
           {/* Day Title & Score Header */}
-          <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400">
                 Day {currentDayItem.day} 自测题目
@@ -196,7 +196,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
 
               <button
                 onClick={handleSaveScore}
-                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-bold shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-bold shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 type="button"
               >
                 <Award size={14} />
@@ -221,10 +221,10 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
               return (
                 <div
                   key={q.id || qIdx}
-                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-4 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="w-7 h-7 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-[2px_2px_5px_rgba(59,130,246,0.3),inset_1px_1px_2px_rgba(255,255,255,0.6)]">
+                    <span className="w-7 h-7 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-[2px_2px_5px_rgba(59,130,246,0.3),inset_1px_1px_2px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]">
                       {qIdx + 1}
                     </span>
                     <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-relaxed">
@@ -259,7 +259,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                           type="button"
                         >
                           <div className="flex items-center gap-3">
-                            <span className="w-6 h-6 rounded-full bg-white dark:bg-slate-700 shadow-[1px_1px_3px_rgba(0,0,0,0.1),inset_1px_1px_1px_rgba(255,255,255,0.8)] text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                            <span className="w-6 h-6 rounded-full bg-white dark:bg-slate-700 shadow-[1px_1px_3px_rgba(0,0,0,0.1),inset_1px_1px_1px_rgba(255,255,255,0.8)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
                               {String.fromCharCode(65 + optIdx)}
                             </span>
                             <span>{opt}</span>
@@ -283,7 +283,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                   {/* Explanation */}
                   {isAnswered && (
                     <div
-                      className={`sm:ml-10 p-4 rounded-2xl text-xs leading-relaxed border shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] ${
+                      className={`sm:ml-10 p-4 rounded-2xl text-xs leading-relaxed border shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] ${
                         isCorrect
                           ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300'
                           : 'bg-amber-50/70 dark:bg-amber-950/20 border-amber-200/60 dark:border-amber-900/40 text-amber-900 dark:text-amber-300'
@@ -308,7 +308,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 第二部分：C++ 代码阅读与辨析
               </h3>
 
-              <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4">
+              <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-4">
                 <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-relaxed">
                   {quiz.codeQuestion.question}
                 </h4>
@@ -347,7 +347,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                         type="button"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="w-6 h-6 rounded-full bg-white dark:bg-slate-700 shadow-[1px_1px_3px_rgba(0,0,0,0.1),inset_1px_1px_1px_rgba(255,255,255,0.8)] text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                          <span className="w-6 h-6 rounded-full bg-white dark:bg-slate-700 shadow-[1px_1px_3px_rgba(0,0,0,0.1),inset_1px_1px_1px_rgba(255,255,255,0.8)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
                             {String.fromCharCode(65 + optIdx)}
                           </span>
                           <span>{opt}</span>
@@ -378,7 +378,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 第三部分：底层机制与深度“为什么”
               </h3>
 
-              <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4">
+              <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-4">
                 <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-relaxed">
                   {quiz.whyQuestion.question}
                 </h4>
@@ -400,7 +400,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 <div className="pt-2">
                   <button
                     onClick={() => toggleReveal('why')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] transition-all duration-300 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] transition-all duration-300 cursor-pointer"
                     type="button"
                   >
                     <Eye size={14} />
@@ -425,7 +425,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 第四部分：Muduo 架构设计映射
               </h3>
 
-              <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4">
+              <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-4">
                 <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-relaxed">
                   {quiz.muduoQuestion.question}
                 </h4>
@@ -439,7 +439,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 <div className="pt-2">
                   <button
                     onClick={() => toggleReveal('muduo')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] transition-all duration-300 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-xs font-bold hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] transition-all duration-300 cursor-pointer"
                     type="button"
                   >
                     <Eye size={14} />
@@ -464,7 +464,7 @@ export const QuizCenterView: React.FC<QuizCenterViewProps> = ({ initialDay = 1 }
                 第五部分：手写编码自测题
               </h3>
 
-              <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4">
+              <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-4">
                 <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-relaxed">
                   {quiz.implQuestion.prompt}
                 </h4>

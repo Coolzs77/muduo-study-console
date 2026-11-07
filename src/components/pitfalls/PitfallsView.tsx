@@ -113,10 +113,10 @@ export const PitfallsView: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Top Banner */}
-      <div className="bg-white/90 dark:bg-[#1a1f2c]/90 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white/90 dark:bg-[#1a1f2c]/90 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900/60 dark:to-rose-800/40 text-rose-600 dark:text-rose-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)]">
+            <span className="p-2.5 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900/60 dark:to-rose-800/40 text-rose-600 dark:text-rose-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
               <ShieldAlert size={22} />
             </span>
             <div>
@@ -132,7 +132,7 @@ export const PitfallsView: React.FC = () => {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs sm:text-sm shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0 cursor-pointer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs sm:text-sm shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0 cursor-pointer"
           type="button"
         >
           <Plus size={16} />
@@ -141,7 +141,7 @@ export const PitfallsView: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-3.5">
+      <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-3.5">
         {/* Search Input */}
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
@@ -162,8 +162,8 @@ export const PitfallsView: React.FC = () => {
               onClick={() => setSelectedTag(tag)}
               className={`px-3.5 py-1 rounded-full text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer ${
                 selectedTag === tag
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-[2px_2px_6px_rgba(244,63,94,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.05),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] hover:-translate-y-0.5'
+                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-[2px_2px_6px_rgba(244,63,94,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.05),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5'
               }`}
               type="button"
             >
@@ -176,19 +176,19 @@ export const PitfallsView: React.FC = () => {
       {/* Pitfall Cards Grid */}
       <div className="space-y-6">
         {filteredPitfalls.length === 0 ? (
-          <div className="text-center py-12 bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7)] text-slate-400 text-sm">
+          <div className="text-center py-12 bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-slate-400 text-sm">
             未找到匹配的踩坑记录
           </div>
         ) : (
           filteredPitfalls.map((item, idx) => (
             <div
               key={item.id}
-              className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-4"
+              className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-4"
             >
               {/* Card Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-3.5">
                 <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-xl bg-gradient-to-br from-rose-400 to-rose-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_5px_rgba(244,63,94,0.3),inset_1px_1px_2px_rgba(255,255,255,0.6)]">
+                  <span className="w-7 h-7 rounded-xl bg-gradient-to-br from-rose-400 to-rose-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_5px_rgba(244,63,94,0.3),inset_1px_1px_2px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]">
                     {idx + 1}
                   </span>
                   <h3 className="font-bold text-base text-slate-900 dark:text-white">
@@ -215,7 +215,7 @@ export const PitfallsView: React.FC = () => {
 
               {/* Error Symptom & Root Cause */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
-                <div className="bg-rose-50/80 dark:bg-rose-950/20 p-4 rounded-2xl border border-rose-100/60 dark:border-rose-900/30 space-y-1.5 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)]">
+                <div className="bg-rose-50/80 dark:bg-rose-950/20 p-4 rounded-2xl border border-rose-100/60 dark:border-rose-900/30 space-y-1.5 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                   <div className="font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
                     <Flame size={15} />
                     错误现象 (Symptom):
@@ -225,7 +225,7 @@ export const PitfallsView: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-amber-50/80 dark:bg-amber-950/20 p-4 rounded-2xl border border-amber-100/60 dark:border-amber-900/30 space-y-1.5 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)]">
+                <div className="bg-amber-50/80 dark:bg-amber-950/20 p-4 rounded-2xl border border-amber-100/60 dark:border-amber-900/30 space-y-1.5 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                   <div className="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
                     <Bug size={15} />
                     底层根因分析 (RCA):
@@ -283,7 +283,7 @@ export const PitfallsView: React.FC = () => {
       {/* Add Pitfall Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#1a1f2c] rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-7 border border-white/80 dark:border-white/10 shadow-[12px_12px_32px_rgba(0,0,0,0.2),inset_2px_2px_4px_rgba(255,255,255,0.7)] space-y-4">
+          <div className="bg-white dark:bg-[#1a1f2c] rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-7 border border-white/80 dark:border-white/10 shadow-[12px_12px_32px_rgba(0,0,0,0.2),inset_2px_2px_4px_rgba(255,255,255,0.7)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-3.5">
               <h3 className="font-black text-lg text-slate-900 dark:text-white flex items-center gap-2.5">
                 <span className="p-2 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 shadow-[inset_1px_1px_2px_rgba(14,165,233,0.15)]">
@@ -293,7 +293,7 @@ export const PitfallsView: React.FC = () => {
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -403,7 +403,7 @@ export const PitfallsView: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                  className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 >
                   确认保存
                 </button>

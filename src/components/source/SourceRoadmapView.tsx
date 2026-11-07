@@ -111,16 +111,16 @@ export const SourceRoadmapView: React.FC = () => {
       {/* LEFT COLUMN: Roadmap & Files Directory (Collapsible)       */}
       {/* ========================================================= */}
       {isSidebarCollapsed ? (
-        <aside className="w-16 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/90 dark:bg-[#151922]/90 shadow-[6px_6px_14px_rgba(0,0,0,0.06),inset_3px_3px_6px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] py-4 flex flex-col items-center space-y-3 sticky top-18 h-[calc(100vh-5.5rem)] hidden md:flex select-none transition-all duration-300">
+        <aside className="w-16 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/90 dark:bg-[#151922]/90 shadow-[6px_6px_14px_rgba(0,0,0,0.06),inset_3px_3px_6px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] py-4 flex flex-col items-center space-y-3 sticky top-18 h-[calc(100vh-5.5rem)] hidden md:flex select-none transition-all duration-300">
           <button
             onClick={() => setIsSidebarCollapsed(false)}
-            className="p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-sky-600 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+            className="p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-sky-600 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             title="展开源码路线"
           >
             <PanelLeftOpen size={18} />
           </button>
 
-          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]" />
+          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.4)]" />
 
           {/* Mini Tab Switchers (Clay Pills) */}
           <div className="flex flex-col items-center space-y-2 text-slate-600 dark:text-slate-400">
@@ -128,8 +128,8 @@ export const SourceRoadmapView: React.FC = () => {
               onClick={() => { setActiveTab('roadmap'); setIsSidebarCollapsed(false); }}
               className={`p-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 activeTab === 'roadmap'
-                  ? 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                  ? 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
               }`}
               title="组件路线图 (8)"
             >
@@ -139,8 +139,8 @@ export const SourceRoadmapView: React.FC = () => {
               onClick={() => { setActiveTab('files'); setIsSidebarCollapsed(false); }}
               className={`p-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 activeTab === 'files'
-                  ? 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                  ? 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
               }`}
               title={`源码文件浏览 (${fileKeys.length})`}
             >
@@ -148,11 +148,11 @@ export const SourceRoadmapView: React.FC = () => {
             </button>
           </div>
 
-          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] mt-auto" />
+          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.4)] mt-auto" />
 
           {/* Mastered Count Pill */}
           <div
-            className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/60 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85)] flex flex-col items-center justify-center text-[10px] font-mono font-bold text-amber-800 dark:text-amber-300 cursor-pointer active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+            className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/60 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] flex flex-col items-center justify-center text-[10px] font-mono font-bold text-amber-800 dark:text-amber-300 cursor-pointer active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
             onClick={() => setIsSidebarCollapsed(false)}
             title={`已吃透组件: ${masteredCompCount}/8`}
           >
@@ -160,17 +160,17 @@ export const SourceRoadmapView: React.FC = () => {
           </div>
         </aside>
       ) : (
-        <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 space-y-4 overflow-y-auto sticky top-18 h-[calc(100vh-5.5rem)] hidden md:block transition-all duration-300 select-none">
+        <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 space-y-4 overflow-y-auto sticky top-18 h-[calc(100vh-5.5rem)] hidden md:block transition-all duration-300 select-none">
           <div className="pb-2 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-amber-100/90 dark:bg-amber-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-amber-600 dark:text-amber-400">
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-amber-100/90 dark:bg-amber-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-amber-600 dark:text-amber-400">
                 <Code2 size={14} />
               </div>
               <span>源码路线</span>
             </h2>
             <button
               onClick={() => setIsSidebarCollapsed(true)}
-              className="p-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+              className="p-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               title="收起源码路线"
             >
               <PanelLeftClose size={16} />
@@ -187,7 +187,7 @@ export const SourceRoadmapView: React.FC = () => {
               type="button"
               className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex items-center justify-center gap-1.5 active:scale-x-105 active:scale-y-90 ${
                 activeTab === 'roadmap'
-                  ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] -translate-y-0.5'
+                  ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] -translate-y-0.5'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -202,7 +202,7 @@ export const SourceRoadmapView: React.FC = () => {
               type="button"
               className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex items-center justify-center gap-1.5 active:scale-x-105 active:scale-y-90 ${
                 activeTab === 'files'
-                  ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] -translate-y-0.5'
+                  ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] -translate-y-0.5'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -241,8 +241,8 @@ export const SourceRoadmapView: React.FC = () => {
                     type="button"
                     className={`w-full text-left p-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex items-start justify-between gap-2 active:scale-x-105 active:scale-y-90 select-none ${
                       isSelected
-                        ? 'bg-gradient-to-r from-amber-100 via-orange-50 to-yellow-100 dark:from-amber-950/60 dark:via-orange-900/40 dark:to-yellow-950/60 text-amber-950 dark:text-amber-100 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5 font-bold'
-                        : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+                        ? 'bg-gradient-to-r from-amber-100 via-orange-50 to-yellow-100 dark:from-amber-950/60 dark:via-orange-900/40 dark:to-yellow-950/60 text-amber-950 dark:text-amber-100 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.12)] -translate-y-0.5 font-bold'
+                        : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
                     }`}
                   >
                     <div className="min-w-0">
@@ -290,8 +290,8 @@ export const SourceRoadmapView: React.FC = () => {
                     type="button"
                     className={`w-full text-left px-3 py-2.5 rounded-2xl text-xs font-mono transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer flex items-center justify-between gap-2 active:scale-x-105 active:scale-y-90 select-none ${
                       isSelected
-                        ? 'bg-gradient-to-r from-amber-100 via-orange-50 to-yellow-100 dark:from-amber-950/60 dark:via-orange-900/40 dark:to-yellow-950/60 text-amber-950 dark:text-amber-100 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] font-bold -translate-y-0.5'
-                        : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+                        ? 'bg-gradient-to-r from-amber-100 via-orange-50 to-yellow-100 dark:from-amber-950/60 dark:via-orange-900/40 dark:to-yellow-950/60 text-amber-950 dark:text-amber-100 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.12)] font-bold -translate-y-0.5'
+                        : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
                     }`}
                   >
                     <span className="truncate">{file}</span>
@@ -315,7 +315,7 @@ export const SourceRoadmapView: React.FC = () => {
       {/* ========================================================= */}
       {/* CENTER COLUMN: Component Deep-Dive or Code (Fluid Full)   */}
       {/* ========================================================= */}
-      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-6 sm:p-8 space-y-6 overflow-y-auto w-full">
+      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-6 sm:p-8 space-y-6 overflow-y-auto w-full">
         {activeTab === 'roadmap' && currentComp && (
           <div className="space-y-6">
             {/* Component Header */}
@@ -329,7 +329,7 @@ export const SourceRoadmapView: React.FC = () => {
                   class {currentComp.name}
                 </h1>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] ${
+                  className={`px-3 py-1 rounded-full text-xs font-bold shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] ${
                     componentStatus[currentComp.id] === '已吃透'
                       ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
                       : componentStatus[currentComp.id] === '学习中'
@@ -348,7 +348,7 @@ export const SourceRoadmapView: React.FC = () => {
             {/* Core Member Variables */}
             <div className="space-y-2.5">
               <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
+                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                   <Cpu size={12} />
                 </div>
                 <span>成员变量</span>
@@ -357,7 +357,7 @@ export const SourceRoadmapView: React.FC = () => {
                 {currentComp.members.map((m, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] text-xs font-mono text-slate-800 dark:text-slate-200"
+                    className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-xs font-mono text-slate-800 dark:text-slate-200"
                   >
                     {m}
                   </div>
@@ -368,7 +368,7 @@ export const SourceRoadmapView: React.FC = () => {
             {/* Key Methods */}
             <div className="space-y-2.5">
               <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
+                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                   <FileCode size={12} />
                 </div>
                 <span>核心函数</span>
@@ -377,7 +377,7 @@ export const SourceRoadmapView: React.FC = () => {
                 {currentComp.functions.map((fn, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] text-xs font-mono text-slate-800 dark:text-slate-200"
+                    className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-xs font-mono text-slate-800 dark:text-slate-200"
                   >
                     {fn}
                   </div>
@@ -388,7 +388,7 @@ export const SourceRoadmapView: React.FC = () => {
             {/* C++ Features Used */}
             <div className="space-y-2.5">
               <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
+                <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                   <Sparkles size={12} />
                 </div>
                 <span>所涉及现代 C++ 语法机制</span>
@@ -397,7 +397,7 @@ export const SourceRoadmapView: React.FC = () => {
                 {currentComp.cppFeatures.map((feat, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1 rounded-2xl text-xs font-mono font-bold bg-amber-100/90 dark:bg-amber-950/70 text-amber-800 dark:text-amber-200 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]"
+                    className="px-3 py-1 rounded-2xl text-xs font-mono font-bold bg-amber-100/90 dark:bg-amber-950/70 text-amber-800 dark:text-amber-200 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                   >
                     {feat}
                   </span>
@@ -438,7 +438,7 @@ export const SourceRoadmapView: React.FC = () => {
               <button
                 onClick={handleCopyCode}
                 type="button"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               >
                 {copiedCode ? (
                   <>
@@ -463,10 +463,10 @@ export const SourceRoadmapView: React.FC = () => {
       {/* ========================================================= */}
       {/* RIGHT COLUMN: Component Mastery Selector & Architecture   */}
       {/* ========================================================= */}
-      <aside className="w-72 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden xl:flex flex-col space-y-4 select-none overflow-y-auto">
+      <aside className="w-72 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden xl:flex flex-col space-y-4 select-none overflow-y-auto">
         <div className="pb-2 border-b border-slate-200/60 dark:border-slate-800/60">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-100/90 dark:bg-amber-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-amber-600 dark:text-amber-400">
+            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-100/90 dark:bg-amber-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-amber-600 dark:text-amber-400">
               <GitCommit size={14} />
             </div>
             <span>组件评定</span>
@@ -475,7 +475,7 @@ export const SourceRoadmapView: React.FC = () => {
 
         {/* Component Mastery Selector (Clay Candy Buttons) */}
         {activeTab === 'roadmap' && currentComp && (
-          <div className="p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-3">
+          <div className="p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-3">
             <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
               设置 {currentComp.name} 掌握状态
             </div>
@@ -490,9 +490,9 @@ export const SourceRoadmapView: React.FC = () => {
                     className={`py-1.5 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                       isCur
                         ? st === '已吃透'
-                          ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[2px_2px_6px_rgba(16,185,129,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[2px_2px_6px_rgba(16,185,129,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)] font-bold -translate-y-0.5'
                           : st === '学习中'
-                          ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-[2px_2px_6px_rgba(245,158,11,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-[2px_2px_6px_rgba(245,158,11,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)] font-bold -translate-y-0.5'
                           : 'bg-slate-600 text-white shadow-[inset_1px_1px_2px_rgba(0,0,0,0.2)]'
                         : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-600 shadow-[1px_1px_3px_rgba(0,0,0,0.04)]'
                     }`}
@@ -506,14 +506,14 @@ export const SourceRoadmapView: React.FC = () => {
         )}
 
         {/* Roadmap Total Progress */}
-        <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-100/70 to-yellow-50/70 dark:from-amber-950/40 dark:to-yellow-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2">
+        <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-100/70 to-yellow-50/70 dark:from-amber-950/40 dark:to-yellow-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-amber-900 dark:text-amber-200">
             <span>核心组件已吃透</span>
             <span className="font-mono font-bold text-amber-800 dark:text-amber-300">
               {masteredCompCount} / {SOURCE_ROADMAP.length}
             </span>
           </div>
-          <div className="w-full h-2 rounded-full bg-amber-200/50 dark:bg-amber-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] overflow-hidden p-0.5">
+          <div className="w-full h-2 rounded-full bg-amber-200/50 dark:bg-amber-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_3px_rgba(0,0,0,0.4)] overflow-hidden p-0.5">
             <div
               className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
               style={{
@@ -524,9 +524,9 @@ export const SourceRoadmapView: React.FC = () => {
         </div>
 
         {/* Call Chain Topology Guidance */}
-        <div className="p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] text-xs space-y-2.5">
+        <div className="p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] text-xs space-y-2.5">
           <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]">
+            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
               <Layers size={12} />
             </div>
             <span>核心调用时序</span>

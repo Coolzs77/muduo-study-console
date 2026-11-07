@@ -133,16 +133,16 @@ export const LearningSystemView: React.FC = () => {
       {/* LEFT COLUMN: Sub-Tab Directory & Chapter Tree (Collapsible)*/}
       {/* ========================================================= */}
       {isSidebarCollapsed ? (
-        <aside className="w-16 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/90 dark:bg-[#151922]/90 shadow-[6px_6px_14px_rgba(0,0,0,0.06),inset_3px_3px_6px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] py-4 flex flex-col items-center space-y-3 sticky top-18 h-[calc(100vh-5.5rem)] hidden md:flex select-none transition-all duration-300">
+        <aside className="w-16 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/90 dark:bg-[#151922]/90 shadow-[6px_6px_14px_rgba(0,0,0,0.06),inset_3px_3px_6px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] py-4 flex flex-col items-center space-y-3 sticky top-18 h-[calc(100vh-5.5rem)] hidden md:flex select-none transition-all duration-300">
           <button
             onClick={() => setIsSidebarCollapsed(false)}
-            className="p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-sky-600 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+            className="p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-sky-600 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             title="展开系统目录"
           >
             <PanelLeftOpen size={18} />
           </button>
 
-          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]" />
+          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.4)]" />
 
           {/* Mini Subtab Icons (Clay Pills) */}
           <div className="flex flex-col items-center space-y-2 text-slate-600 dark:text-slate-400">
@@ -150,8 +150,8 @@ export const LearningSystemView: React.FC = () => {
               onClick={() => { setActiveSubTab('cpp'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
               className={`p-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'cpp'
-                  ? 'bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-[3px_3px_8px_rgba(99,102,241,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                  ? 'bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-[3px_3px_8px_rgba(99,102,241,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
               }`}
               title={`C++ 知识 (${cppMasteredCount}/${CPP_KNOWLEDGE_SYSTEM.length})`}
             >
@@ -161,8 +161,8 @@ export const LearningSystemView: React.FC = () => {
               onClick={() => { setActiveSubTab('linux'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
               className={`p-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'linux'
-                  ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                  ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
               }`}
               title={`Linux 编程 (${linuxMasteredCount}/${LINUX_SYSTEM_KNOWLEDGE.length})`}
             >
@@ -172,8 +172,8 @@ export const LearningSystemView: React.FC = () => {
               onClick={() => { setActiveSubTab('books'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
               className={`p-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'books'
-                  ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                  ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
               }`}
               title="经典书目伴读"
             >
@@ -183,8 +183,8 @@ export const LearningSystemView: React.FC = () => {
               onClick={() => { setActiveSubTab('qa'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
               className={`p-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'qa'
-                  ? 'bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-[3px_3px_8px_rgba(168,85,247,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                  ? 'bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-[3px_3px_8px_rgba(168,85,247,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
               }`}
               title={`问答与面试 (${PROJECT_QA_CATALOG.length} 题)`}
             >
@@ -194,8 +194,8 @@ export const LearningSystemView: React.FC = () => {
               onClick={() => { setActiveSubTab('general'); setSelectedChapter('all'); setIsSidebarCollapsed(false); }}
               className={`p-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'general'
-                  ? 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-[3px_3px_8px_rgba(20,184,166,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                  ? 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-[3px_3px_8px_rgba(20,184,166,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
               }`}
               title={`通识文献 (${GENERAL_READING_CATALOG.length} 篇)`}
             >
@@ -204,17 +204,17 @@ export const LearningSystemView: React.FC = () => {
           </div>
         </aside>
       ) : (
-        <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 space-y-4 overflow-y-auto sticky top-18 h-[calc(100vh-5.5rem)] hidden md:block transition-all duration-300 select-none">
+        <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 space-y-4 overflow-y-auto sticky top-18 h-[calc(100vh-5.5rem)] hidden md:block transition-all duration-300 select-none">
           <div className="pb-2 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-indigo-100/90 dark:bg-indigo-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-indigo-600 dark:text-indigo-400">
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-indigo-100/90 dark:bg-indigo-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-indigo-600 dark:text-indigo-400">
                 <BookMarked size={14} />
               </div>
               <span>系统目录</span>
             </h2>
             <button
               onClick={() => setIsSidebarCollapsed(true)}
-              className="p-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+              className="p-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               title="收起系统目录"
             >
               <PanelLeftClose size={16} />
@@ -231,8 +231,8 @@ export const LearningSystemView: React.FC = () => {
               type="button"
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-left active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'cpp'
-                  ? 'bg-gradient-to-r from-indigo-100 via-blue-50 to-indigo-100 dark:from-indigo-950/60 dark:via-blue-900/40 dark:to-indigo-950/60 text-indigo-900 dark:text-indigo-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
-                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+                  ? 'bg-gradient-to-r from-indigo-100 via-blue-50 to-indigo-100 dark:from-indigo-950/60 dark:via-blue-900/40 dark:to-indigo-950/60 text-indigo-900 dark:text-indigo-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.12)] -translate-y-0.5'
+                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -249,8 +249,8 @@ export const LearningSystemView: React.FC = () => {
               type="button"
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-left active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'linux'
-                  ? 'bg-gradient-to-r from-emerald-100 via-teal-50 to-green-100 dark:from-emerald-950/60 dark:via-teal-900/40 dark:to-green-950/60 text-teal-900 dark:text-teal-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
-                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+                  ? 'bg-gradient-to-r from-emerald-100 via-teal-50 to-green-100 dark:from-emerald-950/60 dark:via-teal-900/40 dark:to-green-950/60 text-teal-900 dark:text-teal-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.12)] -translate-y-0.5'
+                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -267,8 +267,8 @@ export const LearningSystemView: React.FC = () => {
               type="button"
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-left active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'books'
-                  ? 'bg-gradient-to-r from-amber-100 via-orange-50 to-yellow-100 dark:from-amber-950/60 dark:via-orange-900/40 dark:to-yellow-950/60 text-amber-900 dark:text-amber-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
-                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+                  ? 'bg-gradient-to-r from-amber-100 via-orange-50 to-yellow-100 dark:from-amber-950/60 dark:via-orange-900/40 dark:to-yellow-950/60 text-amber-900 dark:text-amber-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.12)] -translate-y-0.5'
+                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -285,8 +285,8 @@ export const LearningSystemView: React.FC = () => {
               type="button"
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-left active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'qa'
-                  ? 'bg-gradient-to-r from-purple-100 via-fuchsia-50 to-pink-100 dark:from-purple-950/60 dark:via-fuchsia-900/40 dark:to-pink-950/60 text-purple-900 dark:text-purple-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
-                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+                  ? 'bg-gradient-to-r from-purple-100 via-fuchsia-50 to-pink-100 dark:from-purple-950/60 dark:via-fuchsia-900/40 dark:to-pink-950/60 text-purple-900 dark:text-purple-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.12)] -translate-y-0.5'
+                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -303,8 +303,8 @@ export const LearningSystemView: React.FC = () => {
               type="button"
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-left active:scale-x-105 active:scale-y-90 ${
                 activeSubTab === 'general'
-                  ? 'bg-gradient-to-r from-teal-100 via-cyan-50 to-teal-100 dark:from-teal-950/60 dark:via-cyan-900/40 dark:to-teal-950/60 text-teal-900 dark:text-teal-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
-                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
+                  ? 'bg-gradient-to-r from-teal-100 via-cyan-50 to-teal-100 dark:from-teal-950/60 dark:via-cyan-900/40 dark:to-teal-950/60 text-teal-900 dark:text-teal-100 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.12)] -translate-y-0.5'
+                  : 'bg-white/80 dark:bg-slate-800/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 text-slate-700 dark:text-slate-300'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -370,7 +370,7 @@ export const LearningSystemView: React.FC = () => {
       {/* ========================================================= */}
       {/* CENTER COLUMN: Clean Documentation Workbench (Fluid Full) */}
       {/* ========================================================= */}
-      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-6 sm:p-8 space-y-6 overflow-y-auto w-full">
+      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-6 sm:p-8 space-y-6 overflow-y-auto w-full">
         {/* Module Header */}
         <div className="border-b border-slate-200/60 dark:border-slate-800/60 pb-3 flex items-center justify-between">
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -401,8 +401,8 @@ export const LearningSystemView: React.FC = () => {
                     key={item.id}
                     className={`p-5 rounded-3xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
                       isChecked
-                        ? 'bg-gradient-to-r from-emerald-50/70 to-teal-50/70 dark:from-emerald-950/30 dark:to-teal-950/30 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]'
-                        : 'bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5'
+                        ? 'bg-gradient-to-r from-emerald-50/70 to-teal-50/70 dark:from-emerald-950/30 dark:to-teal-950/30 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.35)]'
+                        : 'bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] hover:-translate-y-0.5'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -444,7 +444,7 @@ export const LearningSystemView: React.FC = () => {
                         </ul>
                       )}
                       {item.interviewPoint && (
-                        <div className="text-xs text-amber-900 dark:text-amber-200 bg-gradient-to-r from-amber-100/70 to-orange-50/70 dark:from-amber-950/40 dark:to-orange-900/30 p-3 rounded-2xl shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] font-medium">
+                        <div className="text-xs text-amber-900 dark:text-amber-200 bg-gradient-to-r from-amber-100/70 to-orange-50/70 dark:from-amber-950/40 dark:to-orange-900/30 p-3 rounded-2xl shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] font-medium">
                           <strong className="font-bold">面试重点：</strong>
                           {item.interviewPoint}
                         </div>
@@ -476,8 +476,8 @@ export const LearningSystemView: React.FC = () => {
                     key={item.id}
                     className={`p-5 rounded-3xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
                       isChecked
-                        ? 'bg-gradient-to-r from-emerald-50/70 to-teal-50/70 dark:from-emerald-950/30 dark:to-teal-950/30 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]'
-                        : 'bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5'
+                        ? 'bg-gradient-to-r from-emerald-50/70 to-teal-50/70 dark:from-emerald-950/30 dark:to-teal-950/30 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.35)]'
+                        : 'bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] hover:-translate-y-0.5'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -509,7 +509,7 @@ export const LearningSystemView: React.FC = () => {
                         {item.syscallOrCmd.split('/').map((cmd: string, cIdx: number) => (
                           <code
                             key={cIdx}
-                            className="text-[11px] font-mono px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-teal-800 dark:text-teal-200 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] font-bold"
+                            className="text-[11px] font-mono px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-teal-800 dark:text-teal-200 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] font-bold"
                           >
                             {cmd.trim()}
                           </code>
@@ -534,7 +534,7 @@ export const LearningSystemView: React.FC = () => {
               return (
                 <div
                   key={book.key}
-                  className="p-6 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85)] space-y-4"
+                  className="p-6 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.85)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-4"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -561,7 +561,7 @@ export const LearningSystemView: React.FC = () => {
                       <span>当前阅读进度: 第 {currentP} 页</span>
                       <span>剩余 {Math.max(0, totalP - currentP)} 页</span>
                     </div>
-                    <div className="w-full h-2.5 rounded-full bg-slate-200/60 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] overflow-hidden p-0.5">
+                    <div className="w-full h-2.5 rounded-full bg-slate-200/60 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_3px_rgba(0,0,0,0.4)] overflow-hidden p-0.5">
                       <div
                         className="h-full bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                         style={{ width: `${pct}%` }}
@@ -580,7 +580,7 @@ export const LearningSystemView: React.FC = () => {
                         const val = parseInt(e.target.value) || 0;
                         setBooksProgress(prev => ({ ...prev, [book.key]: val }));
                       }}
-                      className="w-24 px-3 py-1.5 rounded-xl shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] bg-white dark:bg-slate-900 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-hidden"
+                      className="w-24 px-3 py-1.5 rounded-xl shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] bg-white dark:bg-slate-900 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-hidden"
                     />
                     <span className="text-xs text-slate-400 font-bold">页</span>
                   </div>
@@ -603,7 +603,7 @@ export const LearningSystemView: React.FC = () => {
                 return (
                   <div
                     key={qa.id}
-                    className="rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] overflow-hidden transition-all duration-300"
+                    className="rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] overflow-hidden transition-all duration-300"
                   >
                     <button
                       onClick={() => toggleQAExpand(qa.id)}
@@ -652,7 +652,7 @@ export const LearningSystemView: React.FC = () => {
               {GENERAL_READING_CATALOG.map((doc, idx) => (
                 <div
                   key={idx}
-                  className="p-5 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2.5"
+                  className="p-5 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-2.5"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="font-bold text-sm text-slate-900 dark:text-white">
@@ -678,10 +678,10 @@ export const LearningSystemView: React.FC = () => {
       {/* ========================================================= */}
       {/* RIGHT COLUMN: Statistics & Quick Actions Panel            */}
       {/* ========================================================= */}
-      <aside className="w-72 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden xl:flex flex-col space-y-4 select-none overflow-y-auto">
+      <aside className="w-72 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden xl:flex flex-col space-y-4 select-none overflow-y-auto">
         <div className="pb-2 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-indigo-100/90 dark:bg-indigo-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-indigo-600 dark:text-indigo-400">
+            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-indigo-100/90 dark:bg-indigo-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-indigo-600 dark:text-indigo-400">
               <Layers size={14} />
             </div>
             <span>学习进度</span>
@@ -689,14 +689,14 @@ export const LearningSystemView: React.FC = () => {
         </div>
 
         {/* C++ Mastery Progress (Clay Indigo Mini Card) */}
-        <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-100/70 to-blue-50/70 dark:from-indigo-950/40 dark:to-blue-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2">
+        <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-100/70 to-blue-50/70 dark:from-indigo-950/40 dark:to-blue-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-indigo-900 dark:text-indigo-200">
             <span>C++ 核心项掌握</span>
             <span className="font-mono font-bold text-indigo-800 dark:text-indigo-300">
               {cppMasteredCount} / {CPP_KNOWLEDGE_SYSTEM.length}
             </span>
           </div>
-          <div className="w-full h-2 rounded-full bg-indigo-200/50 dark:bg-indigo-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] overflow-hidden p-0.5">
+          <div className="w-full h-2 rounded-full bg-indigo-200/50 dark:bg-indigo-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_3px_rgba(0,0,0,0.4)] overflow-hidden p-0.5">
             <div
               className="h-full bg-gradient-to-r from-indigo-500 to-blue-600 rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
               style={{
@@ -707,14 +707,14 @@ export const LearningSystemView: React.FC = () => {
         </div>
 
         {/* Linux Mastery Progress (Clay Emerald Mini Card) */}
-        <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-100/70 to-teal-50/70 dark:from-emerald-950/40 dark:to-teal-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2">
+        <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-100/70 to-teal-50/70 dark:from-emerald-950/40 dark:to-teal-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-emerald-900 dark:text-emerald-200">
             <span>Linux 核心掌握</span>
             <span className="font-mono font-bold text-emerald-800 dark:text-emerald-300">
               {linuxMasteredCount} / {LINUX_SYSTEM_KNOWLEDGE.length}
             </span>
           </div>
-          <div className="w-full h-2 rounded-full bg-emerald-200/50 dark:bg-emerald-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] overflow-hidden p-0.5">
+          <div className="w-full h-2 rounded-full bg-emerald-200/50 dark:bg-emerald-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_3px_rgba(0,0,0,0.4)] overflow-hidden p-0.5">
             <div
               className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
               style={{
@@ -725,9 +725,9 @@ export const LearningSystemView: React.FC = () => {
         </div>
 
         {/* Tips & Engineering Guidance */}
-        <div className="p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] text-xs space-y-2">
+        <div className="p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] text-xs space-y-2">
           <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-sky-600 dark:text-sky-400">
+            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-sky-600 dark:text-sky-400">
               <Sparkles size={14} />
             </div>
             <span>学习建议</span>

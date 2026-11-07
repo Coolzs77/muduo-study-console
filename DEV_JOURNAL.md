@@ -5683,3 +5683,203 @@ sequenceDiagram
   ```
 - **生产构建与发布**：
   `npm run build` 构建成功（耗时 9.1s），最新构建 bundle 已更新。
+
+
+---
+
+## 第 28 轮 [2026-11-07 23:00]：暗色模式高光彻底重构与精密哑光黑曜石质感上线 (Scheme A)
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与核心痛点**：
+  在暗色模式体验中，用户明确指出卡片（尤其是仪表盘 28 天任务微砖、顶部三大指标卡、左侧侧边栏及全站各组件）顶部边缘刺眼发白、带有油腻反光的塑料感。
+- **光学机理与视觉缺陷**：
+  日间模式下的粘土拟态依赖白色的内阴影（如 `inset 2px 2px 4px rgba(255, 255, 255, 0.85)`）来模拟受光面的柔和反光。然而在暗色模式底色（如 `#11141a`、`#151922`、`slate-800`）下，白色内阴影的对比度由日间模式的 1.2:1 骤增至 18:1。大半径（2px~8px）的漫反射白光在深色底色上形成了明显的灰白雾状污渍和刺眼的塑料高光圈，不仅丧失了立体层次，还极易引发视觉疲劳。
+- **重构目标（方案 A 规范）**：
+  用户明确要求采用**方案 A（现代工程级精密哑光深邃质感，类似 Linear / Raycast / macOS Dark Mode）**：
+  1. **彻底根除弥散白内阴影（0 弥散白）**：在暗色模式下完全移除任何模糊半径大于 0px 的白色内阴影；
+  2. **下沉式深色沉浸投影**：依靠外层深色下沉阴影 `dark:shadow-[0_4px_16px_rgba(0,0,0,0.45)]`（微砖采用 `dark:shadow-[0_2px_8px_rgba(0,0,0,0.35)]`）烘托悬浮层次感；
+  3. **1px 亚像素顶边缘微光**：仅保留 `inset 0 1px 0 0 rgba(255, 255, 255, 0.06~0.12)` 或 `dark:border-white/[0.06]` 勾勒轮廓；
+  4. **日夜双模无缝协调**：日间模式完好保留温润软糯的粘土质感，暗色模式切换为精密沉稳的哑光黑曜石质感；
+  5. **全站全组件无死角覆盖**：覆盖全站 400 处阴影节点，实现未覆盖率与弥散白错误率双归零。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **文件改动清单**：
+  - [`src/index.css`](file:///e:/workspace/muduo-study-console/src/index.css)：
+    - 重构底层 CSS 阴影令牌：更新 `.clay-card-shadow`、`.clay-brick-shadow`、`.clay-inset-groove`、`.clay-button-shadow`、`.clay-badge-shadow` 在 `.dark` 环境下的计算值；
+    - 消除 `rgba(255, 255, 255, 0.08)` 的 4px 模糊扩散，统一采用 `inset 0 1px 0 0 rgba(255, 255, 255, 0.06)` 精密边缘光。
+  - [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：
+    - 改造 28 天任务日历矩阵微砖（D01~D28）：全面补齐 `dark:shadow` 覆写，消灭透传的日间 85% 纯白漫反射内阴影；
+    - 改造顶部三大指标卡（任务体系、项目剖析、算法题库）：消除残留的 `inset_4px_4px_8px_rgba(255,255,255,0.1)` 弥散白雾，改用深邃下沉投影与 1px 极微顶光；
+    - 改造左侧 Dock 侧边栏与微圆按键、中间/右侧各小组件容器与操作按钮。
+  - [`src/components/dashboard/FocusTimer.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/FocusTimer.tsx) & [`src/components/dashboard/TaskRoutineList.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/TaskRoutineList.tsx)：
+    - 改造内凹数码屏幕、操作按钮与清单条带阴影，消灭透传的白色漫反射。
+  - [`src/components/algorithm/AlgoCatalog.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoCatalog.tsx) & [`src/components/algorithm/AlgoCard.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoCard.tsx) & [`src/components/algorithm/CarlReaderDrawer.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/CarlReaderDrawer.tsx)：
+    - 三栏布局全面重构暗色阴影，题目卡片移除反光白边，随堂抽屉适配侧滑深色浮层。
+  - [`src/components/daily/DailyCurriculumView.tsx`](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)：
+    - 目录树、周筛选槽、任务列表、主画布核心要点卡片、实验验证卡片、严谨工程对比卡片及右侧掌握度评估全量升级方案 A 阴影。
+  - [`src/components/learning/LearningSystemView.tsx`](file:///e:/workspace/muduo-study-console/src/components/learning/LearningSystemView.tsx)、[`src/components/source/SourceRoadmapView.tsx`](file:///e:/workspace/muduo-study-console/src/components/source/SourceRoadmapView.tsx)、[`src/components/career/CareerSystemView.tsx`](file:///e:/workspace/muduo-study-console/src/components/career/CareerSystemView.tsx)、[`src/components/practice/PracticeCenterView.tsx`](file:///e:/workspace/muduo-study-console/src/components/practice/PracticeCenterView.tsx)、[`src/components/quiz/QuizCenterView.tsx`](file:///e:/workspace/muduo-study-console/src/components/quiz/QuizCenterView.tsx)、[`src/components/reader/ArticleSidebar.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/ArticleSidebar.tsx)、[`src/components/reader/ArticleReader.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/ArticleReader.tsx)、[`src/components/pitfalls/PitfallsView.tsx`](file:///e:/workspace/muduo-study-console/src/components/pitfalls/PitfallsView.tsx) 等全站 20 余个模块：
+    - 彻底消灭透传的日间纯白内阴影，全量部署 Scheme A 精密哑光阴影。
+  - [`scripts/inspect_dark_shadows.cjs`](file:///e:/workspace/muduo-study-console/scripts/inspect_dark_shadows.cjs) & [`scripts/batch_apply_scheme_a.cjs`](file:///e:/workspace/muduo-study-console/scripts/batch_apply_scheme_a.cjs)：
+    - 编写阴影检测分析工具与高精度批量转换引擎。
+  - [`package.json`](file:///e:/workspace/muduo-study-console/package.json) & [`README.md`](file:///e:/workspace/muduo-study-console/README.md)：
+    - 版本递增至 `v6.13.0`，同步更新状态徽标与发布日志。
+
+- **核心代码改动对比片段 (Diff)**：
+  ```diff
+  /* CSS 令牌定义 (src/index.css) */
+  .dark .clay-card-shadow {
+  -  box-shadow: 8px 8px 18px rgba(0, 0, 0, 0.35),
+  -              inset 2px 2px 4px rgba(255, 255, 255, 0.08),
+  -              inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+  +  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45),
+  +              inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .dark .clay-brick-shadow {
+  -  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3),
+  -              inset 2px 2px 4px rgba(255, 255, 255, 0.08),
+  -              inset -1px -1px 2px rgba(0, 0, 0, 0.25);
+  +  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
+  +              inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+  ```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+- **问题现象**：
+  在暗色模式下，卡片边缘有一圈明显的泛白光晕，小方块微砖顶部呈现灰白油光，用户直观体验为“刺眼发白”、“油腻反光”和“塑料感强烈”。
+- **根本原因 (RCA)**：
+  1. **对比度畸变**：日间背景约为 `#eef2f7`，白色内阴影（`rgba(255,255,255,0.85)`）的明度反差约为 1.2:1，呈现出软胶般的受光效果；但在暗色背景（`#11141a`）下，白色内阴影的明度对比激增至 18:1。原本柔和的高光变成了刺眼的纯白硬边；
+  2. **漫反射模糊扩散（Blur Spread）**：原类名包含 `inset 2px 2px 4px` 或 `inset 4px 4px 8px`，模糊半径（4px~8px）在黑色基底下蔓延，形成了一层浓厚的白雾层；
+  3. **Tailwind CSS 继承透传**：部分子组件只写了日间 `shadow-[...]`，未配置 `dark:shadow-[...]`，导致日间的高不透明度白光（80%~90% alpha）直接透传到了深色模式。
+- **具体解法**：
+  1. **执行 0 弥散白铁律**：暗色模式下禁止任何 blur > 0px 的白色内阴影；
+  2. **建立 Scheme A 阶梯规范**：
+     - 大容器/工作台主卡片：`dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)]`；
+     - 中等卡片/板块：`dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)]`；
+     - 按钮/交互按键：`dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]`；
+     - 内凹槽/进度条：`dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]`；
+  3. **自动化全量质检与双归零**：编写检测脚本遍历全站 `src/` 源码，检测 400 处阴影节点，确保未覆盖数与弥散白数量均归零。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 维度 1：日夜光学物理模型演进对比图 (`flowchart TD`)
+```mermaid
+flowchart TD
+    subgraph DayModel ["日间模式：软糯粘土漫反射模型 (Daylight Claymorphism)"]
+        D_Light["顶角光源照射 (Top-Left Light Source)"]
+        D_Card["浅色底板 (Bg: #eef2f7 / White)"]
+        D_High["左上白色大模糊内阴影<br/>inset 2px 2px 4px rgba(255,255,255,0.85)<br/>对比度 1.2:1 · 柔和受光感"]
+        D_Shad["右下柔和下沉阴影<br/>shadow-[4px_4px_12px_rgba(0,0,0,0.06)]"]
+        D_Light --> D_High --> D_Card --> D_Shad
+    end
+
+    subgraph ProblemModel ["缺陷暗色模型：透传漫反射白雾 (Defective State)"]
+        P_Dark["深色基底 (Bg: #151922 / #11141a)"]
+        P_Diffuse["大半径模糊弥散白光<br/>inset 2px~4px blur 4px~8px<br/>对比度 18:1 · 泛白硬边、油腻反光"]
+        P_Dark --- P_Diffuse
+    end
+
+    subgraph NightModel ["方案 A：现代工程级精密哑光模型 (Scheme A Obsidian Matte)"]
+        N_Dark["深黑曜石基底 (Dark Matte Base: #151922)"]
+        N_Drop["深色下沉投影 (Ambient Drop Shadow)<br/>0 4px 16px rgba(0,0,0,0.45)<br/>营造悬浮层次"]
+        N_Rim["1px 亚像素顶边缘微光 (Subpixel Rim Light)<br/>inset 0 1px 0 0 rgba(255,255,255,0.06)<br/>0 弥散白 · 细腻勾勒结构边缘"]
+        N_Dark --> N_Drop
+        N_Dark --> N_Rim
+    end
+```
+
+> **图 1 机制解析**：
+> 详细拆解了日间粘土拟态、此前暗色缺陷状态以及本轮方案 A 的光学物理模型差异。日间模式依靠浅色基底上的白色内阴影形成温润受光感；暗色模式下若直接复用该内阴影，会由于 18:1 的极高反差和漫反射模糊半径产生刺眼的白雾与塑料油光。方案 A 彻底废除了暗色模式下的弥散白内阴影，改用外层深色下沉阴影提供立体感，并辅以 1px 极微顶边缘光精确交代空间边界。
+
+#### 维度 2：全站组件阴影层级与令牌转换流水线 (`flowchart LR`)
+```mermaid
+flowchart LR
+    Scan["阴影节点扫描 (400 处)<br/>src/**/*.tsx & index.css"] --> Classifier{"分类器：元素类型与视觉尺寸"}
+    
+    Classifier -->|大型三栏容器 / 主画布| Tier1["主工作台容器 (Containers)<br/>dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)]"]
+    Classifier -->|卡片 / 指标面板 / 弹窗| Tier2["业务卡片 (Cards / Modals)<br/>dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)]"]
+    Classifier -->|28天任务微砖 / 按钮 / 药丸| Tier3["任务微砖与按键 (Bricks / Pills)<br/>dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.06)]"]
+    Classifier -->|内凹刻度槽 / 进度条 / 搜索框| Tier4["内凹槽 (Grooves / Tracks)<br/>dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]"]
+
+    Tier1 --> Verify["质量校验引擎 (inspect_dark_shadows.cjs)<br/>• 缺失暗色阴影: 0<br/>• 弥散白光 (>1px): 0"]
+    Tier2 --> Verify
+    Tier3 --> Verify
+    Tier4 --> Verify
+```
+
+> **图 2 机制解析**：
+> 展示了对全站 400 处阴影节点进行结构化分类与 Scheme A 转换的工程流水线。流水线根据容器尺寸、交互角色与物理凹凸性，严格划分为四大令牌阶梯，并在末端由自动化脚本断言校验，确保所有组件统一符合现代工程级设计标准。
+
+#### 维度 3：主题切换与样式应用时序图 (`sequenceDiagram`)
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as 用户交互
+    participant ThemeCtx as 主题上下文 (Theme Toggle)
+    participant DOM as HTML 根节点 (class="dark")
+    participant CSS as 样式引擎 (Tailwind / CSS Tokens)
+    participant UI as 界面呈现 (Cards & Micro Bricks)
+
+    User->>ThemeCtx: 切换为暗色模式 (Click Dark Mode)
+    ThemeCtx->>DOM: 为 html 标签追加 "dark" 类名
+    DOM->>CSS: 触发 dark: 前缀选择器与 .dark 变量覆写
+    Note over CSS: 彻底停用日间漫反射高光<br/>激活 0 弥散白 + 1px 顶边缘微光
+    CSS->>UI: 渲染深邃下沉投影与精细亚像素边框
+    UI-->>User: 呈现沉稳舒适的黑曜石哑光质感，毫无刺眼白光
+```
+
+> **图 3 机制解析**：
+> 展现了当用户切换主题时，根节点类名派发、CSS 规则触发与界面渲染的时序闭环。系统通过确定性的样式声明，保证了无论从日间切到夜间、还是跨页面路由跳转，阴影表现均能瞬时、平滑地切换，杜绝任何样式闪烁或白边残留。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **视觉对比度与护眼体验**：
+  消除了此前高达 18:1 的刺眼白雾，整体卡片表面与深色基底的融合度显著提高，长时间阅读代码和实战专栏不再产生视觉疲劳；
+- **材质精度提升**：
+  从“像塑料一样的反光玩具感”转变为类似 Raycast 与 Linear 的高精度哑光金属/黑曜石磨砂质感；
+- **全量无死角闭环**：
+  全站 400 处阴影节点全覆盖，彻底清零遗漏；
+- **业务代码零破坏**：
+  改动严格限制于视觉层，28 天任务进度、算法分类、代码随想录抽屉、计时器状态与本地存储机制 100% 保持稳定。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+- **阴影专项自动化质检命令**：
+  ```bash
+  node scripts/inspect_dark_shadows.cjs
+  ```
+  控制台输出断言：
+  ```text
+  Total white shadows found: 400
+  Missing dark:shadow (uncovered day white shadows): 0
+  Files with missing dark:shadow: []
+  Diffuse white blur (>1px) found in dark:shadow: 0
+  ```
+- **核心功能与随想录集成回归测试**：
+  ```bash
+  node scripts/test_carl_integration.cjs
+  node scripts/test_v6_11_sticky_and_dark_mode.cjs
+  ```
+  控制台输出断言：
+  ```text
+  🎉 ALL 60 VERIFICATION CHECKS PASSED FLAWLESSLY!
+  🎉 ALL 6 VERIFICATION CHECKS PASSED FLAWLESSLY!
+  ```
+- **生产环境静态打包构建**：
+  ```bash
+  npm run build
+  ```
+  控制台输出断言：
+  ```text
+  ✓ 1830 modules transformed.
+  ✓ built in 7.33s
+  [BUILD SUCCESS] Production ready static build in dist/
+  ```

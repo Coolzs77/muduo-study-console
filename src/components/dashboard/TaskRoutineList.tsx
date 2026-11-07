@@ -59,12 +59,12 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
       {/* Header */}
       <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200 px-1">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-sky-600 dark:text-sky-400">
+          <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] text-sky-600 dark:text-sky-400">
             <ListTodo size={14} />
           </div>
           <span className="font-bold">今日清单</span>
         </div>
-        <div className="px-2.5 py-1 rounded-full bg-slate-100/90 dark:bg-slate-900/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] text-[11px] font-mono text-slate-600 dark:text-slate-400 font-normal">
+        <div className="px-2.5 py-1 rounded-full bg-slate-100/90 dark:bg-slate-900/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] text-[11px] font-mono text-slate-600 dark:text-slate-400 font-normal">
           {completedCount} / {tasks.length}
         </div>
       </div>
@@ -76,8 +76,8 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
             key={task.id}
             className={`p-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-between gap-3 ${
               task.completed
-                ? 'bg-gradient-to-r from-emerald-50/80 via-teal-50/50 to-emerald-50/80 dark:from-emerald-950/30 dark:via-teal-950/20 dark:to-emerald-950/30 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]'
-                : 'bg-gradient-to-r from-white via-[#f8fafc] to-[#edf1f7] dark:from-slate-800/80 dark:via-slate-800/70 dark:to-slate-800/60 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 hover:shadow-[6px_6px_14px_rgba(0,0,0,0.08)]'
+                ? 'bg-gradient-to-r from-emerald-50/80 via-teal-50/50 to-emerald-50/80 dark:from-emerald-950/30 dark:via-teal-950/20 dark:to-emerald-950/30 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]'
+                : 'bg-gradient-to-r from-white via-[#f8fafc] to-[#edf1f7] dark:from-slate-800/80 dark:via-slate-800/70 dark:to-slate-800/60 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.06)] dark:border dark:border-white/[0.06] hover:-translate-y-0.5 hover:shadow-[6px_6px_14px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.08)]'
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -86,8 +86,8 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
                 type="button"
                 className={`w-6 h-6 rounded-xl flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-110 active:scale-y-85 cursor-pointer shrink-0 ${
                   task.completed
-                    ? 'bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-[2px_2px_5px_rgba(16,185,129,0.3),inset_1px_1px_2px_rgba(255,255,255,0.8)]'
-                    : 'bg-slate-100/90 dark:bg-slate-900/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-transparent hover:text-emerald-400/50'
+                    ? 'bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-[2px_2px_5px_rgba(16,185,129,0.3),inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)]'
+                    : 'bg-slate-100/90 dark:bg-slate-900/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] text-transparent hover:text-emerald-400/50'
                 }`}
                 title={task.completed ? '标记为未完成' : '标记为已完成'}
               >
@@ -113,7 +113,7 @@ export const TaskRoutineList: React.FC<TaskRoutineListProps> = ({ onNavigateTab 
               <button
                 onClick={() => onNavigateTab(task.linkTab!)}
                 type="button"
-                className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-950/60 dark:to-blue-950/60 text-sky-700 dark:text-sky-300 shadow-[2px_2px_4px_rgba(0,0,0,0.05),inset_1.5px_1.5px_2px_rgba(255,255,255,0.8)] hover:shadow-[3px_3px_6px_rgba(0,0,0,0.08)] active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center gap-1 text-[11px] font-bold cursor-pointer shrink-0"
+                className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-950/60 dark:to-blue-950/60 text-sky-700 dark:text-sky-300 shadow-[2px_2px_4px_rgba(0,0,0,0.05),inset_1.5px_1.5px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:border dark:border-white/[0.06] hover:shadow-[3px_3px_6px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_2px_6px_rgba(0,0,0,0.4)] active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center gap-1 text-[11px] font-bold cursor-pointer shrink-0"
               >
                 <span>直达</span>
                 <ArrowRight size={11} />

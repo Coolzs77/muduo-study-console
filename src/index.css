@@ -222,18 +222,40 @@
   transform: scaleX(1.05) scaleY(0.90);
 }
 
+/* 方案 A: 现代精密哑光深邃质感 (Linear / Raycast / macOS Dark Mode) */
 .clay-card-shadow {
   box-shadow: 8px 8px 18px rgba(0, 0, 0, 0.06), inset 4px 4px 8px rgba(255, 255, 255, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.04);
 }
 .dark .clay-card-shadow {
-  box-shadow: 8px 8px 18px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.08), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+.clay-brick-shadow {
+  box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.05), inset 3px 3px 6px rgba(255, 255, 255, 0.85), inset -2px -2px 4px rgba(0, 0, 0, 0.04);
+}
+.dark .clay-brick-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
 .clay-inset-groove {
   box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.08), inset -2px -2px 4px rgba(255, 255, 255, 0.8);
 }
 .dark .clay-inset-groove {
-  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.3), inset -1px -1px 2px rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.clay-button-shadow {
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.06), inset 2px 2px 4px rgba(255, 255, 255, 0.85), inset -1px -1px 2px rgba(0, 0, 0, 0.04);
+}
+.dark .clay-button-shadow {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+.clay-badge-shadow {
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.04), inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.85);
+}
+.dark .clay-badge-shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
 }
 
 @keyframes staggerFadeIn {

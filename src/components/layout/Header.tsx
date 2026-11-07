@@ -52,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => onSelectTab('dashboard')}
           className="flex items-center gap-2.5 cursor-pointer group shrink-0"
         >
-          <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-[4px_4px_10px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-1px_-1px_2px_rgba(0,0,0,0.15)] group-hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+          <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-[4px_4px_10px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-1px_-1px_2px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_12px_rgba(14,165,233,0.4),inset_0_1px_0_0_rgba(255,255,255,0.25)] group-hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
             <Code size={18} />
           </div>
           <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white hidden md:inline">
@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => onSelectTab(item.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer shrink-0 active:scale-x-105 active:scale-y-90 ${
                   isActive
-                    ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-300 shadow-[3px_3px_8px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] font-bold -translate-y-0.5'
+                    ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-300 shadow-[3px_3px_8px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.1)] font-bold -translate-y-0.5'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -96,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
                   }
                 }, 80);
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-950/60 dark:to-orange-900/60 text-amber-800 dark:text-amber-200 shadow-[3px_3px_8px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] text-xs font-mono font-bold cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-950/60 dark:to-orange-900/60 text-amber-800 dark:text-amber-200 shadow-[3px_3px_8px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.1)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] text-xs font-mono font-bold cursor-pointer"
               title="专注计时进行中，点击返回仪表盘"
             >
               <span className="relative flex h-2 w-2">
@@ -110,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenEnvGuide}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 hover:bg-sky-50 dark:hover:bg-slate-750 text-sky-700 dark:text-sky-300 shadow-[3px_3px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] text-xs font-bold cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 hover:bg-sky-50 dark:hover:bg-slate-750 text-sky-700 dark:text-sky-300 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] text-xs font-bold cursor-pointer"
             title="查看 Linux 远程开发环境实操手册"
           >
             <Server size={14} />
@@ -119,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onToggleTheme}
-            className="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white shadow-[3px_3px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+            className="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             title={isDark ? '切换至浅色模式' : '切换至深色模式'}
           >
             {isDark ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} />}
@@ -129,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
             href="https://github.com/Coolzs77/muduo-study-console"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white shadow-[3px_3px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hidden sm:inline-flex cursor-pointer"
+            className="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hidden sm:inline-flex cursor-pointer"
             title="查看 GitHub 仓库"
           >
             <Github size={15} />

@@ -78,7 +78,7 @@ export const KnowledgeReader: React.FC = () => {
           hasNext={hasNext}
         />
       ) : (
-        <div className="flex-1 flex items-center justify-center rounded-3xl bg-white/80 dark:bg-[#1e2433]/85 p-8 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7)] text-slate-400 font-bold text-sm">
+        <div className="flex-1 flex items-center justify-center rounded-3xl bg-white/80 dark:bg-[#1e2433]/85 p-8 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-slate-400 font-bold text-sm">
           未找到对应文章
         </div>
       )}

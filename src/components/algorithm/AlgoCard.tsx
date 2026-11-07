@@ -18,21 +18,21 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
       case 'easy':
       case '简单':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
             简单
           </span>
         );
       case 'medium':
       case '中等':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
             中等
           </span>
         );
       case 'hard':
       case '困难':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
             困难
           </span>
         );
@@ -49,8 +49,8 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
     <div
       className={`rounded-2xl p-4 text-xs transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
         isDone
-          ? 'bg-gradient-to-r from-emerald-50/70 to-teal-50/70 dark:from-emerald-950/30 dark:to-teal-950/30 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.3)]'
-          : 'bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[4px_4px_10px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-1px_-1px_2px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 hover:shadow-[6px_6px_14px_rgba(0,0,0,0.08)]'
+          ? 'bg-gradient-to-r from-emerald-50/70 to-teal-50/70 dark:from-emerald-950/30 dark:to-teal-950/30 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]'
+          : 'bg-white/80 dark:bg-slate-800/80 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.06)] dark:border dark:border-white/[0.06] hover:-translate-y-0.5 hover:shadow-[6px_6px_14px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.08)]'
       }`}
     >
       <div className="flex items-center justify-between gap-3">
@@ -94,20 +94,20 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
 
               {/* Category Colored Tag */}
               {(problem.category || problem.topic) && (
-                <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold bg-slate-100/90 dark:bg-slate-700/80 text-slate-700 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+                <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold bg-slate-100/90 dark:bg-slate-700/80 text-slate-700 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
                   {problem.category || problem.topic}
                 </span>
               )}
 
               {/* Soft Amber Hot 100 Badge */}
               {problem.isHot100 && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
                   Hot 100
                 </span>
               )}
 
               {problem.isCarl && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
                   随想录
                 </span>
               )}
@@ -132,7 +132,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
               <button
                 type="button"
                 onClick={() => onOpenCarlReader?.(problem)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-[11px] font-bold"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/80 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:border dark:border-white/[0.06] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-[11px] font-bold"
                 title="应用内抽屉阅读随想录精讲"
               >
                 <BookOpen size={13} />
@@ -144,7 +144,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
                 href={problem.carlUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:border dark:border-white/[0.06] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 title="在新标签页打开随想录题解"
               >
                 <ExternalLink size={14} />
@@ -158,7 +158,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
               href={problem.leetcodeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+              className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:border dark:border-white/[0.06] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               title="打开 LeetCode 原题"
             >
               <Code2 size={14} />

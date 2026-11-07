@@ -127,16 +127,16 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
       {/* Left Column: 4-Week & 28-Day Task Directory Tree (Collapsible)       */}
       {/* ==================================================================== */}
       {isSidebarCollapsed ? (
-        <aside className="w-16 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/90 dark:bg-[#151922]/90 shadow-[6px_6px_14px_rgba(0,0,0,0.06),inset_3px_3px_6px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] py-4 flex flex-col items-center space-y-3 sticky top-18 h-[calc(100vh-5.5rem)] hidden md:flex select-none transition-all duration-300">
+        <aside className="w-16 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/90 dark:bg-[#151922]/90 shadow-[6px_6px_14px_rgba(0,0,0,0.06),inset_3px_3px_6px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] py-4 flex flex-col items-center space-y-3 sticky top-18 h-[calc(100vh-5.5rem)] hidden md:flex select-none transition-all duration-300">
           <button
             onClick={() => setIsSidebarCollapsed(false)}
-            className="p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-sky-600 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+            className="p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-sky-600 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             title="展开任务目录"
           >
             <PanelLeftOpen size={18} />
           </button>
 
-          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]" />
+          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.4)]" />
 
           {/* Quick Week Selectors in collapsed state (Clay Pills) */}
           <div className="flex flex-col items-center space-y-2 text-[11px] font-bold">
@@ -144,8 +144,8 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               onClick={() => { setSelectedWeek('all'); setIsSidebarCollapsed(false); }}
               className={`w-10 h-9 rounded-2xl flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 selectedWeek === 'all'
-                  ? 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                  ? 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(16,185,129,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
               }`}
               title="全部 28 天任务"
             >
@@ -157,8 +157,8 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                 onClick={() => { setSelectedWeek(w); setIsSidebarCollapsed(false); }}
                 className={`w-10 h-9 rounded-2xl flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer font-mono active:scale-x-105 active:scale-y-90 ${
                   selectedWeek === w
-                    ? 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold'
-                    : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)]'
+                    ? 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(16,185,129,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]'
                 }`}
                 title={`第 ${w} 周任务`}
               >
@@ -167,11 +167,11 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             ))}
           </div>
 
-          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] mt-auto" />
+          <div className="w-8 h-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.4)] mt-auto" />
 
           {/* Current Day indicator badge */}
           <div
-            className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-950/60 dark:to-teal-900/60 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85)] flex flex-col items-center justify-center text-[10px] font-mono font-bold text-teal-700 dark:text-teal-300 cursor-pointer active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+            className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-950/60 dark:to-teal-900/60 shadow-[3px_3px_6px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.1)] flex flex-col items-center justify-center text-[10px] font-mono font-bold text-teal-700 dark:text-teal-300 cursor-pointer active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
             onClick={() => setIsSidebarCollapsed(false)}
             title={`当前正在学习: Day ${currentDay.day}`}
           >
@@ -179,12 +179,12 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           </div>
         </aside>
       ) : (
-        <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 flex flex-col h-[calc(100vh-5.5rem)] sticky top-18 select-none transition-all duration-300 overflow-hidden">
+        <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 flex flex-col h-[calc(100vh-5.5rem)] sticky top-18 select-none transition-all duration-300 overflow-hidden">
           {/* Top Header & Search */}
           <div className="pb-3 space-y-3 shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-slate-100">
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-teal-100/90 dark:bg-teal-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-teal-600 dark:text-teal-400">
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-teal-100/90 dark:bg-teal-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-teal-600 dark:text-teal-400">
                   <Calendar size={14} />
                 </div>
                 <span>任务目录</span>
@@ -192,7 +192,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               </div>
               <button
                 onClick={() => setIsSidebarCollapsed(true)}
-                className="p-1.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="p-1.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 title="收起任务目录"
               >
                 <PanelLeftClose size={16} />
@@ -200,12 +200,12 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             </div>
 
             {/* Week Selector (Clay recessed groove) */}
-            <div className="grid grid-cols-5 gap-1 p-1 bg-slate-200/50 dark:bg-slate-900/60 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-1px_-1px_2px_rgba(255,255,255,0.05)] text-xs font-semibold text-center">
+            <div className="grid grid-cols-5 gap-1 p-1 bg-slate-200/50 dark:bg-slate-900/60 rounded-2xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.4)] text-xs font-semibold text-center">
               <button
                 onClick={() => setSelectedWeek('all')}
                 className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                   selectedWeek === 'all'
-                    ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
+                    ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)]'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
@@ -217,7 +217,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   onClick={() => setSelectedWeek(w)}
                   className={`py-1.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 font-mono ${
                     selectedWeek === w
-                      ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)]'
+                      ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-300 font-bold shadow-[2px_2px_6px_rgba(0,0,0,0.08),inset_1.5px_1.5px_3px_rgba(255,255,255,0.9)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)]'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
@@ -227,7 +227,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             </div>
 
             {/* Progress Header (Clay mint mini card) */}
-            <div className="bg-gradient-to-br from-emerald-100/70 via-teal-50 to-green-100/70 dark:from-emerald-950/40 dark:via-teal-900/30 dark:to-green-900/40 p-3 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] space-y-1.5">
+            <div className="bg-gradient-to-br from-emerald-100/70 via-teal-50 to-green-100/70 dark:from-emerald-950/40 dark:via-teal-900/30 dark:to-green-900/40 p-3 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-teal-900 dark:text-teal-100">
                   吃透进度 ({stats.mastered}/{stats.total} 天)
@@ -236,7 +236,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   {stats.pct}%
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full bg-emerald-200/50 dark:bg-emerald-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] overflow-hidden p-0.5">
+              <div className="w-full h-2 rounded-full bg-emerald-200/50 dark:bg-emerald-950/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_3px_rgba(0,0,0,0.4)] overflow-hidden p-0.5">
                 <div
                   className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   style={{ width: `${stats.pct}%` }}
@@ -272,8 +272,8 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   onClick={() => setSelectedDayNum(item.day)}
                   className={`group flex items-start gap-2.5 p-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-xs active:scale-x-105 active:scale-y-90 select-none ${
                     isSelected
-                      ? 'bg-gradient-to-r from-emerald-100 via-teal-50 to-green-100 dark:from-emerald-950/60 dark:via-teal-900/40 dark:to-green-950/60 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
-                      : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 hover:shadow-[5px_5px_12px_rgba(0,0,0,0.06)]'
+                      ? 'bg-gradient-to-r from-emerald-100 via-teal-50 to-green-100 dark:from-emerald-950/60 dark:via-teal-900/40 dark:to-green-950/60 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.12)] -translate-y-0.5'
+                      : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 hover:shadow-[5px_5px_12px_rgba(0,0,0,0.06)]'
                   }`}
                 >
                   {/* Day Badge */}
@@ -300,12 +300,12 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                         {SHORT_DAY_TITLES[item.day] || item.title}
                       </span>
                       {isMastered && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] shrink-0">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] shrink-0">
                           ✓ 已吃透
                         </span>
                       )}
                       {isLearning && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] shrink-0">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] shrink-0">
                           学习中
                         </span>
                       )}
@@ -332,17 +332,17 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
       {/* ==================================================================== */}
       {/* Middle Column: Core Task Workspace Canvas (Fluid Full Width)         */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-6 sm:p-8 space-y-6 overflow-y-auto">
+      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-6 sm:p-8 space-y-6 overflow-y-auto">
         {/* Task Header */}
         <div className="border-b border-slate-200/60 dark:border-slate-800/60 pb-5 space-y-3">
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="px-3 py-1 rounded-2xl bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-950/70 text-sky-800 dark:text-sky-300 text-xs font-black font-mono shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)]">
+            <span className="px-3 py-1 rounded-2xl bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-950/70 text-sky-800 dark:text-sky-300 text-xs font-black font-mono shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)]">
               第 {currentDay.week} 周 · Day {currentDay.day}
             </span>
-            <span className="px-2.5 py-1 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-[11px] font-bold">
+            <span className="px-2.5 py-1 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-[11px] font-bold">
               考点等级: Tier {currentDay.tier}
             </span>
-            <span className="px-2.5 py-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 text-[11px] font-semibold shadow-[2px_2px_4px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)]">
+            <span className="px-2.5 py-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 text-[11px] font-semibold shadow-[2px_2px_4px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
               预计 {currentDay.estimatedMinutes || 90} 分钟
             </span>
           </div>
@@ -361,7 +361,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               {currentDay.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)]"
+                  className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]"
                 >
                   #{tag}
                 </span>
@@ -371,9 +371,9 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         </div>
 
         {/* Section 1: 核心要点 (Key Technical Points - Clay Card) */}
-        <section className="bg-white/70 dark:bg-slate-800/60 rounded-3xl p-6 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-1px_-1px_2px_rgba(0,0,0,0.3)] space-y-4">
+        <section className="bg-white/70 dark:bg-slate-800/60 rounded-3xl p-6 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-4">
           <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-100/90 dark:bg-amber-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-amber-600 dark:text-amber-400">
+            <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-amber-100/90 dark:bg-amber-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-amber-600 dark:text-amber-400">
               <Flame size={14} />
             </div>
             <span>核心技术要点与设计意图</span>
@@ -394,7 +394,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         {currentDay.code && (
           <section className="space-y-2">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-sky-600 dark:text-sky-400">
+              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-sky-100/90 dark:bg-sky-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-sky-600 dark:text-sky-400">
                 <Terminal size={14} />
               </div>
               <span>核心 C++ 源码实现</span>
@@ -405,9 +405,9 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
 
         {/* Section 3: 架构深潜与实验步骤 (Experiment Clay Card) */}
         {currentDay.experiment && (
-          <section className="space-y-4 p-6 rounded-3xl bg-gradient-to-br from-indigo-50/70 via-white/80 to-blue-50/70 dark:from-indigo-950/40 dark:via-slate-800/50 dark:to-blue-950/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-1px_-1px_2px_rgba(0,0,0,0.3)]">
+          <section className="space-y-4 p-6 rounded-3xl bg-gradient-to-br from-indigo-50/70 via-white/80 to-blue-50/70 dark:from-indigo-950/40 dark:via-slate-800/50 dark:to-blue-950/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)]">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-indigo-100/90 dark:bg-indigo-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-indigo-600 dark:text-indigo-400">
+              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-indigo-100/90 dark:bg-indigo-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-indigo-600 dark:text-indigo-400">
                 <Cpu size={14} />
               </div>
               <span>实验验证与避坑指南</span>
@@ -471,7 +471,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   <span>编译运行命令:</span>
                   <button
                     onClick={() => handleCopyBuild(currentDay.experiment!.buildCommand!)}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-sky-700 dark:text-sky-300 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-sky-700 dark:text-sky-300 shadow-[2px_2px_4px_rgba(0,0,0,0.06),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                   >
                     {copiedCmd ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
                     <span>{copiedCmd ? '已复制' : '复制命令'}</span>
@@ -489,13 +489,13 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         {currentDay.rigorousNuance && (
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-emerald-100/90 dark:bg-emerald-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] text-emerald-600 dark:text-emerald-400">
+              <div className="w-6 h-6 rounded-xl flex items-center justify-center bg-emerald-100/90 dark:bg-emerald-950/60 shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-emerald-600 dark:text-emerald-400">
                 <ShieldCheck size={14} />
               </div>
               <span>快速认知 vs 严谨工程认知</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-100/80 via-orange-50/70 to-yellow-100/80 dark:from-amber-950/40 dark:via-orange-900/30 dark:to-yellow-900/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08)] space-y-2">
+              <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-100/80 via-orange-50/70 to-yellow-100/80 dark:from-amber-950/40 dark:via-orange-900/30 dark:to-yellow-900/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-2">
                 <div className="font-bold text-amber-900 dark:text-amber-200">常见表面理解:</div>
                 <div className="text-amber-950/90 dark:text-amber-100/90 leading-relaxed font-medium">
                   <InlineMarkdown
@@ -507,7 +507,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   />
                 </div>
               </div>
-              <div className="p-4 rounded-3xl bg-gradient-to-br from-emerald-100/80 via-teal-50/70 to-green-100/80 dark:from-emerald-950/40 dark:via-teal-900/30 dark:to-green-900/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8)] dark:shadow-[6px_6px_14px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08)] space-y-2">
+              <div className="p-4 rounded-3xl bg-gradient-to-br from-emerald-100/80 via-teal-50/70 to-green-100/80 dark:from-emerald-950/40 dark:via-teal-900/30 dark:to-green-900/40 shadow-[6px_6px_14px_rgba(0,0,0,0.05),inset_3px_3px_6px_rgba(255,255,255,0.8)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-2">
                 <div className="font-bold text-emerald-900 dark:text-emerald-200">严谨底层机理:</div>
                 <div className="text-emerald-950/90 dark:text-emerald-100/90 leading-relaxed font-medium">
                   <InlineMarkdown
@@ -532,7 +532,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             disabled={!hasPrev}
             className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer font-bold ${
               hasPrev
-                ? 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[3px_3px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90'
+                ? 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[3px_3px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90'
                 : 'opacity-40 cursor-not-allowed text-slate-400 bg-slate-100 dark:bg-slate-800'
             }`}
           >
@@ -545,7 +545,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             disabled={!hasNext}
             className={`flex items-center gap-1.5 px-5 py-2.5 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer font-bold ${
               hasNext
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[4px_4px_12px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[4px_4px_12px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_4px_12px_rgba(16,185,129,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90'
                 : 'opacity-40 cursor-not-allowed text-slate-400 bg-slate-100 dark:bg-slate-800'
             }`}
           >
@@ -558,7 +558,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
       {/* ==================================================================== */}
       {/* Right Column: Mastery Rating, Quiz Launcher & Daily Notes             */}
       {/* ==================================================================== */}
-      <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[8px_8px_18px_rgba(0,0,0,0.3),inset_2px_2px_4px_rgba(255,255,255,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.3)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden lg:flex flex-col space-y-4 select-none overflow-y-auto">
+      <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 h-[calc(100vh-5.5rem)] sticky top-18 hidden lg:flex flex-col space-y-4 select-none overflow-y-auto">
         {/* Mastery Rating */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-slate-100">
@@ -586,9 +586,9 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                   className={`flex items-center justify-between px-3 py-2 rounded-2xl text-xs transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer text-left active:scale-x-105 active:scale-y-90 font-medium ${
                     isSelected
                       ? tier.lvl >= 4
-                        ? 'bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/70 dark:to-teal-900/70 text-teal-900 dark:text-teal-100 font-bold shadow-[3px_3px_8px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
-                        : 'bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-900/70 text-sky-900 dark:text-sky-100 font-bold shadow-[3px_3px_8px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] -translate-y-0.5'
-                      : 'bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
+                        ? 'bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/70 dark:to-teal-900/70 text-teal-900 dark:text-teal-100 font-bold shadow-[3px_3px_8px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.1)] -translate-y-0.5'
+                        : 'bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-900/70 text-sky-900 dark:text-sky-100 font-bold shadow-[3px_3px_8px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.1)] -translate-y-0.5'
+                      : 'bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5'
                   }`}
                 >
                   <span>{tier.label}</span>
@@ -600,7 +600,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         </div>
 
         {/* Check Criteria (Clay Card) */}
-        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-1.5 text-xs">
+        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-1.5 text-xs">
           <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
             <CheckCircle2 size={13} className="text-emerald-500" />
             <span>达标标准</span>
@@ -611,7 +611,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         </div>
 
         {/* Core Concepts */}
-        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-1.5 text-xs">
+        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-1.5 text-xs">
           <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <BookOpen size={13} className="text-sky-500" />
@@ -623,7 +623,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             {(currentDay.tags || []).map((tag, idx) => (
               <span
                 key={idx}
-                className="px-2.5 py-0.5 rounded-full bg-slate-100/90 dark:bg-slate-700/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] text-slate-700 dark:text-slate-200 text-[11px] font-semibold"
+                className="px-2.5 py-0.5 rounded-full bg-slate-100/90 dark:bg-slate-700/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.08),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-slate-700 dark:text-slate-200 text-[11px] font-semibold"
               >
                 {tag}
               </span>
@@ -632,7 +632,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
         </div>
 
         {/* Quick Build / Test Command */}
-        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] space-y-2 text-xs">
+        <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-800/70 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-2 text-xs">
           <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 font-bold">
             <span className="flex items-center gap-1.5">
               <Terminal size={12} className="text-sky-500" />
@@ -657,7 +657,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           <button
             onClick={() => onJumpToQuiz(currentDay.day)}
             type="button"
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-900/70 text-sky-800 dark:text-sky-200 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] font-bold text-xs cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-sky-100 to-indigo-100 dark:from-sky-950/70 dark:to-indigo-900/70 text-sky-800 dark:text-sky-200 shadow-[4px_4px_10px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.12)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] font-bold text-xs cursor-pointer"
           >
             <HelpCircle size={14} />
             <span>进入 Day {currentDay.day} 自测</span>

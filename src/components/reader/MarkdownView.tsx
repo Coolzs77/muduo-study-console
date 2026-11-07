@@ -360,7 +360,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({ content }) => {
                 <img
                   src={block.src}
                   alt={block.text || '架构与技术图'}
-                  className="rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-[4px_4px_12px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.7)] max-w-full mx-auto"
+                  className="rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-[4px_4px_12px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.7)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] max-w-full mx-auto"
                   loading="lazy"
                 />
                 {block.text && (

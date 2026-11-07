@@ -69,9 +69,9 @@ export const CareerSystemView: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Top Banner */}
-      <div className="bg-white/90 dark:bg-[#1a1f2c]/90 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)]">
+      <div className="bg-white/90 dark:bg-[#1a1f2c]/90 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
         <div className="flex items-center gap-3">
-          <span className="p-2.5 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/60 dark:to-sky-800/40 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)]">
+          <span className="p-2.5 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/60 dark:to-sky-800/40 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
             <Award size={22} />
           </span>
           <div>
@@ -85,12 +85,12 @@ export const CareerSystemView: React.FC = () => {
         </div>
 
         {/* Sub-tab Navigation */}
-        <div className="flex flex-wrap items-center gap-2 mt-6 p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+        <div className="flex flex-wrap items-center gap-2 mt-6 p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.35)]">
           <button
             onClick={() => setActiveTab('evidence')}
             className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'evidence'
-                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
             }`}
           >
@@ -101,7 +101,7 @@ export const CareerSystemView: React.FC = () => {
             onClick={() => setActiveTab('radar')}
             className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'radar'
-                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
             }`}
           >
@@ -112,7 +112,7 @@ export const CareerSystemView: React.FC = () => {
             onClick={() => setActiveTab('interview')}
             className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'interview'
-                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
             }`}
           >
@@ -123,7 +123,7 @@ export const CareerSystemView: React.FC = () => {
             onClick={() => setActiveTab('star')}
             className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer flex items-center gap-2 ${
               activeTab === 'star'
-                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_8px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
             }`}
           >
@@ -145,7 +145,7 @@ export const CareerSystemView: React.FC = () => {
               return (
                 <div
                   key={ev.id}
-                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5 flex flex-col justify-between"
+                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
@@ -209,7 +209,7 @@ export const CareerSystemView: React.FC = () => {
               return (
                 <div
                   key={key}
-                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5"
+                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -224,14 +224,14 @@ export const CareerSystemView: React.FC = () => {
                   </div>
 
                   {/* Level Selector Buttons */}
-                  <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+                  <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.35)]">
                     {[1, 2, 3, 4, 5].map(lvl => (
                       <button
                         key={lvl}
                         onClick={() => setLevel(key, lvl)}
                         className={`flex-1 py-1.5 text-xs font-mono font-bold rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer ${
                           lvl <= currentLvl
-                            ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                            ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
                             : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                         title={`设置为 L${lvl}`}
@@ -262,7 +262,7 @@ export const CareerSystemView: React.FC = () => {
       {activeTab === 'interview' && (
         <div className="space-y-6">
           {/* Elevator Pitch Card */}
-          <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4">
+          <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
@@ -282,7 +282,7 @@ export const CareerSystemView: React.FC = () => {
                     onClick={() => setElevatorPitchLen(len)}
                     className={`px-3.5 py-1 rounded-xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-x-105 active:scale-y-90 cursor-pointer ${
                       elevatorPitchLen === len
-                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)]'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[2px_2px_6px_rgba(14,165,233,0.35),inset_1px_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
@@ -304,7 +304,7 @@ export const CareerSystemView: React.FC = () => {
                     '陈述文本已复制'
                   )
                 }
-                className="absolute top-3 right-3 p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="absolute top-3 right-3 p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                 title="复制陈述"
                 type="button"
               >
@@ -326,14 +326,14 @@ export const CareerSystemView: React.FC = () => {
                 return (
                   <div
                     key={q.id}
-                    className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                    className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   >
                     <div
                       onClick={() => toggleInterviewQ(q.id)}
                       className="p-4 sm:p-5 cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition flex items-center justify-between gap-4 select-none"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_5px_rgba(245,158,11,0.25),inset_1px_1px_2px_rgba(255,255,255,0.6)]">
+                        <span className="w-7 h-7 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_5px_rgba(245,158,11,0.25),inset_1px_1px_2px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)]">
                           Q
                         </span>
                         <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
@@ -371,7 +371,7 @@ export const CareerSystemView: React.FC = () => {
                         </div>
 
                         {q.followUp && (
-                          <div className="bg-sky-50/80 dark:bg-sky-950/30 p-3.5 rounded-2xl border border-sky-100/60 dark:border-sky-900/40 text-xs shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)]">
+                          <div className="bg-sky-50/80 dark:bg-sky-950/30 p-3.5 rounded-2xl border border-sky-100/60 dark:border-sky-900/40 text-xs shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                             <span className="font-bold text-sky-800 dark:text-sky-300 flex items-center gap-1.5 mb-1">
                               <Lightbulb size={14} />
                               面试官潜在追问:
@@ -381,7 +381,7 @@ export const CareerSystemView: React.FC = () => {
                         )}
 
                         {q.trap && (
-                          <div className="bg-rose-50/80 dark:bg-rose-950/30 p-3.5 rounded-2xl border border-rose-100/60 dark:border-rose-900/40 text-xs shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)]">
+                          <div className="bg-rose-50/80 dark:bg-rose-950/30 p-3.5 rounded-2xl border border-rose-100/60 dark:border-rose-900/40 text-xs shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                             <span className="font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5 mb-1">
                               <AlertTriangle size={14} />
                               常见认知误区与答题陷阱:
@@ -403,7 +403,7 @@ export const CareerSystemView: React.FC = () => {
       {activeTab === 'star' && (
         <div className="space-y-6">
           {/* Resume Bullets */}
-          <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] space-y-4">
+          <div className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-6 sm:p-7 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-4">
             <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
               <Award size={17} className="text-sky-600 dark:text-sky-400" />
               精炼简历要点库 (直接可用，带指标量化)
@@ -425,7 +425,7 @@ export const CareerSystemView: React.FC = () => {
                   </div>
                   <button
                     onClick={() => handleCopy(rb.text, '简历要点已复制')}
-                    className="p-2 rounded-2xl bg-white dark:bg-slate-800 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0 cursor-pointer"
+                    className="p-2 rounded-2xl bg-white dark:bg-slate-800 border border-white/80 dark:border-white/10 text-slate-500 hover:text-sky-600 shadow-[2px_2px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0 cursor-pointer"
                     title="复制要点"
                     type="button"
                   >
@@ -447,7 +447,7 @@ export const CareerSystemView: React.FC = () => {
               {CAREER_STAR_STORIES.map(story => (
                 <div
                   key={story.id}
-                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5"
+                  className="bg-white/85 dark:bg-[#1e2433]/85 rounded-3xl p-5 sm:p-6 border border-white/70 dark:border-white/10 shadow-[8px_8px_20px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-3.5"
                 >
                   <h4 className="font-bold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800/80 pb-2.5">
                     {story.title}

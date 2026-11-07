@@ -24,12 +24,12 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white dark:bg-[#1a1f2c] rounded-l-3xl border-l border-white/80 dark:border-white/10 shadow-[-8px_0_32px_rgba(0,0,0,0.15),inset_2px_2px_4px_rgba(255,255,255,0.7)] flex flex-col justify-between p-6 sm:p-7 overflow-y-auto animate-in slide-in-from-right duration-300">
+        <div className="w-screen max-w-md bg-white dark:bg-[#1a1f2c] rounded-l-3xl border-l border-white/80 dark:border-white/10 shadow-[-8px_0_32px_rgba(0,0,0,0.15),inset_2px_2px_4px_rgba(255,255,255,0.7)] dark:shadow-[-8px_0_32px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.06)] flex flex-col justify-between p-6 sm:p-7 overflow-y-auto animate-in slide-in-from-right duration-300">
           {/* Header */}
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-4">
               <div className="flex items-center gap-3">
-                <span className="p-2.5 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/60 dark:to-sky-800/40 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)]">
+                <span className="p-2.5 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/60 dark:to-sky-800/40 text-sky-700 dark:text-sky-300 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                   <Layers size={20} />
                 </span>
                 <div>
@@ -44,7 +44,7 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
 
               <button
                 onClick={onClose}
-                className="p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1px_1px_2px_rgba(255,255,255,0.8)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                className="p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -67,7 +67,7 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
                   <Cpu size={14} className="text-emerald-500" />
                   并发线程模型
                 </div>
-                <div className="bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-300 p-3.5 rounded-2xl border border-emerald-100/60 dark:border-emerald-900/40 font-mono shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)]">
+                <div className="bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-300 p-3.5 rounded-2xl border border-emerald-100/60 dark:border-emerald-900/40 font-mono shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
                   {module.threadModel}
                 </div>
               </div>
@@ -149,7 +149,7 @@ export const TopologyDrawer: React.FC<TopologyDrawerProps> = ({
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80">
             <button
               onClick={onClose}
-              className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-900 text-white font-bold text-xs shadow-[2px_2px_8px_rgba(0,0,0,0.2),inset_1px_1px_2px_rgba(255,255,255,0.3)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+              className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-900 text-white font-bold text-xs shadow-[2px_2px_8px_rgba(0,0,0,0.2),inset_1px_1px_2px_rgba(255,255,255,0.3)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
             >
               关闭架构详情
             </button>

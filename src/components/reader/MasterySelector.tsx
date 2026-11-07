@@ -37,9 +37,9 @@ export const MasterySelector: React.FC<MasterySelectorProps> = ({
               className={`px-3 py-1.5 rounded-2xl text-xs font-semibold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                 isSelected
                   ? tier.level >= 4
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
-                    : 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] font-bold -translate-y-0.5'
-                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[3px_3px_8px_rgba(16,185,129,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold -translate-y-0.5'
+                    : 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] font-bold -translate-y-0.5'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5'
               }`}
             >
               <span className="flex items-center gap-1">

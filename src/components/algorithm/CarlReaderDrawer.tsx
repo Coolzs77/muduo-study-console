@@ -69,21 +69,21 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
       case 'easy':
       case '简单':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
             简单
           </span>
         );
       case 'medium':
       case '中等':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
             中等
           </span>
         );
       case 'hard':
       case '困难':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
             困难
           </span>
         );
@@ -106,7 +106,7 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
 
       <div className={`fixed inset-y-0 right-0 max-w-full flex transition-all duration-300 ${isFullScreen ? 'pl-0' : 'pl-3 sm:pl-10'}`}>
         <div
-          className={`h-full bg-[#f4f7fb] dark:bg-[#151922] ${isFullScreen ? 'rounded-none' : 'rounded-l-3xl'} border-l border-white/80 dark:border-white/10 shadow-[-10px_0_35px_rgba(0,0,0,0.18),inset_2px_2px_4px_rgba(255,255,255,0.7)] flex flex-col overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] animate-in slide-in-from-right duration-300 ${
+          className={`h-full bg-[#f4f7fb] dark:bg-[#151922] ${isFullScreen ? 'rounded-none' : 'rounded-l-3xl'} border-l border-white/80 dark:border-white/10 shadow-[-10px_0_35px_rgba(0,0,0,0.18),inset_2px_2px_4px_rgba(255,255,255,0.7)] dark:shadow-[-8px_0_32px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.06)] flex flex-col overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] animate-in slide-in-from-right duration-300 ${
             isFullScreen ? 'w-screen max-w-full' : 'w-full sm:w-[680px] lg:w-[768px] max-w-full'
           }`}
         >
@@ -115,7 +115,7 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
             <div className="flex items-center justify-between gap-3">
               {/* Title & Tags */}
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-[3px_3px_8px_rgba(14,165,233,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)]">
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-[3px_3px_8px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)]">
                   <BookOpen size={20} />
                 </div>
                 <div className="min-w-0">
@@ -154,7 +154,7 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
                     href={problem.carlUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                    className="p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                     title="在新标签页打开代码随想录原网页"
                   >
                     <ExternalLink size={16} />
@@ -165,7 +165,7 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsFullScreen(!isFullScreen)}
-                  className="p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                  className="p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                   title={isFullScreen ? '恢复标准宽度' : '展开全屏宽度'}
                 >
                   {isFullScreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
@@ -175,7 +175,7 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.05),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
+                  className="p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer"
                   title="关闭 (Esc)"
                 >
                   <X size={16} />
@@ -205,7 +205,7 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
               {showTakeaways && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-2.5 pt-1 animate-in fade-in duration-200">
                   {problem.projectLink && (
-                    <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] text-xs space-y-1">
+                    <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-xs space-y-1">
                       <div className="flex items-center gap-1.5 font-bold text-sky-700 dark:text-sky-300">
                         <Layers size={13} />
                         <span>服务端工程落地</span>
@@ -217,7 +217,7 @@ export const CarlReaderDrawer: React.FC<CarlReaderDrawerProps> = ({
                   )}
 
                   {problem.mistakes && (
-                    <div className="p-3 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/50 dark:border-amber-800/40 shadow-[3px_3px_8px_rgba(0,0,0,0.03),inset_2px_2px_4px_rgba(255,255,255,0.85)] text-xs space-y-1">
+                    <div className="p-3 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/50 dark:border-amber-800/40 shadow-[3px_3px_8px_rgba(0,0,0,0.03),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-xs space-y-1">
                       <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-300">
                         <AlertTriangle size={13} />
                         <span>考点与高频易错警示</span>
