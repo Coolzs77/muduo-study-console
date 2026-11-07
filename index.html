@@ -5,12 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Muduo & CppAIService</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m18 16 4-4-4-4'/><path d='m6 8-4 4 4 4'/><path d='m14.5 4-5 16'/></svg>" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      try {
+        const theme = localStorage.getItem('muduo_theme');
+        const isDark = theme ? theme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    </script>
+    <style>
+      .initial-loader-wrapper {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8fafc;
+        color: #0f172a;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        transition: background-color 0.2s ease;
+        z-index: 99999;
+      }
+      .dark .initial-loader-wrapper {
+        background-color: #020617;
+        color: #f8fafc;
+      }
+      .loader-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 2.25rem 2.5rem;
+        border-radius: 1.25rem;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      }
+      .dark .loader-box {
+        background: rgba(15, 23, 42, 0.75);
+        border-color: rgba(30, 41, 59, 0.8);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      }
+      .loader-icon-ring {
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        box-shadow: 0 0 20px rgba(2, 132, 199, 0.4);
+        animation: pulse-ring 2s infinite ease-in-out;
+      }
+      .loader-bar-bg {
+        width: 13rem;
+        height: 4px;
+        border-radius: 9999px;
+        background: rgba(203, 213, 225, 0.5);
+        overflow: hidden;
+        position: relative;
+      }
+      .dark .loader-bar-bg {
+        background: rgba(51, 65, 85, 0.6);
+      }
+      .loader-bar-fill {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 50%;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, #38bdf8, #6366f1);
+        animation: shimmer-bar 1.5s infinite ease-in-out;
+      }
+      @keyframes pulse-ring {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(2, 132, 199, 0.3); }
+        50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(2, 132, 199, 0.6); }
+      }
+      @keyframes shimmer-bar {
+        0% { left: -50%; width: 30%; }
+        50% { left: 30%; width: 60%; }
+        100% { left: 100%; width: 30%; }
+      }
+    </style>
   </head>
   <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-sky-500 selection:text-white min-h-screen">
-    <div id="root"></div>
+    <div id="root">
+      <div class="initial-loader-wrapper">
+        <div class="loader-box">
+          <div class="loader-icon-ring">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-weight: 700; font-size: 0.95rem; letter-spacing: -0.01em;">Muduo & CppAIService</div>
+            <div style="font-size: 0.75rem; opacity: 0.6; margin-top: 0.25rem;">正在启动学习控制台 · 请稍候...</div>
+          </div>
+          <div class="loader-bar-bg">
+            <div class="loader-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { ActiveTab, DomainModule, PracticeSubTab } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Header } from './components/layout/Header';
@@ -8,14 +8,36 @@ import { ToastContainer } from './components/common/Toast';
 import { EnvGuideModal } from './components/common/EnvGuideModal';
 import { TopologyDrawer } from './components/common/TopologyDrawer';
 
-// 7 Primary Views
+// 7 Primary Views (Dashboard statically loaded for instant landing; others lazy loaded)
 import { DashboardView } from './components/dashboard/DashboardView';
-import { DailyCurriculumView } from './components/daily/DailyCurriculumView';
-import { KnowledgeReader } from './components/reader/KnowledgeReader';
-import { AlgoCatalog } from './components/algorithm/AlgoCatalog';
-import { LearningSystemView } from './components/learning/LearningSystemView';
-import { SourceRoadmapView } from './components/source/SourceRoadmapView';
-import { PracticeCenterView } from './components/practice/PracticeCenterView';
+
+const DailyCurriculumView = lazy(() =>
+  import('./components/daily/DailyCurriculumView').then(m => ({ default: m.DailyCurriculumView }))
+);
+const KnowledgeReader = lazy(() =>
+  import('./components/reader/KnowledgeReader').then(m => ({ default: m.KnowledgeReader }))
+);
+const AlgoCatalog = lazy(() =>
+  import('./components/algorithm/AlgoCatalog').then(m => ({ default: m.AlgoCatalog }))
+);
+const LearningSystemView = lazy(() =>
+  import('./components/learning/LearningSystemView').then(m => ({ default: m.LearningSystemView }))
+);
+const SourceRoadmapView = lazy(() =>
+  import('./components/source/SourceRoadmapView').then(m => ({ default: m.SourceRoadmapView }))
+);
+const PracticeCenterView = lazy(() =>
+  import('./components/practice/PracticeCenterView').then(m => ({ default: m.PracticeCenterView }))
+);
+
+const ViewSuspenseFallback: React.FC = () => (
+  <div className="flex-1 w-full min-h-[calc(100vh-4rem)] flex items-center justify-center p-8">
+    <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400 animate-pulse">
+      <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+      <span className="text-xs font-semibold tracking-wide">模块加载中 · 请稍候...</span>
+    </div>
+  </div>
+);
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useLocalStorage<ActiveTab>('activeTab', 'dashboard');
@@ -89,31 +111,33 @@ export const App: React.FC = () => {
 
       {/* Main View Matrix - Fluid full-screen container with no max-w bottlenecks */}
       <main className="flex-1 w-full min-w-0">
-        {activeTab === 'dashboard' && (
-          <DashboardView
-            onNavigateTab={setActiveTab}
-            onNavigateToDay={handleNavigateToDay}
-            onSelectTopologyModule={setSelectedTopologyModule}
-          />
-        )}
-        {activeTab === 'daily' && (
-          <DailyCurriculumView
-            onJumpToQuiz={handleNavigateToQuiz}
-            selectedDayHighlight={highlightDay}
-            onClearHighlight={() => setHighlightDay(null)}
-          />
-        )}
-        {activeTab === 'reader' && <KnowledgeReader />}
-        {activeTab === 'algo' && <AlgoCatalog />}
-        {activeTab === 'learning' && <LearningSystemView />}
-        {activeTab === 'source' && <SourceRoadmapView />}
-        {activeTab === 'practice' && (
-          <PracticeCenterView
-            activeSubTab={practiceSubTab}
-            onSelectSubTab={setPracticeSubTab}
-            quizDay={quizDay}
-          />
-        )}
+        <Suspense fallback={<ViewSuspenseFallback />}>
+          {activeTab === 'dashboard' && (
+            <DashboardView
+              onNavigateTab={setActiveTab}
+              onNavigateToDay={handleNavigateToDay}
+              onSelectTopologyModule={setSelectedTopologyModule}
+            />
+          )}
+          {activeTab === 'daily' && (
+            <DailyCurriculumView
+              onJumpToQuiz={handleNavigateToQuiz}
+              selectedDayHighlight={highlightDay}
+              onClearHighlight={() => setHighlightDay(null)}
+            />
+          )}
+          {activeTab === 'reader' && <KnowledgeReader />}
+          {activeTab === 'algo' && <AlgoCatalog />}
+          {activeTab === 'learning' && <LearningSystemView />}
+          {activeTab === 'source' && <SourceRoadmapView />}
+          {activeTab === 'practice' && (
+            <PracticeCenterView
+              activeSubTab={practiceSubTab}
+              onSelectSubTab={setPracticeSubTab}
+              quizDay={quizDay}
+            />
+          )}
+        </Suspense>
       </main>
 
       {/* Global Linux Remote Dev Guide Modal */}

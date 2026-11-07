@@ -13,7 +13,6 @@ import {
   Star,
   CheckCircle2,
   HelpCircle,
-  FileEdit,
   Flame,
   ChevronLeft,
   ChevronRight,
@@ -53,7 +52,6 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
 
   // Persisted state
   const [dayMastery, setDayMastery] = useLocalStorage<Record<number, number>>('muduo_day_mastery', {});
-  const [dayNotes, setDayNotes] = useLocalStorage<Record<number, string>>('muduo_day_notes', {});
   const [copiedCmd, setCopiedCmd] = useState(false);
 
   useEffect(() => {
@@ -615,23 +613,6 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             <span>Day {currentDay.day} 自测</span>
           </button>
         )}
-
-        {/* Daily Notes Scratchpad - Fills the vertical space naturally */}
-        <div className="flex-1 flex flex-col space-y-1.5 min-h-[220px]">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-            <div className="flex items-center gap-1">
-              <FileEdit size={13} />
-              <span>随堂笔记</span>
-            </div>
-            <span className="text-[10px] text-slate-400 font-normal">自动保存</span>
-          </div>
-          <textarea
-            value={dayNotes[currentDay.day] || ''}
-            onChange={e => setDayNotes(prev => ({ ...prev, [currentDay.day]: e.target.value }))}
-            placeholder="记录踩坑心得、参数细节与思考..."
-            className="flex-1 w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-hidden focus:border-sky-500 transition resize-none leading-relaxed"
-          />
-        </div>
       </aside>
     </div>
   );

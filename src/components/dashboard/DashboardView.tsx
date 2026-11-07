@@ -482,7 +482,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         key={d.day}
                         onClick={() => onNavigateToDay(d.day)}
                         type="button"
-                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[5.25rem] active-press smooth-hover group ${
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[4.75rem] active-press smooth-hover group ${
                           isMastered
                             ? 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-600 shadow-xs'
                             : isLearning
@@ -511,7 +511,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         </div>
 
                         <div
-                          className={`text-xs font-semibold line-clamp-2 leading-tight mt-1.5 ${
+                          className={`text-xs font-bold truncate mt-1.5 ${
                             isMastered || isLearning
                               ? 'text-white'
                               : 'text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400'
