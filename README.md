@@ -1,6 +1,6 @@
 # Muduo & CppAIService 学习与训练控制台 (Muduo Study Console)
 
-![Version](https://img.shields.io/badge/version-v6.6.1-blue.svg)
+![Version](https://img.shields.io/badge/version-v6.7.0-blue.svg)
 ![React](https://img.shields.io/badge/React-18-cyan.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6.svg)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-38B2AC.svg)
@@ -85,6 +85,7 @@ npm run build
 
 | 版本 | 发布日期 | 更新重点与改动说明 |
 | :--- | :--- | :--- |
+| **v6.7.0** | 2026-11-07 | **StyleKit 新拟物派 (Neumorphism) 4 独立指标卡重构与软触感交互**：<br/>• **彻底恢复 4 个独立指标卡**：响应用户“不要四合一，还是分开”的明确设计诉求，摒弃上一轮的一体化单条带，重塑为网格排列的 4 张独立指标卡片（任务体系、项目剖析、算法题库、专注沉浸）；<br/>• **严格遵守 StyleKit 新拟物派规范 (Hard Prompt)**：统一采用浅灰单色 `#e0e5ec`（暗色 `#1e2024`）基准基底，杜绝纯黑/纯白底色与任何渐变（`bg-gradient-*`），杜绝粗边框与直角，外凸卡片应用双光源立体阴影（左上 `-X/-Y #ffffff` 亮光、右下 `+X/+Y #b8bcc2` 暗阴影）；<br/>• **光学规律与触觉物理动效**：严禁任何 `translate` 浮起位移（元素生长于基底），Hover 时外阴影由 `8px` 缩小至 `4px`（模拟手指靠近遮光效应），Active 点击时由外凸切换为内凹（Extrude to Intrude）；<br/>• **内凹微进度槽与专注软触感按键**：图标与进度槽均采用 `shadow-[inset...]` 凹陷设计并以 `#6d5dfc` 点缀，第 4 张卡片独立嵌入 Neumorphic 软触感起停按键，点击阻止事件冒泡并无缝驱动跨 Tab 绝对时间戳计时器。 |
 | **v6.6.1** | 2026-11-07 | **消除启动白屏卡顿、静态多通道双模自愈引导与生产资源根同步**：<br/>• **根除首屏卡死在启动动画的根因**：定位由于 GitHub Pages 绑定 `main` 分支根目录，静态服务器无法执行开发环境 `/src/main.tsx` 脚本导致 React 无法挂载的物理缺陷；<br/>• **双模自愈引导器与看门狗机制**：在 `index.html` 注入 `window.__BOOTSTRAP_PRODUCTION__` 瞬时自愈脚本与 400ms 看门狗，一旦探测到静态环境 404，立即静默自动载入生产 CSS 与 JS，彻底告别卡顿；<br/>• **根目录静态生产资源双轨同步**：配置 Vite 构建流水线自动将 `dist/assets` 同步至根目录 `assets/`，并采用稳定的入口命名规范（`assets/index.js`、`assets/index.css`），使无论 GitHub Pages 配置为 `main` 根目录、`gh-pages` 分支还是 Actions 部署均能 100% 秒级启动。 |
 | **v6.6.0** | 2026-11-07 | **仪表盘一体化分段遥测条带 (Segmented Ribbon) 重构与新拟物微触感**：<br/>• **彻底消除彩色 Bento 卡片**：剔除 4 个孤立高饱和度彩色卡片，转向 Linear / Raycast / Vercel 的现代工程工具风格，采用中性冷灰（Slate）单色调克制美学，仅保留极细微的状态点缀；<br/>• **一体化紧凑遥测条带 (Telemetry Bar)**：高度严格控制在 56px~72px 内（桌面 `md:h-16` 64px），单一容器微细边框与 1px `divide-x` 逻辑分割，移动端自适应 2x2 网格，绝不侵占主体工作区垂直空间；<br/>• **新拟物派 (Neumorphism) 触感与内凹微段刻度**：外层容器配备微凸起柔和双重阴影，进度展示摒弃粗笨单色条，采用内凹槽（inset groove dual-shadow）与 7 级微段刻度（micro-ticks）精准表征吃透率；<br/>• **第 4 单元专注遥测原生启停集成**：原生集成一键快速开始/暂停按钮与时间流逝显示，无缝联动 `useFocusTimer` 跨 Tab 绝对时间戳引擎，运行中带呼吸脉冲与 LIVE 标记，空闲时显示今日累计学时。 |
 | **v6.5.0** | 2026-11-07 | **任务行内代码高亮、仪表盘四色卡片、专注计时跨Tab持久化与时长调整至3h**：<br/>• **任务行内代码与加粗安全渲染**：封装零依赖现代 `<InlineMarkdown />` 组件，将核心要点、实验步骤与细微辨析中的反引号代码转译为高对比度圆角代码胶囊，杜绝反引号裸露与 HTML 实体转义破损；<br/>• **仪表盘 4 大指标卡专属四色升级**：消灭单调白底，为任务（天蓝）、项目（翡翠绿）、算法（紫罗兰）、专注（琥珀暖金）定制专属微渐变底色、彩色发光边框与动态进度条，遵循 Emil Kowalski 微交互标准；<br/>• **右侧专注计时跨 Tab 持久化（杜绝切页停止失效归零）**：重塑底层计时为基于 `Date.now()` 系统绝对时间戳的持久化引擎，跨 Tab 切换、刷新页面或后台阅读均保持计时无损，并在顶栏同步展示实时呼吸专注胶囊，点击一键切回仪表盘；<br/>• **今日清单任务时间调整为 3h**：在数据体系与本地存储中将算法练习与项目实战时长规范调整为 180 分钟（3h），并以智能时/分格式（`3h` / `3h (180 分钟)`）友好呈现。 |

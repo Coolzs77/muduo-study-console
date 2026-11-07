@@ -3732,3 +3732,323 @@ node scripts/deploy_all.cjs
   ```
 - **`node scripts/test_v6_6_features.cjs`**：10 项深度断言全部通过；
 - **全流程部署**：同步推送至 `origin/main` 与 `origin/gh-pages`。
+
+
+---
+
+## 第 21 轮 [2026-11-07 14:15]：StyleKit 新拟物派 (Neumorphism) 4 独立卡片重构与软触感交互实现
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与背景**：
+  在完成上一轮一体化分段条带后，用户明确表达了对该方案的不满意与审美疲劳，指出不要把所有指标合为一体，明确提出：“**不要四合一，还是分开**”，并直接引入了专业设计系统规范：
+  > “[新拟物派 (Neumorphism) | StyleKit](https://www.stylekit.top/zh/styles/neumorphism) 这个网站中的样式挺好，请你给我设计，使用这个里面的设计来重构仪表盘，你目前的卡片我很不满意，另外，不要四合一，还是分开”。
+  用户提供了完整的 StyleKit Neumorphism Hard Prompt 规范，对色彩、阴影、光学方向、交互状态做出了严格的物理与工程约束。
+- **预期达成指标**：
+  1. **空间形态重构**：彻底废止单线条带容器，恢复为清晰利落的 4 张独立指标卡片（`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6`），分别承载「任务体系」、「项目剖析」、「算法题库」与「专注沉浸」；
+  2. **严格遵循 Neumorphism 绝对禁止项**：
+     - 杜绝纯黑（`#000000`）与纯白（`#ffffff`）作为卡片底色，底色必须与背景同一色系（浅色 `#e0e5ec`，暗色 `#1e2024`）；
+     - 杜绝渐变背景（`bg-gradient-*`）与粗边框（`border-2` 及以上，设为 `border-0 border-transparent`）；
+     - 杜绝直角（`rounded-none`，采用中等柔和曲率 `rounded-2xl`）；
+     - **杜绝任何位移浮起动效（`translate-x/y`）**：新拟物元素源于背景材质一体塑形，不可悬浮于空中；
+     - **杜绝 hover 时放大阴影**：违背光学物理规律；
+  3. **严格遵守 Neumorphism 必须项与微观物理**：
+     - **双光源系统（Fixed Illuminant）**：固定左上方亮高光（`-X/-Y #ffffff`）与右下方暗阴影（`+X/+Y #b8bcc2`）；
+     - **手指靠近遮光（Hover Shadowing）**：鼠标悬停时外阴影从 `8px` 缩小至 `3px~4px`（模拟手指/指针阻挡环境光）；
+     - **外凸转内凹（Extrude to Intrude）**：按下（active）状态由外凸阴影即时转换为内凹阴影（`shadow-[inset...]`）；
+     - **内凹微进度槽与槽位**：图标底座与进度条全部使用内凹阴影槽，点缀 `#6d5dfc` 主色；
+     - **专注卡片内嵌软触感按键**：Card 4 内嵌 Neumorphic 独立控制按键，具备事件冒泡阻断（`e.stopPropagation()`），并无缝联动系统时钟持久化计时引擎；
+  4. **全生命周期测试与自动化部署**：更新类型检查、编写专属 7 维自动化断言套件、无头浏览器静态测试、生产打包构建与 GitHub 远端双分支同步。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+
+- **涉及文件**：
+  - [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)：重塑仪表盘外层画板为 `#e0e5ec` 拟物基底；移除单线条带，重构为 4 独立 Neumorphic 卡片网格；嵌入内凹微槽与 Card 4 软触感按钮；
+  - [`scripts/test_v6_7_features.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_v6_7_features.cjs)：编写针对 StyleKit Hard Prompt 的 7 维自动化断言脚本；
+  - [`scripts/test_static_auto_heal.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_static_auto_heal.cjs)：更新 Edge 无头浏览器断言文本为新版 Neumorphic 指标卡标题；
+  - [`package.json`](file:///e:/workspace/muduo-study-console/package.json)：版本号升至 `6.7.0`；
+  - [`README.md`](file:///e:/workspace/muduo-study-console/README.md)：更新版本徽标与 Changelog 表格首行；
+  - [`DEV_JOURNAL.md`](file:///e:/workspace/muduo-study-console/DEV_JOURNAL.md)：追加第 21 轮研发实录与多维演进图。
+
+- **核心代码实现片段**：
+  ```tsx
+  {/* StyleKit Neumorphic 4 Distinct Metric Cards (新拟物派 4 独立卡片) */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+    {/* 1. 任务体系指标卡 (独立外凸，内嵌内凹图标与进度槽) */}
+    <div
+      onClick={() => onNavigateTab('daily')}
+      role="button"
+      tabIndex={0}
+      className="bg-[#e0e5ec] dark:bg-[#1e2024] rounded-2xl p-4 sm:p-5 flex flex-col justify-between select-none cursor-pointer border-0 border-transparent shadow-[6px_6px_14px_#b8bcc2,-6px_-6px_14px_#ffffff] md:shadow-[8px_8px_18px_#b8bcc2,-8px_-8px_18px_#ffffff] dark:shadow-[6px_6px_14px_#141618,-6px_-6px_14px_#282c30] dark:md:shadow-[8px_8px_18px_#141618,-8px_-8px_18px_#282c30] hover:shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff] dark:hover:shadow-[3px_3px_6px_#141618,-3px_-3px_6px_#282c30] active:shadow-[inset_4px_4px_8px_#b8bcc2,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#141618,inset_-4px_-4px_8px_#282c30] transition-all duration-300 ease-in-out group"
+      title="点击进入任务体系"
+    >
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+          任务体系
+        </span>
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[#e0e5ec] dark:bg-[#1e2024] shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] text-gray-700 dark:text-gray-300">
+          <Calendar size={15} />
+        </div>
+      </div>
+      ...
+      {/* 内凹微进度槽 */}
+      <div
+        className="w-full h-2 rounded-full bg-[#e0e5ec] dark:bg-[#1e2024] shadow-[inset_2px_2px_4px_#b8bcc2,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#141618,inset_-2px_-2px_4px_#282c30] overflow-hidden p-0.5"
+      >
+        <div
+          className="h-full rounded-full bg-[#6d5dfc] transition-all duration-300 ease-in-out"
+          style={{ width: `${Math.round((masteredDaysCount / 28) * 100)}%` }}
+        />
+      </div>
+    </div>
+
+    {/* 4. 专注指标卡 (独立集成新拟物软触感起停按键) */}
+    <div
+      onClick={() => scrollIntoFocusTimer()}
+      role="button"
+      className="bg-[#e0e5ec] dark:bg-[#1e2024] rounded-2xl p-4 sm:p-5 flex flex-col justify-between select-none cursor-pointer border-0 border-transparent shadow-[6px_6px_14px_#b8bcc2,-6px_-6px_14px_#ffffff] hover:shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff] active:shadow-[inset_4px_4px_8px_#b8bcc2,inset_-4px_-4px_8px_#ffffff] transition-all duration-300 ease-in-out"
+    >
+      ...
+      {/* 新拟物软触感按键 (Extrude to Intrude) */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleFocus();
+        }}
+        type="button"
+        className={`w-full py-1.5 px-3 rounded-xl font-semibold text-xs transition-all duration-300 ease-in-out flex items-center justify-center gap-1.5 cursor-pointer border-0 ${
+          isFocusRunning
+            ? 'bg-[#e0e5ec] dark:bg-[#1e2024] text-[#6d5dfc] shadow-[inset_3px_3px_6px_#b8bcc2,inset_-3px_-3px_6px_#ffffff]'
+            : 'bg-[#e0e5ec] dark:bg-[#1e2024] text-gray-700 shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff] hover:shadow-[1px_1px_3px_#b8bcc2,-1px_-1px_3px_#ffffff] active:shadow-[inset_3px_3px_6px_#b8bcc2,inset_-3px_-3px_6px_#ffffff]'
+        }`}
+      >
+        {isFocusRunning ? <Pause size={13} className="fill-current" /> : <Play size={13} className="fill-current ml-0.5" />}
+        <span>{isFocusRunning ? '专注进行中' : '快速开启专注'}</span>
+      </button>
+    </div>
+  </div>
+  ```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+- **问题现象 1：常规前端悬浮动效破坏新拟物材质物理真实感**
+  - **根本原因 (RCA)**：在传统扁平或 Material Design 中，按钮或卡片 hover 时习惯加上 `hover:-translate-y-1 hover:shadow-xl`。但在 Neumorphism（软塑料/粘土）物理世界中，所有界面元素均是直接从同一块材质背景上“挤压塑形（Molding）”而成的一体结构，物理表面不可能脱离底座飞升；且当手指靠近表面时，手指会遮挡光源，投射到基底边缘的投影面积理应收窄变浅，放大阴影属于违反光学物理的视觉假象。
+  - **解法**：全面清理代码中所有的 `translate` 位移属性，将 hover 状态严格配置为阴影收缩（`8px -> 3px`，Hover Shadowing），按下时由凸起直接转为内凹（`active:shadow-[inset...]`），带来真实的物理压感体验。
+
+- **问题现象 2：事件冒泡导致点击按键时误触发卡片整体滚动行为**
+  - **根本原因 (RCA)**：Card 4 本身配置了 `onClick`（点击平滑滚动并高亮定位至右侧专用专注面板），如果其内部的新拟物软触感按键直接触发，浏览器原生事件冒泡（Event Bubbling）机制会将点击事件传递至外层 Card，导致用户本来只是想就地开始计时，视口却突兀发生了整页滚动。
+  - **解法**：在软触感按键的 `onClick` 处理函数首行执行 `e.stopPropagation()`，明确切断事件向上传播，实现“点击按键仅就地起停计时，点击卡片主体才进行视口导航”的清晰分工。
+
+- **问题现象 3：测试断言脚本提取作用域提前截断**
+  - **根本原因 (RCA)**：编写自动化断言脚本时，使用正则表达式 `\{\/\* 4\. 专注指标卡[\s\S]*?<\/div>\s*<\/div>` 试图匹配卡片，由于非贪婪匹配机制，提前匹配到了卡片内部图标容器的连续封闭 `div` 标签，导致截取后的卡片文本中丢失了软触感按键代码，致使 `toggleFocus` 断言失败。
+  - **解法**：将提取边界修正为前瞻断言 `(?=\{\/\* 28-Day Task Calendar)`，完整包裹整个指标网格区域，使 7 项专项测试 100% 绿色通过。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 架构图 1：StyleKit 新拟物 4 独立卡片双光源光学拓扑与材质层次图
+
+```mermaid
+flowchart TD
+    subgraph ViewportCanvas ["Neumorphic 统一物理画板 (Canvas: #e0e5ec / #1e2024)"]
+        subgraph LightSource ["环境光照模型 (Fixed Dual-Light System)"]
+            TopLeft["左上方亮高光 (-X, -Y, #ffffff)\n模拟左上方主光源漫反射"]
+            BottomRight["右下方暗阴影 (+X, +Y, #b8bcc2)\n模拟物体遮挡环境漫反射形成的柔和暗投影"]
+        end
+
+        subgraph CardGrid ["4 独立物理挤压成型卡片网格 (grid-cols-2 md:grid-cols-4)"]
+            Card1["1. 任务体系卡 (Convex 凸起)\n• 掌握天数: 1 / 28 天 (等宽字)\n• 嵌入凹陷图标槽 (Inset Groove)\n• 嵌入凹陷微进度条 (Inset Slot)"]
+            Card2["2. 项目剖析卡 (Convex 凸起)\n• 专栏精读: 2 / 27 篇\n• 嵌入凹陷图标槽\n• 嵌入凹陷微进度条"]
+            Card3["3. 算法题库卡 (Convex 凸起)\n• 刷题进展: 10 / 234 题\n• 嵌入凹陷图标槽\n• 嵌入凹陷微进度条"]
+            Card4["4. 专注沉浸卡 (Convex 凸起)\n• 今日时长: 0 / 180 分 / LIVE 时钟\n• 嵌入软触感起停按键 (Soft Button)\n• 按压凹陷/运行时保持凹陷 (#6d5dfc)"]
+        end
+    end
+
+    TopLeft -.->|投影照射| Card1 & Card2 & Card3 & Card4
+    BottomRight -.->|背光投影| Card1 & Card2 & Card3 & Card4
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了 StyleKit Neumorphism 的物理光照模型与 4 独立卡片在画板上的拓扑分布：
+  1. 页面视口完全采用同一色系基底（`#e0e5ec` / `#1e2024`），卡片与画板在材质上连续一体，消除了割裂与悬浮感；
+  2. 左上（`-X/-Y`）与右下（`+X/+Y`）构成立体双光源，暗阴影与亮高光互为反向偏置，塑造出自然的外凸凸起轮廓；
+  3. 卡片内部的图标底座和微进度槽，反转为内凹阴影（`shadow-[inset...]`），在凸起卡片上进一步创造二级凹陷深度，层次分明。
+- **底层架构收益**：
+  彻底响应用户“不要四合一，还是分开”的设计诉求，各个模块信息独立可辨，空间呼吸感充足。
+
+---
+
+#### 架构图 2：Neumorphism 触觉状态机与物理光学迁移图
+
+```mermaid
+stateDiagram-v2
+    [*] --> ConvexDefault: 默认静态状态 (Extrude)
+    
+    state ConvexDefault {
+        desc1: 8px 凸起外双阴影 (shadow-[8px_8px_18px_#b8bcc2,-8px_-8px_18px_#ffffff])
+        desc2: 元素自画板自然隆起，无任何位移
+    }
+
+    ConvexDefault --> HoverApproaching: 指针/手指悬停靠近 (Hover)
+    
+    state HoverApproaching {
+        desc3: 手指靠近遮挡入射光，阴影收窄变浅
+        desc4: 缩小为 3px 浅阴影 (hover:shadow-[3px_3px_6px_#b8bcc2,-3px_-3px_6px_#ffffff])
+        desc5: 严禁 translate 位移
+    }
+
+    HoverApproaching --> ConvexDefault: 指针移开 (MouseLeave)
+    HoverApproaching --> PressedIntrude: 鼠标/手指按下 (MouseDown / Active)
+
+    state PressedIntrude {
+        desc6: 物理表面受力下陷，由凸转凹 (Extrude to Intrude)
+        desc7: 切换为内凹阴影 (active:shadow-[inset_4px_4px_8px_#b8bcc2,inset_-4px_-4px_8px_#ffffff])
+    }
+
+    PressedIntrude --> HoverApproaching: 释放按压 (MouseUp)
+    
+    state FocusButtonSpecial {
+        state IdleConvex: 空闲未启动 (外凸按键 3px)
+        state RunningIntrude: 计时运行中 (保持内凹 inset 3px + #6d5dfc 高亮 + 脉冲呼吸)
+        
+        IdleConvex --> RunningIntrude: 点击触发 toggleFocus()
+        RunningIntrude --> IdleConvex: 再次点击暂停
+    }
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  系统状态机精确表达了 StyleKit Hard Prompt 对交互物理的刚性约束：
+  1. **静态凸起态 (`ConvexDefault`)**：元素自然凸出，维持标准 8px 双重阴影；
+  2. **悬停遮光态 (`HoverApproaching`)**：遵循光学阻挡原理，阴影由 8px 收窄至 3px，严禁产生“浮空移动”；
+  3. **受力下陷态 (`PressedIntrude`)**：瞬间反转为内凹阴影（inset），产生真实的软塑料回弹触感；
+  4. **专注按键专用状态 (`FocusButtonSpecial`)**：运行态直接保持在内凹状态，并点缀 `#6d5dfc` 主色与脉冲，直观表征“正在沉浸计时”。
+- **底层架构收益**：
+  动效全量由 CSS 阴影属性与 GPU 硬件加速合成，执行开销极小且无重排抖动（Zero Reflow）。
+
+---
+
+#### 架构图 3：第 4 单元专注软触感按键事件隔离与时间戳引擎调度时序图
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 用户交互
+    participant Btn as 软触感起停按键 (button)
+    participant Card as Card 4 容器 (div)
+    participant TimerHook as useFocusTimer 状态引擎
+    participant Storage as localStorage (持续化存储)
+    participant Panel as 右侧专注面板 (#dashboard-focus-timer)
+
+    alt 用户点击卡片空白主体
+        User->>Card: 点击卡片主体区域
+        Card->>Panel: document.getElementById('dashboard-focus-timer').scrollIntoView()
+        Card->>Panel: classList.add('ring-2', 'ring-[#6d5dfc]') (高亮提醒 1.5s)
+    else 用户点击卡片内新拟物软按键
+        User->>Btn: 点击按键 (Play / Pause)
+        Btn->>Btn: 执行 e.stopPropagation() (阻断冒泡)
+        Btn--xCard: 事件被拦截，不会触发卡片滚动
+        Btn->>TimerHook: 调用 toggleFocus()
+        TimerHook->>Storage: 写入绝对时间戳 (baseTimestamp = Date.now())
+        TimerHook->>TimerHook: 更新 isFocusRunning 状态
+        TimerHook-->>Btn: 切换按键形态 (外凸 Play -> 内凹 Pause)
+        TimerHook-->>Card: 显示实时递增时间 (focusFormattedTime + LIVE 标)
+    end
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  清晰解构了单一卡片内部复合交互的事件路由与调度机制：
+  1. 点击卡片主体时，平滑定位到右侧面板并加以高亮光圈，满足用户深度设置需求；
+  2. 点击按键时，通过 `e.stopPropagation()` 阻断事件扩散，专心处理计时器引擎的起停；
+  3. 计时器依托基于 `Date.now()` 的绝对时间戳引擎工作，跨 Tab 与页面刷新数据始终严谨保持。
+- **底层架构收益**：
+  杜绝了交互歧义与界面误动，提供了利落平滑的操作手感。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **严格遵循 WCAG AA 高对比度要求**：文字选用 `text-gray-800` 与 `text-gray-700`（夜间模式 `text-gray-100` 与 `text-gray-300`），在 `#e0e5ec` 软粘土基底上达到 7:1 以上的对比度，彻底杜绝发虚看不清；
+- **排版呼吸节奏**：卡片内部高度自适应扩展，统一采用等宽字体（`font-mono tabular-nums`）排布数字，避免数字变动时的文本横向跳动；
+- **全屏流式与自适应对齐**：4 卡片在移动端自适应为 2×2 网格，桌面端平铺为 1×4，并随着大屏流式自适应舒展，彻底消除留白死角。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 进入工程根目录
+cd e:\workspace\muduo-study-console
+
+# 2. 执行静态 TypeScript 编译验证 (0 错误)
+npx tsc --noEmit
+
+# 3. 执行 StyleKit 新拟物派专属自动化 7 维深度断言
+node scripts/test_v6_7_features.cjs
+
+# 4. 执行生产环境打包构建并同步根目录 assets
+npm run build
+
+# 5. 执行 Edge/Chromium 无头浏览器端到端静态自愈与卡片渲染验证
+node scripts/test_static_auto_heal.cjs
+
+# 6. 执行全自动提交并推送到 origin/main 与 origin/gh-pages
+node scripts/deploy_all.cjs
+```
+
+#### (2) 实际运行结果断言
+- **`npx tsc --noEmit`**：执行成功，退出码 `0`，0 个 TypeScript 编译错误；
+- **`node scripts/test_v6_7_features.cjs`**：
+  ```
+  🧪 Starting deep verification suite for v6.7.0 StyleKit Neumorphism features...
+
+  --- Test 1: Separation into 4 Distinct Cards ---
+  ✓ 4 distinct separated cards confirmed (no unified ribbon / no divide-x).
+
+  --- Test 2: StyleKit Neumorphism Absolute Prohibitions ---
+  ✓ Hard Prompt Prohibitions: No pure white/black, no gradients, no thick borders, no rounded-none, no translate displacement verified.
+
+  --- Test 3: Dual-Light Physics & Fixed Illuminant Direction ---
+  ✓ Canonical dual light source (top-left highlight #ffffff, bottom-right shadow #b8bcc2) verified.
+
+  --- Test 4: Hover Shadowing & Active Extrude-to-Intrude ---
+  ✓ Hover Shadowing (shrinking shadow) & Active Extrude-to-Intrude confirmed.
+
+  --- Test 5: Recessed Inset Grooves & Progress Slots ---
+  ✓ Recessed inset micro-groove shadows and #6d5dfc accent verified.
+
+  --- Test 6: Card 4 Focus Timer & Neumorphic Soft Button ---
+  ✓ Card 4 Focus timer integration & Neumorphic soft button verified.
+
+  --- Test 7: Semantic Titles & Information Hierarchy ---
+  ✓ All 4 card semantic titles and clean hierarchy confirmed.
+
+  🎉 ALL 7 ADVANCED STYLEKIT NEUMORPHISM TEST SUITES PASSED WITH 100% SUCCESS!
+  ```
+- **`npm run build`**：
+  ```
+  dist/index.html                                6.17 kB │ gzip:   2.41 kB
+  dist/assets/index.css                         87.87 kB │ gzip:  13.72 kB
+  dist/assets/index.js                         799.36 kB │ gzip: 237.96 kB
+  ✓ built in 8.17s
+  ✓ Copied images/ to dist/images/
+  ✓ Synced dist/assets/ to root assets/ for dual-channel static hosting
+  ✓ Successfully completed Vite production build
+  ✓ Copied classic.html -> dist/classic.html
+  ✓ Created dist/.nojekyll
+  [BUILD SUCCESS] Production ready static build in dist/
+  ```
+- **`node scripts/test_static_auto_heal.cjs`**：
+  ```
+  ✓ Pure static mock server listening on port 4173
+  Navigating to http://localhost:4173/index.html (simulating GitHub Pages serving repo root)...
+  ✓ React successfully mounted and replaced initial loader in static environment!
+  ✓ Has Neumorphic Metric Cards: true
+  🎉 STATIC AUTO-HEAL TEST PASSED 100%! The page loads flawlessly in pure static root hosting!
+  ```

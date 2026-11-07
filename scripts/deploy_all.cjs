@@ -8,7 +8,7 @@ try {
   const fs = require('fs');
   const pkg = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf8'));
   const version = pkg.version || '6.6.0';
-  execSync(`git commit -m "fix: 根除首屏启动卡死、静态多通道双模自愈引导与生产资源根同步 (v${version})"`, { cwd: rootDir, stdio: 'inherit' });
+  execSync(`git commit -m "feat: StyleKit 新拟物派 (Neumorphism) 4 独立卡片重构与软触感交互 (v${version})"`, { cwd: rootDir, stdio: 'inherit' });
   console.log('[DEPLOY-ALL] Pushing main branch to origin/main...');
   execSync('git push origin main', { cwd: rootDir, stdio: 'inherit' });
   console.log('✓ [DEPLOY-ALL] Pushed main successfully!');

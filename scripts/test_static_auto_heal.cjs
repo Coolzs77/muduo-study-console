@@ -64,14 +64,14 @@ async function runTest() {
 
     console.log('✓ React successfully mounted and replaced initial loader in static environment!');
     
-    const hasRibbon = await page.evaluate(() => {
+    const hasNeumorphicCards = await page.evaluate(() => {
       const text = document.body.innerText;
-      return text.includes('任务进度') && text.includes('专注遥测');
+      return text.includes('任务体系') && text.includes('专注沉浸');
     });
-    console.log(`✓ Has Telemetry Segmented Ribbon: ${hasRibbon}`);
+    console.log(`✓ Has Neumorphic Metric Cards: ${hasNeumorphicCards}`);
 
-    if (!hasRibbon) {
-      throw new Error('Telemetry Ribbon not found in rendered DOM!');
+    if (!hasNeumorphicCards) {
+      throw new Error('Neumorphic Metric Cards not found in rendered DOM!');
     }
 
     console.log('🎉 STATIC AUTO-HEAL TEST PASSED 100%! The page loads flawlessly in pure static root hosting!');
