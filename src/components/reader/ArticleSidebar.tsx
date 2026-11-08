@@ -183,7 +183,7 @@ export const ArticleSidebar: React.FC<ArticleSidebarProps> = ({
         <div className="bg-gradient-to-br from-amber-100/70 via-orange-50 to-yellow-100/70 dark:from-amber-950/40 dark:via-orange-900/30 dark:to-yellow-900/40 p-3 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-1.5">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-amber-900 dark:text-amber-100">
-              {moduleStats.bookName} 吃透 {moduleStats.mastered} / {moduleStats.total} 篇
+              {moduleStats.bookName} 已学习 {moduleStats.mastered} / {moduleStats.total} 篇
             </span>
             <span className="font-mono font-bold text-amber-800 dark:text-amber-200">
               {moduleStats.pct}%
@@ -253,7 +253,7 @@ export const ArticleSidebar: React.FC<ArticleSidebarProps> = ({
                   <div className="flex items-center gap-1.5 shrink-0">
                     {isMastered && (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
-                        ✓ 已吃透
+                        ✓ 已学习
                       </span>
                     )}
                     {isLearning && (

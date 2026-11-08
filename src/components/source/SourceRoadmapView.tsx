@@ -102,7 +102,7 @@ export const SourceRoadmapView: React.FC = () => {
 
   // Stats
   const masteredCompCount = useMemo(() => {
-    return Object.values(componentStatus).filter(s => s === '已吃透').length;
+    return Object.values(componentStatus).filter(s => s === '已学习' || s === '已吃透').length;
   }, [componentStatus]);
 
   return (
@@ -154,7 +154,7 @@ export const SourceRoadmapView: React.FC = () => {
           <div
             className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/60 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] flex flex-col items-center justify-center text-[10px] font-mono font-bold text-amber-800 dark:text-amber-300 cursor-pointer active:scale-x-105 active:scale-y-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
             onClick={() => setIsSidebarCollapsed(false)}
-            title={`已吃透组件: ${masteredCompCount}/8`}
+            title={`已学组件: ${masteredCompCount}/8`}
           >
             {masteredCompCount}/8
           </div>
@@ -232,7 +232,7 @@ export const SourceRoadmapView: React.FC = () => {
               {filteredComponents.map(comp => {
                 const isSelected = selectedCompId === comp.id;
                 const status = componentStatus[comp.id] || '未读';
-                const isMastered = status === '已吃透';
+                const isMastered = status === '已学习' || status === '已吃透';
 
                 return (
                   <button
@@ -330,14 +330,14 @@ export const SourceRoadmapView: React.FC = () => {
                 </h1>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-bold shadow-[inset_1.5px_1.5px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] ${
-                    componentStatus[currentComp.id] === '已吃透'
+                    componentStatus[currentComp.id] === '已学习' || componentStatus[currentComp.id] === '已吃透'
                       ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
                       : componentStatus[currentComp.id] === '学习中'
                       ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
                       : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                   }`}
                 >
-                  {componentStatus[currentComp.id] || '未读'}
+                  {componentStatus[currentComp.id] === '已吃透' ? '已学习' : (componentStatus[currentComp.id] || '未读')}
                 </span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed font-medium">
@@ -480,8 +480,9 @@ export const SourceRoadmapView: React.FC = () => {
               设置 {currentComp.name} 掌握状态
             </div>
             <div className="grid grid-cols-3 gap-1.5">
-              {(['已吃透', '学习中', '未读'] as const).map(st => {
-                const isCur = (componentStatus[currentComp.id] || '未读') === st;
+              {(['已学习', '学习中', '未读'] as const).map(st => {
+                const currentStatus = componentStatus[currentComp.id] === '已吃透' ? '已学习' : (componentStatus[currentComp.id] || '未读');
+                const isCur = currentStatus === st;
                 return (
                   <button
                     key={st}
@@ -489,7 +490,7 @@ export const SourceRoadmapView: React.FC = () => {
                     type="button"
                     className={`py-1.5 rounded-2xl text-xs font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
                       isCur
-                        ? st === '已吃透'
+                        ? st === '已学习'
                           ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[2px_2px_6px_rgba(16,185,129,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)] font-bold -translate-y-0.5'
                           : st === '学习中'
                           ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-[2px_2px_6px_rgba(245,158,11,0.3),inset_1.5px_1.5px_3px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_0_rgba(255,255,255,0.15)] font-bold -translate-y-0.5'
@@ -508,7 +509,7 @@ export const SourceRoadmapView: React.FC = () => {
         {/* Roadmap Total Progress */}
         <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-100/70 to-yellow-50/70 dark:from-amber-950/40 dark:to-yellow-900/30 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-amber-900 dark:text-amber-200">
-            <span>核心组件已吃透</span>
+            <span>核心组件已学习</span>
             <span className="font-mono font-bold text-amber-800 dark:text-amber-300">
               {masteredCompCount} / {SOURCE_ROADMAP.length}
             </span>

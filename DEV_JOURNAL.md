@@ -6097,3 +6097,187 @@ sequenceDiagram
   [BUILD SUCCESS] Production ready static build in dist/
   ```
 
+
+
+---
+
+## 第 30 轮 [2026-11-08 17:25]：全局消除“吃透”焦虑词汇，重构为平和自然的“学习”体系
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求**：
+  用户在体验 `Muduo & CppAIService` 学习控制台 (https://coolzs77.github.io/muduo-study-console/) 时指出：
+  “对于我的[Muduo & CppAIService](https://coolzs77.github.io/muduo-study-console/),删除吃透,替换为别的,吃透让人不适 换为学习更合适”。
+- **背景与认知分析**：
+  “吃透”一词带有强烈的功利主义与过度用力感，作为学习软件的核心文案容易给学习者带来沉重的心理压迫与焦虑。改用“学习”与“掌握”等更平和、谦逊、接地气的语汇，契合循序渐进的真实学习心智。
+- **技术指标与改造范围**：
+  1. 全局清理 Dashboard 仪表盘、Daily Curriculum 任务体系、Knowledge Reader 专栏精读、Source Roadmap 源码路线图中所有直接面向用户的“吃透”文案；
+  2. 统一步骤度量：将“吃透进度”统一调整为“学习进度”；
+  3. 统一状态表达：将“✓ 已吃透”规范为“✓ 已学习”；
+  4. 阶位与评级梳理：将掌握度第 5 级从“5 吃透”规范为“5 调优”（与前几个级别的“0 未学、1 概念、2 机制、3 阐述、4 编码”形成严谨对称）；
+  5. 历史缓存兼容：对源码路线图中存储在 `localStorage` 的旧状态值（`'已吃透'`）做无缝平滑兼容，展示层统一映射为“已学习”，保证老用户进度不丢失；
+  6. 执行 Vite 编译构建并由 Selenium 自动化测试在四大主要视图中进行真机断言与全景截图。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+
+涉及的核心文件与代码改动如下：
+
+1. [`src/components/dashboard/DashboardView.tsx`](file:///e:/workspace/muduo-study-console/src/components/dashboard/DashboardView.tsx)
+   - 任务指标卡：将“吃透进度”改名为“学习进度”，`title` 属性中的“任务吃透率”修改为“学习进度”；
+   - 28 天任务日历图例：绿色状态指示珠从“已吃透”修改为“已学习”；
+   - 日历微砖卡片内部：完成状态徽标从 `<Check /> <span>已吃透</span>` 修改为 `<Check /> <span>已学习</span>`。
+
+2. [`src/components/daily/DailyCurriculumView.tsx`](file:///e:/workspace/muduo-study-console/src/components/daily/DailyCurriculumView.tsx)
+   - 掌握度状态数组 `labels`：将第 4 级从 `'✓ 已吃透 (独立编码)'` 修改为 `'✓ 已学习 (独立编码)'`；
+   - 任务侧边栏进度摘要：从“吃透进度 (x/28 天)”修改为“学习进度 (x/28 天)”；
+   - 侧边栏任务卡片：状态标签从 `✓ 已吃透` 统一替换为 `✓ 已学习`；
+   - 右侧掌握度评级区域：将最高级别按钮从 `{ lvl: 5, label: '5 吃透' }` 优化为 `{ lvl: 5, label: '5 调优' }`，已完成徽标同步更新为 `✓ 已学习`。
+
+3. [`src/components/reader/ArticleSidebar.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/ArticleSidebar.tsx)
+   - 专栏分类统计条：文案从 `{bookName} 吃透 x / y 篇` 调整为 `{bookName} 已学习 x / y 篇`；
+   - 专栏文章列表项：绿色徽章从 `✓ 已吃透` 统一替换为 `✓ 已学习`。
+
+4. [`src/components/reader/MasterySelector.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/MasterySelector.tsx)
+   - 掌握度阶位配置：将第 4 级阶位标签从 `'✓ 已吃透 (独立编码)'` 统一调整为 `'✓ 已学习 (独立编码)'`。
+
+5. [`src/components/source/SourceRoadmapView.tsx`](file:///e:/workspace/muduo-study-console/src/components/source/SourceRoadmapView.tsx)
+   - 统计计算与过滤：更新过滤条件为 `s === '已学习' || s === '已吃透'`，保证旧数据兼容；
+   - 组件状态切换按钮组：选项从 `['已吃透', '学习中', '未读']` 重构为 `['已学习', '学习中', '未读']`；
+   - 界面状态标签与总览进度：文案从“已吃透组件”、“核心组件已吃透”更新为“已学组件”、“核心组件已学习”。
+
+6. [`js/dataset-domain.js`](file:///e:/workspace/muduo-study-console/js/dataset-domain.js) & [`docs/8_WEEK_ROADMAP.md`](file:///e:/workspace/muduo-study-console/docs/8_WEEK_ROADMAP.md)
+   - 描述文本中的“吃透 epoll”、“重点吃透 shared_ptr”等功利性文案统一更新为“系统学习”、“重点学习”。
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题 1：历史 LocalStorage 数据与新状态字面量的对齐兼容
+- **问题现象**：
+  源码路线图组件中，用户的组件学习状态以往直接持久化为字符串 `'已吃透'`。如果仅仅将状态选项硬编码修改为 `'已学习'`，已访问过的用户其历史组件不会自动亮起绿色完成态。
+- **根本原因 (RCA)**：
+  状态机使用了中文文本作为枚举键而非数字 ID，且未设置映射转换。
+- **解决方案**：
+  在读取状态和判断激活态时增加平滑迁移逻辑：
+  ```typescript
+  const currentStatus = componentStatus[currentComp.id] === '已吃透' 
+    ? '已学习' 
+    : (componentStatus[currentComp.id] || '未读');
+  ```
+  这样老用户无论何时打开，历史标记都会自动平滑呈现在“已学习”按钮上，兼顾了数据兼容与词汇净化。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：学习状态度量体系重构前后对比流向
+```mermaid
+flowchart LR
+    subgraph Legacy ["旧文案度量体系 (焦躁施压型)"]
+        direction TB
+        L1["吃透进度 (Progress)"] --> L2["状态标签: ✓ 已吃透"]
+        L2 --> L3["评级: 5 吃透"]
+        L3 --> L4["隐喻: 功利强求、制造焦虑"]
+    end
+
+    subgraph Refactored ["新文案度量体系 (平和自然型)"]
+        direction TB
+        R1["学习进度 (Progress)"] --> R2["状态标签: ✓ 已学习"]
+        R2 --> R3["评级: 5 调优"]
+        R3 --> R4["隐喻: 循序渐进、温和沉淀"]
+    end
+
+    Legacy -.->|用户体验重构| Refactored
+```
+**【架构解析与设计意图】**：
+对比图清晰展现了从“吃透”到“学习”的语义演化路径：
+旧体系将学习成果简化为“吃透”，具有强烈的应试色彩与焦虑隐喻；新体系采用对称自然的“已学习、学习中、未开始”，在心理层面上更符合日常工程探索的真实节奏。
+
+---
+
+#### 图 2：掌握度层级阶梯与状态映射模型
+```mermaid
+stateDiagram-v2
+    [*] --> 未学: Level 0 (未开始)
+    未学 --> 概念: Level 1 (快速了解)
+    概念 --> 机制: Level 2 (掌握机制)
+    机制 --> 阐述: Level 3 (能口述原理)
+    阐述 --> 已学习: Level 4 (独立编码实现)
+    已学习 --> 调优: Level 5 (深入调优与排障)
+    
+    note right of 已学习
+      原: ✓ 已吃透 (独立编码)
+      现: ✓ 已学习 (独立编码)
+      呈现: 翡翠绿糖果拟态徽章
+    end note
+
+    note right of 调优
+      原: 5 吃透
+      现: 5 调优
+      呈现: 生产级深入排障
+    end note
+```
+**【架构解析与设计意图】**：
+上图为 6 级掌握度状态机阶梯模型。将 Level 4 规范为“已学习（独立编码）”，Level 5 规范为“调优”，形成了“概念 -> 机制 -> 阐述 -> 编码（已学习） -> 调优”的完整闭环，字数均整、层次分明。
+
+---
+
+#### 图 3：全局四大核心视图统一净化拓扑
+```mermaid
+flowchart TD
+    AppRoot["Muduo & CppAIService 控制台"] --> Dash["1. 仪表盘 (DashboardView)<br/>• 学习进度卡片<br/>• 日历图例: 已学习 / 学习中 / 未开始<br/>• D01~D28 徽章: 已学习"]
+    AppRoot --> Daily["2. 任务中心 (DailyCurriculumView)<br/>• 学习进度统计<br/>• 任务微砖: ✓ 已学习<br/>• 评级选项: 5 调优"]
+    AppRoot --> Reader["3. 专栏阅读 (ArticleSidebar)<br/>• 专栏已学习统计<br/>• 目录项: ✓ 已学习"]
+    AppRoot --> Source["4. 源码路线 (SourceRoadmapView)<br/>• 核心组件已学习<br/>• 状态选择: [已学习 / 学习中 / 未读]"]
+```
+**【架构解析与设计意图】**：
+该拓扑图展示了四大功能视图在本次文案净化改造中的对齐结构，所有入口、侧边栏、进度条以及状态徽章全部实现了无死角的词汇对齐与风格统一。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+1. **消除心理阻抗**：彻底去除了“吃透”这种带有压迫感的字眼，整体界面语调变得舒适、克制、亲和；
+2. **术语对称性**：图例中“已学习、学习中、未开始”在词性与格式上完全对应，排版更具秩序美感；
+3. **阶位名称专业化**：最高级评级用“调优”替代“吃透”，更加贴合 Linux C++ 高性能服务器编程与调优的真实工作要求。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### 自动化测试执行命令
+```bash
+# 进入 muduo-study-console 项目
+cd e:\workspace\muduo-study-console
+
+# 1. 运行系统已有规则与语法树检测
+npm test
+
+# 2. 运行无头浏览器全景断言
+python scripts/verify_muduo_selenium.py
+```
+
+#### 控制台真实测试输出
+```text
+[*] Local static server serving E:\workspace\muduo-study-console\dist on http://127.0.0.1:4199
+[1] Inspecting Dashboard View...
+  ✓ [PASS] Dashboard verified: '学习进度' & '已学习' present, ZERO '吃透'!
+  ✓ Saved screenshot: docs/images/verify_muduo_dashboard_learning.png
+[2] Switching to Daily Curriculum View...
+  ✓ [PASS] Daily Curriculum verified: '学习进度' present, ZERO '吃透'!
+  ✓ Saved screenshot: docs/images/verify_muduo_daily_learning.png
+[3] Switching to Knowledge Reader View...
+  ✓ [PASS] Knowledge Reader verified: ZERO '吃透'!
+  ✓ Saved screenshot: docs/images/verify_muduo_reader_learning.png
+[4] Switching to Source Roadmap View...
+  ✓ [PASS] Source Roadmap verified: '已学习' present, ZERO '吃透'!
+  ✓ Saved screenshot: docs/images/verify_muduo_source_learning.png
+
+🎉🎉 ALL MUDUO VIEWS VERIFIED: '吃透' COMPLETELY REPLACED BY '学习' WITH ZERO DEFECTS! 🎉🎉
+```
+
+#### 实机交付物截图凭据
+- **仪表盘全景学习进度凭据**：[`docs/images/verify_muduo_dashboard_learning.png`](file:///e:/workspace/muduo-study-console/docs/images/verify_muduo_dashboard_learning.png)
+- **任务体系“已学习”状态凭据**：[`docs/images/verify_muduo_daily_learning.png`](file:///e:/workspace/muduo-study-console/docs/images/verify_muduo_daily_learning.png)
+- **项目专栏研读徽章凭据**：[`docs/images/verify_muduo_reader_learning.png`](file:///e:/workspace/muduo-study-console/docs/images/verify_muduo_reader_learning.png)
+- **源码路线组件“已学习”凭据**：[`docs/images/verify_muduo_source_learning.png`](file:///e:/workspace/muduo-study-console/docs/images/verify_muduo_source_learning.png)

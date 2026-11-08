@@ -12,7 +12,7 @@ const MASTERY_TIERS = [
   { level: 1, label: '了解概念', desc: '通读核心概念与背景' },
   { level: 2, label: '理清时序', desc: '理清调用链与状态机' },
   { level: 3, label: '能够阐述', desc: '口述架构亮点与设计取舍' },
-  { level: 4, label: '✓ 已吃透 (独立编码)', desc: '独立编写与重构核心模块' },
+  { level: 4, label: '✓ 已学习 (独立编码)', desc: '独立编写与重构核心模块' },
   { level: 5, label: '✓ 生产调优', desc: '深入排障与生产级性能调优' },
 ];
 

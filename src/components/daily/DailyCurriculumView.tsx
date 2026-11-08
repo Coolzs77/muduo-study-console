@@ -109,7 +109,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
 
   const setMasteryLevel = (level: number) => {
     setDayMastery(prev => ({ ...prev, [selectedDayNum]: level }));
-    const labels = ['未学', '快速了解', '掌握机制', '能口述原理', '✓ 已吃透 (独立编码)', '✓ 深度调优'];
+    const labels = ['未学', '快速了解', '掌握机制', '能口述原理', '✓ 已学习 (独立编码)', '✓ 深度调优'];
     showToast(`Day ${selectedDayNum} 掌握状态更新为: ${labels[level] || '已更新'}`, 'success');
   };
 
@@ -230,7 +230,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
             <div className="bg-gradient-to-br from-emerald-100/70 via-teal-50 to-green-100/70 dark:from-emerald-950/40 dark:via-teal-900/30 dark:to-green-900/40 p-3 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-teal-900 dark:text-teal-100">
-                  吃透进度 ({stats.mastered}/{stats.total} 天)
+                  学习进度 ({stats.mastered}/{stats.total} 天)
                 </span>
                 <span className="font-mono font-bold text-teal-800 dark:text-teal-200">
                   {stats.pct}%
@@ -301,7 +301,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
                       </span>
                       {isMastered && (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] shrink-0">
-                          ✓ 已吃透
+                          ✓ 已学习
                         </span>
                       )}
                       {isLearning && (
@@ -564,7 +564,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
           <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-slate-100">
             <span>掌握度评级</span>
             <span className="font-mono text-[11px] text-teal-700 dark:text-teal-300 font-bold">
-              {(dayMastery[currentDay.day] || 0) >= 4 ? '✓ 已吃透' : `${dayMastery[currentDay.day] || 0} 阶`}
+              {(dayMastery[currentDay.day] || 0) >= 4 ? '✓ 已学习' : `${dayMastery[currentDay.day] || 0} 阶`}
             </span>
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -574,7 +574,7 @@ export const DailyCurriculumView: React.FC<DailyCurriculumViewProps> = ({
               { lvl: 2, label: '2 机制' },
               { lvl: 3, label: '3 阐述' },
               { lvl: 4, label: '4 编码' },
-              { lvl: 5, label: '5 吃透' }
+              { lvl: 5, label: '5 调优' }
             ].map(tier => {
               const currentLvl = dayMastery[currentDay.day] || 0;
               const isSelected = currentLvl === tier.lvl;

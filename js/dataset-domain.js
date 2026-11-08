@@ -16,7 +16,7 @@ var DOMAIN_PROJECTS = [
     yuqueUrl: "https://www.yuque.com/chengxuyuancarl/gixnqn",
     yuquePassword: "khf4",
     yuqueTitle: "网络库muduo-core",
-    role: "L0~L2 底座：吃透 epoll 水平/边缘触发、One Loop Per Thread 事件循环模型、非阻塞 I/O 与应用层 Buffer 读写",
+    role: "L0~L2 底座：系统学习 epoll 水平/边缘触发、One Loop Per Thread 事件循环模型、非阻塞 I/O 与应用层 Buffer 读写",
     techStack: ["C++11", "Linux", "epoll", "Reactor", "pthread", "POSIX Socket", "RAII"],
     modulesCount: 10,
     tasksCount: 28,

@@ -406,7 +406,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-teal-700 dark:text-teal-300 font-medium">吃透进度</span>
+                <span className="text-teal-700 dark:text-teal-300 font-medium">学习进度</span>
                 <span className="font-mono font-bold text-teal-900 dark:text-teal-100">
                   {Math.round((masteredDaysCount / 28) * 100)}%
                 </span>
@@ -414,7 +414,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               {/* 粘土内凹微进度槽 */}
               <div
                 className="w-full h-2.5 rounded-full bg-emerald-200/50 dark:bg-emerald-950/60 shadow-[inset_3px_3px_6px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] overflow-hidden p-0.5"
-                title={`任务吃透率: ${Math.round((masteredDaysCount / 28) * 100)}%`}
+                title={`学习进度: ${Math.round((masteredDaysCount / 28) * 100)}%`}
               >
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 shadow-xs transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
@@ -542,7 +542,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1.5 font-medium">
                 <span className="w-3 h-3 rounded-full bg-emerald-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)]" />
-                已吃透
+                已学习
               </span>
               <span className="flex items-center gap-1.5 font-medium">
                 <span className="w-3 h-3 rounded-full bg-sky-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)]" />
@@ -598,7 +598,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           {isMastered ? (
                             <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300 flex items-center gap-0.5">
                               <Check size={11} strokeWidth={3} />
-                              <span>已吃透</span>
+                              <span>已学习</span>
                             </span>
                           ) : isLearning ? (
                             <span className="text-[10px] font-bold text-sky-700 dark:text-sky-300">
