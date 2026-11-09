@@ -61,6 +61,9 @@ assert(drawerContent.includes('translateY(12px) scale(0.98)'), 'Exit transform t
 assert(drawerContent.includes('cubic-bezier(0.16, 1, 0.3, 1)'), 'Emil Kowalski entrance curve cubic-bezier(0.16, 1, 0.3, 1) implemented (200ms)');
 assert(drawerContent.includes('cubic-bezier(0.7, 0, 0.84, 0)'), 'Emil Kowalski exit curve cubic-bezier(0.7, 0, 0.84, 0) implemented (150ms)');
 assert(drawerContent.includes("willChange: 'transform, opacity'"), 'Hardware acceleration declared via willChange');
+assert(drawerContent.includes('opacity: isVisible ? 1 : 0'), 'Drawer Card explicitly specifies hardware-accelerated opacity transition');
+assert(drawerContent.includes('duration-150'), 'Drawer exit opacity transition matches 150ms unmount timer');
+assert(drawerContent.includes('pb-8 sm:pb-4'), 'Scrollable category container accounts for mobile safe area padding');
 assert(drawerContent.includes('active:scale-[0.96] transition-transform duration-100'), 'Tactile press squash feedback active:scale-[0.96] duration-100 implemented');
 assert(drawerContent.includes('isComposing') || drawerContent.includes('Process'), 'Protects Chinese IME composition so Escape does not prematurely close drawer');
 assert(drawerContent.includes("addEventListener('keydown', handleKeyDown, true)"), 'Uses capture phase event listener to catch Esc key reliably');
@@ -91,6 +94,8 @@ assert(catalogContent.includes("pillRefs.current[cat]"), 'Ref attached to catego
 assert(catalogContent.includes('scrollIntoView'), 'Implements scrollIntoView on selectedCategory change');
 assert(catalogContent.includes("inline: 'center'"), 'scrollIntoView centers the active pill horizontally');
 assert(catalogContent.includes("block: 'nearest'"), 'scrollIntoView prevents unwanted vertical page displacement');
+assert(catalogContent.includes('[selectedCategory, viewTrack]'), 'Auto-scroll effect triggers on both selectedCategory and viewTrack updates');
+assert(!catalogContent.includes('py-0.2'), 'Pill badges use valid Tailwind CSS classes (no py-0.2 typo)');
 assert(catalogContent.includes('bg-gradient-to-r from-purple-600 to-indigo-600'), 'Selected pill styled with purple-to-indigo gradient');
 assert(catalogContent.includes('LayoutGrid'), 'Horizontal bar includes expand grid icon button (LayoutGrid)');
 assert(catalogContent.includes('setIsCategoryDrawerOpen(true)'), 'Grid button triggers category drawer opening');
@@ -123,9 +128,14 @@ assert(cssContent.includes('-ms-overflow-style: none;'), '-ms-overflow-style: no
 assert(cssContent.includes('display: none;'), '::-webkit-scrollbar display: none defined for Chrome/Safari/Blink');
 
 // ----------------------------------------------------------------------------
-// Test 8: End-to-End Simulation of Track & Category Selection Lifecycle
+// Test 8: Real Data Layer & Category Calculation Engine Verification
 // ----------------------------------------------------------------------------
-console.log('\nTest 8: Simulating Track & Category Selection Lifecycle...');
+console.log('\nTest 8: Verifying Real Data Layer & Category Calculation Engine...');
+const datasetContent = fs.readFileSync(path.join(rootDir, 'src/data/algoDataset.ts'), 'utf8');
+const match = datasetContent.match(/export const ALGORITHM_LAB_CATALOG: AlgoProblem\[\] = (\[[\s\S]*?\]);\n/);
+assert(match !== null, 'ALGORITHM_LAB_CATALOG dataset loaded successfully');
+const catalog = JSON.parse(match[1]);
+
 const STANDARD_CATEGORIES = [
   '数组', '链表', '哈希表', '字符串', '双指针法', '栈与队列',
   '二叉树', '回溯算法', '贪心算法', '动态规划', '单调栈', '图论'
@@ -136,28 +146,74 @@ const CARL_HOT100_CHAPTERS = [
   '动态规划', '多维动态规划', '技巧'
 ];
 
-let simTrack = 'all';
-let simSelectedCategory = 'all';
-let simDrawerOpen = false;
+// 1. Data Integrity: all 234 problems belong to standard categories
+const unknownCats = catalog.filter(p => !STANDARD_CATEGORIES.includes(p.category));
+assert(unknownCats.length === 0, `All ${catalog.length} problems belong to STANDARD_CATEGORIES`);
 
-// 1. User clicks drawer button
-simDrawerOpen = true;
-assert(simDrawerOpen === true, 'Drawer opens upon trigger');
+// 2. Data Integrity: all 100 Hot100 problems belong to CARL_HOT100_CHAPTERS
+const hot100Probs = catalog.filter(p => p.isHot100);
+assert(hot100Probs.length === 100, `Hot 100 problems count is 100 (got ${hot100Probs.length})`);
+const unknownChapters = hot100Probs.filter(p => !CARL_HOT100_CHAPTERS.includes(p.hot100Chapter));
+assert(unknownChapters.length === 0, `All Hot 100 problems belong to CARL_HOT100_CHAPTERS`);
 
-// 2. User switches track in drawer
-simTrack = 'hot100';
-simSelectedCategory = 'all';
-assert(simTrack === 'hot100' && simSelectedCategory === 'all', 'Track switch in drawer updates track and resets category');
+// 3. Category coverage: every Hot 100 chapter has problems
+const emptyChapters = CARL_HOT100_CHAPTERS.filter(ch => !hot100Probs.some(p => p.hot100Chapter === ch));
+assert(emptyChapters.length === 0, `All 17 Hot 100 chapters have active problems`);
 
-// 3. User picks a category from Hot100
-const targetChapter = CARL_HOT100_CHAPTERS[2]; // '滑动窗口'
-simSelectedCategory = targetChapter;
-simDrawerOpen = false;
-assert(simSelectedCategory === '滑动窗口' && simDrawerOpen === false, 'Selecting category updates selection and closes drawer');
+// 4. Category coverage: every Standard category has problems in Carl track
+const carlProbs = catalog.filter(p => p.isCarl);
+assert(carlProbs.length === 179, `Carl track problems count is 179 (got ${carlProbs.length})`);
+const emptyCarlCats = STANDARD_CATEGORIES.filter(cat => !carlProbs.some(p => p.category === cat));
+assert(emptyCarlCats.length === 0, `All 12 Standard categories have active Carl problems`);
 
-// 4. User directly taps a pill in horizontal bar (0 modal opening)
-simSelectedCategory = '双指针';
-assert(simSelectedCategory === '双指针' && simDrawerOpen === false, 'Tapping horizontal pill immediately updates category with 0 modal opening');
+// 5. Test real categoryStats computation engine logic
+function computeCategoryStats(trackProblems, categories, completedMap, isHot100) {
+  const stats = {};
+  categories.forEach(cat => {
+    stats[cat] = { total: 0, completed: 0, pct: 0 };
+  });
+
+  trackProblems.forEach(p => {
+    const key = isHot100 ? p.hot100Chapter || '' : p.category || '';
+    if (stats[key]) {
+      stats[key].total++;
+      const done = p.num !== null && p.num !== undefined ? !!completedMap[p.num] : !!completedMap[p.id];
+      if (done) stats[key].completed++;
+    }
+  });
+
+  Object.keys(stats).forEach(cat => {
+    const { total, completed } = stats[cat];
+    stats[cat].pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  });
+
+  return stats;
+}
+
+// Stats with 0 completed
+const emptyMap = {};
+const statsAll = computeCategoryStats(catalog, STANDARD_CATEGORIES, emptyMap, false);
+let sumTotalAll = 0;
+Object.values(statsAll).forEach(s => { sumTotalAll += s.total; });
+assert(sumTotalAll === 234, `Sum of standard category totals equals catalog total (234)`);
+
+// Stats with simulated completions
+const simulatedMap = {};
+hot100Probs.slice(0, 20).forEach(p => {
+  if (p.num !== null && p.num !== undefined) simulatedMap[p.num] = true;
+  else simulatedMap[p.id] = true;
+});
+const statsHot100 = computeCategoryStats(hot100Probs, CARL_HOT100_CHAPTERS, simulatedMap, true);
+let sumDoneHot100 = 0;
+Object.values(statsHot100).forEach(s => { sumDoneHot100 += s.completed; });
+assert(sumDoneHot100 === 20, `Simulated category completion count exactly matches (20)`);
+
+// 6. Test problem filtering by category
+const dpProblems = catalog.filter(p => p.category === '动态规划');
+assert(dpProblems.length > 0 && dpProblems.every(p => p.category === '动态规划'), `Filter by category '动态规划' isolates DP problems strictly`);
+
+const slidingWindow = hot100Probs.filter(p => p.hot100Chapter === '滑动窗口');
+assert(slidingWindow.length > 0 && slidingWindow.every(p => p.hot100Chapter === '滑动窗口'), `Filter by chapter '滑动窗口' isolates Hot100 sliding window problems strictly`);
 
 console.log('\n================================================================');
 if (failCount === 0) {

@@ -54,7 +54,7 @@ export const AlgoCatalog: React.FC = () => {
         block: 'nearest'
       });
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, viewTrack]);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
     'sidebar_collapsed_algo',
@@ -482,7 +482,7 @@ export const AlgoCatalog: React.FC = () => {
         <div className="shrink-0 space-y-3 pb-3 border-b border-slate-200/60 dark:border-slate-800/60">
           {/* Mobile / Narrow Screen Horizontal Clay Category Pill Bar (Track 1) */}
           <div className="md:hidden flex items-center gap-2 pb-1 pt-0.5">
-            <div className="flex-1 overflow-x-auto scrollbar-none flex items-center gap-2 py-1 px-0.5 scroll-smooth [-webkit-overflow-scrolling:touch]">
+            <div className="flex-1 overflow-x-auto scrollbar-none flex items-center gap-2 py-1 px-1 scroll-smooth [-webkit-overflow-scrolling:touch]">
               {/* All Categories Pill */}
               <button
                 ref={(el) => { pillRefs.current['all'] = el; }}
@@ -495,7 +495,7 @@ export const AlgoCatalog: React.FC = () => {
                 }`}
               >
                 <span>全部</span>
-                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
                   selectedCategory === 'all'
                     ? 'bg-white/20 text-white'
                     : 'bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400'
@@ -524,7 +524,7 @@ export const AlgoCatalog: React.FC = () => {
                   >
                     {isAllDone && <CheckCircle2 size={12} className={isSelected ? 'text-white' : 'text-emerald-500'} />}
                     <span>{cat}</span>
-                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
                       isSelected
                         ? 'bg-white/20 text-white'
                         : isAllDone
@@ -552,7 +552,7 @@ export const AlgoCatalog: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             {/* Difficulty Chips (Clay Candy Pills) */}
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-xs overflow-x-auto scrollbar-none py-0.5">
               {(['all', 'Easy', 'Medium', 'Hard'] as const).map(df => (
                 <button
                   key={df}
@@ -581,7 +581,7 @@ export const AlgoCatalog: React.FC = () => {
                 <StickyNote size={13} className={onlyNotesFilter ? 'fill-white/30' : ''} />
                 <span>便签</span>
                 {totalNotesCount > 0 && (
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                  <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
                     onlyNotesFilter
                       ? 'bg-white/20 text-white'
                       : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'

@@ -96,8 +96,8 @@ export const AlgoCategoryDrawer: React.FC<AlgoCategoryDrawerProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-200 select-none ${
-        isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      className={`fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity select-none ${
+        isVisible ? 'opacity-100 duration-200' : 'opacity-0 duration-150 pointer-events-none'
       }`}
       aria-modal="true"
       role="dialog"
@@ -114,6 +114,7 @@ export const AlgoCategoryDrawer: React.FC<AlgoCategoryDrawerProps> = ({
         className="relative w-full sm:max-w-md max-h-[88vh] bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_24px_rgba(0,0,0,0.12),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:border dark:border-white/[0.08] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden text-slate-800 dark:text-slate-200"
         style={{
           transform: transformStyle,
+          opacity: isVisible ? 1 : 0,
           transition: transitionStyle,
           willChange: 'transform, opacity'
         }}
@@ -218,14 +219,15 @@ export const AlgoCategoryDrawer: React.FC<AlgoCategoryDrawerProps> = ({
         </div>
 
         {/* Category List with Individual Progress (Scrollable) */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2 pr-3 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto p-4 pb-8 sm:pb-4 space-y-2 pr-3 scrollbar-thin">
           {/* 'All Categories' Button */}
-          <div
+          <button
+            type="button"
             onClick={() => {
               onSelectCategory('all');
               onClose();
             }}
-            className={`flex items-center justify-between p-3 rounded-2xl transition-transform duration-100 cursor-pointer text-xs active:scale-[0.96] ${
+            className={`w-full text-left flex items-center justify-between p-3 rounded-2xl transition-transform duration-100 cursor-pointer text-xs active:scale-[0.96] ${
               selectedCategory === 'all'
                 ? 'bg-gradient-to-r from-purple-100 via-fuchsia-50 to-pink-100 dark:from-purple-950/60 dark:via-fuchsia-900/40 dark:to-pink-950/60 text-purple-950 dark:text-purple-100 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.12)] font-bold'
                 : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-slate-700 dark:text-slate-300'
@@ -236,7 +238,7 @@ export const AlgoCategoryDrawer: React.FC<AlgoCategoryDrawerProps> = ({
               <span>{trackCompletedCount} / {trackTotalCount}</span>
               <ChevronRight size={14} className="text-slate-400" />
             </div>
-          </div>
+          </button>
 
           {/* Individual Category Items */}
           {categories.map((cat) => {
@@ -245,13 +247,14 @@ export const AlgoCategoryDrawer: React.FC<AlgoCategoryDrawerProps> = ({
             const isAllDone = cStat.total > 0 && cStat.completed === cStat.total;
 
             return (
-              <div
+              <button
                 key={cat}
+                type="button"
                 onClick={() => {
                   onSelectCategory(cat);
                   onClose();
                 }}
-                className={`group p-3 rounded-2xl transition-transform duration-100 cursor-pointer text-xs space-y-1.5 active:scale-[0.96] select-none ${
+                className={`w-full text-left group p-3 rounded-2xl transition-transform duration-100 cursor-pointer text-xs space-y-1.5 active:scale-[0.96] select-none block ${
                   isSelected
                     ? 'bg-gradient-to-r from-purple-100 via-fuchsia-50 to-pink-100 dark:from-purple-950/60 dark:via-fuchsia-900/40 dark:to-pink-950/60 shadow-[4px_4px_12px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-1px_-1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.12)]'
                     : 'bg-white/80 dark:bg-slate-800/80 shadow-[3px_3px_8px_rgba(0,0,0,0.04),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] text-slate-700 dark:text-slate-300'
@@ -288,7 +291,7 @@ export const AlgoCategoryDrawer: React.FC<AlgoCategoryDrawerProps> = ({
                     style={{ width: `${cStat.pct}%` }}
                   />
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

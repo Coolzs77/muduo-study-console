@@ -6803,6 +6803,31 @@ useEffect(() => {
 - **根本原因 (RCA)**：不同渲染引擎（WebKit、Gecko、Trident/Blink）对滚动条隐藏的 CSS 标准属性不一致（需要同时覆盖 `::-webkit-scrollbar`、`scrollbar-width` 与 `-ms-overflow-style`）。
 - **具体解法**：在 `src/index.css` 建立专属 `.scrollbar-none` 工具类并配合 Tailwind 任意属性双重注入，彻底隐藏横向容器的突兀滚动条，同时保留流畅的原生手势滚动惯性。
 
+#### 问题 4：抽屉出场退场遮罩时间不对齐导致 150ms 卸载瞬态硬闪
+- **问题现象**：当用户点击遮罩或选择专题关闭抽屉时，退场阶段遮罩有肉眼可见的突兀残影骤变硬切。
+- **根本原因 (RCA)**：最外层包裹容器硬编码了 `transition-opacity duration-200`（200ms 淡出），但内部卸载定时器 `setTimeout(..., 150)` 设定在 150ms 执行 `isMounted = false`；在 150ms 时遮罩透明度仍残留约 25%，组件直接被 React 从 DOM 卸载，造成突兀闪切。
+- **具体解法**：将外层遮罩容器过渡样式重构为 `${isVisible ? 'opacity-100 duration-200' : 'opacity-0 duration-150 pointer-events-none'}`，使退场淡出时长严格对齐 150ms 定时器与出场缓动曲线，实现平滑渐隐至 0% 的零残影卸载。
+
+#### 问题 5：抽屉卡片遗漏显式 `opacity` 样式导致 Emil Kowalski 透明度动效未生效
+- **问题现象**：抽屉入场与出场时，卡片位移与缩放正常，但卡片自身缺乏透明度渐变，且 `transitionStyle` 中声明的 `opacity` 过渡属性成为空置规则。
+- **根本原因 (RCA)**：抽屉卡片的内联 `style` 声明了 `willChange: 'transform, opacity'` 与包含 `opacity` 的 `transitionStyle`，但漏写了 `opacity: isVisible ? 1 : 0`，导致卡片自身不具备响应式透明度状态。
+- **具体解法**：在卡片内联 `style` 中补齐 `opacity: isVisible ? 1 : 0`，激活真正的硬件加速双通道（位移 + 透明度）合流渲染。
+
+#### 问题 6：跨题单切换时水平药丸栏未能重新居中激活项
+- **问题现象**：当用户在当前题单横向滑动到末尾专题后，通过抽屉切换了题单（如从 Hot 100 切换到全部），顶部的水平胶囊栏停留于旧滚动偏移量，未能自动重置滚动到选中的“全部”胶囊。
+- **根本原因 (RCA)**：药丸栏的自动对齐 `useEffect` 仅依赖 `[selectedCategory]`；当跨题单切换时如果前后选中的类别恰好同为 `'all'`，该 `useEffect` 不会被触发。
+- **具体解法**：将 `useEffect` 依赖数组扩充为 `[selectedCategory, viewTrack]`，使无论类别变化还是所属题单切换，均触发激活药丸的居中平滑对齐。
+
+#### 问题 7：Tailwind 药丸微角标存在无效工具类 `py-0.2`
+- **问题现象**：药丸角标与便签过滤器的垂直内边距在部分环境下未能按预期贴合胶囊。
+- **根本原因 (RCA)**：代码中误用了非标准 Tailwind 类名 `py-0.2`，Tailwind 编译器无法识别该类，导致垂直 padding 回退为 0。
+- **具体解法**：全局修正为标准的微边距实用类 `py-0.5`，确保角标在跨分辨率屏幕上居中饱满。
+
+#### 问题 8：自动化测试虚假断言与真实数据层断言加固
+- **问题现象**：原先的自动化测试 Test 8 仅通过修改本地临时 JS 变量进行自身赋值断言，未能对真实的数据层、状态计算器与题单映射执行实质检验（违背测试真实性标准）。
+- **根本原因 (RCA)**：测试编写使用了恒真断言（Tautology），无论真实业务逻辑是否有缺陷均会假装 100% 通过。
+- **具体解法**：重写 Test 8 为高精度数据集成测试，载入真实 `ALGORITHM_LAB_CATALOG` 数据库，完整遍历校验 234 道标准题目、100 道 Hot100 题目与 179 道随想录题目的章节对应、分类覆盖率与 `categoryStats` 运算引擎。
+
 ---
 
 ### 4. 架构与机制演进图 (Architectural Evolution Diagram)
@@ -7030,6 +7055,9 @@ Test 2: Verifying Emil Kowalski Motion Specs & Accessibility in Drawer...
   ✅ [PASS] Emil Kowalski entrance curve cubic-bezier(0.16, 1, 0.3, 1) implemented (200ms)
   ✅ [PASS] Emil Kowalski exit curve cubic-bezier(0.7, 0, 0.84, 0) implemented (150ms)
   ✅ [PASS] Hardware acceleration declared via willChange
+  ✅ [PASS] Drawer Card explicitly specifies hardware-accelerated opacity transition
+  ✅ [PASS] Drawer exit opacity transition matches 150ms unmount timer
+  ✅ [PASS] Scrollable category container accounts for mobile safe area padding
   ✅ [PASS] Tactile press squash feedback active:scale-[0.96] duration-100 implemented
   ✅ [PASS] Protects Chinese IME composition so Escape does not prematurely close drawer
   ✅ [PASS] Uses capture phase event listener to catch Esc key reliably
@@ -7054,6 +7082,8 @@ Test 4: Verifying Track 1 Horizontal Category Pill Bar in AlgoCatalog.tsx...
   ✅ [PASS] Implements scrollIntoView on selectedCategory change
   ✅ [PASS] scrollIntoView centers the active pill horizontally
   ✅ [PASS] scrollIntoView prevents unwanted vertical page displacement
+  ✅ [PASS] Auto-scroll effect triggers on both selectedCategory and viewTrack updates
+  ✅ [PASS] Pill badges use valid Tailwind CSS classes (no py-0.2 typo)
   ✅ [PASS] Selected pill styled with purple-to-indigo gradient
   ✅ [PASS] Horizontal bar includes expand grid icon button (LayoutGrid)
   ✅ [PASS] Grid button triggers category drawer opening
@@ -7074,13 +7104,20 @@ Test 7: Verifying CSS Utility Class in src/index.css...
   ✅ [PASS] -ms-overflow-style: none defined for IE/Edge
   ✅ [PASS] ::-webkit-scrollbar display: none defined for Chrome/Safari/Blink
 
-Test 8: Simulating Track & Category Selection Lifecycle...
-  ✅ [PASS] Drawer opens upon trigger
-  ✅ [PASS] Track switch in drawer updates track and resets category
-  ✅ [PASS] Selecting category updates selection and closes drawer
-  ✅ [PASS] Tapping horizontal pill immediately updates category with 0 modal opening
+Test 8: Verifying Real Data Layer & Category Calculation Engine...
+  ✅ [PASS] ALGORITHM_LAB_CATALOG dataset loaded successfully
+  ✅ [PASS] All 234 problems belong to STANDARD_CATEGORIES
+  ✅ [PASS] Hot 100 problems count is 100 (got 100)
+  ✅ [PASS] All Hot 100 problems belong to CARL_HOT100_CHAPTERS
+  ✅ [PASS] All 17 Hot 100 chapters have active problems
+  ✅ [PASS] Carl track problems count is 179 (got 179)
+  ✅ [PASS] All 12 Standard categories have active Carl problems
+  ✅ [PASS] Sum of standard category totals equals catalog total (234)
+  ✅ [PASS] Simulated category completion count exactly matches (20)
+  ✅ [PASS] Filter by category '动态规划' isolates DP problems strictly
+  ✅ [PASS] Filter by chapter '滑动窗口' isolates Hot100 sliding window problems strictly
 
 ================================================================
-🎉 ALL 61 RESPONSIVE CATEGORY NAVIGATION CHECKS PASSED FLAWLESSLY!
+🎉 ALL 73 RESPONSIVE CATEGORY NAVIGATION CHECKS PASSED FLAWLESSLY!
 ================================================================
 ```
