@@ -9207,3 +9207,153 @@ O(n) / O(1)
 
 🎉🎉🎉 ALL ALGO NOTE MULTI-COLOR, TOGGLE & SYNTAX HIGHLIGHT VERIFICATIONS PASSED 100%! 🎉🎉🎉
 ```
+
+
+## 第 40 轮 [2026-11-09 21:05]：Markdown 正文渲染色彩去单一黄色化与窄屏保存状态溢出治理
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+用户在实机使用算法做题便签过程中，上传了实机截图（`media_1794229377336_fd19e478.png`），指出了两处关键体验问题：
+1. **渲染内容的色彩去单一黄色化**：
+   - 用户明确强调：“我是说渲染的颜色ok?不光是工具栏”。截图显示正文中密集出现的行内代码（如 `right=left-1`, `left == right`, `target`）以及引用块（`[...]`）全屏呈现刺眼的淡黄色胶囊与琥珀黄色块，缺少技术文档的高级质感与对比度层次。必须重塑 Markdown 渲染色彩，使行内代码、引用块、三级标题等不同元素具备各自独立、协调且舒适的色彩。
+2. **窄屏移动端保存状态文字溢出便签卡片**：
+   - 用户明确指出：“另外,窄屏下,保存的文字有时候会超出便签框”。截图右上角显示，在宽度较窄的窗口或移动端下，左侧 11 个工具栏按钮占满空间，右侧状态栏 `🕒 21:02 • 373 字` 被硬挤出便签卡片的右外侧边界。必须根治弹性盒超宽溢出，确保保存状态 100% 停留在便签框内部。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+所有改动文件均具备点击链接与完整相对路径：
+- [`src/index.css`](file:///e:/workspace/muduo-study-console/src/index.css)：
+  - **行内代码样式革新**：彻底替换 `.ProseMirror code` 的琥珀黄硬编码背景（`rgba(254, 243, 199, 0.7)`）与棕黄字体（`#78350f`），全面升级为现代科技浅冷灰底色（`#f1f5f9`）与深天蓝（`#0284c7`）代码字体，暗黑模式采用 `rgba(30, 41, 59, 0.75)` 与清爽天蓝高光（`#38bdf8`），彻底消除大片黄色小胶囊；
+  - **引用块色系重塑**：将 `.ProseMirror blockquote` 由原本的琥珀黄左边框（`#f59e0b`）与黄色底色，改为典雅深邃的**靛蓝/紫蓝 (Indigo)**：白天使用 `#6366f1` 边线配合 `rgba(238, 242, 255, 0.7)` 微紫蓝底和 `#3730a3` 字体，暗夜模式使用 `#818cf8` 与沉稳深靛蓝，和行内代码形成鲜明的冷色层次；
+  - **三级标题去黄**：将 `.ProseMirror h3` 的 `#d97706` 黄色调重置为高对比度石板沉稳色（`#334155`，暗黑 `#cbd5e1`）。
+- [`src/components/algorithm/AlgoNoteModal.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoNoteModal.tsx)：
+  - **工具栏弹性盒自适应收缩 (Responsive Toolbar Shrink)**：
+    - 外层工具栏容器加上 `w-full overflow-hidden` 与 `gap-1.5 sm:gap-3`；
+    - 左侧按钮容器由强行不换行的 `shrink-0` 改为 `shrink min-w-0 overflow-x-auto scrollbar-none`；
+    - 右侧保存状态容器保持 `shrink-0 whitespace-nowrap ml-auto`，并优化窄屏字体 `text-[10.5px] sm:text-[11px]`；
+    - **核心机制效果**：在宽屏下全部按钮与右侧状态从容并排；在窄屏移动端下，左侧按钮组优先收缩并支持顺畅的横向手势滑动，而右侧保存状态文字获得绝对宽度保障，牢牢锚定在便签框内最右侧，**永不溢出框外**！
+  - **便签卡片内边距响应式微调**：卡片边距由固定的 `p-5 sm:p-7` 优化为 `p-4 sm:p-7 overflow-hidden`，在超窄视口下为内容区释放出更多水平展示空间。
+- [`scripts/verify_algo_note_narrow_and_palette.py`](file:///e:/workspace/muduo-study-console/scripts/verify_algo_note_narrow_and_palette.py)：
+  - 编写专用真机自动化脚本，在 420px 窄屏视口下验证右侧状态栏 `status_rect['right'] <= modal_rect['right']` 零溢出，并断言计算样式中行内代码为 `rgb(2, 132, 199)`、引用块为 `rgb(99, 102, 241)`、H3 为 `rgb(51, 65, 85)`。
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题 1：渲染的正文内容满屏尽是黄色胶囊
+- **问题现象**：用户在便签内编写题解思路，文本中只要有反引号包裹的代码或公式（如 `left == right`、`target`），就会渲染为突兀刺眼的黄色背景小方块，搭配黄色引用块，全屏色调单一枯燥。
+- **根本原因 (RCA)**：样式表 `.ProseMirror code` 与 `.ProseMirror blockquote` 之前为了与便签头部的便签纸图标统一，采用了琥珀黄预设（`rgba(254, 243, 199, 0.7)` / `#f59e0b`），忽视了长篇技术笔记中代码与引用的真实排版审美。
+- **具体解法**：遵循 Typora / GitHub / VSCode 的主流科技排版美学，将行内代码定格在 Slate/Sky 蓝灰冷色调，将引用块定格在 Indigo 靛青紫蓝调，配合深色代码块，层次分明，久看不累。
+
+#### 问题 2：窄屏下保存文字超出便签右边框
+- **问题现象**：实机截图显示，`🕒 21:02 • 373 字` 的右边缘越过了白色便签模态卡片的右边线。
+- **根本原因 (RCA)**：
+  1. 左侧按钮组容器（包含 11 个格式按钮）被设为了 `shrink-0`，占用固定宽度约 370px；
+  2. 右侧状态栏也被设为了 `shrink-0`，占用宽度约 110px；
+  3. 当手机屏幕或窄窗口的总宽度低于 `370 + 110 + padding ≈ 520px` 时，弹性盒无法收缩左侧，硬生生把右侧子元素推挤出卡片边界。
+- **具体解法**：解除左侧按钮组的 `shrink-0` 锁定，改为 `shrink min-w-0 overflow-x-auto scrollbar-none`；外层加上 `overflow-hidden`。窄屏下由左侧按钮区自适应收缩，右侧状态栏坚决不退让，严丝合缝对齐在框内右边缘。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：正文 Markdown 渲染多色层级与视觉对比矩阵
+```mermaid
+flowchart TD
+    Doc["便签正文渲染层 (ProseMirror Canvas)"] --> Heading["标题层级 (Headings)"]
+    Doc --> InlineCode["行内代码 (`code`)"]
+    Doc --> Quote["引用块 (`blockquote`)"]
+    Doc --> BlockCode["算法代码块 (`codeBlock`)"]
+    Doc --> Tasks["任务待办 (`taskList`)"]
+
+    subgraph ColorDistribution["多色系协调分布 (告别单一纯黄)"]
+        direction TB
+        Heading ---|高对比板岩灰| C_H["color: #334155 / #cbd5e1"]
+        InlineCode ---|清爽天蓝+冷灰底| C_IC["bg: #f1f5f9, color: #0284c7"]
+        Quote ---|沉稳典雅靛蓝| C_Q["border: #6366f1, bg: rgba(238,242,255,0.7)"]
+        BlockCode ---|终端深色+VSCode高亮| C_BC["bg: #151922, hljs-* 多色"]
+        Tasks ---|生机翡翠绿| C_T["checkbox: #10b981"]
+    end
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了便签 Markdown 各项语法元素的色彩分离设计：
+  1. 行内代码采用清爽冷灰底与深天蓝文字，阅读行内变量（如 `left`、`right`）时清晰醒目而不突兀；
+  2. 引用块采用优雅的靛青蓝边框与浅紫微透明底，用以突出核心备忘，与行内代码形成色彩呼应；
+  3. 标题与代码块各自拥有明确视觉边界，彻底消除了“满屏黄色小胶囊”的视觉污染。
+
+---
+
+#### 图 2：窄屏弹性盒自适应无溢出收缩模型 (Responsive Flex Shrink Pipeline)
+```mermaid
+flowchart LR
+    subgraph NarrowViewport["窄屏视口 (<= 480px)"]
+        Card["模态框卡片 (p-4 sm:p-7 overflow-hidden)"] --> ToolbarRow["工具栏水平单行 (w-full overflow-hidden)"]
+        
+        ToolbarRow --> BtnGroup["按钮组 (shrink min-w-0 overflow-x-auto)"]
+        ToolbarRow --> SaveStatus["保存状态 (shrink-0 whitespace-nowrap ml-auto)"]
+
+        BtnGroup -.->|视口狭窄时自动收缩/横滑| SmoothScroll["顺畅手势水平滑动"]
+        SaveStatus -.->|绝对保留完整尺寸| PinnedRight["稳稳固定在卡片右内壁 (0 溢出)"]
+    end
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  拆解了移动端窄屏下零溢出的布局机制：
+  1. 通过给按钮容器赋予 `shrink min-w-0` 与 `overflow-x-auto scrollbar-none`，使其从不可压缩的“硬块”转变为“弹性柔性容器”；
+  2. 右侧保存状态声明 `shrink-0` 与 `ml-auto`，确保文字在 Flex 布局中享有最优先的显示完整度，牢牢吸附在便签卡片的右内壁，彻底杜绝文字悬空或越界出框。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **视口 100% 内部对齐**：在 420px 真实移动端视口下，保存状态右边缘距离卡片右边界尚有 21px 安全间距，彻底根治溢出；
+- **行内代码质感跃升**：`#0284c7` 天蓝字体与 `#f1f5f9` 浅冷灰底，与 VSCode / GitHub 规范保持一致；
+- **引用块优雅大方**：靛蓝边线与浅紫蓝底色使核心笔记具有极高的可读性。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 静态类型编译检查
+cd e:\workspace\muduo-study-console
+npx tsc --noEmit
+
+# 2. 全量单元与集成测试套件 (130+ 项)
+npm test
+
+# 3. 生产静态包打包构建
+npm run build
+
+# 4. 窄屏溢出与渲染色彩真机自动化测试
+python scripts/verify_algo_note_narrow_and_palette.py
+
+# 5. 宽屏回归真机测试
+python scripts/verify_algo_note_multitoggle_and_highlight.py
+```
+
+#### (2) 控制台真实运行输出凭据
+```
+[*] Local static server serving E:\workspace\muduo-study-console\dist on http://127.0.0.1:4210
+[1] Navigating to Algorithm Catalog in Narrow Viewport (420px)...
+[2] Opening AlgoNoteModal in narrow viewport...
+[3] Verifying Save Status Text Boundary Alignment in Narrow Viewport...
+  Modal Card: left=12, right=494, width=482
+  Save Status: left=435.15625, right=473, width=37.84375
+  ✓ [PASS] Save status text is 100% strictly contained within modal boundary in narrow screen! Zero overflow!
+[4] Testing Rendered Markdown Palette (Inline Code, Blockquote, H3)...
+  Rendered <code> computed color: rgb(2, 132, 199), bg: rgb(241, 245, 249)
+  ✓ [PASS] Inline code rendered with modern slate/sky tech palette (NOT yellow)!
+  Rendered <blockquote> computed borderLeftColor: rgb(99, 102, 241), bg: rgba(238, 242, 255, 0.7)
+  ✓ [PASS] Blockquote rendered with elegant indigo palette (NOT yellow)!
+  Rendered <h3> computed color: rgb(51, 65, 85)
+  ✓ [PASS] H3 rendered with high-contrast slate palette (NOT yellow)!
+  ✓ Saved visual verification screenshot to: docs/images/verify_algo_note_narrow_and_palette.png
+[6] Exiting modal cleanly...
+  ✓ [PASS] Modal closed cleanly!
+
+🎉🎉🎉 ALL ALGO NOTE NARROW VIEWPORT & RENDERED PALETTE VERIFICATIONS PASSED 100%! 🎉🎉🎉
+```

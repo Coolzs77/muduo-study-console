@@ -397,7 +397,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         },
         blockquote: {
           HTMLAttributes: {
-            class: 'border-l-4 border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 rounded-r-xl px-3.5 py-2 my-2.5 text-xs sm:text-sm not-italic'
+            class: 'border-l-4 border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-950 dark:text-indigo-200 rounded-r-xl px-3.5 py-2 my-2.5 text-xs sm:text-sm not-italic'
           }
         },
         horizontalRule: {
@@ -734,7 +734,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             : 'transform 150ms cubic-bezier(0.7, 0, 0.84, 0), opacity 150ms cubic-bezier(0.7, 0, 0.84, 0)',
           willChange: 'transform, opacity'
         }}
-        className="relative z-10 w-full max-w-3xl bg-white/95 dark:bg-slate-900/95 rounded-3xl p-5 sm:p-7 shadow-[12px_12px_32px_rgba(0,0,0,0.18),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.08)] border border-white/80 dark:border-white/10 flex flex-col space-y-3.5 max-h-[92vh]"
+        className="relative z-10 w-full max-w-3xl bg-white/95 dark:bg-slate-900/95 rounded-3xl p-4 sm:p-7 shadow-[12px_12px_32px_rgba(0,0,0,0.18),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.08)] border border-white/80 dark:border-white/10 flex flex-col space-y-3.5 max-h-[92vh] overflow-hidden"
       >
         {/* Header - Cleaned without superfluous promotional comments */}
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3 shrink-0">
@@ -802,9 +802,9 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         </div>
 
         {/* Toolbar & Live Status Bar */}
-        <div className="flex items-center justify-between gap-3 px-1 pt-0.5 shrink-0 min-w-0">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-3 px-1 pt-0.5 shrink-0 min-w-0 w-full overflow-hidden">
           {/* Typora-style Formatting Actions Toolbar with claymorphic groove pill container */}
-          <div className="flex items-center gap-0.5 sm:gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)] shrink-0">
+          <div className="flex items-center gap-0.5 sm:gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)] shrink min-w-0 overflow-x-auto scrollbar-none">
             {/* 1. Bold (Blue) */}
             <button
               type="button"
@@ -1010,8 +1010,8 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             </button>
           </div>
 
-          {/* Right Live Status (Saving / Words / Timestamp) - Strictly on the Right, Non-wrapping */}
-          <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-mono shrink-0 whitespace-nowrap ml-auto">
+          {/* Right Live Status (Saving / Words / Timestamp) - Strictly on the Right, Non-wrapping, Never overflowing */}
+          <div className="flex items-center gap-1.5 sm:gap-2 text-[10.5px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-mono shrink-0 whitespace-nowrap ml-auto pl-1">
             {saveStatus === 'saving' && (
               <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-sans font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
