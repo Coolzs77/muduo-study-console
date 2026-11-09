@@ -45,11 +45,21 @@ export default defineConfig({
         assetFileNames: 'assets/[name].[ext]',
         manualChunks(id) {
           if (id.includes('node_modules')) {
+            if (
+              id.includes('/node_modules/react/') ||
+              id.includes('\\node_modules\\react\\') ||
+              id.includes('/node_modules/react-dom/') ||
+              id.includes('\\node_modules\\react-dom\\') ||
+              id.includes('/node_modules/scheduler/') ||
+              id.includes('\\node_modules\\scheduler\\')
+            ) {
+              return 'vendor-react';
+            }
             if (id.includes('highlight.js')) {
               return 'vendor-highlight';
             }
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'vendor-react';
+            if (id.includes('@tiptap') || id.includes('prosemirror') || id.includes('turndown') || id.includes('marked')) {
+              return 'vendor-editor';
             }
             if (id.includes('lucide-react')) {
               return 'vendor-icons';

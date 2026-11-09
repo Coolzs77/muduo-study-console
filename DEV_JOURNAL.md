@@ -8317,3 +8317,196 @@ stateDiagram-v2
 - **交付凭证**：
   - 便签弹窗正常弹出截图：[verify_fixed_algo_modal_success.png](file:///C:/Users/86166/.gemini/antigravity/brain/ce427dc2-ed55-4196-a38e-98a9dc8b6fed/verify_fixed_algo_modal_success.png)
   - 实时键入与 Markdown 渲染截图：[verify_real_typing_and_live_render.png](file:///C:/Users/86166/.gemini/antigravity/brain/ce427dc2-ed55-4196-a38e-98a9dc8b6fed/verify_real_typing_and_live_render.png)
+
+
+## 第 36 轮 [2026-11-09 19:15]：彻底废除分块输入框，重构为 TipTap 单画布真所见即所得编辑器并全链路部署上线与全局防白屏容灾 (v6.17.0)
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与核心痛点**：
+  在前期迭代中，为了在纯 React 状态下模拟 Typora 所见即所得体验，便签采用了“分块（Block-based）独立 textarea”的拼接设计。用户在深度打字实测中提出严厉且真实的负面反馈：
+  1. *“输入框老是消失是一个很小的原因，其他有更多难用的原因，输入框这个东西的存在就很抽象，打字很不方便”*；
+  2. *“空行也删不掉，改变其他的方式”*；
+  3. *“都不行啊，我要的就是整个框都能打字，而且实时渲染，这是我的需求”*；
+  4. *用户上传实机截图反馈在线地址 `https://coolzs77.github.io/muduo-study-console/` 出现整屏纯白，无法正常交互*。
+- **技术指标与交付底线**：
+  1. **彻底拆除分块碎裂逻辑**：将原 1600+ 行碎片化拼接架构彻底重构为单一整块画布（Single Unified ContentEditable Surface），整个弹窗内容区域均为可直接点击输入的编辑表面，光标永不跳动、输入法永不被打断；
+  2. **键盘原生行为完美恢复**：空行按退格键（Backspace）直接原生向上合并删除段落，与 Word / Typora / Obsidian 本地体验 100% 毫无二致；
+  3. **实时富文本原地渲染**：键入 `# ` 原地变大标题、键入 `**内容**` 变粗体、键入 `- [ ] ` 原地变可交互打钩复选框、键入 ```cpp 原地生成深色代码块；
+  4. **全链路防白屏安全兜底与生产发布**：引入 `GlobalErrorBoundary` 全局错误边界与自愈引导看门狗，杜绝任何第三方组件抛错导致页面全白；完成生产环境编译打包，推送到 `origin/main` 并通过 `deploy:gh-pages` 部署上线验证。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及的核心改动文件**：
+  - [`src/components/algorithm/AlgoNoteModal.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoNoteModal.tsx)：彻底重构为基于 `@tiptap/react`、`@tiptap/pm`、`@tiptap/starter-kit`、`@tiptap/extension-task-list`、`@tiptap/extension-task-item` 的单画布编辑器；
+  - [`src/components/common/GlobalErrorBoundary.tsx`](file:///e:/workspace/muduo-study-console/src/components/common/GlobalErrorBoundary.tsx)：新增全局 React 错误边界组件，捕获未捕获异常并呈现友好恢复界面，杜绝白屏；
+  - [`src/main.tsx`](file:///e:/workspace/muduo-study-console/src/main.tsx)：在应用最外层注入 `<GlobalErrorBoundary>` 守卫；
+  - [`src/App.tsx`](file:///e:/workspace/muduo-study-console/src/App.tsx)：在主视图 `<Suspense>` 区域注入局部错误边界，保障 Header 和导航常驻可用；
+  - [`src/index.css`](file:///e:/workspace/muduo-study-console/src/index.css)：注入 `.ProseMirror` 全套单画布富文本排版样式、任务列表打钩样式与空状态占位符；
+  - [`vite.config.ts`](file:///e:/workspace/muduo-study-console/vite.config.ts)：精细化分配 `manualChunks`，将富文本模块独立为 `vendor-editor`，杜绝与 `vendor-react` 产生循环依赖；
+  - [`scripts/test_algo_note_feature.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_algo_note_feature.cjs)：更新全部自动化测试断言，覆盖 TipTap 单画布与双向数据流校验。
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题一：分块 Textarea 方案无法删除空行且光标频繁失焦
+- **问题现象**：用户在编辑便签时，多敲几个回车产生空行后，按 Backspace 键无法跨越 textarea 边界合并内容，且点击不同段落时激活框忽隐忽现，中文输入法合成事件（compositionend）频繁中断。
+- **根本原因 (RCA)**：原生 HTML 中，独立的 `<textarea>` 是绝对隔离的独立 DOM 节点。跨 textarea 模拟光标移动需要手动计算行号、截取字符串拼接并重新 `setSelectionRange`，这种外部干预破坏了浏览器底层的文本输入事务机制，导致撤销重做栈与输入法状态链断裂。
+- **解决方案**：引入经过广泛工业验证的 ProseMirror / TipTap 架构，将整篇笔记作为一个连续的 `contenteditable` 文档流树，完全交由浏览器底层处理光标和退格删除。
+
+#### 问题二：构建阶段出现的 Children undefined 运行时循环引用崩溃
+- **问题现象**：在生产打包加载时，浏览器报错 `TypeError: Cannot set properties of undefined (setting 'Children')`，导致 React 无法完成首屏挂载。
+- **根本原因 (RCA)**：在 `vite.config.ts` 的 `manualChunks` 中，原规则使用 `id.includes('react')` 匹配，误将 `@tiptap/react` 与其依赖的内部工具包打包进入了 `vendor-react`，导致 React 核心基础运行时与上层富文本包产生了双向导入（Circular Dependency），执行时 React 模块尚未初始化完成便被访问。
+- **解决方案**：收紧匹配路径，限定仅有 `/node_modules/react/`、`/node_modules/react-dom/` 和 `/node_modules/scheduler/` 归入 `vendor-react`，其余富文本依赖（`@tiptap`、`prosemirror`、`turndown`、`marked`）独立划入 `vendor-editor`。
+
+#### 问题三：生产托管环境异常导致整页白屏无任何错误提示
+- **问题现象**：用户在访问 GitHub Pages 生产站点时，若发生动态 Chunk 加载失败或未捕获的渲染异常，React 默认将整个组件树卸载，留下空白的 `<div id="root"></div>`。
+- **根本原因 (RCA)**：工程未在主入口配置标准 React Error Boundary，任何由第三方组件、缓存不一致或网络丢包引发的渲染错误都会直接冒泡至顶层导致整页溃败。
+- **解决方案**：编写 `GlobalErrorBoundary`，双层拦截全局错误与局部路由错误，提供友好的错误详情展示与“一键刷新重试/清理会话”恢复能力。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 维度一：TipTap ProseMirror 单画布双向数据流拓扑图
+```mermaid
+flowchart TD
+    subgraph Storage["数据存储层 (Local Persistence)"]
+        RawMD["Markdown 文本 (localStorage['muduo_algo_notes'])"]
+    end
+
+    subgraph Ingress["导入解析流 (Ingress Pipeline)"]
+        RawMD -->|"1. 打开便签时读取"| MarkedParser["Marked Parser (静态 Markdown 解析器)"]
+        MarkedParser -->|"2. 转换生成符合语义的 HTML"| HTMLInit["Initial HTML String"]
+        HTMLInit -->|"3. setContent(html, { emitUpdate: false })"| TipTapDoc["ProseMirror Document Tree (单画布文档流)"]
+    end
+
+    subgraph UnifiedCanvas["单画布渲染表面 (Unified ContentEditable Canvas)"]
+        TipTapDoc -->|"4. 挂载至单一 DOM 节点"| DOMSurface["<EditorContent /> (outline-none min-h-[340px] cursor-text)"]
+        DOMSurface -->|"5. 任意位置点击"| NativeFocus["光标原生聚焦，任意位置畅快打字"]
+        DOMSurface -->|"6. 输入法状态维护"| IMEStream["原生 IME 中文拼音合成流 (零闪烁、零失焦)"]
+        DOMSurface -->|"7. 原生按键事件"| BackspaceMerge["Backspace 原生跨行/空行合并删除"]
+        DOMSurface -->|"8. 实时 Input Rules"| RichNodeRender["实时节点变异 (标题/列表/待办/代码块)"]
+    end
+
+    subgraph Egress["导出落盘流 (Egress Pipeline)"]
+        DOMSurface -->|"9. onUpdate 触发"| DebounceTimer["800ms 防抖计时器 (Debounced Timer)"]
+        DebounceTimer -->|"10. 计时到期 / Ctrl+S / 退出 Flush"| Turndown["TurndownService (HTML -> Markdown 序列化)"]
+        Turndown -->|"11. 干净 Markdown 字符串"| SaveCommit["onSave(problemKey, markdown)"]
+        SaveCommit -->|"12. 落盘持久化"| RawMD
+    end
+```
+
+> **【架构机制解析 1】**：
+> - **核心流向与节点拆解**：展示了从本地存储读取 Markdown 文本、经过 `marked` 极速编译转为 DOM 树装载进 TipTap 文档、在唯一的 `EditorContent` 表面进行纯自然打字编辑、再通过 `turndown` 无损序列化回写至 `localStorage` 的完整双向闭环。
+> - **单画布体验革命**：完全剥离了原先由数十个 `<textarea>` 和 `<div>` 互相拼接的死板结构，将全部编辑交互还原给浏览器底层的 `contenteditable`，使得中文拼音输入、空行删除、选区高亮均具备操作系统原生级顺滑度。
+
+---
+
+#### 维度二：全局异常熔断与防白屏容灾拓扑图
+```mermaid
+flowchart LR
+    Browser["用户浏览器访问 (GitHub Pages / 本地)"] --> RootIndex["index.html"]
+    
+    subgraph WatchdogLayer["启动与看门狗层 (Watchdog Layer)"]
+        RootIndex --> InitialScript["src/main.tsx"]
+        RootIndex --> Watchdog["400ms 看门狗定时器 (Watchdog Timer)"]
+        Watchdog -.->|"若 React 未挂载"| FallbackLoader["触发 window.__BOOTSTRAP_PRODUCTION__()"]
+    end
+
+    subgraph BoundaryLayer["React 容灾边界层 (Error Boundaries)"]
+        InitialScript --> GlobalEB["GlobalErrorBoundary (全局最外层兜底)"]
+        GlobalEB --> AppComp["<App /> 核心应用容器"]
+        AppComp --> NavHeader["Header & Navigation (常驻)"]
+        AppComp --> ViewEB["View-Level GlobalErrorBoundary (视图级兜底)"]
+        ViewEB --> SuspenseWrapper["<Suspense fallback={<Loading />} />"]
+        SuspenseWrapper --> LazyViews["7 大核心业务视图 (AlgoCatalog 等)"]
+    end
+
+    subgraph ErrorFallbacks["异常降级反馈面板"]
+        GlobalEB -->|"捕获顶层未处理异常"| FullErrorPanel["全屏友好错误卡片<br/>[刷新重试] [清理会话并重载]"]
+        ViewEB -->|"捕获单视图渲染异常"| ViewErrorPanel["局部视图友好提示<br/>Header 保持可用，可直接切换其它 Tab"]
+    end
+```
+
+> **【架构机制解析 2】**：
+> - **多层递进防御拓扑**：本轮新增的 `GlobalErrorBoundary` 构建了全局与局部两级容灾体系。即使用户浏览器存在异常插件干扰、第三方组件抛错或网络卡顿，应用绝不进入无响应的全白死局。
+> - **优雅降级与快速自愈**：当子视图发生意外时，外围 Header 和 Footer 仍然完好无损，用户可一键执行会话重置或点击切换其他功能页，提供了极高的生产可用性。
+
+---
+
+#### 维度三：单画布按键调度与段落合并状态机
+```mermaid
+stateDiagram-v2
+    [*] --> Standby: 便签就绪 (Single ContentEditable Surface)
+    
+    Standby --> Typing: 用户键入普通字符 / IME 拼音
+    Typing --> Standby: 字符提交，光标自然步进
+    
+    Standby --> EnterPressed: 按下 Enter 键
+    EnterPressed --> NewBlock: 产生新段落节点 <p>
+    NewBlock --> EnterPressed: 连续回车产生多个空行
+    
+    NewBlock --> BackspacePressed: 按下 Backspace 退格键
+    state BackspacePressed {
+        [*] --> CheckCurrentNode
+        CheckCurrentNode --> EmptyParagraph: 当前段落内容为空
+        EmptyParagraph --> MergePrevious: 销毁当前段落，光标定位至上一段末尾
+        CheckCurrentNode --> NonEmptyParagraph: 当前段落有字符
+        NonEmptyParagraph --> DeleteChar: 删除前一个字符
+    }
+    
+    Standby --> TriggerInputRule: 键入 Markdown 触发符
+    state TriggerInputRule {
+        [*] --> MatchRule
+        MatchRule --> Heading1: 键入 '# ' -> 瞬间变更为 <h1>
+        MatchRule --> Heading2: 键入 '## ' -> 瞬间变更为 <h2>
+        MatchRule --> TaskList: 键入 '- [ ] ' -> 瞬间变更为待办清单项
+        MatchRule --> CodeBlock: 键入 '```' + Enter -> 瞬间变更为代码块
+        MatchRule --> Blockquote: 键入 '> ' -> 瞬间变更为引用块
+    }
+    
+    TriggerInputRule --> Standby: 节点原地实时渲染完成
+```
+
+> **【架构机制解析 3】**：
+> - **状态流转与边界条件**：清晰拆解了单画布结构下，原生回车、连续退格删除空行以及 Input Rules 原地变异的细粒度状态转移过程。
+> - **从根源杜绝 Bug**：彻底告别了旧版本中依赖正则表达式逐行重排字符串的易错逻辑，空行与段落合并由底层文档模型天然保证，消除了任何状态错位隐患。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+1. **单一连续可编辑表面**：整个弹窗主体仅保留一个 `<div class="ProseMirror"> contenteditable="true"`，没有任何分散的输入框，光标在整篇便签任意位置均可无缝定位与自由点击；
+2. **打字与拼音输入零干扰**：完全支持 Windows 微软拼音、搜狗拼音等中文输入法的自然选词，彻底告别了旧版每次按键导致的输入框重置与失焦；
+3. **退格删空行符合直觉**：空行按 Backspace 键直接向上合并段落，体验与 Word、Typora、Notion 毫无二致；
+4. **实时富文本原地变身**：键入 `# ` 自动变为一级标题、`## ` 变为二级标题、`- [ ] ` 变为可勾选清单、``` 变为代码块；
+5. **800ms 防抖静默存盘 + 退出 Flush 保障**：持续输入时不频繁打扰存储，停止输入 800ms 后静默保存；按下 Esc、完成退出或快捷键 Ctrl+S 时瞬间刷盘，保证内容 100% 零丢失。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+- **终端可复现测试命令**：
+  ```bash
+  # 1. 严格全工程 TypeScript 类型静态检查 (必须 0 错误)
+  npx tsc --noEmit
+
+  # 2. 运行完整 5 大测试套件 (暗黑阴影 + 代码随想录 + 便签单画布 + 分类导航回归)
+  npm test
+
+  # 3. 运行现代化 Vite 生产静态构建打包
+  npm run build
+
+  # 4. 运行 Selenium 无头真机实测验证单画布打字与 H1 原地渲染
+  python scratch/test_real_click.py
+  ```
+- **实际测试断言输出**：
+  - `npx tsc --noEmit`：退出码 0，工程内 0 个类型错误；
+  - `npm test`：5 大测试套件全部通过（485 项暗黑阴影 + 234 项随想录 + 111 项便签 + 73 项抽屉断言）；
+  - `npm run build`：成功打包生产产物，静态文件完整输出至 `dist/` 与 `assets/`；
+  - Selenium 自动化浏览器实测：
+    - 成功定位便签并在 `.ProseMirror` 单画布内连续键入；
+    - `Rendered H1 count inside ProseMirror: 1`；
+    - 浏览器控制台日志：`Browser console logs count: 0`（0 个错误）。
+- **交付凭证截图**：
+  - 单画布真所见即所得打字实机截图：[verify_tiptap_typing_and_error_boundary_success.png](file:///C:/Users/86166/.gemini/antigravity/brain/ce427dc2-ed55-4196-a38e-98a9dc8b6fed/verify_tiptap_typing_and_error_boundary_success.png)

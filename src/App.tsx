@@ -7,6 +7,7 @@ import { Footer } from './components/layout/Footer';
 import { ToastContainer } from './components/common/Toast';
 import { EnvGuideModal } from './components/common/EnvGuideModal';
 import { TopologyDrawer } from './components/common/TopologyDrawer';
+import { GlobalErrorBoundary } from './components/common/GlobalErrorBoundary';
 
 // 7 Primary Views (Dashboard statically loaded for instant landing; others lazy loaded)
 import { DashboardView } from './components/dashboard/DashboardView';
@@ -111,33 +112,35 @@ export const App: React.FC = () => {
 
       {/* Main View Matrix - Fluid full-screen container with no max-w bottlenecks */}
       <main className="flex-1 w-full min-w-0">
-        <Suspense fallback={<ViewSuspenseFallback />}>
-          {activeTab === 'dashboard' && (
-            <DashboardView
-              onNavigateTab={setActiveTab}
-              onNavigateToDay={handleNavigateToDay}
-              onSelectTopologyModule={setSelectedTopologyModule}
-            />
-          )}
-          {activeTab === 'daily' && (
-            <DailyCurriculumView
-              onJumpToQuiz={handleNavigateToQuiz}
-              selectedDayHighlight={highlightDay}
-              onClearHighlight={() => setHighlightDay(null)}
-            />
-          )}
-          {activeTab === 'reader' && <KnowledgeReader />}
-          {activeTab === 'algo' && <AlgoCatalog />}
-          {activeTab === 'learning' && <LearningSystemView />}
-          {activeTab === 'source' && <SourceRoadmapView />}
-          {activeTab === 'practice' && (
-            <PracticeCenterView
-              activeSubTab={practiceSubTab}
-              onSelectSubTab={setPracticeSubTab}
-              quizDay={quizDay}
-            />
-          )}
-        </Suspense>
+        <GlobalErrorBoundary fallbackTitle="当前视图加载遇到异常">
+          <Suspense fallback={<ViewSuspenseFallback />}>
+            {activeTab === 'dashboard' && (
+              <DashboardView
+                onNavigateTab={setActiveTab}
+                onNavigateToDay={handleNavigateToDay}
+                onSelectTopologyModule={setSelectedTopologyModule}
+              />
+            )}
+            {activeTab === 'daily' && (
+              <DailyCurriculumView
+                onJumpToQuiz={handleNavigateToQuiz}
+                selectedDayHighlight={highlightDay}
+                onClearHighlight={() => setHighlightDay(null)}
+              />
+            )}
+            {activeTab === 'reader' && <KnowledgeReader />}
+            {activeTab === 'algo' && <AlgoCatalog />}
+            {activeTab === 'learning' && <LearningSystemView />}
+            {activeTab === 'source' && <SourceRoadmapView />}
+            {activeTab === 'practice' && (
+              <PracticeCenterView
+                activeSubTab={practiceSubTab}
+                onSelectSubTab={setPracticeSubTab}
+                quizDay={quizDay}
+              />
+            )}
+          </Suspense>
+        </GlobalErrorBoundary>
       </main>
 
       {/* Global Linux Remote Dev Guide Modal */}
