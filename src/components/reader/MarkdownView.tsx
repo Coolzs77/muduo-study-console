@@ -23,6 +23,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
     const result: Array<{
       type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'code' | 'quote' | 'ul' | 'ol' | 'checklist' | 'table' | 'hr' | 'img';
       text?: string;
+      lines?: string[];
       src?: string;
       id?: string;
       lang?: string;
@@ -41,6 +42,8 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
     let listBuffer: string[] = [];
     let inChecklist = false;
     let checklistBuffer: Array<{ checked: boolean; text: string }> = [];
+    let inQuote = false;
+    let quoteBuffer: string[] = [];
 
     const flushList = () => {
       if (inList && listBuffer.length > 0) {
@@ -58,17 +61,27 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
       }
     };
 
-    const flushAllLists = () => {
+    const flushQuote = () => {
+      if (inQuote && quoteBuffer.length > 0) {
+        result.push({ type: 'quote', text: quoteBuffer.join('\n'), lines: [...quoteBuffer] });
+        quoteBuffer = [];
+        inQuote = false;
+      }
+    };
+
+    const flushAll = () => {
       flushList();
       flushChecklist();
+      flushQuote();
     };
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      const trimmedStart = line.trimStart();
 
       // Code blocks
-      if (line.startsWith('```')) {
-        flushAllLists();
+      if (trimmedStart.startsWith('```')) {
+        flushAll();
         if (inCode) {
           result.push({
             type: 'code',
@@ -80,7 +93,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
           inCode = false;
         } else {
           inCode = true;
-          codeLang = line.slice(3).trim();
+          codeLang = trimmedStart.slice(3).trim().split(/\s+/)[0] || '';
         }
         continue;
       }
@@ -92,7 +105,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
 
       // Horizontal rule: ---, ***, ___
       if (/^(?:---+|\*\*\*+|___+)$/.test(line.trim())) {
-        flushAllLists();
+        flushAll();
         result.push({ type: 'hr' });
         continue;
       }
@@ -100,7 +113,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
       // Images: ![alt](url)
       const imgMatch = line.trim().match(/^!\[(.*?)\]\((.*?)\)$/);
       if (imgMatch) {
-        flushAllLists();
+        flushAll();
         result.push({ type: 'img', text: imgMatch[1], src: imgMatch[2] });
         continue;
       }
@@ -111,7 +124,7 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
         const delimParts = nextLine.split('|').map(s => s.trim()).filter(Boolean);
         const isTable = delimParts.length > 0 && delimParts.every(p => /^:?-+:?$/.test(p));
         if (isTable) {
-          flushAllLists();
+          flushAll();
           const parseRow = (str: string) => {
             let s = str.trim();
             if (s.startsWith('|')) s = s.slice(1);
@@ -140,54 +153,60 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
 
       // Headings (H1 to H6)
       if (line.startsWith('###### ')) {
-        flushAllLists();
+        flushAll();
         const text = line.slice(7).trim();
         const id = 'heading-' + text.toLowerCase().replace(/[^\w一-龥]+/g, '-');
         result.push({ type: 'h6', text, id });
         continue;
       }
       if (line.startsWith('##### ')) {
-        flushAllLists();
+        flushAll();
         const text = line.slice(6).trim();
         const id = 'heading-' + text.toLowerCase().replace(/[^\w一-龥]+/g, '-');
         result.push({ type: 'h5', text, id });
         continue;
       }
       if (line.startsWith('#### ')) {
-        flushAllLists();
+        flushAll();
         const text = line.slice(5).trim();
         const id = 'heading-' + text.toLowerCase().replace(/[^\w一-龥]+/g, '-');
         result.push({ type: 'h4', text, id });
         continue;
       }
       if (line.startsWith('### ')) {
-        flushAllLists();
+        flushAll();
         const text = line.slice(4).trim();
         const id = 'heading-' + text.toLowerCase().replace(/[^\w一-龥]+/g, '-');
         result.push({ type: 'h3', text, id });
         continue;
       }
       if (line.startsWith('## ')) {
-        flushAllLists();
+        flushAll();
         const text = line.slice(3).trim();
         const id = 'heading-' + text.toLowerCase().replace(/[^\w一-龥]+/g, '-');
         result.push({ type: 'h2', text, id });
         continue;
       }
       if (line.startsWith('# ')) {
-        flushAllLists();
+        flushAll();
         const text = line.slice(2).trim();
         const id = 'heading-' + text.toLowerCase().replace(/[^\w一-龥]+/g, '-');
         result.push({ type: 'h1', text, id });
         continue;
       }
 
-      // Blockquotes
-      if (line.startsWith('> ')) {
-        flushAllLists();
-        result.push({ type: 'quote', text: line.slice(2).trim() });
+      // Blockquotes: > text or >text (buffered to avoid fragmented quote blocks)
+      const quoteMatch = line.match(/^>\s?(.*)$/);
+      if (quoteMatch) {
+        flushList();
+        flushChecklist();
+        inQuote = true;
+        quoteBuffer.push(quoteMatch[1]);
         continue;
       }
+
+      // If line is not a quote, flush any active blockquote
+      flushQuote();
 
       // Checklists: - [ ] or - [x] or * [ ] or * [x]
       const checklistMatch = line.match(/^[-*+]\s+\[([ xX])\]\s*(.*)$/);
@@ -230,16 +249,16 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
 
       // Empty line
       if (line.trim() === '') {
-        flushAllLists();
+        flushAll();
         continue;
       }
 
       // Regular paragraph
-      flushAllLists();
+      flushAll();
       result.push({ type: 'p', text: line });
     }
 
-    flushAllLists();
+    flushAll();
     if (inCode && codeBuffer.length > 0) {
       result.push({
         type: 'code',
@@ -251,83 +270,192 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
     return result;
   }, [content]);
 
-  // Inline formatting helper supporting code, bold, italic, strikethrough, links
-  const renderInline = (str: string): React.ReactNode => {
-    if (!str) return null;
+  // Tokenizer for inline formatting elements
+  const tokenizeInline = (text: string) => {
+    if (!text) return [];
 
-    // First isolate inline code spans: `code`
-    const codeParts = str.split(/(`[^`]+`)/g);
+    const tokens: Array<
+      | { type: 'code'; content: string }
+      | { type: 'link'; content: string; url: string }
+      | { type: 'bold'; content: string }
+      | { type: 'del'; content: string }
+      | { type: 'italic'; content: string }
+      | { type: 'text'; content: string }
+    > = [];
+    let i = 0;
 
-    return codeParts.map((part, idx) => {
-      if (part.startsWith('`') && part.endsWith('`') && part.length > 1) {
-        return (
-          <code
-            key={idx}
-            className="inline-code font-mono text-[12px] bg-slate-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 px-1.5 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_1px_rgba(0,0,0,0.3)]"
-          >
-            {part.slice(1, -1)}
-          </code>
-        );
+    while (i < text.length) {
+      // 1. Inline code: `code`
+      if (text[i] === '`') {
+        const end = text.indexOf('`', i + 1);
+        if (end !== -1) {
+          tokens.push({
+            type: 'code',
+            content: text.slice(i + 1, end)
+          });
+          i = end + 1;
+          continue;
+        }
       }
 
-      // Non-code formatting: Links, bold, strikethrough, italic
-      const formatRegex = /(\[[^\]]+\]\([^\)]+\)|\*\*[^*]+\*\*|~~[^~]+~~|\*(?:[^*\n]+?)\*|_(?:[^_\n]+?)_)/g;
-      const subParts = part.split(formatRegex);
+      // 2. Link: [text](url)
+      if (text[i] === '[') {
+        const closeBracket = text.indexOf(']', i + 1);
+        if (closeBracket !== -1 && text[closeBracket + 1] === '(') {
+          const closeParen = text.indexOf(')', closeBracket + 2);
+          if (closeParen !== -1) {
+            const linkText = text.slice(i + 1, closeBracket);
+            const linkUrl = text.slice(closeBracket + 2, closeParen).trim();
+            tokens.push({
+              type: 'link',
+              content: linkText,
+              url: linkUrl
+            });
+            i = closeParen + 1;
+            continue;
+          }
+        }
+      }
 
-      return subParts.map((sub, sIdx) => {
-        if (!sub) return null;
-        const key = `${idx}-${sIdx}`;
+      // 3. Bold: **text**
+      if (text.startsWith('**', i)) {
+        const end = text.indexOf('**', i + 2);
+        if (end !== -1 && end > i + 2) {
+          tokens.push({
+            type: 'bold',
+            content: text.slice(i + 2, end)
+          });
+          i = end + 2;
+          continue;
+        }
+      }
 
-        // Link: [text](url)
-        const linkMatch = sub.match(/^\[(.*?)\]\(([^\s\)]+)\)$/);
-        if (linkMatch) {
-          const linkText = linkMatch[1];
-          const linkUrl = linkMatch[2];
-          const isExternal = linkUrl.startsWith('http://') || linkUrl.startsWith('https://');
+      // 4. Strikethrough: ~~text~~
+      if (text.startsWith('~~', i)) {
+        const end = text.indexOf('~~', i + 2);
+        if (end !== -1 && end > i + 2) {
+          tokens.push({
+            type: 'del',
+            content: text.slice(i + 2, end)
+          });
+          i = end + 2;
+          continue;
+        }
+      }
+
+      // 5. Italic: *text* or _text_
+      if (text[i] === '*' || text[i] === '_') {
+        const marker = text[i];
+        const nextChar = text[i + 1];
+        if (nextChar && !/\s/.test(nextChar) && nextChar !== marker) {
+          let end = -1;
+          for (let j = i + 1; j < text.length; j++) {
+            if (text[j] === marker) {
+              const prevChar = text[j - 1];
+              const afterChar = text[j + 1];
+              if (!/\s/.test(prevChar)) {
+                if (marker === '*' && afterChar && /\w/.test(afterChar)) {
+                  continue;
+                }
+                end = j;
+                break;
+              }
+            }
+          }
+          if (end !== -1) {
+            tokens.push({
+              type: 'italic',
+              content: text.slice(i + 1, end)
+            });
+            i = end + 1;
+            continue;
+          }
+        }
+      }
+
+      // Regular character accumulation
+      let nextSpecial = i + 1;
+      while (nextSpecial < text.length) {
+        const ch = text[nextSpecial];
+        if (ch === '`' || ch === '[' || ch === '~') break;
+        if (ch === '*' || ch === '_') break;
+        nextSpecial++;
+      }
+
+      tokens.push({
+        type: 'text',
+        content: text.slice(i, nextSpecial)
+      });
+      i = nextSpecial;
+    }
+
+    const merged: typeof tokens = [];
+    for (const t of tokens) {
+      if (merged.length > 0 && merged[merged.length - 1].type === 'text' && t.type === 'text') {
+        merged[merged.length - 1].content += t.content;
+      } else {
+        merged.push(t);
+      }
+    }
+
+    return merged;
+  };
+
+  // Recursive inline formatting helper supporting code, bold, italic, strikethrough, links
+  const renderInline = (str: string, depth = 0): React.ReactNode => {
+    if (!str) return null;
+    if (depth > 3) return str;
+
+    const tokens = tokenizeInline(str);
+    return tokens.map((token, idx) => {
+      const key = `${depth}-${idx}`;
+      switch (token.type) {
+        case 'code':
+          return (
+            <code
+              key={key}
+              className="inline-code font-mono text-[12px] bg-slate-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 px-1.5 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_1px_rgba(0,0,0,0.3)]"
+            >
+              {token.content}
+            </code>
+          );
+        case 'link': {
+          const isExternal = token.url.startsWith('http://') || token.url.startsWith('https://');
           return (
             <a
               key={key}
-              href={linkUrl}
+              href={token.url}
               target={isExternal ? '_blank' : undefined}
               rel={isExternal ? 'noopener noreferrer' : undefined}
               className="inline-flex items-center gap-0.5 text-sky-600 dark:text-sky-400 hover:underline font-medium"
             >
-              <span>{linkText}</span>
+              <span>{renderInline(token.content, depth + 1)}</span>
               {isExternal && <ExternalLink size={11} className="inline ml-0.5 opacity-70" />}
             </a>
           );
         }
-
-        // Bold: **text**
-        if (sub.startsWith('**') && sub.endsWith('**') && sub.length >= 4) {
+        case 'bold':
           return (
             <strong key={key} className="font-bold text-slate-900 dark:text-white">
-              {sub.slice(2, -2)}
+              {renderInline(token.content, depth + 1)}
             </strong>
           );
-        }
-
-        // Strikethrough: ~~text~~
-        if (sub.startsWith('~~') && sub.endsWith('~~') && sub.length >= 4) {
+        case 'del':
           return (
             <del key={key} className="line-through text-slate-400 dark:text-slate-500">
-              {sub.slice(2, -2)}
+              {renderInline(token.content, depth + 1)}
             </del>
           );
-        }
-
-        // Italic: *text* or _text_
-        if ((sub.startsWith('*') && sub.endsWith('*') && sub.length >= 2) ||
-            (sub.startsWith('_') && sub.endsWith('_') && sub.length >= 2)) {
+        case 'italic':
           return (
             <em key={key} className="italic text-slate-800 dark:text-slate-200">
-              {sub.slice(1, -1)}
+              {renderInline(token.content, depth + 1)}
             </em>
           );
-        }
-
-        return sub;
-      });
+        case 'text':
+        default:
+          return token.content;
+      }
     });
   };
 
@@ -398,15 +526,32 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
               </h4>
             );
           case 'h5':
-          case 'h6':
             return (
               <h5
                 key={idx}
                 id={block.id}
-                className="font-bold text-xs mt-2 mb-1 scroll-mt-24 text-slate-700 dark:text-slate-300"
+                className={
+                  isNote
+                    ? 'text-xs font-bold text-slate-700 dark:text-slate-300 mt-1.5 mb-1 scroll-mt-24'
+                    : 'font-bold text-xs mt-2 mb-1 scroll-mt-24 text-slate-700 dark:text-slate-300'
+                }
               >
                 {renderInline(block.text || '')}
               </h5>
+            );
+          case 'h6':
+            return (
+              <h6
+                key={idx}
+                id={block.id}
+                className={
+                  isNote
+                    ? 'text-[11px] font-bold text-slate-600 dark:text-slate-400 mt-1 mb-0.5 uppercase tracking-wider scroll-mt-24'
+                    : 'font-bold text-xs uppercase tracking-wider mt-2 mb-1 scroll-mt-24 text-slate-600 dark:text-slate-400'
+                }
+              >
+                {renderInline(block.text || '')}
+              </h6>
             );
           case 'p':
             return (
@@ -417,19 +562,25 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({
                 {renderInline(block.text || '')}
               </p>
             );
-          case 'quote':
+          case 'quote': {
+            const quoteLines = block.lines || (block.text ? block.text.split('\n') : []);
             return (
               <blockquote
                 key={idx}
                 className={
                   isNote
-                    ? 'my-2 py-1.5 px-3 border-l-4 border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 rounded-r-xl text-xs sm:text-sm shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_0_1px_1px_rgba(0,0,0,0.2)]'
-                    : undefined
+                    ? 'my-2 py-2 px-3 border-l-4 border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 rounded-r-xl text-xs sm:text-sm shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_0_1px_1px_rgba(0,0,0,0.2)] space-y-1'
+                    : 'my-4 py-2 px-4 border-l-4 border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 text-slate-800 dark:text-slate-200 rounded-r-xl text-sm space-y-1'
                 }
               >
-                {renderInline(block.text || '')}
+                {quoteLines.map((lineText, lIdx) => (
+                  <p key={lIdx} className="leading-relaxed">
+                    {renderInline(lineText)}
+                  </p>
+                ))}
               </blockquote>
             );
+          }
           case 'code':
             return (
               <CodeBlock

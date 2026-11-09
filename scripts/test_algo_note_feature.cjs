@@ -201,12 +201,15 @@ assert(mdViewContent.includes('line.startsWith(\'#### \')'), 'Supports H4 headin
 assert(mdViewContent.includes('line.startsWith(\'### \')'), 'Supports H3 heading syntax');
 assert(mdViewContent.includes('line.startsWith(\'## \')'), 'Supports H2 heading syntax');
 assert(mdViewContent.includes('line.startsWith(\'# \')'), 'Supports H1 heading syntax');
-assert(mdViewContent.includes('line.startsWith(\'> \')'), 'Supports blockquote syntax');
+assert(mdViewContent.includes('quoteMatch') && mdViewContent.includes('flushQuote'), 'Supports buffered blockquote syntax');
 assert(mdViewContent.includes('isTable'), 'Supports markdown tables with column alignments');
-assert(mdViewContent.includes('sub.startsWith(\'**\')'), 'Supports bold markdown (**text**)');
-assert(mdViewContent.includes('sub.startsWith(\'~~\')'), 'Supports strikethrough markdown (~~text~~)');
-assert(mdViewContent.includes('sub.startsWith(\'*\')') || mdViewContent.includes('sub.startsWith(\'_\')'), 'Supports italic markdown (*text* and _text_)');
-assert(mdViewContent.includes('linkMatch'), 'Supports markdown links with external icon');
+assert(mdViewContent.includes('type: \'bold\'') && mdViewContent.includes('case \'bold\':'), 'Supports bold markdown (**text**)');
+assert(mdViewContent.includes('type: \'del\'') && mdViewContent.includes('case \'del\':'), 'Supports strikethrough markdown (~~text~~)');
+assert(mdViewContent.includes('type: \'italic\'') && mdViewContent.includes('case \'italic\':'), 'Supports italic markdown (*text* and _text_)');
+assert(mdViewContent.includes('type: \'link\'') && mdViewContent.includes('case \'link\':'), 'Supports markdown links with external icon');
+assert(mdViewContent.includes('case \'h6\':') && mdViewContent.includes('<h6'), 'Provides semantic H6 heading element');
+assert(mdViewContent.includes('case \'h5\':') && mdViewContent.includes('<h5'), 'Provides semantic H5 heading element');
+assert(mdViewContent.includes('tokenizeInline'), 'Implements robust inline tokenizer');
 
 // ----------------------------------------------------------------------------
 // Test 9: Verify AlgoNoteModal.tsx Markdown Mode Toggle Architecture & UX
@@ -224,6 +227,10 @@ assert(modalContent.includes('setViewMode(\'preview\')'), 'Provides preview mode
 assert(modalContent.includes('setViewMode(\'split\')'), 'Provides split mode switcher');
 assert(modalContent.includes('handleInsertMarkdown'), 'Provides quick Markdown insertion helper');
 assert(modalContent.includes('handleTextareaKeyDown'), 'Supports Tab key indentation handling (2 spaces)');
+assert(modalContent.includes('e.shiftKey'), 'Supports Shift+Tab block unindenting');
+assert(modalContent.includes('onMouseDown={(e) => e.preventDefault()}'), 'Format buttons prevent textarea selection loss on click');
+assert(modalContent.includes('active:scale-[0.96]'), 'Format buttons provide Emil Kowalski tactile feedback');
+assert(modalContent.includes('sm:grid-cols-2'), 'Split mode provides dual-column grid matching sm screen breakpoint');
 assert(modalContent.includes('max-w-4xl') || modalContent.includes('max-w-5xl'), 'Expands modal card width in split mode for comfortable dual columns');
 assert(modalContent.includes('variant="note"'), 'Passes variant="note" to MarkdownView for compact note styling');
 assert(modalContent.includes('便签内容为空'), 'Provides friendly empty state when previewing blank note');
@@ -232,9 +239,8 @@ assert(modalContent.includes('立即编辑便签'), 'Empty preview state provide
 // ----------------------------------------------------------------------------
 // Test 10: Functional Verification: Parse Real Markdown Sample Through Engine
 // ----------------------------------------------------------------------------
-console.log('\nTest 10: Functional Verification of Markdown Block & Inline Engine...');
+console.log('\nTest 10: Functional Verification of Markdown Block Engine...');
 
-// Real block parser engine logic mirror
 function parseMarkdownBlocks(content) {
   if (!content || !content.trim()) return [];
   const lines = content.split('\n');
@@ -247,6 +253,8 @@ function parseMarkdownBlocks(content) {
   let listBuffer = [];
   let inChecklist = false;
   let checklistBuffer = [];
+  let inQuote = false;
+  let quoteBuffer = [];
 
   const flushList = () => {
     if (inList && listBuffer.length > 0) {
@@ -262,11 +270,20 @@ function parseMarkdownBlocks(content) {
       inChecklist = false;
     }
   };
-  const flushAll = () => { flushList(); flushChecklist(); };
+  const flushQuote = () => {
+    if (inQuote && quoteBuffer.length > 0) {
+      result.push({ type: 'quote', text: quoteBuffer.join('\n'), lines: [...quoteBuffer] });
+      quoteBuffer = [];
+      inQuote = false;
+    }
+  };
+  const flushAll = () => { flushList(); flushChecklist(); flushQuote(); };
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line.startsWith('```')) {
+    const trimmedStart = line.trimStart();
+
+    if (trimmedStart.startsWith('```')) {
       flushAll();
       if (inCode) {
         result.push({ type: 'code', text: codeBuffer.join('\n'), lang: codeLang || 'cpp' });
@@ -275,7 +292,7 @@ function parseMarkdownBlocks(content) {
         inCode = false;
       } else {
         inCode = true;
-        codeLang = line.slice(3).trim();
+        codeLang = trimmedStart.slice(3).trim().split(/\s+/)[0] || '';
       }
       continue;
     }
@@ -312,6 +329,21 @@ function parseMarkdownBlocks(content) {
         continue;
       }
     }
+    if (line.startsWith('###### ')) {
+      flushAll();
+      result.push({ type: 'h6', text: line.slice(7).trim() });
+      continue;
+    }
+    if (line.startsWith('##### ')) {
+      flushAll();
+      result.push({ type: 'h5', text: line.slice(6).trim() });
+      continue;
+    }
+    if (line.startsWith('#### ')) {
+      flushAll();
+      result.push({ type: 'h4', text: line.slice(5).trim() });
+      continue;
+    }
     if (line.startsWith('### ')) {
       flushAll();
       result.push({ type: 'h3', text: line.slice(4).trim() });
@@ -327,11 +359,16 @@ function parseMarkdownBlocks(content) {
       result.push({ type: 'h1', text: line.slice(2).trim() });
       continue;
     }
-    if (line.startsWith('> ')) {
-      flushAll();
-      result.push({ type: 'quote', text: line.slice(2).trim() });
+    const quoteMatch = line.match(/^>\s?(.*)$/);
+    if (quoteMatch) {
+      flushList();
+      flushChecklist();
+      inQuote = true;
+      quoteBuffer.push(quoteMatch[1]);
       continue;
     }
+    flushQuote();
+
     const checkMatch = line.match(/^[-*+]\s+\[([ xX])\]\s*(.*)$/);
     if (checkMatch) {
       flushList();
@@ -360,6 +397,7 @@ const testSample = [
   '# 算法解题核心备忘',
   '## 动态规划五部曲',
   '> 确定 dp 数组及其下标含义',
+  '> 注意初值与非法状态特判',
   '```cpp',
   'int dp[1005];',
   'dp[0] = 1;',
@@ -376,7 +414,7 @@ const parsed = parseMarkdownBlocks(testSample);
 assert(parsed.length === 7, `Parsed exactly 7 structural blocks from complex markdown (got ${parsed.length})`);
 assert(parsed[0].type === 'h1' && parsed[0].text === '算法解题核心备忘', 'Parsed H1 heading correctly');
 assert(parsed[1].type === 'h2' && parsed[1].text === '动态规划五部曲', 'Parsed H2 heading correctly');
-assert(parsed[2].type === 'quote' && parsed[2].text === '确定 dp 数组及其下标含义', 'Parsed blockquote correctly');
+assert(parsed[2].type === 'quote' && parsed[2].lines.length === 2, 'Consecutive blockquote lines grouped cleanly');
 assert(parsed[3].type === 'code' && parsed[3].lang === 'cpp' && parsed[3].text.includes('dp[0] = 1;'), 'Parsed C++ code block correctly');
 assert(parsed[4].type === 'checklist' && parsed[4].checkItems.length === 2, 'Parsed checklist with 2 items');
 assert(parsed[4].checkItems[0].checked === true, 'First checklist item is checked');
@@ -384,13 +422,119 @@ assert(parsed[4].checkItems[1].checked === false, 'Second checklist item is unch
 assert(parsed[5].type === 'table' && parsed[5].headers[0] === '算法' && parsed[5].rows[0][1] === 'O(N*V)', 'Parsed table and rows correctly');
 assert(parsed[6].type === 'p' && parsed[6].text.includes('**滚动数组**'), 'Parsed paragraph containing formatting tokens');
 
-// Inline token splitter test
-const inlineRegex = /(\[[^\]]+\]\([^\)]+\)|\*\*[^*]+\*\*|~~[^~]+~~|\*(?:[^*\n]+?)\*|_(?:[^_\n]+?)_)/g;
-const inlineSample = '使用 **双指针** 和 *开闭区间*，参考 [Muduo](https://github.com/chenshuo/muduo)';
-const tokens = inlineSample.split(inlineRegex);
-assert(tokens.includes('**双指针**'), 'Inline parser isolates bold token');
-assert(tokens.includes('*开闭区间*'), 'Inline parser isolates italic token');
-assert(tokens.includes('[Muduo](https://github.com/chenshuo/muduo)'), 'Inline parser isolates link token');
+// ----------------------------------------------------------------------------
+// Test 11: Real-world C++ Markdown Robustness & Recursive Inline Verification
+// ----------------------------------------------------------------------------
+console.log('\nTest 11: Verifying Real-world C++ Markdown Parsing Robustness...');
+
+const tokenizeInlineMirror = (text) => {
+  if (!text) return [];
+  const tokens = [];
+  let i = 0;
+  while (i < text.length) {
+    if (text[i] === '`') {
+      const end = text.indexOf('`', i + 1);
+      if (end !== -1) {
+        tokens.push({ type: 'code', content: text.slice(i + 1, end) });
+        i = end + 1;
+        continue;
+      }
+    }
+    if (text[i] === '[') {
+      const closeBracket = text.indexOf(']', i + 1);
+      if (closeBracket !== -1 && text[closeBracket + 1] === '(') {
+        const closeParen = text.indexOf(')', closeBracket + 2);
+        if (closeParen !== -1) {
+          tokens.push({
+            type: 'link',
+            content: text.slice(i + 1, closeBracket),
+            url: text.slice(closeBracket + 2, closeParen).trim()
+          });
+          i = closeParen + 1;
+          continue;
+        }
+      }
+    }
+    if (text.startsWith('**', i)) {
+      const end = text.indexOf('**', i + 2);
+      if (end !== -1 && end > i + 2) {
+        tokens.push({ type: 'bold', content: text.slice(i + 2, end) });
+        i = end + 2;
+        continue;
+      }
+    }
+    if (text.startsWith('~~', i)) {
+      const end = text.indexOf('~~', i + 2);
+      if (end !== -1 && end > i + 2) {
+        tokens.push({ type: 'del', content: text.slice(i + 2, end) });
+        i = end + 2;
+        continue;
+      }
+    }
+    if (text[i] === '*' || text[i] === '_') {
+      const marker = text[i];
+      const nextChar = text[i + 1];
+      if (nextChar && !/\s/.test(nextChar) && nextChar !== marker) {
+        let end = -1;
+        for (let j = i + 1; j < text.length; j++) {
+          if (text[j] === marker) {
+            const prevChar = text[j - 1];
+            const afterChar = text[j + 1];
+            if (!/\s/.test(prevChar)) {
+              if (marker === '*' && afterChar && /\w/.test(afterChar)) continue;
+              end = j;
+              break;
+            }
+          }
+        }
+        if (end !== -1) {
+          tokens.push({ type: 'italic', content: text.slice(i + 1, end) });
+          i = end + 1;
+          continue;
+        }
+      }
+    }
+    let nextSpecial = i + 1;
+    while (nextSpecial < text.length) {
+      const ch = text[nextSpecial];
+      if (ch === '`' || ch === '[' || ch === '~' || ch === '*' || ch === '_') break;
+      nextSpecial++;
+    }
+    tokens.push({ type: 'text', content: text.slice(i, nextSpecial) });
+    i = nextSpecial;
+  }
+  const merged = [];
+  for (const t of tokens) {
+    if (merged.length > 0 && merged[merged.length - 1].type === 'text' && t.type === 'text') {
+      merged[merged.length - 1].content += t.content;
+    } else {
+      merged.push(t);
+    }
+  }
+  return merged;
+};
+
+// 1. Nested inline code inside bold
+const nestedCodeTokens = tokenizeInlineMirror('**重点：`vector<int>` 扩容机制**');
+assert(nestedCodeTokens.length === 1 && nestedCodeTokens[0].type === 'bold', 'Bold token captures nested inline code cleanly');
+const innerTokens = tokenizeInlineMirror(nestedCodeTokens[0].content);
+assert(innerTokens.some(t => t.type === 'code' && t.content === 'vector<int>'), 'Nested code token is preserved inside bold');
+
+// 2. C++ pointer type with asterisk inside bold
+const pointerBoldTokens = tokenizeInlineMirror('**Node* root 不能为空**');
+assert(pointerBoldTokens.length === 1 && pointerBoldTokens[0].type === 'bold' && pointerBoldTokens[0].content === 'Node* root 不能为空', 'C++ pointer asterisk does not break bold parsing');
+
+// 3. Pointer dereference arithmetic does not trigger false italic
+const derefTokens = tokenizeInlineMirror('普通指针运算：*p1 = *p2;');
+assert(derefTokens.every(t => t.type !== 'italic'), 'Pointer dereferencing (*p1 = *p2) does not trigger false italic');
+
+// 4. Multiplication math does not trigger false italic
+const mathTokens = tokenizeInlineMirror('普通乘法运算：3 * 4 * 5 = 60');
+assert(mathTokens.every(t => t.type !== 'italic'), 'Arithmetic multiplication (3 * 4 * 5) does not trigger false italic');
+
+// 5. Link with nested formatting
+const linkTokens = tokenizeInlineMirror('查看 [官方题解与`Code`](https://leetcode.cn) 获取更多');
+assert(linkTokens.some(t => t.type === 'link' && t.url === 'https://leetcode.cn'), 'Parses markdown link target correctly');
 
 console.log('\n================================================================');
 if (failCount === 0) {
@@ -402,4 +546,5 @@ if (failCount === 0) {
   console.log('================================================================');
   process.exit(1);
 }
+
 

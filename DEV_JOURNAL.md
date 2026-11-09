@@ -7247,6 +7247,36 @@ const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
   1. 第一阶段利用正则 `/(`[^`]+`)/g` 优先将文本严格拆分为“行内代码片断”与“普通文本片断”；
   2. 仅对普通文本片断执行第二阶段的粗体（`**`）、删除线（`~~`）、斜体（`*` / `_`）与超链接（`[...]`）正则匹配；行内代码片断则直接包裹为 `<code className="inline-code ...">` 纯字面量渲染，从底层杜绝 C++ 指针星号导致的斜体串扰。
 
+#### 问题 3：粗体嵌套行内代码、C++ 指针类型与连续引用行解析碎片化
+- **问题现象**：
+  1. 在便签中输入 `**重点：\`vector<int>\` 扩容机制**` 时，由于两阶段粗暴切割，粗体标记在反引号处被截断为 `**重点：` 和 ` 扩容机制**`，导致前后星号无法闭合，直接以裸文本输出；
+  2. 在 C++ 笔记中输入 `**Node* root 不能为空**` 时，粗体正则 `\*\*[^*]+\*\*` 严禁星号出现，导致 C++ 指针类型无法被正常加粗；
+  3. 普通指针运算 `*p1 = *p2;` 或算术乘法 `3 * 4 * 5` 被误识别为成对斜体；
+  4. 连续多行引用（如 `> line 1\n> line 2`）被解析为多个断开的独立引用盒子。
+- **根本原因 (RCA)**：单一正则无法维护嵌套语义上下文，且对 Markdown CommonMark 强调界定符（Whitespace & Flanking Delimiters）缺乏边界判断；块状态机在解析引用时缺少连续行缓冲器。
+- **具体解法**：
+  1. 重构为状态机内联词法分词器（`tokenizeInline`），按照 `code` -> `link` -> `bold` -> `del` -> `italic` 优先级严密提取 Token，支持任意字符（包含反引号与指针星号）作为加粗载荷；
+  2. 采用限制深度的递归渲染器（`renderInline(str, depth + 1)`），使得粗体内可无缝包裹高亮行内代码与超链接；
+  3. 引入斜体界定符非空白校验与非字母跟随校验，彻底杜绝指针解引用与乘法误判；
+  4. 块解析器引入 `quoteBuffer` 缓冲合并连续引用行，统一输出为一个连贯的多行引用块。
+
+#### 问题 4：工具栏按钮点击导致文本框选区丢失与分屏断点不一致
+- **问题现象**：
+  1. 用户在文本框中选中一段文字（如 `vector<int>`）后点击工具栏的“粗体”或“C++代码块”按钮，选区瞬间被取消，未能成功包裹所选文字，而是插入了默认占位符；
+  2. 在平板/中等屏幕（640px~768px）下点击“分屏”按钮后，内容区未呈现双栏左右并排，而是纵向堆叠成两个大盒子。
+- **根本原因 (RCA)**：
+  1. 浏览器中点击普通 `<button>` 会触发默认的 focus 转移，导致文本框失去焦点并折叠选区；
+  2. 分屏切换按钮声明为 `hidden sm:flex`（640px 开启），而分屏网格容器声明为 `grid-cols-1 md:grid-cols-2`（768px 开启），导致 640px~768px 之间产生断点错位。
+- **具体解法**：
+  1. 所有格式化按钮均加入 `onMouseDown={(e) => e.preventDefault()}`，阻止焦点转移，牢牢锁定文本框选区；
+  2. 同步注入 Emil Kowalski `active:scale-[0.96] duration-100` 触觉反馈；
+  3. 分屏网格修正为 `grid-cols-1 sm:grid-cols-2`，确保分屏按钮可见时 100% 呈现双栏实时对照。
+
+#### 问题 5：Windows 驱动器盘符大小写不匹配引发 Vite 构建失败
+- **问题现象**：在通过 `npm --prefix e:/workspace/... run build` 或特定脚本调用时，Vite 构建报错 `[vite:html-inline-proxy] Could not load ... index.html?html-proxy&inline-css&index=0.css: No matching HTML proxy module found`。
+- **根本原因 (RCA)**：Windows 系统下 `path.resolve` 保留了参数输入的小写 `e:`，而底层 Rollup 与系统物理路径规范为大写 `E:`，导致 Vite 内存 Map 中基于完整字符串的模块缓存 Key 查找失败。
+- **具体解法**：在 `scripts/build_static.cjs` 中使用 `fs.realpathSync.native` 规范化真实物理路径，彻底根除跨终端调用时的盘符大小写不一致隐患。
+
 ---
 
 ### 4. 架构与机制演进图 (Architectural Evolution Diagram)
@@ -7457,28 +7487,37 @@ Test 9: Verifying AlgoNoteModal.tsx Mode Toggle & UX Features...
   ✅ [PASS] Provides split mode switcher
   ✅ [PASS] Provides quick Markdown insertion helper
   ✅ [PASS] Supports Tab key indentation handling (2 spaces)
+  ✅ [PASS] Supports Shift+Tab block unindenting
+  ✅ [PASS] Format buttons prevent textarea selection loss on click
+  ✅ [PASS] Format buttons provide Emil Kowalski tactile feedback
+  ✅ [PASS] Split mode provides dual-column grid matching sm screen breakpoint
   ✅ [PASS] Expands modal card width in split mode for comfortable dual columns
   ✅ [PASS] Passes variant="note" to MarkdownView for compact note styling
   ✅ [PASS] Provides friendly empty state when previewing blank note
   ✅ [PASS] Empty preview state provides immediate shortcut back to edit mode
 
-Test 10: Functional Verification of Markdown Block & Inline Engine...
+Test 10: Functional Verification of Markdown Block Engine...
   ✅ [PASS] Parsed exactly 7 structural blocks from complex markdown (got 7)
   ✅ [PASS] Parsed H1 heading correctly
   ✅ [PASS] Parsed H2 heading correctly
-  ✅ [PASS] Parsed blockquote correctly
+  ✅ [PASS] Consecutive blockquote lines grouped cleanly
   ✅ [PASS] Parsed C++ code block correctly
   ✅ [PASS] Parsed checklist with 2 items
   ✅ [PASS] First checklist item is checked
   ✅ [PASS] Second checklist item is unchecked
   ✅ [PASS] Parsed table and rows correctly
   ✅ [PASS] Parsed paragraph containing formatting tokens
-  ✅ [PASS] Inline parser isolates bold token
-  ✅ [PASS] Inline parser isolates italic token
-  ✅ [PASS] Inline parser isolates link token
+
+Test 11: Verifying Real-world C++ Markdown Parsing Robustness...
+  ✅ [PASS] Bold token captures nested inline code cleanly
+  ✅ [PASS] Nested code token is preserved inside bold
+  ✅ [PASS] C++ pointer asterisk does not break bold parsing
+  ✅ [PASS] Pointer dereferencing (*p1 = *p2) does not trigger false italic
+  ✅ [PASS] Arithmetic multiplication (3 * 4 * 5) does not trigger false italic
+  ✅ [PASS] Parses markdown link target correctly
 
 ================================================================
-🎉 ALL 118 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
+🎉 ALL 128 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
 ================================================================
 ```
 
@@ -7490,11 +7529,11 @@ npm run build
 ```text
 ✓ 1832 modules transformed.
 dist/index.html                                6.17 kB │ gzip:   2.41 kB
-dist/assets/index.css                        198.96 kB │ gzip:  21.61 kB
-dist/assets/MarkdownView-Bcr0x8U7.js           9.42 kB │ gzip:   2.99 kB
-dist/assets/AlgoCatalog-B_zXyqXq.js           84.53 kB │ gzip:  14.80 kB
-dist/assets/index.js                         848.50 kB │ gzip: 243.08 kB
-✓ built in 8.86s
+dist/assets/index.css                        198.93 kB │ gzip:  21.60 kB
+dist/assets/MarkdownView-DhmbL4or.js          11.09 kB │ gzip:   3.43 kB
+dist/assets/AlgoCatalog-BqGgQyHL.js           85.47 kB │ gzip:  14.99 kB
+dist/assets/index.js                         848.50 kB │ gzip: 243.07 kB
+✓ built in 8.24s
 ✓ Synced dist/assets/ to root assets/ for dual-channel static hosting
 [BUILD SUCCESS] Production ready static build in dist/
 ```

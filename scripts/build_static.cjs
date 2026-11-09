@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const rootDir = path.resolve(__dirname, '..');
+const rootDir = (fs.realpathSync && fs.realpathSync.native)
+  ? fs.realpathSync.native(path.resolve(__dirname, '..'))
+  : path.resolve(__dirname, '..');
 const distDir = path.resolve(rootDir, 'dist');
 
 console.log('[BUILD] Packaging modern Vite React SPA into dist/ ...');

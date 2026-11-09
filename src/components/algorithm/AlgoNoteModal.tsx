@@ -63,6 +63,10 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       setContent(initialNote?.content || '');
       setIsConfirmingClear(false);
       setIsCopied(false);
+      // Auto-switch to edit mode for empty notes so user is not stuck in blank preview
+      if (!initialNote?.content) {
+        setViewMode('edit');
+      }
     }
   }, [problem, initialNote]);
 
@@ -189,7 +193,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     }, 0);
   };
 
-  // Support Tab key indentation in textarea
+  // Support Tab key indentation in textarea (single cursor or multi-line block indent / Shift+Tab unindent)
   const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -197,11 +201,41 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       if (!el) return;
       const start = el.selectionStart;
       const end = el.selectionEnd;
-      const newContent = content.slice(0, start) + '  ' + content.slice(end);
-      setContent(newContent);
-      setTimeout(() => {
-        el.selectionStart = el.selectionEnd = start + 2;
-      }, 0);
+      const val = content;
+
+      if (start === end) {
+        // Single cursor: insert 2 spaces
+        const newContent = val.slice(0, start) + '  ' + val.slice(end);
+        setContent(newContent);
+        setTimeout(() => {
+          el.selectionStart = el.selectionEnd = start + 2;
+        }, 0);
+      } else {
+        // Multi-line selection: indent or Shift+Tab unindent
+        const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = val.indexOf('\n', end);
+        const effectiveEnd = lineEnd === -1 ? val.length : lineEnd;
+        const selectedBlock = val.slice(lineStart, effectiveEnd);
+        const lines = selectedBlock.split('\n');
+
+        if (e.shiftKey) {
+          const unindented = lines.map(line => line.replace(/^ {1,2}/, '')).join('\n');
+          const newContent = val.slice(0, lineStart) + unindented + val.slice(effectiveEnd);
+          setContent(newContent);
+          setTimeout(() => {
+            el.selectionStart = lineStart;
+            el.selectionEnd = lineStart + unindented.length;
+          }, 0);
+        } else {
+          const indented = lines.map(line => '  ' + line).join('\n');
+          const newContent = val.slice(0, lineStart) + indented + val.slice(effectiveEnd);
+          setContent(newContent);
+          setTimeout(() => {
+            el.selectionStart = lineStart;
+            el.selectionEnd = lineStart + indented.length;
+          }, 0);
+        }
+      }
     }
   };
 
@@ -379,48 +413,54 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             <div className="hidden md:flex items-center gap-1 p-0.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-white/5">
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleInsertMarkdown('**', '**', '重点文本')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
                 title="粗体 (**文本**)"
               >
                 <Bold size={12} />
               </button>
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleInsertMarkdown('*', '*', '斜体文本')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
                 title="斜体 (*文本*)"
               >
                 <Italic size={12} />
               </button>
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleInsertMarkdown('`', '`', 'code')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
                 title="行内代码 (`code`)"
               >
                 <Code size={12} />
               </button>
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleInsertMarkdown('\n```cpp\n', '\n```\n', '// C++ 优化实现\nclass Solution {\npublic:\n    // ...\n};')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
                 title="C++ 代码块 (```cpp)"
               >
                 <FileCode2 size={12} />
               </button>
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleInsertMarkdown('\n- [ ] ', '', '解题任务与边界验证')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
                 title="待办清单 (- [ ])"
               >
                 <ListCheck size={12} />
               </button>
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleInsertMarkdown('\n> ', '', '解题心得与模式总结')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
                 title="引用块 (> )"
               >
                 <Quote size={12} />
@@ -489,7 +529,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
 
           {/* Split Mode (Side by Side) */}
           {viewMode === 'split' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 flex-1 min-h-[250px] sm:min-h-[280px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 flex-1 min-h-[250px] sm:min-h-[280px]">
               {/* Left Column: Markdown Editor */}
               <div className="flex flex-col h-full min-h-[240px]">
                 <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between">
