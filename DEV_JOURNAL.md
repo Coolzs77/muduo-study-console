@@ -9357,3 +9357,312 @@ python scripts/verify_algo_note_multitoggle_and_highlight.py
 
 🎉🎉🎉 ALL ALGO NOTE NARROW VIEWPORT & RENDERED PALETTE VERIFICATIONS PASSED 100%! 🎉🎉🎉
 ```
+
+
+---
+
+## 第 41 轮 [2026-11-09 22:15]：便签 Markdown 表格全链路支持 (TipTap Table + GFM 序列化 + Tab 键导航)
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求**：用户明确提出：“便签还需要支持md表格”，要求在算法做题便签中无缝支持 Markdown 格式表格的直接渲染、富文本交互式编辑与双向无损持久化；
+- **具体使用场景**：在算法刷题过程中，用户频繁需要记录对比状态转移方程、时空复杂度对比矩阵（如预处理 vs 单次查询）、不同边界条件分支表等结构化数据；
+- **预期达成的技术指标**：
+  1. **输入与加载无损支持**：外部输入的 Markdown 表格（`| 字段 | 说明 |\n| --- | --- |\n| a | b |`）在便签打开时自动解析成标准 HTML 表格，并被 TipTap 渲染为富文本网格；
+  2. **工具栏一键插入与删除**：工具栏新增独立表格操作按钮（青色 Teal 主题），光标在普通段落时单击直接插入 3×3 初始表格（首行为表头）；光标处于表格内部时按钮高亮激活，单击一键删除当前表格；
+  3. **智能 Tab / Shift-Tab 单元格跳转**：用户在表格内部按 `Tab` 键跳到下一个单元格（在最后一行最后一格按 `Tab` 自动增添新行），按 `Shift-Tab` 返回上一个单元格，且绝不误触发文本编辑器的 2 空格缩进；
+  4. **标准 GFM 序列化存储**：底层自动保存与手动保存时，TipTap 内部的复杂表格 DOM 必须通过 Turndown 准确序列化为纯正、标准的 GitHub Flavored Markdown (GFM) 管道符表格，严禁泄露任何 `<table...>` 原生 HTML 标签；
+  5. **工程闭环与自动化验证**：全量通过 TypeScript 严格类型检查、全量单元测试与无头浏览器真实端到端测试。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及的核心文件列表**：
+  - [src/components/algorithm/AlgoNoteModal.tsx](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoNoteModal.tsx)：集成 TipTap 表格扩展套件，注册自定义 `tiptapTable` GFM 序列化规则，添加表格工具栏按钮，优化 Tab 键事件拦截；
+  - [src/turndown-plugin-gfm.d.ts](file:///e:/workspace/muduo-study-console/src/turndown-plugin-gfm.d.ts)：新建针对 `turndown-plugin-gfm` 的环境声明文件，消除 TypeScript 编译阶段 TS7016 / TS2665 报错；
+  - [src/index.css](file:///e:/workspace/muduo-study-console/src/index.css)：补充 TipTap ProseMirror 表格规范样式（含单元格边框、表头加粗与深灰底色、交替行斑马纹、聚焦单元格高亮以及昼夜模式深度适配）；
+  - [scripts/test_algo_note_feature.cjs](file:///e:/workspace/muduo-study-console/scripts/test_algo_note_feature.cjs)：追加 Test 12，覆盖表格扩展导入、工具栏配置、CSS 属性及递归单元格格式序列化断言；
+  - [scripts/verify_algo_note_table.py](file:///e:/workspace/muduo-study-console/scripts/verify_algo_note_table.py)：编写真实 Chrome 无头浏览器自动化端到端测试脚本，验证“插入表格 -> 单元格输入 -> Tab 导航跳格 -> 自动保存为标准 Markdown -> 关闭再打开重水合还原”完整闭环。
+
+- **核心代码片段 (TipTap 表格配置与自定义序列化规则)**：
+```typescript
+// 1. 集成 TipTap Table 官方套件
+Table.configure({
+  resizable: false,
+  HTMLAttributes: {
+    class: 'border-collapse w-full my-3 text-xs sm:text-sm'
+  }
+}),
+TableRow,
+TableHeader,
+TableCell,
+
+// 2. TabIndent 键盘拦截避让表格（保留 TipTap Table 内部的原生 Tab 键跳格逻辑）
+Tab: ({ editor }) => {
+  if (editor.isActive('codeBlock') || editor.isActive('table')) {
+    return false; // 返回 false 交由 ProseMirror 表格快捷键插件处理
+  }
+  // ... 列表与普通段落处理
+}
+
+// 3. 注册自定义 tiptapTable 转换规则（攻克 TipTap colgroup 与内联富文本断行痛点）
+turndownService.addRule('tiptapTable', {
+  filter: 'table',
+  replacement: function (_content, node) {
+    const tableEl = node as HTMLTableElement;
+    const rows = Array.from(tableEl.querySelectorAll('tr'));
+    if (rows.length === 0) return '';
+
+    const lines: string[] = [];
+    rows.forEach((tr, rowIndex) => {
+      const cells = Array.from(tr.querySelectorAll('th, td'));
+      if (cells.length === 0) return;
+      const rowText =
+        '| ' +
+        cells
+          .map((c) => {
+            const cellHtml = c.innerHTML || '';
+            const cellMd = turndownService
+              .turndown(cellHtml)
+              .trim()
+              .replace(/\n+/g, ' ')
+              .replace(/\|/g, '\\|');
+            return cellMd;
+          })
+          .join(' | ') +
+        ' |';
+      lines.push(rowText);
+
+      // 首行表头后自动生成 GFM 标准分隔行
+      if (rowIndex === 0) {
+        const delimiter = '| ' + cells.map(() => '---').join(' | ') + ' |';
+        lines.push(delimiter);
+      }
+    });
+
+    return '\n\n' + lines.join('\n') + '\n\n';
+  }
+});
+```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题 1：TypeScript 静态类型检查报错 TS2613 与 TS2665
+- **报错现象**：
+  ```
+  src/components/algorithm/AlgoNoteModal.tsx(12,8): error TS2613: Module '@tiptap/extension-table' has no default export. Did you mean to use 'import { Table } from ...' instead?
+  src/types/index.ts(424,16): error TS2665: Invalid module name in augmentation. Module 'turndown-plugin-gfm' resolves to an untyped module...
+  ```
+- **根本原因 (RCA)**：
+  1. `@tiptap/extension-table` 源码采用具名导出 `export { Table }`，未提供默认导出 `export default`；
+  2. `src/types/index.ts` 本身是一个拥有顶层 `export` 的 ES 模块，TypeScript 规范禁止在外部模块中通过 `declare module` 直接增补非类型化的纯 JavaScript 库（会导致模块增补冲突）。
+- **具体解法**：
+  1. 将导入修改为 `import { Table } from '@tiptap/extension-table'`；
+  2. 剥离 `src/types/index.ts` 中的增补，在根目录下建立独立的纯环境类型声明文件 `src/turndown-plugin-gfm.d.ts`，精准声明模块函数接口。
+
+#### 问题 2：TipTap 渲染的表格保存至本地存储时变成了未经转换的原生 HTML `<table...>` 标签
+- **报错现象**：
+  运行自动化端到端测试时，读取 `localStorage.getItem('muduo_algo_notes')` 发现数据为 `<table class="..."><tbody><tr><th>...</th></tr></tbody></table>`，而非 Markdown 的 `| 表头 |` 结构，断言失败。
+- **根本原因 (RCA)**：
+  1. 深入排查 `turndown-plugin-gfm` 核心源码：
+     ```javascript
+     function isHeadingRow (tr) {
+       var parentNode = tr.parentNode;
+       return (
+         parentNode.nodeName === 'THEAD' ||
+         (parentNode.firstChild === tr && (parentNode.nodeName === 'TABLE' || isFirstTbody(parentNode)) &&
+          every.call(tr.childNodes, function (n) { return n.nodeName === 'TH' }))
+       )
+     }
+     function isFirstTbody (element) {
+       var previousSibling = element.previousSibling;
+       return (element.nodeName === 'TBODY' && (!previousSibling || (previousSibling.nodeName === 'THEAD' && ...)))
+     }
+     ```
+  2. TipTap Table 渲染时，默认在 `<table>` 内部插入了用于列宽分配的 `<colgroup><col...></colgroup>`。这导致 `<tbody>` 的 `previousSibling` 变成了 `<colgroup>` 元素（既非 `null` 也非 `THEAD`），直接判定 `isFirstTbody` 为 `false`，从而判定 `isHeadingRow` 失败，触发了插件底层的 `turndownService.keep()` 机制，将整个表格直接作为 HTML 字符串原样保留；
+  3. 此外，TipTap 单元格默认包裹 `<p>` 标签，经过普通 Turndown 转换会产生 `\n\n` 换行符，而 Markdown 表格严格要求一行一个记录，多行换行会直接粉碎表格解析器。
+- **具体解法**：
+  为 `turndownService` 定制开发专属的 `tiptapTable` 顶级规则，直接对 TipTap 的 `<table>` 元素进行结构化递归解析，通过遍历 `rows` 和 `cells`，递归提取单元格内部并平坦化多余换行，无视 `<colgroup>` 干扰，稳定输出标准的 `| ... |` 纯净 Markdown 表格。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 维度一：Markdown 表格双向数据流转时序图 (`sequenceDiagram`)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 用户 (User)
+    participant Modal as 算法便签 (AlgoNoteModal)
+    participant Parser as marked 解析器
+    participant Editor as TipTap 编辑器画布
+    participant TD as Turndown + tiptapTable 规则
+    participant Storage as 本地存储 (localStorage)
+
+    Note over User,Storage: [阶段 1: 首次打开或历史数据加载]
+    User->>Modal: 点击题目卡片上的便签按钮
+    Modal->>Storage: 读取题目历史笔记 (Markdown 文本)
+    Storage-->>Modal: 返回包含 GFM 表格的原始字符串
+    Modal->>Parser: marked.parse(rawMd)
+    Parser-->>Modal: 生成 HTML <table> 表格文档片段
+    Modal->>Editor: editor.commands.setContent(parsedHtml)
+    Editor-->>User: 展现美观优雅的表格网格界面
+
+    Note over User,Storage: [阶段 2: 用户交互与实时编辑]
+    alt 用户单击表格工具栏按钮
+        User->>Editor: 单击 Table 按钮 (或快捷键)
+        Editor->>Editor: 插入 3x3 标准表格或删除当前表格
+    else 用户在表格单元格打字与跳格
+        User->>Editor: 输入内容并按下 Tab 键
+        Editor->>Editor: 焦点平滑切入下一个单元格 (末行自动增行)
+    end
+
+    Note over User,Storage: [阶段 3: 静默防抖双向序列化保存]
+    Editor->>Modal: 触发 onUpdate 事件 (800ms 防抖)
+    Modal->>Editor: editor.getHTML()
+    Editor-->>Modal: 包含 colgroup 与 table 的富文本 HTML
+    Modal->>TD: turndownService.turndown(html)
+    TD->>TD: 触发 tiptapTable 自定义规则，平坦化单元格并生成 GFM 管道符
+    TD-->>Modal: 输出纯净标准 GFM 表格 Markdown
+    Modal->>Storage: 持久化保存到 muduo_algo_notes (0 光标干扰)
+```
+
+##### 机制详细拆解与设计价值 (Diagram Walkthrough & Analysis)：
+1. **输入与加载的无损解耦**：从 `localStorage` 加载时，由已成熟支持 GFM 的 `marked.parse` 将 Markdown 表格直接转化为标准 DOM 结构，再灌入 TipTap，保证首次加载即所见即所得；
+2. **编辑态的响应式感知**：用户在单元格中的每次按键，TipTap 内部维护微事务状态；当按下 `Tab` 键时，自定义键盘扩展智能放行，使 ProseMirror 内部的单元格移动指令完全接管；
+3. **输出态的确定性防降级**：持久化阶段利用自定义 `tiptapTable` 规则，克服了传统插件对 `<colgroup>` 的兼容缺陷，确保写入本地存储的数据是 100% 具备便携性与跨平台规范性的纯 Markdown 格式。
+
+---
+
+#### 维度二：表格单元格焦点与 Tab 键盘事件决策状态机 (`stateDiagram-v2`)
+```mermaid
+stateDiagram-v2
+    [*] --> EditorFocused: 光标定位到编辑器画布
+
+    state EditorFocused {
+        [*] --> InNormalParagraph: 光标处于普通正文段落
+        [*] --> InListOrTask: 光标处于无序列表/待办清单
+        [*] --> InCodeBlock: 光标处于代码块内部
+        [*] --> InTableCell: 光标处于表格单元格内部
+    }
+
+    InNormalParagraph --> InsertTwoSpaces: 用户按下 Tab 键
+    InsertTwoSpaces --> InNormalParagraph: 插入 2 个空格 (支持缩进)
+
+    InListOrTask --> SinkListItem: 用户按下 Tab 键
+    SinkListItem --> InListOrTask: 列表节点向右下沉一层 (层级嵌套)
+
+    InNormalParagraph --> LiftTwoSpaces: 用户按下 Shift-Tab 键
+    LiftTwoSpaces --> InNormalParagraph: 消除前方 2 个空格
+
+    InListOrTask --> LiftListItem: 用户按下 Shift-Tab 键
+    LiftListItem --> InListOrTask: 列表节点向左提升一层
+
+    InCodeBlock --> CodeBlockNativeTab: 用户按下 Tab 键
+    CodeBlockNativeTab --> InCodeBlock: 代码块原生制表符缩进
+
+    InTableCell --> TableNextCell: 用户按下 Tab 键
+    TableNextCell --> InTableCell: 聚焦移动到同行右侧或下一行首格 (末格自动追加行)
+
+    InTableCell --> TablePrevCell: 用户按下 Shift-Tab 键
+    TablePrevCell --> InTableCell: 聚焦返回到左侧或上一行末格
+```
+
+##### 机制详细拆解与设计价值 (Diagram Walkthrough & Analysis)：
+1. **多场景键盘事件的互不干扰**：在 TipTap 的统一画布中，Tab 键兼具“段落首行缩进”、“列表层级嵌套”、“代码缩进”与“表格单元格导航”四重语义；
+2. **严密的状态拦截条件**：在 `TabIndent` 扩展中，优先检测 `editor.isActive('table')` 与 `editor.isActive('codeBlock')`，若为真则立即返回 `false`，将事件控制权完整归还给 TipTap 的表格导航模块；
+3. **连贯顺畅的操作体验**：用户在做题整理表格时，双手无需离开键盘使用鼠标点击，仅凭连续敲击 `Tab` 键即可完成整张对比表格的高效录入。
+
+---
+
+#### 维度三：TipTap DOM 到 GFM Markdown 流水线清洗转换管道图 (`flowchart LR`)
+```mermaid
+flowchart LR
+    subgraph Step1["阶段一: TipTap 原始 HTML"]
+        HTML["TipTap 产物:<br/>&lt;table class=...&gt;<br/>&lt;colgroup&gt;&lt;col&gt;...&lt;/colgroup&gt;<br/>&lt;tbody&gt;&lt;tr&gt;&lt;th&gt;&lt;p&gt;...&lt;/p&gt;&lt;/th&gt;&lt;/tr&gt;"]
+    end
+
+    subgraph Step2["阶段二: 结构过滤与清洗"]
+        Filter["tiptapTable 规则拦截<br/>• 剔除 &lt;colgroup&gt; 辅助标签<br/>• 提取 &lt;tr&gt; 行集合<br/>• 区分表头 (Index 0) 与数据行"]
+    end
+
+    subgraph Step3["阶段三: 单元格递归序列化"]
+        CellProcess["单元格内联转换<br/>• 递归转义 cell.innerHTML<br/>• 保留粗体 `**` 与行内代码 `` ` ``<br/>• 平坦化多余换行 `\n` 为单空格<br/>• 管道符转义 `|` -> `\|`"]
+    end
+
+    subgraph Step4["阶段四: GFM 管道符拼接"]
+        Format["标准 GFM 表格装配<br/>• 拼接行: `| col1 | col2 |`<br/>• 注入分隔行: `| --- | --- |`<br/>• 双换行包裹注入正文流"]
+    end
+
+    Step1 --> Filter
+    Filter --> CellProcess
+    CellProcess --> Format
+```
+
+##### 机制详细拆解与设计价值 (Diagram Walkthrough & Analysis)：
+1. **阶段一至阶段二**：剥离由编辑器视图层注入的样式和辅助排版节点（如 colgroup），确保数据核心纯净；
+2. **阶段三**：关键创新点在于对每个单元格的 `innerHTML` 调用 `turndownService.turndown`，使得表格内部的富文本格式（如 `**复杂度**`、`` `O(log n)` ``）能被原样保留，同时将富文本段落产生的换行符压缩为单个空格，杜绝 Markdown 语法崩坏；
+3. **阶段四**：严格按照 CommonMark / GFM 规范生成分隔线与双外侧管道符，确保无论是导出到本地、提交到 GitHub 还是在 Typora/Obsidian 中读取，均能完美显示。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **视觉风格与微质感对齐**：
+  - 表格容器圆角设为 `rounded-xl`，外边框采用柔和的 Slate 灰阶（亮色 `#e2e8f0`，暗色 `#334155`）；
+  - 表头背景采用沉稳科技感的 Slate 灰（亮色 `#f8fafc`，暗色 `#1e293b`），文字加粗，清晰突显数据维度；
+  - 数据行应用交替行斑马纹色彩（偶数行微妙浅底色），大幅提升多行数据对比时的视觉阅读舒适度；
+  - 单元格聚焦状态配备天空蓝微透明高亮遮罩（`.selectedCell:after`），交互动效流畅自然；
+- **工具栏操作按钮体验**：
+  - 新增表格专属青色主题（Teal），在普通状态与激活删除状态之间形成鲜明的语义反差；
+  - 按钮配置 `onMouseDown={(e) => e.preventDefault()}`，防止点击按钮时编辑器失焦导致光标跳动。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 静态类型编译检查 (TypeScript 0 错误)
+cd e:\workspace\muduo-study-console
+npx tsc --noEmit
+
+# 2. 全量单元与特性测试套件 (包含 Markdown 表格断言)
+npm test
+
+# 3. 生产静态包打包构建 (验证 Vite 打包完整性)
+npm run build
+
+# 4. 表格真实浏览器交互与序列化自动化测试
+python scripts/verify_algo_note_table.py
+```
+
+#### (2) 控制台真实运行输出凭据
+```
+[*] Local static server serving E:\workspace\muduo-study-console\dist on http://127.0.0.1:4212
+[1] Navigating to Algorithm Catalog...
+[2] Opening AlgoNoteModal...
+  ✅ Note modal opened successfully.
+[3] Verifying Table toolbar button...
+  ✅ Table toolbar button located.
+[4] Inserting 3x3 GFM table via toolbar button...
+  ✅ Table DOM node created successfully in TipTap.
+  ✅ Found 3 header cells and 6 data cells (expected 3 th, 6 td for 3x3 table).
+  ✅ Table Header background computed color: rgb(248, 250, 252)
+[5] Populating table cells with sample complexity matrix via Tab navigation...
+[6] Saving table note...
+
+Saved Markdown Table in Storage:
+| 操作类型 | 时间复杂度 | 空间复杂度 |
+| --- | --- | --- |
+| 二分查找 | O(log n) | O(1) |
+|  |  |  |
+
+  ✅ GFM Table Markdown serialization roundtrip verified 100%!
+  ✅ Screenshot saved to docs/images/verify_algo_note_table.png
+  ✅ Copied screenshot to brain artifact directory.
+[7] Closing modal and reopening to verify roundtrip re-hydration...
+  ✅ Table cleanly re-hydrated from Markdown into TipTap DOM on modal reopening!
+
+🎉 ALL TABLE INTEGRATION AND SERIALIZATION TESTS PASSED PERFECTLY!
+```

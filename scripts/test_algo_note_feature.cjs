@@ -377,6 +377,74 @@ assert(modalContent.includes('Heading3') && modalContent.includes('三级标题'
 assert(modalContent.includes('onSaveRef'), 'Uses onSaveRef to protect debounced auto-save from stale closure');
 assert(modalContent.includes('resetSaveStatusTimerRef'), 'Uses resetSaveStatusTimerRef to relax save status back to idle');
 
+// ----------------------------------------------------------------------------
+// Test 12: Verifying Markdown Table Integration (TipTap Table + GFM Serialization)
+// ----------------------------------------------------------------------------
+console.log('\nTest 12: Verifying Markdown Table Integration & GFM Serialization...');
+assert(modalContent.includes("from '@tiptap/extension-table'"), 'Imports Table extension from @tiptap/extension-table');
+assert(modalContent.includes("from '@tiptap/extension-table-row'"), 'Imports TableRow extension');
+assert(modalContent.includes("from '@tiptap/extension-table-cell'"), 'Imports TableCell extension');
+assert(modalContent.includes("from '@tiptap/extension-table-header'"), 'Imports TableHeader extension');
+assert(modalContent.includes("from 'turndown-plugin-gfm'"), 'Imports turndown-plugin-gfm for GFM table support');
+assert(modalContent.includes("addRule('tiptapTable'"), 'Registers custom tiptapTable rule handling TipTap colgroup and cell recursion');
+assert(modalContent.includes("Table as TableIcon"), 'Imports TableIcon from lucide-react');
+assert(modalContent.includes("insertTable({ rows: 3, cols: 3, withHeaderRow: true })"), 'Configures table insert action with 3x3 layout and header row');
+assert(modalContent.includes("deleteTable()"), 'Configures table delete action when active inside a table');
+assert(modalContent.includes("text-teal-700") && modalContent.includes("border-teal-300"), 'Table action button uses distinct Teal theme');
+assert(modalContent.includes("editor.isActive('table')"), 'TabIndent extension checks table activity to yield native Tab cell navigation');
+
+const indexCssContent = fs.readFileSync(path.join(__dirname, '../src/index.css'), 'utf8');
+assert(indexCssContent.includes('.ProseMirror table'), 'Defines .ProseMirror table CSS styles');
+assert(indexCssContent.includes('.ProseMirror th') && indexCssContent.includes('.dark .ProseMirror th'), 'Defines light and dark .ProseMirror th styles');
+assert(indexCssContent.includes('.ProseMirror td') && indexCssContent.includes('.dark .ProseMirror td'), 'Defines light and dark .ProseMirror td styles');
+assert(indexCssContent.includes('.ProseMirror tr:nth-child(even) td'), 'Defines zebra striping for table rows');
+assert(indexCssContent.includes('.ProseMirror .selectedCell'), 'Defines TipTap cell selection highlight overlay');
+
+// Functional test of custom tiptapTable serialization
+const mockTd = new TurndownService();
+const { tables: gfmTables } = require('turndown-plugin-gfm');
+mockTd.use(gfmTables);
+mockTd.addRule('tiptapTable', {
+  filter: 'table',
+  replacement: function (_content, node) {
+    const tableEl = node;
+    const rows = Array.from(tableEl.querySelectorAll('tr'));
+    if (rows.length === 0) return '';
+    const lines = [];
+    rows.forEach((tr, rowIndex) => {
+      const cells = Array.from(tr.querySelectorAll('th, td'));
+      if (cells.length === 0) return;
+      const rowText =
+        '| ' +
+        cells
+          .map((c) => {
+            const cellHtml = c.innerHTML || '';
+            const cellMd = mockTd
+              .turndown(cellHtml)
+              .trim()
+              .replace(/\n+/g, ' ')
+              .replace(/\|/g, '\\|');
+            return cellMd;
+          })
+          .join(' | ') +
+        ' |';
+      lines.push(rowText);
+      if (rowIndex === 0) {
+        const delimiter = '| ' + cells.map(() => '---').join(' | ') + ' |';
+        lines.push(delimiter);
+      }
+    });
+    return '\n\n' + lines.join('\n') + '\n\n';
+  }
+});
+
+const sampleTableHtml = '<table class="border-collapse w-full my-3"><colgroup><col><col></colgroup><tbody><tr><th><p><strong>复杂度</strong></p></th><th><p>描述</p></th></tr><tr><td><p><code>O(1)</code></p></td><td><p>常数级别</p></td></tr></tbody></table>';
+const serializedTableMd = mockTd.turndown(sampleTableHtml).trim();
+assert(serializedTableMd.includes('| **复杂度** | 描述 |'), 'Serializes header row with nested formatting preserved');
+assert(serializedTableMd.includes('| --- | --- |'), 'Serializes standard Markdown table delimiter');
+assert(serializedTableMd.includes('| `O(1)` | 常数级别 |'), 'Serializes data row with inline code preserved');
+assert(!serializedTableMd.includes('<colgroup>') && !serializedTableMd.includes('<table'), 'Eliminates all raw HTML tags from table Markdown');
+
 console.log('\n================================================================');
 if (failCount === 0) {
   console.log(`🎉 ALL ${passCount} ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!`);

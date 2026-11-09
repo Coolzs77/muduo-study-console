@@ -9,7 +9,12 @@ import StarterKit from '@tiptap/starter-kit';
 import { CodeBlock } from '@tiptap/extension-code-block';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
+import { Table } from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
 import TurndownService from 'turndown';
+import { tables as turndownTables } from 'turndown-plugin-gfm';
 import { marked } from 'marked';
 import { AlgoProblem, AlgoProblemNote } from '../../types';
 import { formatComplexity } from '../../utils/formatters';
@@ -31,6 +36,7 @@ import {
   Heading2,
   Heading3,
   List,
+  Table as TableIcon,
   Minus,
   Terminal
 } from 'lucide-react';
@@ -55,6 +61,48 @@ const turndownService = new TurndownService({
   codeBlockStyle: 'fenced',
   bulletListMarker: '-',
   hr: '---',
+});
+
+// Configure GFM Markdown table serialization plugin
+turndownService.use(turndownTables);
+
+// Custom table rule ensuring TipTap's <colgroup> and nested <p> are converted to clean, standard GFM Markdown tables
+turndownService.addRule('tiptapTable', {
+  filter: 'table',
+  replacement: function (_content, node) {
+    const tableEl = node as HTMLTableElement;
+    const rows = Array.from(tableEl.querySelectorAll('tr'));
+    if (rows.length === 0) return '';
+
+    const lines: string[] = [];
+    rows.forEach((tr, rowIndex) => {
+      const cells = Array.from(tr.querySelectorAll('th, td'));
+      if (cells.length === 0) return;
+      const rowText =
+        '| ' +
+        cells
+          .map((c) => {
+            const cellHtml = c.innerHTML || '';
+            const cellMd = turndownService
+              .turndown(cellHtml)
+              .trim()
+              .replace(/\n+/g, ' ')
+              .replace(/\|/g, '\\|');
+            return cellMd;
+          })
+          .join(' | ') +
+        ' |';
+      lines.push(rowText);
+
+      // After first row (header row), add standard GFM markdown delimiter line
+      if (rowIndex === 0) {
+        const delimiter = '| ' + cells.map(() => '---').join(' | ') + ' |';
+        lines.push(delimiter);
+      }
+    });
+
+    return '\n\n' + lines.join('\n') + '\n\n';
+  }
 });
 
 /**
@@ -301,7 +349,7 @@ const TabIndent = Extension.create({
   addKeyboardShortcuts() {
     return {
       Tab: ({ editor }) => {
-        if (editor.isActive('codeBlock')) {
+        if (editor.isActive('codeBlock') || editor.isActive('table')) {
           return false;
         }
         if (editor.isActive('taskItem')) {
@@ -315,7 +363,7 @@ const TabIndent = Extension.create({
         return editor.commands.insertContent('  ');
       },
       'Shift-Tab': ({ editor }) => {
-        if (editor.isActive('codeBlock')) {
+        if (editor.isActive('codeBlock') || editor.isActive('table')) {
           return false;
         }
         if (editor.isActive('taskItem')) {
@@ -418,6 +466,15 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
           class: 'flex items-start gap-2.5 my-1 text-slate-800 dark:text-slate-200 group'
         }
       }),
+      Table.configure({
+        resizable: false,
+        HTMLAttributes: {
+          class: 'border-collapse w-full my-3 text-xs sm:text-sm'
+        }
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
       TabIndent
     ],
     editorProps: {
@@ -997,7 +1054,30 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
               <Quote size={14} />
             </button>
 
-            {/* 11. Divider Line (Slate) */}
+            {/* 11. Table (Teal) */}
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                if (!editor) return;
+                if (editor.isActive('table')) {
+                  editor.chain().focus().deleteTable().run();
+                } else {
+                  editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+                }
+              }}
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
+                editor?.isActive('table')
+                  ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 border border-teal-300 dark:border-teal-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/70 dark:hover:bg-teal-950/40'
+              }`}
+              title={editor?.isActive('table') ? "删除表格 (单击删除当前表格)" : "插入表格 (3x3 表格，Tab 键跳格/自动加行)"}
+              aria-label="表格"
+            >
+              <TableIcon size={14} />
+            </button>
+
+            {/* 12. Divider Line (Slate) */}
             <button
               type="button"
               onMouseDown={(e) => e.preventDefault()}

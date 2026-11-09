@@ -498,4 +498,67 @@
   border: none !important;
 }
 
+/* ========================================================================== */
+/* TipTap ProseMirror GFM 表格排版规范                                        */
+/* ========================================================================== */
+.ProseMirror table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.85rem 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  font-size: 0.875rem;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.dark .ProseMirror table {
+  border-color: #334155;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.ProseMirror th {
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #e2e8f0;
+}
+
+.dark .ProseMirror th {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+.ProseMirror td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.dark .ProseMirror td {
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+.ProseMirror tr:nth-child(even) td {
+  background-color: rgba(248, 250, 252, 0.55);
+}
+
+.dark .ProseMirror tr:nth-child(even) td {
+  background-color: rgba(30, 41, 59, 0.35);
+}
+
+.ProseMirror .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(56, 189, 248, 0.15);
+  pointer-events: none;
+}
+
+
 
