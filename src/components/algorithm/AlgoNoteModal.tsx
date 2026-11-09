@@ -25,6 +25,7 @@ import {
   Quote,
   Heading1,
   Heading2,
+  Heading3,
   List,
   Minus,
   Terminal
@@ -52,15 +53,39 @@ const turndownService = new TurndownService({
   hr: '---',
 });
 
-// Configure custom rule for task items to ensure clean `- [ ] ` and `- [x] ` Markdown output
+/**
+ * Normalize code block language tag matching CodeBlock.tsx behavior
+ */
+export const normalizeCodeLanguage = (rawLang?: string): string => {
+  const raw = (rawLang || '').toLowerCase().trim();
+  if (raw === 'c++') return 'cpp';
+  if (raw === 'sh' || raw === 'shell') return 'bash';
+  if (raw === 'js') return 'javascript';
+  if (raw === 'ts') return 'typescript';
+  if (raw === 'py') return 'python';
+  return raw || 'cpp';
+};
+
+// Configure custom rule for task items to ensure clean `- [ ] ` and `- [x] ` Markdown output with nested child indentation
 turndownService.addRule('tiptapTaskList', {
   filter: function (node) {
-    return node.nodeName === 'LI' && (node.getAttribute('data-type') === 'taskItem' || node.classList.contains('task-item') || !!node.querySelector('input[type="checkbox"]'));
+    return (
+      node.nodeName === 'LI' &&
+      (node.getAttribute('data-type') === 'taskItem' ||
+        node.classList.contains('task-item') ||
+        !!node.querySelector('input[type="checkbox"]'))
+    );
   },
   replacement: function (content, node) {
-    const isChecked = node.getAttribute('data-checked') === 'true' || !!node.querySelector('input[type="checkbox"]:checked');
-    const cleanContent = content.trimStart().replace(/^\[[ xX]\]\s*/, '');
-    return (isChecked ? '- [x] ' : '- [ ] ') + cleanContent + '\n';
+    const isChecked =
+      node.getAttribute('data-checked') === 'true' ||
+      !!node.querySelector('input[type="checkbox"]:checked');
+    const prefix = isChecked ? '- [x] ' : '- [ ] ';
+    let clean = content.trimStart().replace(/^\[[ xX]\]\s*/, '');
+    clean = clean.replace(/^\n+/, '').replace(/\n+$/, '');
+    // Indent any nested children (e.g. subtask lists) by 2 spaces to preserve Markdown hierarchy
+    clean = clean.replace(/\n/gm, '\n  ');
+    return prefix + clean + '\n';
   }
 });
 
@@ -72,8 +97,9 @@ turndownService.addRule('fencedCodeBlock', {
   replacement: function (content, node) {
     const codeEl = node.querySelector('code');
     const className = codeEl ? codeEl.className || '' : '';
-    const langMatch = className.match(/language-(\w+)/);
-    const lang = langMatch ? langMatch[1] : 'cpp';
+    const langMatch = className.match(/language-([^\s]+)/);
+    const rawLang = langMatch ? langMatch[1] : 'cpp';
+    const lang = normalizeCodeLanguage(rawLang);
     const rawCode = codeEl ? codeEl.textContent || '' : content;
     return `\n\`\`\`${lang}\n${rawCode.replace(/\n$/, '')}\n\`\`\`\n\n`;
   }
@@ -81,22 +107,41 @@ turndownService.addRule('fencedCodeBlock', {
 
 /**
  * Custom CodeBlock NodeView component restoring the original Claymorphic Terminal Card style.
- * Includes Terminal icon, language tag, line count, and one-click copy button.
+ * Includes Terminal icon, language tag, line count, and one-click copy button with clipboard fallback.
  */
 export const CodeBlockView: React.FC<ReactNodeViewProps> = ({ node }) => {
   const [copied, setCopied] = useState(false);
-  const lang = (node.attrs?.language || 'cpp').toLowerCase();
+  const lang = normalizeCodeLanguage(node.attrs?.language);
   const codeText = node.textContent || '';
   const lineCount = codeText ? codeText.split('\n').length : 1;
 
-  const handleCopy = (e: React.MouseEvent) => {
+  const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     if (!codeText) return;
-    navigator.clipboard.writeText(codeText).then(() => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(codeText);
+      } else {
+        throw new Error('Clipboard API unavailable');
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = codeText;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } finally {
+        document.body.removeChild(ta);
+      }
+    }
   };
 
   return (
@@ -184,6 +229,19 @@ const TabIndent = Extension.create({
           editor.commands.liftListItem('listItem');
           return true;
         }
+        if (editor.state.selection.empty) {
+          const { $from } = editor.state.selection;
+          const textBefore = $from.parent.textBetween(
+            Math.max(0, $from.parentOffset - 2),
+            $from.parentOffset,
+            '\n',
+            '\n'
+          );
+          if (textBefore === '  ') {
+            editor.commands.deleteRange({ from: $from.pos - 2, to: $from.pos });
+            return true;
+          }
+        }
         return true;
       },
     };
@@ -210,6 +268,9 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   const [wordCount, setWordCount] = useState<number>(0);
 
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetSaveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
   const activeProblemRef = useRef<AlgoProblem | null>(problem);
   activeProblemRef.current = problem;
   const loadedProblemKeyRef = useRef<string>('');
@@ -282,7 +343,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
           const html = currentEditor.getHTML();
           const md = turndownService.turndown(html).trim();
           lastSavedMdRef.current = md;
-          onSave(pKey, md);
+          onSaveRef.current(pKey, md);
         }
         setSaveStatus('saved');
         const now = new Date();
@@ -290,6 +351,14 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         const mm = String(now.getMinutes()).padStart(2, '0');
         setLastSavedTime(`${hh}:${mm}`);
         autoSaveTimerRef.current = null;
+
+        if (resetSaveStatusTimerRef.current) {
+          clearTimeout(resetSaveStatusTimerRef.current);
+        }
+        resetSaveStatusTimerRef.current = setTimeout(() => {
+          setSaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
+          resetSaveStatusTimerRef.current = null;
+        }, 3000);
       }, 800);
     }
   });
@@ -371,6 +440,14 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     setLastSavedTime(`${hh}:${mm}`);
     setIsManualSavedFeedback(true);
     setTimeout(() => setIsManualSavedFeedback(false), 2000);
+
+    if (resetSaveStatusTimerRef.current) {
+      clearTimeout(resetSaveStatusTimerRef.current);
+    }
+    resetSaveStatusTimerRef.current = setTimeout(() => {
+      setSaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
+      resetSaveStatusTimerRef.current = null;
+    }, 3000);
   }, [editor, problemKey, onSave]);
 
   // Flush on Close / Exit: synchronously commit & save before unmounting (100% zero data loss)
@@ -661,6 +738,18 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
               title="二级标题 (键入 ## 内容)"
             >
               <Heading2 size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+                editor?.isActive('heading', { level: 3 })
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+              }`}
+              title="三级标题 (键入 ### 内容)"
+            >
+              <Heading3 size={14} />
             </button>
 
             <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5" />

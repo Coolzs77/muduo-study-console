@@ -98,7 +98,9 @@ def run_tests():
         # Check active button color or classes
         toolbar_html = toolbar.get_attribute('outerHTML')
         assert 'purple' not in toolbar_html, "Error: Purple color token found in toolbar!"
-        print("  ✓ [PASS] Zero purple detected; Toolbar unified with Amber/Slate theme!")
+        h3_btns = modal.find_elements(By.CSS_SELECTOR, "button[title*='三级标题']")
+        assert len(h3_btns) > 0, "Error: Heading3 toolbar button not found!"
+        print("  ✓ [PASS] Zero purple detected; Toolbar unified with Amber/Slate theme & H1/H2/H3 complete!")
         
         # 5. Type into single canvas editor
         print("[5] Typing into TipTap Editor Canvas...")
@@ -135,7 +137,7 @@ def run_tests():
         prose_mirror.send_keys("int left = 0, right = n - 1;")
         time.sleep(0.5)
         
-        # 6. Verify CodeBlock NodeView appearance
+        # 6. Verify CodeBlock NodeView appearance & Copy Click
         print("[6] Verifying CodeBlock Terminal Appearance...")
         # Check if code block contains terminal header
         code_blocks = modal.find_elements(By.CSS_SELECTOR, ".font-mono")
@@ -145,10 +147,12 @@ def run_tests():
         # Check copy button
         copy_btns = modal.find_elements(By.CSS_SELECTOR, "button[title='复制代码']")
         assert len(copy_btns) > 0, "Error: Copy code button not found in CodeBlock!"
+        copy_btns[0].click()
+        time.sleep(0.3)
         print("  ✓ [PASS] CodeBlock NodeView verified: Terminal header, line count, and copy button present!")
         
-        # 7. Test Tab Indentation in Editor
-        print("[7] Verifying Tab indentation...")
+        # 7. Test Tab Indentation and Shift-Tab in Editor
+        print("[7] Verifying Tab & Shift-Tab indentation...")
         prose_mirror.send_keys(Keys.ENTER)
         initial_editor_text = prose_mirror.text
         prose_mirror.send_keys(Keys.TAB)

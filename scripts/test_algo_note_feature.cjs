@@ -266,14 +266,49 @@ const td = new TurndownService({
   hr: '---',
 });
 
+const normalizeCodeLanguage = (rawLang) => {
+  const raw = (rawLang || '').toLowerCase().trim();
+  if (raw === 'c++') return 'cpp';
+  if (raw === 'sh' || raw === 'shell') return 'bash';
+  if (raw === 'js') return 'javascript';
+  if (raw === 'ts') return 'typescript';
+  if (raw === 'py') return 'python';
+  return raw || 'cpp';
+};
+
 td.addRule('tiptapTaskList', {
   filter: function (node) {
-    return node.nodeName === 'LI' && (node.getAttribute('data-type') === 'taskItem' || node.classList.contains('task-item') || !!node.querySelector('input[type="checkbox"]'));
+    return (
+      node.nodeName === 'LI' &&
+      (node.getAttribute('data-type') === 'taskItem' ||
+        node.classList.contains('task-item') ||
+        !!node.querySelector('input[type="checkbox"]'))
+    );
   },
   replacement: function (content, node) {
-    const isChecked = node.getAttribute('data-checked') === 'true' || !!node.querySelector('input[type="checkbox"]:checked');
-    const cleanContent = content.trimStart().replace(/^\[[ xX]\]\s*/, '');
-    return (isChecked ? '- [x] ' : '- [ ] ') + cleanContent + '\n';
+    const isChecked =
+      node.getAttribute('data-checked') === 'true' ||
+      !!node.querySelector('input[type="checkbox"]:checked');
+    const prefix = isChecked ? '- [x] ' : '- [ ] ';
+    let clean = content.trimStart().replace(/^\[[ xX]\]\s*/, '');
+    clean = clean.replace(/^\n+/, '').replace(/\n+$/, '');
+    clean = clean.replace(/\n/gm, '\n  ');
+    return prefix + clean + '\n';
+  }
+});
+
+td.addRule('fencedCodeBlock', {
+  filter: function (node) {
+    return node.nodeName === 'PRE' && !!node.querySelector('code');
+  },
+  replacement: function (content, node) {
+    const codeEl = node.querySelector('code');
+    const className = codeEl ? codeEl.className || '' : '';
+    const langMatch = className.match(/language-([^\s]+)/);
+    const rawLang = langMatch ? langMatch[1] : 'cpp';
+    const lang = normalizeCodeLanguage(rawLang);
+    const rawCode = codeEl ? codeEl.textContent || '' : content;
+    return `\n\`\`\`${lang}\n${rawCode.replace(/\n$/, '')}\n\`\`\`\n\n`;
   }
 });
 
@@ -309,6 +344,13 @@ assert(roundtripMd.includes('[x]') && roundtripMd.includes('初始化基础状�
 assert(roundtripMd.includes('[ ]') && roundtripMd.includes('确定遍历顺序'), 'Roundtripped markdown preserves unchecked task item');
 assert(roundtripMd.includes('**滚动数组**'), 'Roundtripped markdown preserves bold emphasis');
 
+// Test nested task list roundtrip preservation
+const nestedTaskHtml = '<ul data-type="taskList"><li data-type="taskItem"><p>父任务</p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>子任务 1</p></li><li data-type="taskItem"><p>子任务 2</p></li></ul></li></ul>';
+const nestedTaskMd = td.turndown(nestedTaskHtml);
+assert(nestedTaskMd.includes('- [ ] 父任务'), 'Nested task list preserves parent item');
+assert(nestedTaskMd.includes('- [x] 子任务 1'), 'Nested task list preserves checked child item');
+assert(nestedTaskMd.includes('  - [x] 子任务 1') || nestedTaskMd.includes('    - [x] 子任务 1'), 'Nested task list child item is indented');
+
 // ----------------------------------------------------------------------------
 // Test 11: Verifying Note Editor Experience & Style Polish Refinement
 // ----------------------------------------------------------------------------
@@ -317,6 +359,7 @@ assert(modalContent.includes('CodeBlockView'), 'Implements CodeBlockView custom 
 assert(modalContent.includes('ReactNodeViewRenderer(CodeBlockView)'), 'Registers CodeBlockView with ReactNodeViewRenderer');
 assert(modalContent.includes('<Terminal size={14}'), 'CodeBlockView renders Terminal icon');
 assert(modalContent.includes('title="复制代码"'), 'CodeBlockView has dedicated one-click copy button');
+assert(modalContent.includes('document.execCommand') && modalContent.includes('ta.value = codeText'), 'CodeBlockView has robust clipboard copy fallback');
 assert(modalContent.includes('loadedProblemKeyRef'), 'Uses loadedProblemKeyRef to prevent auto-save from resetting cursor position');
 assert(!modalContent.match(/\[isOpen,\s*problem,\s*initialNote/), 'initialNote strictly excluded from setContent effect dependencies');
 assert(modalContent.includes('TabIndent'), 'Configures TabIndent keyboard shortcut extension');
@@ -325,6 +368,9 @@ assert(!modalContent.includes('Typora / Notion 单画布真所见即所得'), 'S
 assert(!modalContent.includes('Ctrl + S 保存 · 800ms 自动保存'), 'Superfluous shortcut hint removed from Footer');
 assert(!modalContent.includes('bg-purple-100') && !modalContent.includes('text-purple-700'), 'Zero purple in Toolbar (unified Amber theme)');
 assert(modalContent.includes('text-amber-600 dark:text-amber-400'), 'Toolbar active state styled with Amber theme');
+assert(modalContent.includes('Heading3') && modalContent.includes('三级标题'), 'Toolbar includes Heading3 button');
+assert(modalContent.includes('onSaveRef'), 'Uses onSaveRef to protect debounced auto-save from stale closure');
+assert(modalContent.includes('resetSaveStatusTimerRef'), 'Uses resetSaveStatusTimerRef to relax save status back to idle');
 
 console.log('\n================================================================');
 if (failCount === 0) {

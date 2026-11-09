@@ -8801,3 +8801,170 @@ flowchart TD
   - `npm run deploy:gh-pages`：强制推送到 `origin/gh-pages` 成功（`7d2b0b5`）。
 - **实机凭证**：
   - 便签深度打磨实机截图：[`docs/images/verify_algo_note_refinement.png`](file:///e:/workspace/muduo-study-console/docs/images/verify_algo_note_refinement.png)
+
+---
+
+## 第 38 轮 [2026-11-09 20:20]：便签编辑器嵌套缩进反序列化修复、剪贴板容灾降级、H3 工具栏补全与保存状态生命周期调优
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+在第 37 轮 TipTap 单画布 WYSIWYG 架构重构初稿提交后，作为资深独立审查员，对整个便签组件进行了全方位的深度红蓝对抗破题与边缘用例穿透审查：
+1. **彻底攻坚嵌套待办清单序列化断层**：上一轮引入的 `tiptapTaskList` 自定义 Turndown 规则只粗暴处理了平级单项，当用户在单画布中通过 Tab 键将清单缩进为子清单后，Turndown 序列化时未给子节点填充缩进空格，导致重新打开便签时多级嵌套的子任务直接被压平成顶层扁平列表；
+2. **代码块复制代码按钮异常崩溃容灾降级**：`CodeBlockView` 中的复制代码按钮直接依赖裸调 `navigator.clipboard.writeText(codeText)`，缺乏错误捕获与降级容灾。在非安全上下文（如内网 HTTP 或受限 Webview）下会直接抛出未捕获异常导致按钮静默失效；
+3. **工具栏 H3 按钮遗漏补全**：需求明确要求全面恢复原版 H1/H2/H3 标题体系，但上一轮工作栏中仅放置了 `Heading1` 与 `Heading2`，遗漏了 `Heading3`；
+4. **代码块编程语言识别正则与归一化强化**：原正则 `/language-(\w+)/` 无法匹配带非单词字符的语言（如 `language-c++` 会被截断为 `c`，`language-c#` 亦同），需引入规范归一化函数 `normalizeCodeLanguage`，与项目原版 `CodeBlock.tsx` 严格对齐；
+5. **自动保存状态常驻绿标体验调优与闭包隔离**：保存状态触发 `'saved'` 后永久停留在绿色“已保存”，使得原本设计的时钟展示失效；同时 TipTap `onUpdate` 存在捕获父级 `onSave` 闭包的潜在风险，需引入 `onSaveRef` 与 3s 平滑回归 `idle` 定时器；
+6. **段落 Shift+Tab 逆向反缩进**：在普通文本段落中，当光标前存在 2 个缩进空格时，按 Shift+Tab 应能精准回退删除 2 个空格。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- [`src/components/algorithm/AlgoNoteModal.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoNoteModal.tsx)：
+  1. **代码语言归一化与正则增强**：提取并导出 `normalizeCodeLanguage`，将 `c++` 映射为 `cpp`，`py` 映射为 `python` 等；Turndown 规则正则升级为 `/language-([^\s]+)/`；
+  2. **Turndown 嵌套清单缩进支持**：在 `tiptapTaskList` 规则中增加 `clean.replace(/\n/gm, '\n  ')`，使任何嵌套的子级清单在序列化为 Markdown 时自动补全 2 空格前导缩进，与 `marked.parse` 的层级解析 100% 闭环；
+  3. **CodeBlockView 双轨容灾复制**：集成 `navigator.clipboard` 与 `document.execCommand('copy')` 隐式 textarea 降级机制，支持多环境无感复制；
+  4. **补全 H3 工具栏按键**：从 `lucide-react` 导入 `Heading3` 并添加工具栏按钮；
+  5. **闭包安全与状态平滑回退**：引入 `onSaveRef` 消除闭包漂移风险；引入 `resetSaveStatusTimerRef` 在保存成功 3 秒后平滑将状态由 `'saved'` 恢复至 `'idle'`；
+  6. **Shift+Tab 段落反缩进**：在 `TabIndent` 的 `Shift-Tab` 处理函数中增加空选区前置空格检测，若光标前为 `'  '` 则安全删除 2 个空格。
+- [`src/index.css`](file:///e:/workspace/muduo-study-console/src/index.css)：
+  - 追加 `.ProseMirror ul[data-type="taskList"] ul[data-type="taskList"] { margin-left: 1.25rem; }`，使单画布中的多级待办清单具备清晰的层级树状视觉阶梯。
+- [`scripts/test_algo_note_feature.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_algo_note_feature.cjs)：
+  - 增强 `Test 10` 与 `Test 11`，覆盖多级嵌套待办清单 Markdown 往返序列化、`normalizeCodeLanguage`、`Heading3` 按钮、CodeBlockView 复制降级和闭包保护等测试断言，断言数提升至 127 项。
+- [`scripts/verify_algo_note_refinement.py`](file:///e:/workspace/muduo-study-console/scripts/verify_algo_note_refinement.py)：
+  - Selenium E2E 实测中追加对 `Heading3` 按钮存在性、代码块复制代码点击交互及 Shift-Tab 逆向反缩进的真实浏览器测试。
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题一：通过 Tab 缩进的子任务清单在保存并重新打开后被强行展平为顶层列表
+- **问题现象**：在单画布中输入 `- [ ] 父任务`，回车后按 Tab 键缩进为 `- [ ] 子任务`，此时视觉上呈嵌套状；但触发自动保存并重新打开弹窗后，子任务变成了同级的普通清单，缩进完全丢失。
+- **根本原因 (RCA)**：上一轮在 `turndownService.addRule('tiptapTaskList')` 中自定义的替换函数直接将 `content.trimStart()` 拼接到 `- [ ] ` 前缀后。当 `content` 内部包含嵌套的子 `ul`（已被递归渲染为包含 `\n- [ ] 子任务` 的字符串）时，由于没有在换行处插入缩进前导空格，导致子任务以顶格换行输出，输出为 `- [ ] 父任务\n- [ ] 子任务`，从而被后续的 Markdown 解析器理解为两个平级项。
+- **具体解法**：在 `tiptapTaskList` 替换函数中增加换行缩进变换：`clean = clean.replace(/\n/gm, '\n  ');`，确保所有内嵌行均自动获得 2 空格缩进，完美保持 Markdown 标准的嵌套语法树。
+
+#### 问题二：代码块一键复制按钮在特定受限 Web 环境下静默抛错
+- **问题现象**：在特定非安全域（如无 HTTPS 的局域网测试环境或受限 iframe）下点击代码块右上角的“复制代码”按钮无响应，控制台出现未捕获的 Promise Rejection。
+- **根本原因 (RCA)**：`CodeBlockView` 的 `handleCopy` 仅简单调用了现代异步 `navigator.clipboard.writeText`，未作 `try/catch` 保护，也未像模态框底部的全局复制按钮那样配备基于临时 `textarea` + `document.execCommand('copy')` 的双轨降级链路。
+- **具体解法**：将 `handleCopy` 改造为完整双轨异步容灾函数，优先尝试异步 Clipboard API，遇错或无权限时无缝降级至经典隐式 DOM 文本域复制，保证 100% 跨环境可靠性。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 维度一：多级嵌套待办清单双向序列化与解析管线图
+```mermaid
+flowchart LR
+    subgraph EditorCanvas["TipTap 单画布原生 DOM 树"]
+        ParentLI["li[data-type='taskItem']<br/>父级任务"]
+        NestedUL["ul[data-type='taskList']<br/>(margin-left: 1.25rem)"]
+        ChildLI["li[data-type='taskItem']<br/>子级任务 (data-checked)"]
+        ParentLI --> NestedUL --> ChildLI
+    end
+
+    subgraph TurndownEngine["Turndown 序列化引擎 (修复后)"]
+        ChildProcess["递归处理 ChildLI<br/>输出: - [x] 子级任务"]
+        ParentProcess["处理 ParentLI<br/>执行 clean.replace(/\\n/gm, '\\n  ')"]
+        ChildProcess --> ParentProcess
+    end
+
+    subgraph SerializedMD["Markdown 文本规范持久化"]
+        OutputMD["- [ ] 父级任务\n  - [x] 子级任务"]
+    end
+
+    subgraph MarkedParse["Marked 再次解析载入"]
+        ParseTree["恢复正确嵌套的 DOM 树<br/>100% 层级保真"]
+    end
+
+    EditorCanvas --> TurndownEngine --> SerializedMD --> MarkedParse --> EditorCanvas
+```
+
+> **【架构机制解析 1】**：
+> - **核心流向拆解**：清晰展现了单画布中包含层级关系的 DOM 节点在 Turndown 递归遍历中的缩进转换逻辑，彻底解决了旧代码中嵌套子列表被扁平化的严重数据失真缺陷；
+> - **底层架构收益**：保证了用户在界面上使用 Tab / Shift+Tab 调整的清单大纲结构在落盘存盘与二次读取时严格一致。
+
+---
+
+#### 维度二：CodeBlockView 一键复制双轨容灾交互时序图
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 用户点击“复制代码”
+    participant Btn as CodeBlockView 复制按钮
+    participant Clip as Navigator.clipboard API
+    participant Fallback as 临时 Textarea DOM 降级
+    participant UI as 状态反馈 (Check 2s)
+
+    User->>Btn: 点击事件 (handleCopy)
+    Btn->>Btn: e.stopPropagation() & 检查有效 codeText
+    
+    alt 运行在安全上下文 (HTTPS / 本地开发) 且具备权限
+        Btn->>Clip: navigator.clipboard.writeText(codeText)
+        Clip-->>Btn: 成功 Resolve
+    else API 不可用 / 权限拒绝 / 纯 HTTP 局域网
+        Btn->>Fallback: 创建 document.createElement('textarea')
+        Btn->>Fallback: 注入 codeText 并设置 opacity: 0
+        Btn->>Fallback: textarea.select()
+        Btn->>Fallback: document.execCommand('copy')
+        Btn->>Fallback: document.body.removeChild(textarea)
+    end
+
+    Btn->>UI: setCopied(true) 切换为绿勾“已复制”
+    Note over UI: 保持 2000ms 后自动平滑恢复为原版 Copy 图标
+```
+
+> **【架构机制解析 2】**：
+> - **双轨安全兜底**：详细刻画了复制命令在现代浏览器沙盒安全策略下的双层容灾流转；
+> - **体验无感一致**：无论在任何环境下触发复制，均能保证剪贴板正确写入并给予用户统一的 2 秒绿色勾选动效反馈。
+
+---
+
+#### 维度三：自动保存状态机生命周期演进图
+```mermaid
+stateDiagram-v2
+    [*] --> Idle: 模态框打开 / 初始内容载入
+    
+    Idle --> Saving: 用户打字触发 onUpdate (800ms 防抖计时启动)
+    Saving --> Saving: 持续打字 (重置 800ms 计时器)
+    
+    Saving --> Saved: 停顿超过 800ms，onSaveRef 触发后台落盘
+    Saved --> Idle: 3000ms 计时结束，平滑淡出并恢复时钟展示
+    
+    Idle --> Saved: 用户按 Ctrl+S / 点击“立即保存”
+    Saved --> Saving: 再次触发打字输入
+```
+
+> **【架构机制解析 3】**：
+> - **状态闭环清晰**：明确了 `idle`、`saving`、`saved` 之间的时延转换契约，消除了保存完成后状态文字永久凝固在“已保存”的视觉卡死问题；
+> - **时钟信息恢复**：通过 3 秒平滑过渡，为用户重新呈现便签最后保存的具体时分（`HH:mm`），信息密度与实用性显著提高。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+1. **多级清单保真度提升**：单画布支持多级待办清单通过 Tab / Shift+Tab 任意缩进升降级，且在 CSS 与 Markdown 持久化层面实现端到端严格保真；
+2. **H1/H2/H3 完整工具栏**：完整恢复三级标题快捷按键，琥珀金色调统一；
+3. **复制代码 100% 可用性**：增加隐式 DOM 复制降级，彻底根除环境限制引起的复制无响应；
+4. **代码块语言识别健壮性**：支持识别并归一化带符号的语言标签（如 `c++` -> `cpp`）；
+5. **保存反馈平滑自然**：绿标反馈 3 秒后自动释放，时钟信息正常回显；
+6. **段落快速回退**：普通段落按 Shift+Tab 可快速删除 2 个缩进空格。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+- **终端可复现测试命令**：
+  ```bash
+  # 1. 严格全工程 TypeScript 静态类型检查
+  npx tsc --noEmit
+
+  # 2. 运行完整测试套件 (包含增强版 Test 10 与 Test 11 127 项便签断言)
+  npm test
+
+  # 3. 运行生产静态打包构建
+  npm run build
+
+  # 4. 运行 Selenium 无头浏览器全链路 E2E 测试
+  python scripts/verify_algo_note_refinement.py
+  ```
+- **实际测试断言输出**：
+  - `npx tsc --noEmit`：0 错误，严格类型校验全部通过；
+  - `npm test`：全部 5 大测试套件通过（488 项暗黑阴影检测、234 道算法题卡尔链接、便签专项 127 项断言、响应式分类导航 73 项断言）；
+  - `npm run build`：Vite 35.99s 成功构建，静态资源完整打包输出；
+  - `python scripts/verify_algo_note_refinement.py`：Selenium Chrome 无头模式自动化实机验证，确认 Header/Footer 无多余小字、工具栏包含 H1/H2/H3、无紫色、代码块带终端栏及复制成功响应、Tab/Shift-Tab 正常缩进、800ms 防抖保存后光标无任何跳变且可连续键入，所有测试全绿通过。

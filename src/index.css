@@ -404,6 +404,10 @@
   margin: 0.5rem 0;
 }
 
+.ProseMirror ul[data-type="taskList"] ul[data-type="taskList"] {
+  margin-left: 1.25rem;
+}
+
 .ProseMirror ul[data-type="taskList"] li {
   display: flex;
   align-items: flex-start;
