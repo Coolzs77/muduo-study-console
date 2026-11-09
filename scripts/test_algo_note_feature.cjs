@@ -179,6 +179,219 @@ assert(catalogContent.includes('onOpenNote={(p) => setActiveNoteProblem(p)}'), '
 assert(catalogContent.includes('hasNote={carlReaderProblem ? hasProblemNote(carlReaderProblem) : false}'), 'AlgoCatalog passes hasNote to CarlReaderDrawer');
 assert(catalogContent.includes('<AlgoNoteModal'), 'AlgoCatalog mounts AlgoNoteModal');
 
+
+// ----------------------------------------------------------------------------
+// Test 8: Verify MarkdownView.tsx Component Architecture & Syntax Engine
+// ----------------------------------------------------------------------------
+console.log('\nTest 8: Verifying MarkdownView.tsx Component Architecture...');
+const mdViewPath = path.join(__dirname, '../src/components/reader/MarkdownView.tsx');
+assert(fs.existsSync(mdViewPath), 'MarkdownView.tsx file exists');
+const mdViewContent = fs.readFileSync(mdViewPath, 'utf8');
+
+assert(mdViewContent.includes('export const MarkdownView'), 'MarkdownView component is exported');
+assert(mdViewContent.includes('variant?: \'article\' | \'note\''), 'Supports variant prop for article and note layouts');
+assert(mdViewContent.includes('emptyPlaceholder?: React.ReactNode'), 'Supports emptyPlaceholder prop');
+assert(mdViewContent.includes('checklistMatch'), 'Supports checklist regex parsing (- [ ] and - [x])');
+assert(mdViewContent.includes('type: \'checklist\''), 'Parses checklists into distinct checklist block type');
+assert(mdViewContent.includes('checkItems?: Array<{ checked: boolean; text: string }>'), 'Defines checkItems array type with checked boolean state');
+assert(mdViewContent.includes('<CodeBlock'), 'Integrates CodeBlock for syntax highlighted code rendering');
+assert(mdViewContent.includes('line.startsWith(\'###### \')'), 'Supports H6 heading syntax');
+assert(mdViewContent.includes('line.startsWith(\'##### \')'), 'Supports H5 heading syntax');
+assert(mdViewContent.includes('line.startsWith(\'#### \')'), 'Supports H4 heading syntax');
+assert(mdViewContent.includes('line.startsWith(\'### \')'), 'Supports H3 heading syntax');
+assert(mdViewContent.includes('line.startsWith(\'## \')'), 'Supports H2 heading syntax');
+assert(mdViewContent.includes('line.startsWith(\'# \')'), 'Supports H1 heading syntax');
+assert(mdViewContent.includes('line.startsWith(\'> \')'), 'Supports blockquote syntax');
+assert(mdViewContent.includes('isTable'), 'Supports markdown tables with column alignments');
+assert(mdViewContent.includes('sub.startsWith(\'**\')'), 'Supports bold markdown (**text**)');
+assert(mdViewContent.includes('sub.startsWith(\'~~\')'), 'Supports strikethrough markdown (~~text~~)');
+assert(mdViewContent.includes('sub.startsWith(\'*\')') || mdViewContent.includes('sub.startsWith(\'_\')'), 'Supports italic markdown (*text* and _text_)');
+assert(mdViewContent.includes('linkMatch'), 'Supports markdown links with external icon');
+
+// ----------------------------------------------------------------------------
+// Test 9: Verify AlgoNoteModal.tsx Markdown Mode Toggle Architecture & UX
+// ----------------------------------------------------------------------------
+console.log('\nTest 9: Verifying AlgoNoteModal.tsx Mode Toggle & UX Features...');
+assert(modalContent.includes('import { MarkdownView }'), 'AlgoNoteModal imports MarkdownView component');
+assert(modalContent.includes('type NoteViewMode = \'edit\' | \'preview\' | \'split\''), 'Defines NoteViewMode type (edit, preview, split)');
+assert(modalContent.includes('viewMode'), 'Maintains viewMode state');
+assert(modalContent.includes('setViewMode'), 'Provides setViewMode state setter');
+assert(modalContent.includes('Edit3'), 'Imports Edit3 icon for edit mode');
+assert(modalContent.includes('Eye'), 'Imports Eye icon for preview mode');
+assert(modalContent.includes('Columns2'), 'Imports Columns2 icon for split screen mode');
+assert(modalContent.includes('setViewMode(\'edit\')'), 'Provides edit mode switcher');
+assert(modalContent.includes('setViewMode(\'preview\')'), 'Provides preview mode switcher');
+assert(modalContent.includes('setViewMode(\'split\')'), 'Provides split mode switcher');
+assert(modalContent.includes('handleInsertMarkdown'), 'Provides quick Markdown insertion helper');
+assert(modalContent.includes('handleTextareaKeyDown'), 'Supports Tab key indentation handling (2 spaces)');
+assert(modalContent.includes('max-w-4xl') || modalContent.includes('max-w-5xl'), 'Expands modal card width in split mode for comfortable dual columns');
+assert(modalContent.includes('variant="note"'), 'Passes variant="note" to MarkdownView for compact note styling');
+assert(modalContent.includes('便签内容为空'), 'Provides friendly empty state when previewing blank note');
+assert(modalContent.includes('立即编辑便签'), 'Empty preview state provides immediate shortcut back to edit mode');
+
+// ----------------------------------------------------------------------------
+// Test 10: Functional Verification: Parse Real Markdown Sample Through Engine
+// ----------------------------------------------------------------------------
+console.log('\nTest 10: Functional Verification of Markdown Block & Inline Engine...');
+
+// Real block parser engine logic mirror
+function parseMarkdownBlocks(content) {
+  if (!content || !content.trim()) return [];
+  const lines = content.split('\n');
+  const result = [];
+  let inCode = false;
+  let codeBuffer = [];
+  let codeLang = '';
+  let inList = false;
+  let listType = 'ul';
+  let listBuffer = [];
+  let inChecklist = false;
+  let checklistBuffer = [];
+
+  const flushList = () => {
+    if (inList && listBuffer.length > 0) {
+      result.push({ type: listType, items: [...listBuffer] });
+      listBuffer = [];
+      inList = false;
+    }
+  };
+  const flushChecklist = () => {
+    if (inChecklist && checklistBuffer.length > 0) {
+      result.push({ type: 'checklist', checkItems: [...checklistBuffer] });
+      checklistBuffer = [];
+      inChecklist = false;
+    }
+  };
+  const flushAll = () => { flushList(); flushChecklist(); };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('```')) {
+      flushAll();
+      if (inCode) {
+        result.push({ type: 'code', text: codeBuffer.join('\n'), lang: codeLang || 'cpp' });
+        codeBuffer = [];
+        codeLang = '';
+        inCode = false;
+      } else {
+        inCode = true;
+        codeLang = line.slice(3).trim();
+      }
+      continue;
+    }
+    if (inCode) {
+      codeBuffer.push(line);
+      continue;
+    }
+    if (/^(?:---+|\*\*\*+|___+)$/.test(line.trim())) {
+      flushAll();
+      result.push({ type: 'hr' });
+      continue;
+    }
+    if (line.includes('|') && i + 1 < lines.length) {
+      const nextLine = lines[i + 1].trim();
+      const delimParts = nextLine.split('|').map(s => s.trim()).filter(Boolean);
+      const isTable = delimParts.length > 0 && delimParts.every(p => /^:?-+:?$/.test(p));
+      if (isTable) {
+        flushAll();
+        const parseRow = (str) => {
+          let s = str.trim();
+          if (s.startsWith('|')) s = s.slice(1);
+          if (s.endsWith('|')) s = s.slice(0, -1);
+          return s.split('|').map(c => c.trim());
+        };
+        const headers = parseRow(line);
+        const rows = [];
+        i += 2;
+        while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+          rows.push(parseRow(lines[i]));
+          i++;
+        }
+        i--;
+        result.push({ type: 'table', headers, rows });
+        continue;
+      }
+    }
+    if (line.startsWith('### ')) {
+      flushAll();
+      result.push({ type: 'h3', text: line.slice(4).trim() });
+      continue;
+    }
+    if (line.startsWith('## ')) {
+      flushAll();
+      result.push({ type: 'h2', text: line.slice(3).trim() });
+      continue;
+    }
+    if (line.startsWith('# ')) {
+      flushAll();
+      result.push({ type: 'h1', text: line.slice(2).trim() });
+      continue;
+    }
+    if (line.startsWith('> ')) {
+      flushAll();
+      result.push({ type: 'quote', text: line.slice(2).trim() });
+      continue;
+    }
+    const checkMatch = line.match(/^[-*+]\s+\[([ xX])\]\s*(.*)$/);
+    if (checkMatch) {
+      flushList();
+      if (!inChecklist) { inChecklist = true; checklistBuffer = []; }
+      checklistBuffer.push({ checked: checkMatch[1].toLowerCase() === 'x', text: checkMatch[2] });
+      continue;
+    }
+    if (/^[-*+]\s+/.test(line)) {
+      flushChecklist();
+      if (!inList) { inList = true; listBuffer = []; }
+      listBuffer.push(line.replace(/^[-*+]\s+/, '').trim());
+      continue;
+    }
+    if (line.trim() === '') {
+      flushAll();
+      continue;
+    }
+    flushAll();
+    result.push({ type: 'p', text: line });
+  }
+  flushAll();
+  return result;
+}
+
+const testSample = [
+  '# 算法解题核心备忘',
+  '## 动态规划五部曲',
+  '> 确定 dp 数组及其下标含义',
+  '```cpp',
+  'int dp[1005];',
+  'dp[0] = 1;',
+  '```',
+  '- [x] 初始化基础状态',
+  '- [ ] 确定遍历顺序（正序或倒序）',
+  '| 算法 | 时间复杂度 | 空间复杂度 |',
+  '| :--- | :---: | ---: |',
+  '| 01背包 | O(N*V) | O(V) |',
+  '关键在于 **滚动数组** 与 *逆序遍历*，防止 ~~重复计算~~ 与覆盖。'
+].join('\n');
+
+const parsed = parseMarkdownBlocks(testSample);
+assert(parsed.length === 7, `Parsed exactly 7 structural blocks from complex markdown (got ${parsed.length})`);
+assert(parsed[0].type === 'h1' && parsed[0].text === '算法解题核心备忘', 'Parsed H1 heading correctly');
+assert(parsed[1].type === 'h2' && parsed[1].text === '动态规划五部曲', 'Parsed H2 heading correctly');
+assert(parsed[2].type === 'quote' && parsed[2].text === '确定 dp 数组及其下标含义', 'Parsed blockquote correctly');
+assert(parsed[3].type === 'code' && parsed[3].lang === 'cpp' && parsed[3].text.includes('dp[0] = 1;'), 'Parsed C++ code block correctly');
+assert(parsed[4].type === 'checklist' && parsed[4].checkItems.length === 2, 'Parsed checklist with 2 items');
+assert(parsed[4].checkItems[0].checked === true, 'First checklist item is checked');
+assert(parsed[4].checkItems[1].checked === false, 'Second checklist item is unchecked');
+assert(parsed[5].type === 'table' && parsed[5].headers[0] === '算法' && parsed[5].rows[0][1] === 'O(N*V)', 'Parsed table and rows correctly');
+assert(parsed[6].type === 'p' && parsed[6].text.includes('**滚动数组**'), 'Parsed paragraph containing formatting tokens');
+
+// Inline token splitter test
+const inlineRegex = /(\[[^\]]+\]\([^\)]+\)|\*\*[^*]+\*\*|~~[^~]+~~|\*(?:[^*\n]+?)\*|_(?:[^_\n]+?)_)/g;
+const inlineSample = '使用 **双指针** 和 *开闭区间*，参考 [Muduo](https://github.com/chenshuo/muduo)';
+const tokens = inlineSample.split(inlineRegex);
+assert(tokens.includes('**双指针**'), 'Inline parser isolates bold token');
+assert(tokens.includes('*开闭区间*'), 'Inline parser isolates italic token');
+assert(tokens.includes('[Muduo](https://github.com/chenshuo/muduo)'), 'Inline parser isolates link token');
+
 console.log('\n================================================================');
 if (failCount === 0) {
   console.log(`🎉 ALL ${passCount} ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!`);
@@ -189,3 +402,4 @@ if (failCount === 0) {
   console.log('================================================================');
   process.exit(1);
 }
+

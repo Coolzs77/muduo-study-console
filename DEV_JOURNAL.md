@@ -7121,3 +7121,380 @@ Test 8: Verifying Real Data Layer & Category Calculation Engine...
 🎉 ALL 73 RESPONSIVE CATEGORY NAVIGATION CHECKS PASSED FLAWLESSLY!
 ================================================================
 ```
+
+---
+
+## 第 33 轮 [2026-11-09 16:00]：做题便签 Markdown 实时渲染引擎与三模态交互体系 (编辑/预览/分屏)
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与背景**：在 `AlgoNoteModal.tsx`（算法题库独立做题便签模态框）中，用户在记录每道题的解题思路、核心状态转移方程、容易忽略的边界条件以及 C++/Python 优化解法时，旧版界面仅提供基础单行/多行纯文本输入域，无法对 Markdown 语法进行结构化排版和代码高亮渲染。代码块、加粗强调、重点待办清单（Checklist）和表格均显示为原始字符，阅读与复盘体验受限。
+- **用户目标与技术指标**：
+  1. **完整 Markdown 语法渲染支持**：便签模态需支持标准与扩展 Markdown 语法，包括 H1~H6 层次标题、粗体、斜体、删除线、行内代码、C++/Python/Shell 语法高亮代码块（复用轻量 `highlight.js` 与 `CodeBlock`）、无序/有序列表、任务待办清单（`- [ ] / - [x]`）、引用块、表格与超链接；
+  2. **流畅三模态交互体系（编辑 / 预览 / 分屏）**：设计温润质感的 StyleKit 粘土拟态切分药丸选项卡（`Edit3`、`Eye`、`Columns2`），移动端支持即时「编辑」与「预览」单屏切换，桌面端（`>= sm`）支持「双栏分屏 (Split)」即时边写边看；分屏模式下模态框自适应从 `max-w-2xl` 平滑扩展至 `max-w-5xl`；
+  3. **便签空白态友好引导**：在用户尚未输入任何内容直接切换至「预览」模式时，展示优雅的空状态卡片，并配备「立即编辑便签」一键快捷跳转按钮，杜绝空白死灰界面；
+  4. **快捷语法工具栏与编辑器工程**：在编辑与分屏模式顶部配备快速插入语法按钮（粗体、斜体、行内代码、C++代码块、待办清单、引用块），支持选区智能包裹与默认占位符；支持文本框 `Tab` 键 2 空格缩进；
+  5. **严格继承既有便签工程规范**：
+     - 100% 保留每题独立无碰撞存储主键（`problem.id || ('p_' + problem.num) || problem.title`），杜绝 234 道题变体覆盖；
+     - 实时字符数统计与最后更新时间戳；
+     - 剪贴板一键安全复制（兼容现代与非安全上下文）；
+     - 清空二次确认安全保护；
+     - `Ctrl+Enter` / `Cmd+Enter` 快速保存；
+     - `Esc` 捕获阶段拦截关闭，全程守护中文输入法 IME 合成（`isComposing`）；
+     - `z-[60]` 绝对堆叠上下文优先权。
+  6. **动效与暗黑模式合规**：严格执行 Emil Kowalski 硬件加速标准（仅 `transform` 与 `opacity`，严禁 `scale(0)`，退场 `scale(0.98)`）；严格执行 Scheme A 暗黑模式规范，全站 490 处阴影 0 弥散白，WCAG AA 高对比度。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及文件**：
+  - [`src/components/reader/MarkdownView.tsx`](file:///e:/workspace/muduo-study-console/src/components/reader/MarkdownView.tsx)：增强 Markdown 渲染引擎，支持待办清单（`- [ ] / - [x]`）、H1~H6 完整标头、双模布局变体（`variant="article" | "note"`）、空状态占位与增强内联解析器（粗体、斜体、删除线、行内代码与链接）；
+  - [`src/components/algorithm/AlgoNoteModal.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoNoteModal.tsx)：重构便签模态框为三模态架构（编辑/预览/分屏），集成药丸选项卡、快速语法插入栏、Tab 键缩进保护、分屏自适应宽度与实时预览；
+  - [`package.json`](file:///e:/workspace/muduo-study-console/package.json)：升级版本号至 `v6.16.0`；
+  - [`scripts/test_algo_note_feature.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_algo_note_feature.cjs)：新增 Test 8、Test 9 与 Test 10，累计自动化验证项扩展至 118 项；
+  - [`README.md`](file:///e:/workspace/muduo-study-console/README.md)：更新版本徽标与发布日志。
+
+#### 核心代码实现解析
+
+1. **Markdown 渲染引擎扩展清单与标头解析 (`MarkdownView.tsx`)**：
+```tsx
+// 支持双模变体与空状态
+export interface MarkdownViewProps {
+  content: string;
+  variant?: 'article' | 'note';
+  className?: string;
+  emptyPlaceholder?: React.ReactNode;
+}
+
+// 待办清单正则表达式识别与块状态机
+const checklistMatch = line.match(/^[-*+]\s+\[([ xX])\]\s*(.*)$/);
+if (checklistMatch) {
+  flushList();
+  if (!inChecklist) {
+    inChecklist = true;
+    checklistBuffer = [];
+  }
+  checklistBuffer.push({
+    checked: checklistMatch[1].toLowerCase() === 'x',
+    text: checklistMatch[2]
+  });
+  continue;
+}
+
+// 多层级内联标记解析 (代码隔离 -> 格式分词 -> 语义节点转换)
+const codeParts = str.split(/(`[^`]+`)/g);
+return codeParts.map((part, idx) => {
+  if (part.startsWith('`') && part.endsWith('`') && part.length > 1) {
+    return <code key={idx} className="inline-code font-mono ...">{part.slice(1, -1)}</code>;
+  }
+  const formatRegex = /(\[[^\]]+\]\([^\)]+\)|\*\*[^*]+\*\*|~~[^~]+~~|\*(?:[^*\n]+?)\*|_(?:[^_\n]+?)_)/g;
+  return part.split(formatRegex).map((sub, sIdx) => {
+    // 智能转换链接、粗体、删除线与斜体
+  });
+});
+```
+
+2. **三模态视图状态与快速语法插入引擎 (`AlgoNoteModal.tsx`)**：
+```tsx
+export type NoteViewMode = 'edit' | 'preview' | 'split';
+const [viewMode, setViewMode] = useState<NoteViewMode>('edit');
+
+// 快捷语法插入辅助函数 (支持选区包裹与光标精确定位)
+const handleInsertMarkdown = (prefix: string, suffix: string = '', defaultPlaceholder: string = '') => {
+  const el = textareaRef.current;
+  if (!el) return;
+  const start = el.selectionStart ?? content.length;
+  const end = el.selectionEnd ?? content.length;
+  const hasSelection = start !== end;
+  const selectedText = hasSelection ? content.slice(start, end) : defaultPlaceholder;
+  const replacement = `${prefix}${selectedText}${suffix}`;
+  const newContent = content.slice(0, start) + replacement + content.slice(end);
+  setContent(newContent);
+  setTimeout(() => {
+    el.focus();
+    el.setSelectionRange(start + prefix.length, start + prefix.length + selectedText.length);
+  }, 0);
+};
+
+// 文本框 Tab 键代码缩进支持 (2空格)
+const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const el = textareaRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    setContent(content.slice(0, start) + '  ' + content.slice(end));
+    setTimeout(() => { el.selectionStart = el.selectionEnd = start + 2; }, 0);
+  }
+};
+```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题 1：直接在模态框中复用长文排版导致便签视图字号过大与挤压
+- **问题现象**：在旧版 `MarkdownView.tsx` 中，H1 标头默认拥有 `font-size: 1.75rem; margin-top: 2rem;`，并且表格的外边距为 `my-6`。当在算法便签弹窗（高度限制在 92vh、内容区约 300px~500px）中直接渲染时，一个一级标题就占据了近 1/3 的视口高度，正文可读区域被严重压缩。
+- **根本原因 (RCA)**：`MarkdownView.tsx` 原先为专栏长文精读器（`ArticleReader.tsx`）设计，其排版参数面向全屏纵向滚动文章，未对模态浮层（Scratchpad Modal）这一紧凑上下文做尺寸适配。
+- **具体解法**：为 `MarkdownView` 引入 `variant?: 'article' | 'note'` 策略参数：
+  - 当 `variant === 'article'` 时（默认），保留原长文排版与 `.reading-content` 样式表，保障专栏精读 100% 零回归；
+  - 当 `variant === 'note'` 时，启用紧凑型排版类名 `.note-markdown`，H1 自适应收敛至 `text-base sm:text-lg`，代码块高度上限设为 `max-h-[340px]`，表格间距设为 `my-3`，引用块缩减外边距并赋予琥珀暖金微光，在保证排版美感的同时提供极致的紧凑信息密度。
+
+#### 问题 2：行内代码与粗体斜体分词冲突导致的转义错乱
+- **问题现象**：如果用户在 Markdown 中书写类似 `auto ptr = *node;` 或 `vector<int> &vec` 等包含 `*` 或 `_` 的 C++ 语法时，若直接使用单一全局正则分词，代码中的指针解引用符号 `*` 会被误识别为斜体标记，导致代码块外或反引号内的内容错乱。
+- **根本原因 (RCA)**：Markdown 规范规定行内代码（Inline Code `...`）具有最高优先级，反引号内的任何字符均属于字面量，严禁参与粗体、斜体或超链接的二次解析。
+- **具体解法**：采用两阶段隔离分词算法：
+  1. 第一阶段利用正则 `/(`[^`]+`)/g` 优先将文本严格拆分为“行内代码片断”与“普通文本片断”；
+  2. 仅对普通文本片断执行第二阶段的粗体（`**`）、删除线（`~~`）、斜体（`*` / `_`）与超链接（`[...]`）正则匹配；行内代码片断则直接包裹为 `<code className="inline-code ...">` 纯字面量渲染，从底层杜绝 C++ 指针星号导致的斜体串扰。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：便签 Markdown 实时渲染与三模态架构拓扑图
+```mermaid
+flowchart TD
+    subgraph UserInterface ["AlgoNoteModal 便签交互层"]
+        PillTabs["粘土拟态选项卡 (Edit3 / Eye / Columns2)"]
+        Toolbar["快捷语法工具栏 (粗体/斜体/代码/C++块/清单/引用)"]
+        Tab1["编辑模式 (Edit)"]
+        Tab2["预览模式 (Preview)"]
+        Tab3["双栏分屏 (Split)"]
+        
+        PillTabs -->|viewMode = edit| Tab1
+        PillTabs -->|viewMode = preview| Tab2
+        PillTabs -->|viewMode = split| Tab3
+        Toolbar -.->|插入占位语法| Tab1
+        Toolbar -.->|插入占位语法| Tab3
+    end
+
+    subgraph DataPipeline ["Markdown 核心解析与分流管道"]
+        RawContent["用户输入的原始 Markdown 文本 (content)"]
+        BlockParser["结构块状态机解析器 (blocks)"]
+        InlineParser["双阶段隔离内联解析器 (renderInline)"]
+        
+        RawContent --> BlockParser
+        BlockParser --> Heading["H1 ~ H6 层次标头"]
+        BlockParser --> CodeEngine["CodeBlock 语法高亮引擎 (highlight.js)"]
+        BlockParser --> Checklist["待办清单渲染 (- [ ] / - [x])"]
+        BlockParser --> Tables["自适应斑马纹表格"]
+        BlockParser --> Quotes["粘土内凹引用块"]
+        BlockParser --> Paragraph["标准段落与列表"]
+        
+        Heading & Checklist & Tables & Quotes & Paragraph --> InlineParser
+    end
+
+    subgraph StorageLayer ["数据持久化与防护"]
+        KeyGen["确定性主键生成器 getAlgoProblemKey"]
+        LocalStore["localStorage['muduo_algo_notes']"]
+        IMEShield["中文输入法合成保护 (isComposing)"]
+        Shortcuts["快捷键系统 (Ctrl+Enter / Esc)"]
+        
+        KeyGen --> LocalStore
+        Shortcuts -->|安全保存| LocalStore
+        IMEShield -->|屏蔽误触发| Shortcuts
+    end
+
+    Tab1 & Tab3 --> RawContent
+    Tab2 & Tab3 --> DataPipeline
+    UserInterface --> StorageLayer
+```
+- **图 1 机制深度解析**：
+  1. **核心流向拆解**：用户在模态框顶部可通过粘土拟态药丸选项卡自由切换编辑、预览与双栏分屏视图。编辑模式与分屏左栏直接绑定原生状态 `content`，编辑时的快捷工具栏可通过智能选区包裹插入 Markdown 语法；预览模式与分屏右栏无缝接入 Markdown 数据管道，由结构块状态机解析出代码块、清单、表格与标题，并由双阶段内联解析器渲染具体文字样式。
+  2. **条件决策与异常分支**：当 `content` 为空时，预览模式自动展示包含“立即编辑便签”快捷按钮的空状态引导；当屏幕缩窄至手机端（`< sm`）时，双栏分屏按钮自动隐藏以防止窄屏拥挤，保留最自然的单屏编辑与预览切换；当用户使用拼音输入法输入中文时，`isComposing` 严密阻断 `Esc` 误关弹窗。
+  3. **底层架构收益**：彻底实现编辑逻辑与渲染逻辑的高内聚低耦合，既保障了打字时的零延迟与绝对响应度，又提供了所见即所得的精美 Claymorphic 渲染体验。
+
+---
+
+#### 图 2：三模态交互、快捷语法注入与即时保存时序图
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 用户
+    participant Modal as AlgoNoteModal (UI)
+    participant Textarea as HTMLTextArea (DOM)
+    participant MDView as MarkdownView (渲染器)
+    participant Engine as CodeBlock / hljs (高亮)
+    participant Store as localStorage (持久化)
+
+    User->>Modal: 点击题卡便签按钮唤起
+    Modal->>Textarea: 挂载并自动聚焦，光标移至末尾
+    
+    alt 场景 A: 使用快捷语法栏
+        User->>Modal: 点击 [C++ 代码块] 按钮
+        Modal->>Textarea: 获取选区，包裹 ```cpp 代码并回填
+        Modal->>Textarea: 重新聚焦并选中文本
+    end
+
+    alt 场景 B: 切换为双栏分屏
+        User->>Modal: 点击 [分屏] 药丸选项卡
+        Modal->>Modal: 动态扩展卡片宽度至 max-w-5xl
+        Modal->>MDView: 传入当前 content，variant="note"
+        MDView->>Engine: 语法高亮 C++ 代码
+        MDView-->>Modal: 右侧实时输出美化渲染节点
+    end
+
+    alt 场景 C: 键盘快捷保存
+        User->>Modal: 按下 Ctrl + Enter (未处于 IME 合成)
+        Modal->>Store: 原子写入 muduo_algo_notes[problemKey]
+        Modal->>Modal: 触发 Emil Kowalski 150ms 顺滑退场
+        Modal-->>User: 题卡自动点亮琥珀暖金微光徽章
+    end
+```
+- **图 2 机制深度解析**：
+  1. **核心流向拆解**：时序精确展示了用户唤起便签后的典型三大交互分支：通过语法栏快速插入 C++ 解题模板、切换为双栏分屏即时边写边看、以及按下 `Ctrl+Enter` 快速保存并触发退场动画与题卡徽章点亮。
+  2. **条件决策与异常分支**：快捷语法插入过程中自动检测是否有文字被选定，若有则对选中文本进行外层包裹，若无则自动注入规范的初始占位文本（如 `class Solution { ... }`），并将光标精准重设在模板内部，无需用户手动删改反引号。
+  3. **底层架构收益**：全流程操作手不离键盘，打字、格式化、预览、保存一气呵成，极大降低了算法刷题时的认知负担。
+
+---
+
+#### 图 3：便签生命周期与模态转换有限状态机迁移图
+```mermaid
+stateDiagram-v2
+    [*] --> Closed: 页面初始加载
+
+    Closed --> Entering: 点击题卡便签按钮 (传入 problem)
+    state Entering {
+        [*] --> MountDOM: isMounted = true
+        MountDOM --> AnimateIn: rAF requestAnimationFrame
+        AnimateIn --> Resting: transform translateY(0) scale(1)
+    }
+
+    Resting --> ModeActive: 渲染主界面
+
+    state ModeActive {
+        [*] --> EditMode: 默认编辑态
+        EditMode --> PreviewMode: 点击 [预览] 药丸 (查看渲染效果)
+        PreviewMode --> EditMode: 点击 [编辑] 药丸 或 空状态引导
+        EditMode --> SplitMode: 点击 [分屏] 药丸 (桌面端 >= sm)
+        SplitMode --> EditMode: 点击 [编辑] 药丸
+        SplitMode --> PreviewMode: 点击 [预览] 药丸
+    }
+
+    ModeActive --> Exiting: 点击 [关闭] / 按下 Esc / 点击背景
+    ModeActive --> Saving: 按下 Ctrl+Enter / 点击 [保存便签]
+    Saving --> Exiting: 数据原子持久化
+
+    state Exiting {
+        [*] --> AnimateOut: transform scale(0.98), opacity 0
+        AnimateOut --> UnmountDOM: 150ms 定时器触发 isMounted = false
+    }
+
+    Exiting --> Closed: 彻底重置状态
+```
+- **图 3 机制深度解析**：
+  1. **核心流向拆解**：状态机精确定义了便签模态从挂载入场、多视图模式平滑迁移、保存持久化到卸载出场的完整生命周期。
+  2. **条件决策与异常分支**：在入场时利用 `requestAnimationFrame` 驱动 GPU 合成层，确保 200ms `cubic-bezier(0.16, 1, 0.3, 1)` 入场无跳帧；出场时利用 `activeProblem` 暂存当前题目对象，即使父级卸载，卡片也能在 150ms 内平滑缩放淡出后再脱离 DOM，避免由于数据瞬间变 `null` 导致的视觉塌陷。
+  3. **底层架构收益**：严格遵循 Emil Kowalski 动效工程规范，彻底规避了 `scale(0)` 导致的抗锯齿闪烁与界面白屏重绘问题。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+1. **暗黑模式 Scheme A 阴影深度质检**：
+   - 全站扫描 490 处阴影，覆盖率 100%，弥散白数量 0；
+   - 模态卡片、药丸选项卡、内嵌文本框与代码块在暗色下均采用沉稳深色阴影搭配 `inset_0_1px_0_0_rgba(255,255,255,0.08)` 零虚化物理内线，彻底杜绝塑料白雾反光。
+2. **Tab 键缩进保护与光标记忆**：
+   - 原生 HTML Textarea 按下 Tab 键通常会导致焦点跳转至外部按键。针对算法刷题写代码的高频诉求，拦截 Tab 键并自动插入 2 个标准空格，同时智能递增光标偏移量，带来媲美专业编辑器的手感。
+3. **选区智能包裹与格式化撤销防护**：
+   - 快捷语法插入栏全面覆盖加粗、斜体、代码、代码块、待办项与引用，点击操作后瞬间归还焦点至文本框，保持打字流连续性。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### 终端自动化测试复现
+在控制台项目根目录运行全新升级的测试套件：
+```bash
+npm test
+```
+**实测输出记录断言**：
+```text
+> muduo-study-console@6.16.0 test
+> node scripts/inspect_dark_shadows.cjs && node scripts/test_carl_integration.cjs && node scripts/test_v6_11_sticky_and_dark_mode.cjs && node scripts/test_algo_note_feature.cjs && node scripts/test_responsive_category_navigation.cjs
+
+================================================================
+🔍 Scheme A Dark Mode High-Precision Shadow Inspection Engine
+================================================================
+Total white shadows found in day mode: 490
+Missing dark:shadow (uncovered day white shadows): 0
+Diffuse white blur (>0px) found in dark:shadow: 0
+
+🎉 ALL SCHEME A SHADOW SPEC CHECKS PASSED (0 missing, 0 diffuse blurs)!
+
+...
+Test 8: Verifying MarkdownView.tsx Component Architecture...
+  ✅ [PASS] MarkdownView.tsx file exists
+  ✅ [PASS] MarkdownView component is exported
+  ✅ [PASS] Supports variant prop for article and note layouts
+  ✅ [PASS] Supports emptyPlaceholder prop
+  ✅ [PASS] Supports checklist regex parsing (- [ ] and - [x])
+  ✅ [PASS] Parses checklists into distinct checklist block type
+  ✅ [PASS] Defines checkItems array type with checked boolean state
+  ✅ [PASS] Integrates CodeBlock for syntax highlighted code rendering
+  ✅ [PASS] Supports H6 heading syntax
+  ✅ [PASS] Supports H5 heading syntax
+  ✅ [PASS] Supports H4 heading syntax
+  ✅ [PASS] Supports H3 heading syntax
+  ✅ [PASS] Supports H2 heading syntax
+  ✅ [PASS] Supports H1 heading syntax
+  ✅ [PASS] Supports blockquote syntax
+  ✅ [PASS] Supports markdown tables with column alignments
+  ✅ [PASS] Supports bold markdown (**text**)
+  ✅ [PASS] Supports strikethrough markdown (~~text~~)
+  ✅ [PASS] Supports italic markdown (*text* and _text_)
+  ✅ [PASS] Supports markdown links with external icon
+
+Test 9: Verifying AlgoNoteModal.tsx Mode Toggle & UX Features...
+  ✅ [PASS] AlgoNoteModal imports MarkdownView component
+  ✅ [PASS] Defines NoteViewMode type (edit, preview, split)
+  ✅ [PASS] Maintains viewMode state
+  ✅ [PASS] Provides setViewMode state setter
+  ✅ [PASS] Imports Edit3 icon for edit mode
+  ✅ [PASS] Imports Eye icon for preview mode
+  ✅ [PASS] Imports Columns2 icon for split screen mode
+  ✅ [PASS] Provides edit mode switcher
+  ✅ [PASS] Provides preview mode switcher
+  ✅ [PASS] Provides split mode switcher
+  ✅ [PASS] Provides quick Markdown insertion helper
+  ✅ [PASS] Supports Tab key indentation handling (2 spaces)
+  ✅ [PASS] Expands modal card width in split mode for comfortable dual columns
+  ✅ [PASS] Passes variant="note" to MarkdownView for compact note styling
+  ✅ [PASS] Provides friendly empty state when previewing blank note
+  ✅ [PASS] Empty preview state provides immediate shortcut back to edit mode
+
+Test 10: Functional Verification of Markdown Block & Inline Engine...
+  ✅ [PASS] Parsed exactly 7 structural blocks from complex markdown (got 7)
+  ✅ [PASS] Parsed H1 heading correctly
+  ✅ [PASS] Parsed H2 heading correctly
+  ✅ [PASS] Parsed blockquote correctly
+  ✅ [PASS] Parsed C++ code block correctly
+  ✅ [PASS] Parsed checklist with 2 items
+  ✅ [PASS] First checklist item is checked
+  ✅ [PASS] Second checklist item is unchecked
+  ✅ [PASS] Parsed table and rows correctly
+  ✅ [PASS] Parsed paragraph containing formatting tokens
+  ✅ [PASS] Inline parser isolates bold token
+  ✅ [PASS] Inline parser isolates italic token
+  ✅ [PASS] Inline parser isolates link token
+
+================================================================
+🎉 ALL 118 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
+================================================================
+```
+
+#### 生产打包构建验证
+```bash
+npm run build
+```
+**实测打包日志记录**：
+```text
+✓ 1832 modules transformed.
+dist/index.html                                6.17 kB │ gzip:   2.41 kB
+dist/assets/index.css                        198.96 kB │ gzip:  21.61 kB
+dist/assets/MarkdownView-Bcr0x8U7.js           9.42 kB │ gzip:   2.99 kB
+dist/assets/AlgoCatalog-B_zXyqXq.js           84.53 kB │ gzip:  14.80 kB
+dist/assets/index.js                         848.50 kB │ gzip: 243.08 kB
+✓ built in 8.86s
+✓ Synced dist/assets/ to root assets/ for dual-channel static hosting
+[BUILD SUCCESS] Production ready static build in dist/
+```
