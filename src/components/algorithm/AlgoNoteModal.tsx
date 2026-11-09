@@ -20,7 +20,6 @@ import {
   Plus
 } from 'lucide-react';
 import { CodeBlock } from '../common/CodeBlock';
-import { MarkdownView } from '../reader/MarkdownView';
 
 export const getAlgoProblemKey = (problem: AlgoProblem): string => {
   return problem.id || (problem.num !== null && problem.num !== undefined ? 'p_' + problem.num : problem.title);
@@ -37,7 +36,7 @@ export interface AlgoNoteModalProps {
 
 export interface MarkdownBlock {
   id: string;
-  type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'code' | 'quote' | 'checklist' | 'list' | 'hr' | 'p' | 'empty';
+  type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'code' | 'quote' | 'checklist' | 'list' | 'table' | 'hr' | 'p' | 'empty';
   raw: string;
   startLine: number;
   endLine: number;
@@ -51,6 +50,9 @@ export interface MarkdownBlock {
   quoteLines?: string[];
   listType?: 'ul' | 'ol';
   listItems?: string[];
+  tableHeaders?: string[];
+  tableRows?: string[][];
+  tableAlignments?: ('left' | 'center' | 'right')[];
 }
 
 export function parseToBlocks(content: string): MarkdownBlock[] {
@@ -166,7 +168,49 @@ export function parseToBlocks(content: string): MarkdownBlock[] {
       continue;
     }
 
-    // 6. Unordered or ordered list item
+    // 6. Markdown Table: header line with '|' followed by delimiter row
+    if (line.includes('|') && i + 1 < lines.length) {
+      const nextLine = lines[i + 1].trim();
+      const delimParts = nextLine.split('|').map(s => s.trim()).filter(Boolean);
+      const isTable = delimParts.length > 0 && delimParts.every(p => /^:?-+:?$/.test(p));
+      if (isTable) {
+        const startLine = i;
+        const parseRow = (str: string) => {
+          let s = str.trim();
+          if (s.startsWith('|')) s = s.slice(1);
+          if (s.endsWith('|')) s = s.slice(0, -1);
+          return s.split('|').map(c => c.trim());
+        };
+        const headers = parseRow(line);
+        const alignments: ('left' | 'center' | 'right')[] = delimParts.map(p => {
+          if (p.startsWith(':') && p.endsWith(':')) return 'center';
+          if (p.endsWith(':')) return 'right';
+          return 'left';
+        });
+        const rows: string[][] = [];
+        const tableLines = [line, lines[i + 1]];
+        i += 2;
+        while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+          tableLines.push(lines[i]);
+          rows.push(parseRow(lines[i]));
+          i++;
+        }
+        const endLine = i - 1;
+        blocks.push({
+          id: `block-table-${startLine}`,
+          type: 'table',
+          raw: tableLines.join('\n'),
+          startLine,
+          endLine,
+          tableHeaders: headers,
+          tableRows: rows,
+          tableAlignments: alignments
+        });
+        continue;
+      }
+    }
+
+    // 7. Unordered or ordered list item
     const listMatch = line.match(/^([-*+]|\d+\.)\s+(.*)$/);
     if (listMatch) {
       const isOrdered = /^\d+\./.test(listMatch[1]);
@@ -197,7 +241,7 @@ export function parseToBlocks(content: string): MarkdownBlock[] {
       continue;
     }
 
-    // 7. Empty line
+    // 8. Empty line
     if (trimmed === '') {
       blocks.push({
         id: `block-empty-${i}`,
@@ -210,7 +254,7 @@ export function parseToBlocks(content: string): MarkdownBlock[] {
       continue;
     }
 
-    // 8. Normal paragraph
+    // 9. Normal paragraph
     const startLine = i;
     const pLines: string[] = [];
     while (i < lines.length) {
@@ -223,6 +267,10 @@ export function parseToBlocks(content: string): MarkdownBlock[] {
       if (/^[-*+]\s+\[([ xX])\]/.test(cur)) break;
       if (/^>\s?/.test(cur)) break;
       if (/^([-*+]|\d+\.)\s+/.test(cur)) break;
+      if (cur.includes('|') && i + 1 < lines.length) {
+        const nextDelim = lines[i + 1].trim().split('|').map(s => s.trim()).filter(Boolean);
+        if (nextDelim.length > 0 && nextDelim.every(p => /^:?-+:?$/.test(p))) break;
+      }
       pLines.push(cur);
       i++;
     }
@@ -411,6 +459,12 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   const contentRef = useRef(content);
   contentRef.current = content;
 
+  const activeBlockIdRef = useRef<string | null>(activeBlockId);
+  activeBlockIdRef.current = activeBlockId;
+
+  const activeBlockRawRef = useRef<string>(activeBlockRaw);
+  activeBlockRawRef.current = activeBlockRaw;
+
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -431,10 +485,14 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       // If note is empty, immediately activate the first empty block for instant typing
       if (!initialText.trim()) {
         setActiveBlockId('block-empty-0');
+        activeBlockIdRef.current = 'block-empty-0';
         setActiveBlockRaw('');
+        activeBlockRawRef.current = '';
       } else {
         setActiveBlockId(null);
+        activeBlockIdRef.current = null;
         setActiveBlockRaw('');
+        activeBlockRawRef.current = '';
       }
     }
   }, [problem, initialNote]);
@@ -463,7 +521,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   const autoResizeTextarea = useCallback(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight, 32)}px`;
+      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight, 36)}px`;
     }
   }, []);
 
@@ -476,6 +534,8 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
 
   // Parse current markdown document into structured blocks
   const blocks = useMemo(() => parseToBlocks(content), [content]);
+  const blocksRef = useRef<MarkdownBlock[]>(blocks);
+  blocksRef.current = blocks;
 
   // 800ms debounced auto-save handler
   const scheduleAutoSave = useCallback((newContent: string) => {
@@ -496,62 +556,70 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     }, 800);
   }, [problemKey, onSave]);
 
-  // Helper to reassemble full markdown from blocks and active block edits
+  // Helper to reassemble full markdown from blocks and active block edits without line-index desync
   const assembleContent = useCallback((targetBlocks: MarkdownBlock[], targetId: string, updatedRaw: string) => {
-    const target = targetBlocks.find(b => b.id === targetId);
-    if (!target) return updatedRaw;
-    const lines = content.split('\n');
-    const newLines = [
-      ...lines.slice(0, target.startLine),
-      ...updatedRaw.split('\n'),
-      ...lines.slice(target.endLine + 1)
-    ];
-    return newLines.join('\n');
-  }, [content]);
+    return targetBlocks.map(b => (b.id === targetId ? updatedRaw : b.raw)).join('\n');
+  }, []);
 
   // Commit changes from active block to document state
   const commitActiveBlock = useCallback(() => {
-    if (!activeBlockId) return;
-    const currentBlock = blocks.find(b => b.id === activeBlockId);
-    if (currentBlock && activeBlockRaw !== currentBlock.raw) {
-      const lines = content.split('\n');
-      const newLines = [
-        ...lines.slice(0, currentBlock.startLine),
-        ...activeBlockRaw.split('\n'),
-        ...lines.slice(currentBlock.endLine + 1)
-      ];
-      const newContent = newLines.join('\n');
+    if (!activeBlockIdRef.current) return;
+    const targetId = activeBlockIdRef.current;
+    const currentRaw = activeBlockRawRef.current;
+    const currentBlocks = blocksRef.current;
+    const targetBlock = currentBlocks.find(b => b.id === targetId);
+
+    if (targetBlock && currentRaw !== targetBlock.raw) {
+      const newContent = currentBlocks.map(b => (b.id === targetId ? currentRaw : b.raw)).join('\n');
       setContent(newContent);
       contentRef.current = newContent;
       scheduleAutoSave(newContent);
     }
     setActiveBlockId(null);
-  }, [activeBlockId, blocks, content, activeBlockRaw, scheduleAutoSave]);
+    activeBlockIdRef.current = null;
+  }, [scheduleAutoSave]);
 
-  // Activate an inactive block for in-place editing
-  const activateBlock = useCallback((block: MarkdownBlock) => {
-    if (activeBlockId === block.id) return;
-    commitActiveBlock();
-    setActiveBlockId(block.id);
-    setActiveBlockRaw(block.raw);
-  }, [activeBlockId, commitActiveBlock]);
-
-  // Interactive Checklist: toggle checkbox directly in-place without opening edit mode
-  const handleToggleChecklist = useCallback((block: MarkdownBlock) => {
-    const lines = content.split('\n');
-    const targetLine = lines[block.startLine];
-    if (targetLine === undefined) return;
-    const newChecked = !block.checked;
-    const updatedLine = targetLine.replace(
-      /^([-*+]\s+\[)([ xX])(\]\s*.*)$/,
-      `$1${newChecked ? 'x' : ' '}$3`
-    );
-    lines[block.startLine] = updatedLine;
-    const newContent = lines.join('\n');
+  const commitActiveBlockWithCustomRaw = useCallback((customRaw: string) => {
+    if (!activeBlockIdRef.current) return;
+    const targetId = activeBlockIdRef.current;
+    const currentBlocks = blocksRef.current;
+    const newContent = currentBlocks.map(b => (b.id === targetId ? customRaw : b.raw)).join('\n');
     setContent(newContent);
     contentRef.current = newContent;
     scheduleAutoSave(newContent);
-  }, [content, scheduleAutoSave]);
+    setActiveBlockId(null);
+    activeBlockIdRef.current = null;
+  }, [scheduleAutoSave]);
+
+  // Activate an inactive block for in-place editing
+  const activateBlock = useCallback((block: MarkdownBlock) => {
+    if (activeBlockIdRef.current === block.id) return;
+    commitActiveBlock();
+    setActiveBlockId(block.id);
+    activeBlockIdRef.current = block.id;
+    setActiveBlockRaw(block.raw);
+    activeBlockRawRef.current = block.raw;
+  }, [commitActiveBlock]);
+
+  // Interactive Checklist: toggle checkbox directly in-place without opening edit mode
+  const handleToggleChecklist = useCallback((block: MarkdownBlock) => {
+    commitActiveBlock();
+
+    const curContent = contentRef.current;
+    const curBlocks = parseToBlocks(curContent);
+    const target = curBlocks.find(b => b.id === block.id) || curBlocks.find(b => b.type === 'checklist' && b.checkText === block.checkText);
+    if (!target) return;
+
+    const newChecked = !target.checked;
+    const updatedLine = target.raw.replace(
+      /^([-*+]\s+\[)([ xX])(\]\s*.*)$/,
+      `$1${newChecked ? 'x' : ' '}$3`
+    );
+    const newContent = curBlocks.map(b => (b.id === target.id ? updatedLine : b.raw)).join('\n');
+    setContent(newContent);
+    contentRef.current = newContent;
+    scheduleAutoSave(newContent);
+  }, [commitActiveBlock, scheduleAutoSave]);
 
   // Instant Manual Save (Ctrl+S / Ctrl+Enter or Click)
   const handleManualSave = useCallback(() => {
@@ -560,16 +628,13 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       autoSaveTimerRef.current = null;
     }
     // Commit any active block edits
-    if (activeBlockId) {
-      const currentBlock = blocks.find(b => b.id === activeBlockId);
-      if (currentBlock) {
-        const lines = content.split('\n');
-        const newLines = [
-          ...lines.slice(0, currentBlock.startLine),
-          ...activeBlockRaw.split('\n'),
-          ...lines.slice(currentBlock.endLine + 1)
-        ];
-        const newContent = newLines.join('\n');
+    if (activeBlockIdRef.current) {
+      const targetId = activeBlockIdRef.current;
+      const currentRaw = activeBlockRawRef.current;
+      const curBlocks = blocksRef.current;
+      const targetBlock = curBlocks.find(b => b.id === targetId);
+      if (targetBlock) {
+        const newContent = curBlocks.map(b => (b.id === targetId ? currentRaw : b.raw)).join('\n');
         setContent(newContent);
         contentRef.current = newContent;
       }
@@ -585,7 +650,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     setLastSavedTime(`${hh}:${mm}`);
     setIsManualSavedFeedback(true);
     setTimeout(() => setIsManualSavedFeedback(false), 2000);
-  }, [activeBlockId, blocks, content, activeBlockRaw, problemKey, onSave]);
+  }, [problemKey, onSave]);
 
   // Flush on Close / Exit: synchronously commit & save before unmounting (100% zero data loss)
   const handleCloseWithFlush = useCallback(() => {
@@ -594,39 +659,40 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       autoSaveTimerRef.current = null;
     }
     let finalContent = contentRef.current;
-    if (activeBlockId) {
-      const currentBlock = blocks.find(b => b.id === activeBlockId);
-      if (currentBlock) {
-        const lines = content.split('\n');
-        const newLines = [
-          ...lines.slice(0, currentBlock.startLine),
-          ...activeBlockRaw.split('\n'),
-          ...lines.slice(currentBlock.endLine + 1)
-        ];
-        finalContent = newLines.join('\n');
-        setContent(finalContent);
+    if (activeBlockIdRef.current) {
+      const targetId = activeBlockIdRef.current;
+      const currentRaw = activeBlockRawRef.current;
+      const curBlocks = blocksRef.current;
+      const targetBlock = curBlocks.find(b => b.id === targetId);
+      if (targetBlock) {
+        finalContent = curBlocks.map(b => (b.id === targetId ? currentRaw : b.raw)).join('\n');
         contentRef.current = finalContent;
+        setContent(finalContent);
       }
     }
-    if (problemKey && finalContent !== initialNote?.content) {
+    if (problemKey && finalContent !== (initialNote?.content || '')) {
       onSave(problemKey, finalContent);
     }
     onClose();
-  }, [activeBlockId, blocks, content, activeBlockRaw, problemKey, initialNote, onSave, onClose]);
+  }, [problemKey, initialNote, onSave, onClose]);
 
   // Format insertion helper supporting active block selection wrapping or document appending
-  const handleInsertMarkdown = (prefix: string, suffix: string = '', defaultPlaceholder: string = '') => {
+  const handleInsertMarkdown = useCallback((prefix: string, suffix: string = '', defaultPlaceholder: string = '') => {
     const el = textareaRef.current;
-    if (activeBlockId && el) {
-      const start = el.selectionStart ?? activeBlockRaw.length;
-      const end = el.selectionEnd ?? activeBlockRaw.length;
+    if (activeBlockIdRef.current && el) {
+      const curRaw = activeBlockRawRef.current;
+      const start = el.selectionStart ?? curRaw.length;
+      const end = el.selectionEnd ?? curRaw.length;
       const hasSel = start !== end;
-      const selected = hasSel ? activeBlockRaw.slice(start, end) : defaultPlaceholder;
+      const selected = hasSel ? curRaw.slice(start, end) : defaultPlaceholder;
       const replacement = `${prefix}${selected}${suffix}`;
-      const newRaw = activeBlockRaw.slice(0, start) + replacement + activeBlockRaw.slice(end);
+      const newRaw = curRaw.slice(0, start) + replacement + curRaw.slice(end);
+      
       setActiveBlockRaw(newRaw);
+      activeBlockRawRef.current = newRaw;
 
-      const updatedDoc = assembleContent(blocks, activeBlockId, newRaw);
+      const targetId = activeBlockIdRef.current;
+      const updatedDoc = blocksRef.current.map(b => (b.id === targetId ? newRaw : b.raw)).join('\n');
       contentRef.current = updatedDoc;
       scheduleAutoSave(updatedDoc);
 
@@ -642,7 +708,8 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     } else {
       commitActiveBlock();
       const snippet = `${prefix}${defaultPlaceholder}${suffix}`;
-      const newContent = content ? `${content.trimEnd()}\n\n${snippet}` : snippet;
+      const cur = contentRef.current;
+      const newContent = cur ? `${cur.trimEnd()}\n\n${snippet}` : snippet;
       setContent(newContent);
       contentRef.current = newContent;
       scheduleAutoSave(newContent);
@@ -652,15 +719,169 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         const last = newBlocks[newBlocks.length - 1];
         if (last) {
           setActiveBlockId(last.id);
+          activeBlockIdRef.current = last.id;
           setActiveBlockRaw(last.raw);
+          activeBlockRawRef.current = last.raw;
         }
       }, 10);
     }
-  };
+  }, [commitActiveBlock, scheduleAutoSave, autoResizeTextarea]);
 
-  // Active Block Textarea KeyDown handling: Shortcuts, Tab indentation, IME protection
+  // Helper for Smart Enter: insert after current block
+  const handleInsertAfterBlock = useCallback((targetBlockId: string, newRaw: string) => {
+    const curBlocks = parseToBlocks(contentRef.current);
+    const targetIdx = curBlocks.findIndex(b => b.id === targetBlockId);
+    let newContent: string;
+    if (targetIdx !== -1) {
+      const before = curBlocks.slice(0, targetIdx + 1).map(b => b.raw);
+      const after = curBlocks.slice(targetIdx + 1).map(b => b.raw);
+      newContent = [...before, newRaw, ...after].join('\n');
+    } else {
+      const cur = contentRef.current;
+      newContent = cur ? `${cur.trimEnd()}\n${newRaw}` : newRaw;
+    }
+    contentRef.current = newContent;
+    setContent(newContent);
+    scheduleAutoSave(newContent);
+
+    setTimeout(() => {
+      const refreshedBlocks = parseToBlocks(newContent);
+      const nextIdx = targetIdx !== -1 ? targetIdx + 1 : refreshedBlocks.length - 1;
+      const targetBlock = refreshedBlocks[nextIdx] || refreshedBlocks[refreshedBlocks.length - 1];
+      if (targetBlock) {
+        setActiveBlockId(targetBlock.id);
+        activeBlockIdRef.current = targetBlock.id;
+        setActiveBlockRaw(targetBlock.raw);
+        activeBlockRawRef.current = targetBlock.raw;
+      }
+    }, 10);
+  }, [scheduleAutoSave]);
+
+  // Active Block Textarea KeyDown handling: Shortcuts, Tab indentation, Smart Enter, IME protection
   const handleActiveTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.isComposing) return;
+    if (e.isComposing || (e.nativeEvent as any).isComposing || e.keyCode === 229) return;
+
+    // Smart Enter logic for Obsidian/Typora feeling
+    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const el = e.currentTarget;
+      const val = activeBlockRawRef.current;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+
+      const currentBlock = blocksRef.current.find(b => b.id === activeBlockIdRef.current);
+      const isCode = currentBlock?.type === 'code' || val.trimStart().startsWith('```');
+
+      if (!isCode && start === end) {
+        const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = val.indexOf('\n', end);
+        const curLine = val.slice(lineStart, lineEnd === -1 ? val.length : lineEnd);
+
+        // Heading: finish heading, create new empty block below
+        const headingMatch = curLine.match(/^#{1,6}\s+/);
+        if (headingMatch) {
+          e.preventDefault();
+          const before = val.slice(0, start);
+          const after = val.slice(start);
+          const newBlockContent = after.trimStart();
+          const activeId = activeBlockIdRef.current || '';
+          
+          commitActiveBlockWithCustomRaw(before);
+          setTimeout(() => {
+            handleInsertAfterBlock(activeId, newBlockContent);
+          }, 0);
+          return;
+        }
+
+        // Checklist: - [ ] or - [x]
+        const checkMatch = curLine.match(/^([-*+]\s+\[[ xX]\]\s*)(.*)$/);
+        if (checkMatch) {
+          e.preventDefault();
+          const checkPrefix = checkMatch[1].replace(/\[[xX]\]/, '[ ]');
+          const checkBody = checkMatch[2].trim();
+
+          // If empty checklist item, turn into plain line
+          if (!checkBody) {
+            const updated = val.slice(0, lineStart) + val.slice(lineStart + checkMatch[1].length);
+            setActiveBlockRaw(updated);
+            activeBlockRawRef.current = updated;
+            const updatedDoc = blocksRef.current.map(b => (b.id === activeBlockIdRef.current ? updated : b.raw)).join('\n');
+            contentRef.current = updatedDoc;
+            scheduleAutoSave(updatedDoc);
+            return;
+          }
+
+          // Otherwise, create new checklist item below
+          const before = val.slice(0, start);
+          const after = val.slice(start);
+          const newBlockContent = `${checkPrefix}${after}`;
+          const activeId = activeBlockIdRef.current || '';
+
+          commitActiveBlockWithCustomRaw(before);
+          setTimeout(() => {
+            handleInsertAfterBlock(activeId, newBlockContent);
+          }, 0);
+          return;
+        }
+
+        // Unordered List: - or * or +
+        const listMatch = curLine.match(/^([-*+]\s+)(.*)$/);
+        if (listMatch) {
+          e.preventDefault();
+          const listPrefix = listMatch[1];
+          const listBody = listMatch[2].trim();
+
+          if (!listBody) {
+            const updated = val.slice(0, lineStart) + val.slice(lineStart + listPrefix.length);
+            setActiveBlockRaw(updated);
+            activeBlockRawRef.current = updated;
+            const updatedDoc = blocksRef.current.map(b => (b.id === activeBlockIdRef.current ? updated : b.raw)).join('\n');
+            contentRef.current = updatedDoc;
+            scheduleAutoSave(updatedDoc);
+            return;
+          }
+
+          const before = val.slice(0, start);
+          const after = val.slice(start);
+          const newBlockContent = `${listPrefix}${after}`;
+          const activeId = activeBlockIdRef.current || '';
+
+          commitActiveBlockWithCustomRaw(before);
+          setTimeout(() => {
+            handleInsertAfterBlock(activeId, newBlockContent);
+          }, 0);
+          return;
+        }
+
+        // Ordered List: 1. , 2. , etc.
+        const numMatch = curLine.match(/^(\d+)\.\s+(.*)$/);
+        if (numMatch) {
+          e.preventDefault();
+          const nextNum = parseInt(numMatch[1], 10) + 1;
+          const listBody = numMatch[2].trim();
+
+          if (!listBody) {
+            const updated = val.slice(0, lineStart) + val.slice(lineStart + numMatch[0].length);
+            setActiveBlockRaw(updated);
+            activeBlockRawRef.current = updated;
+            const updatedDoc = blocksRef.current.map(b => (b.id === activeBlockIdRef.current ? updated : b.raw)).join('\n');
+            contentRef.current = updatedDoc;
+            scheduleAutoSave(updatedDoc);
+            return;
+          }
+
+          const before = val.slice(0, start);
+          const after = val.slice(start);
+          const newBlockContent = `${nextNum}. ${after}`;
+          const activeId = activeBlockIdRef.current || '';
+
+          commitActiveBlockWithCustomRaw(before);
+          setTimeout(() => {
+            handleInsertAfterBlock(activeId, newBlockContent);
+          }, 0);
+          return;
+        }
+      }
+    }
 
     // 1. Tab / Shift+Tab indentation (2 spaces)
     if (e.key === 'Tab') {
@@ -668,12 +889,14 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       const el = e.currentTarget;
       const start = el.selectionStart;
       const end = el.selectionEnd;
-      const val = activeBlockRaw;
+      const val = activeBlockRawRef.current;
 
       if (start === end) {
         const updated = val.slice(0, start) + '  ' + val.slice(end);
         setActiveBlockRaw(updated);
-        const updatedDoc = assembleContent(blocks, activeBlockId!, updated);
+        activeBlockRawRef.current = updated;
+        const targetId = activeBlockIdRef.current || '';
+        const updatedDoc = blocksRef.current.map(b => (b.id === targetId ? updated : b.raw)).join('\n');
         contentRef.current = updatedDoc;
         scheduleAutoSave(updatedDoc);
         setTimeout(() => {
@@ -690,7 +913,9 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
           const unindented = lines.map(line => line.replace(/^ {1,2}/, '')).join('\n');
           const updated = val.slice(0, lineStart) + unindented + val.slice(effectiveEnd);
           setActiveBlockRaw(updated);
-          const updatedDoc = assembleContent(blocks, activeBlockId!, updated);
+          activeBlockRawRef.current = updated;
+          const targetId = activeBlockIdRef.current || '';
+          const updatedDoc = blocksRef.current.map(b => (b.id === targetId ? updated : b.raw)).join('\n');
           contentRef.current = updatedDoc;
           scheduleAutoSave(updatedDoc);
           setTimeout(() => {
@@ -701,7 +926,9 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
           const indented = lines.map(line => '  ' + line).join('\n');
           const updated = val.slice(0, lineStart) + indented + val.slice(effectiveEnd);
           setActiveBlockRaw(updated);
-          const updatedDoc = assembleContent(blocks, activeBlockId!, updated);
+          activeBlockRawRef.current = updated;
+          const targetId = activeBlockIdRef.current || '';
+          const updatedDoc = blocksRef.current.map(b => (b.id === targetId ? updated : b.raw)).join('\n');
           contentRef.current = updatedDoc;
           scheduleAutoSave(updatedDoc);
           setTimeout(() => {
@@ -716,7 +943,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     const isMod = e.ctrlKey || e.metaKey;
 
     // 2. Ctrl+S or Ctrl+Enter: Manual save
-    if (isMod && (e.key.toLowerCase() === 's' || e.key === 'Enter')) {
+    if (((e.ctrlKey || e.metaKey) && e.key === 'Enter') || (isMod && e.key.toLowerCase() === 's')) {
       e.preventDefault();
       handleManualSave();
       return;
@@ -765,87 +992,84 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     }
   };
 
-  // Global window keyboard listener: Esc to flush & close, Ctrl+Enter / Ctrl+S to save
+  // Global window keyboard listener: Esc to flush & close, Ctrl+Enter / Ctrl+S to save, plus global formatting shortcuts
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.isComposing) return;
+      if (e.isComposing || (e as any).keyCode === 229) return;
+
+      const isMod = e.ctrlKey || e.metaKey;
 
       if (e.key === 'Escape') {
         e.preventDefault();
         e.stopImmediatePropagation();
         handleCloseWithFlush();
-      } else if (((e.ctrlKey || e.metaKey) && e.key === 'Enter') || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's')) {
+        return;
+      }
+
+      if (((e.ctrlKey || e.metaKey) && e.key === 'Enter') || (isMod && e.key.toLowerCase() === 's')) {
         e.preventDefault();
         e.stopImmediatePropagation();
         handleManualSave();
+        return;
+      }
+
+      // If user pressed formatting shortcuts while modal is open, but textarea is not focused:
+      // Prevent browser default actions (Ctrl+B = bookmarks, Ctrl+Shift+C = devtools, Ctrl+K = search bar, etc.)
+      const activeEl = document.activeElement;
+      const isInsideTextarea = activeEl === textareaRef.current;
+
+      if (!isInsideTextarea) {
+        if (isMod && !e.shiftKey && e.key.toLowerCase() === 'b') {
+          e.preventDefault();
+          handleInsertMarkdown('**', '**', '重点文本');
+        } else if (isMod && !e.shiftKey && e.key.toLowerCase() === 'i') {
+          e.preventDefault();
+          handleInsertMarkdown('*', '*', '斜体文本');
+        } else if (isMod && !e.shiftKey && e.key.toLowerCase() === 'e') {
+          e.preventDefault();
+          handleInsertMarkdown('`', '`', 'code');
+        } else if (isMod && e.shiftKey && e.key.toLowerCase() === 'c') {
+          e.preventDefault();
+          handleInsertMarkdown('\n```cpp\n', '\n```\n', '// C++ 核心逻辑\nclass Solution {\npublic:\n    // ...\n};');
+        } else if (isMod && e.shiftKey && e.key.toLowerCase() === 'l') {
+          e.preventDefault();
+          handleInsertMarkdown('\n- [ ] ', '', '待办清单事项');
+        } else if (isMod && !e.shiftKey && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          handleInsertMarkdown('[', '](https://)', '链接标题');
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown, true);
     return () => window.removeEventListener('keydown', handleKeyDown, true);
-  }, [isOpen, handleCloseWithFlush, handleManualSave]);
-
-  if (!isMounted || !currentProblem) return null;
-
-  const handleCopy = async () => {
-    if (!content) return;
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(content);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = content;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.warn('Failed to copy note:', err);
-    }
-  };
-
-  const handleClear = () => {
-    if (!isConfirmingClear) {
-      setIsConfirmingClear(true);
-      return;
-    }
-    setContent('');
-    contentRef.current = '';
-    setActiveBlockId('block-empty-0');
-    setActiveBlockRaw('');
-    setIsConfirmingClear(false);
-    if (onDelete) {
-      onDelete(problemKey);
-    } else {
-      onSave(problemKey, '');
-    }
-    setSaveStatus('saved');
-    setLastSavedTime('已清空');
-  };
+  }, [isOpen, handleCloseWithFlush, handleManualSave, handleInsertMarkdown]);
 
   // Append new blank line/block at the bottom of the document
-  const handleAppendNewBlock = () => {
+  const handleAppendNewBlock = useCallback(() => {
     commitActiveBlock();
-    const newContent = content ? `${content.trimEnd()}\n` : '';
+    const cur = contentRef.current;
+    const newContent = cur ? `${cur.trimEnd()}\n` : '';
     setContent(newContent);
     contentRef.current = newContent;
-    const newBlocks = parseToBlocks(newContent);
-    const last = newBlocks[newBlocks.length - 1];
-    if (last) {
-      setActiveBlockId(last.id);
-      setActiveBlockRaw('');
-    }
+    scheduleAutoSave(newContent);
+
     setTimeout(() => {
+      const newBlocks = parseToBlocks(newContent);
+      const last = newBlocks[newBlocks.length - 1];
+      if (last) {
+        setActiveBlockId(last.id);
+        activeBlockIdRef.current = last.id;
+        setActiveBlockRaw('');
+        activeBlockRawRef.current = '';
+      }
       if (canvasRef.current) {
         canvasRef.current.scrollTop = canvasRef.current.scrollHeight;
       }
     }, 10);
-  };
+  }, [commitActiveBlock, scheduleAutoSave]);
 
   const formatTimestamp = (timestamp?: number) => {
     if (!timestamp) return null;
@@ -1085,8 +1309,9 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
                     onChange={(e) => {
                       const val = e.target.value;
                       setActiveBlockRaw(val);
+                      activeBlockRawRef.current = val;
                       autoResizeTextarea();
-                      const updatedDoc = assembleContent(blocks, block.id, val);
+                      const updatedDoc = assembleContent(blocksRef.current, block.id, val);
                       contentRef.current = updatedDoc;
                       scheduleAutoSave(updatedDoc);
                     }}
@@ -1241,6 +1466,55 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
                     )}
                   </div>
                 );
+              case 'table': {
+                const headers = block.tableHeaders || [];
+                const rows = block.tableRows || [];
+                const alignments = block.tableAlignments || [];
+                const getAlignClass = (align?: 'left' | 'center' | 'right') => {
+                  if (align === 'center') return 'text-center';
+                  if (align === 'right') return 'text-right';
+                  return 'text-left';
+                };
+                return (
+                  <div
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="my-3 overflow-x-auto rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-[2px_2px_8px_rgba(0,0,0,0.04),inset_1px_1px_2px_rgba(255,255,255,0.7)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] cursor-pointer hover:border-amber-400 transition-colors"
+                    title="点击直接编辑表格 Markdown"
+                  >
+                    <table className="w-full text-left text-xs border-collapse">
+                      {headers.length > 0 && (
+                        <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 font-semibold">
+                          <tr>
+                            {headers.map((h, hIdx) => (
+                              <th
+                                key={hIdx}
+                                className={`px-3.5 py-2 border-r last:border-r-0 border-slate-200 dark:border-slate-800 whitespace-nowrap ${getAlignClass(alignments[hIdx])}`}
+                              >
+                                {renderInlineContent(h)}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                      )}
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">
+                        {rows.map((row, rIdx) => (
+                          <tr key={rIdx} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                            {row.map((cell, cIdx) => (
+                              <td
+                                key={cIdx}
+                                className={`px-3.5 py-1.5 border-r last:border-r-0 border-slate-100 dark:border-slate-800/60 ${getAlignClass(alignments[cIdx])}`}
+                              >
+                                {renderInlineContent(cell)}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              }
               case 'hr':
                 return (
                   <hr

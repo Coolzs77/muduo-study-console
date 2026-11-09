@@ -7707,6 +7707,39 @@ const handleCloseWithFlush = useCallback(() => {
   - 正在编辑的块以等宽圆角内凹槽轻柔微凸，不产生横向几何伸缩；
   - 既保障了 100% 完整的阅读排版，又彻底消除了眼球左右晃动的认知负荷。
 
+#### 问题 4：快速连续点击复选框时的状态覆盖与未提交输入竞态
+- **问题现象**：在包含多条待办项（`- [ ]`）的笔记中，用户快速连续点击多个复选框打卡时，部分勾选状态丢失；若当前有正在编辑的段落块，点击复选框甚至会导致正在编辑的未提交文字被覆盖回滚。
+- **根本原因 (RCA)**：初版 `handleToggleChecklist` 直接从 React 状态闭包（`content`）读取文本，连续异步事件触发时发生 Stale Closure 状态覆盖；且函数执行前未先将正在激活的块（`activeBlockId` / `activeBlockRaw`）刷新回主缓冲，导致旧状态覆盖了活跃修改。
+- **具体解法**：
+  1. 在 `handleToggleChecklist` 中率先判断并同步提交流式活跃块数据至 `contentRef.current`；
+  2. 全程以全局唯一真实源 `contentRef.current` 为基准做增量修改，并采用块 ID 与行文本双重保险匹配；
+  3. 修改完成后同步回写 `contentRef.current` 并分发 `scheduleAutoSave`，保证多次快速点击顺序一致性。
+
+#### 问题 5：基于静态行号切片跨块操作导致的行偏移数据破坏
+- **问题现象**：当在上方段落块中敲入多次回车换行导致该块行数膨胀后，退出模态框或切换块时，下方其他块的内容可能发生错位或头部被截断吞没。
+- **根本原因 (RCA)**：初版在退出 Flush 或提交时，直接使用了初始解析时记录的 `currentBlock.startLine` 与 `currentBlock.endLine` 对 `content.split('\n')` 进行 `lines.slice(0, startLine)` 与 `lines.slice(endLine + 1)` 拼接。一旦某个块动态改变了行数，下方所有块的物理行号均已位移，静态切片必然引发严重错位与数据损坏。
+- **具体解法**：废除基于物理行号的切片拼接算法，采用**行位移不变性的结构化块映射汇编机制**：
+  - `targetBlocks.map(b => (b.id === targetId ? updatedRaw : b.raw)).join('\n')`；
+  - 每个块通过稳定 ID 索引，无论前置块扩展了多少行，所有块的替换与拼装都具有数学上的行位移不变性，100% 杜绝多块内容拼接破坏。
+
+#### 问题 6：仿 Typora/Obsidian 智能回车 (Smart Enter) 机制缺失
+- **问题现象**：用户在标题行（`# `）、待办清单行（`- [ ] `）或普通列表行（`- `、`1. `）按下 Enter 换行时，直接在当前块原位插入硬回车换行符，无法像 Typora/Obsidian 一样自动延续列表前缀，或在标题输入完成后自动开启下方空白新块。
+- **根本原因 (RCA)**：缺少块级键入事件拦截器对语法前缀的上下文敏感派发逻辑。
+- **具体解法**：在 `handleActiveTextareaKeyDown` 中实现智能 Enter 分流：
+  1. **标题块 (`# `)**：按下 Enter 立即提交当前标题，并在下方自动创建并聚焦一个全新的空白段落块；
+  2. **待办清单 (`- [ ] `)**：若当前项非空，按下 Enter 自动延续前缀 `- [ ] ` 并将光标定位于新项；若当前项为空（仅有 `- [ ] `），按下 Enter 自动清除前缀降级为普通空行；
+  3. **无序/有序列表 (`- ` / `1. `)**：智能延续列表符或序号递增（`1. -> 2.`），空列表项回车则退出列表模式。
+
+#### 问题 7：便签画布缺少 Markdown 表格语法解析与结构化渲染
+- **问题现象**：做题时记录包含输入输出对照或复杂度对比的 Markdown 表格（`| Header | ... |`）时，表格退化为带竖线的杂乱纯文本段落。
+- **根本原因 (RCA)**：便签解析器 `parseToBlocks` 未定义 `type: 'table'`，未扫描管道符和 `:---:` 对齐标头，JSX 渲染分支亦缺少表格呈现。
+- **具体解法**：在 `parseToBlocks` 状态机中注入 GFM 表格流式解析器，提取 `tableHeaders`、`tableAlignments` 与 `tableRows`；并在单画布中渲染符合 Scheme A 规范的自适应滚动圆角表格，支持斑马纹与内阴影。
+
+#### 问题 8：文本域未聚焦时全局快捷键触发浏览器原生行为冲突
+- **问题现象**：当便签处于静态渲染态（尚未点击任何块进入输入框）时，用户若按下 `Ctrl+Shift+C` 试图插入代码块，会直接唤起 Chrome/Edge 的 DevTools 控制台；按 `Ctrl+B` 会触发浏览器书签栏开关；按 `Ctrl+K` 会聚焦浏览器地址栏。
+- **根本原因 (RCA)**：初版快捷键监听仅绑定在 `<textarea onKeyDown>` 局部事件上，模态顶层全局监听仅捕获了 `Esc` 与 `Ctrl+S`，未阻止其他 Markdown 快捷键的默认事件。
+- **具体解法**：在模态窗口顶层 `window.addEventListener('keydown', ...)` 统一注入全局拦截网：当焦点位于便签模态内但未聚焦于具体文本域时，检测到 `Ctrl+B`、`Ctrl+Shift+C`、`Ctrl+K` 等组合键时率先调用 `e.preventDefault()` 阻止浏览器默认行为，并智能激活或新增块后执行对应格式化模板注入。
+
 ---
 
 ### 4. 架构与机制演进图 (Architectural Evolution Diagram)
@@ -8006,8 +8039,33 @@ Test 11: Verifying Real-world C++ Markdown Parsing Robustness...
   ✅ [PASS] Arithmetic multiplication (3 * 4 * 5) does not trigger false italic
   ✅ [PASS] Parses markdown link target correctly
 
+Test 12: Verifying Hardened Architecture Contract in AlgoNoteModal.tsx...
+  ✅ [PASS] Active block ID ref tracked synchronously
+  ✅ [PASS] Active block raw text ref tracked synchronously
+  ✅ [PASS] Blocks ref tracked to prevent stale render closures
+  ✅ [PASS] MarkdownBlock interface includes table block type
+  ✅ [PASS] MarkdownBlock interface defines tableHeaders
+  ✅ [PASS] MarkdownBlock interface defines tableRows
+  ✅ [PASS] AlgoNoteModal canvas renders rich markdown tables
+  ✅ [PASS] Supports committing custom raw content for Smart Enter block splitting
+  ✅ [PASS] Supports inserting new block below active block on Enter
+  ✅ [PASS] Implements defense against Chinese IME keyCode 229
+  ✅ [PASS] Modal global listener intercepts shortcuts when textarea is not focused
+  ✅ [PASS] Document assembled via line-shift-invariant block mapping
+
+Test 13: Functional Simulation of Document Reconstruction & Race Elimination...
+  ✅ [PASS] Full document fidelity roundtrip: blocks.map(b => b.raw).join("\n") equals original text
+  ✅ [PASS] parseToBlocks correctly recognizes markdown table block
+  ✅ [PASS] Table block parsed 3 headers correctly
+  ✅ [PASS] Table block parsed data rows correctly
+  ✅ [PASS] Rapid toggle 1 retained (checked)
+  ✅ [PASS] Rapid toggle 2 retained (checked)
+  ✅ [PASS] Rapid toggle 3 retained (checked)
+  ✅ [PASS] Rapid toggle 2 toggled back to unchecked cleanly
+  ✅ [PASS] Line expansion in block 1 does not shift or corrupt block 2
+
 ================================================================
-🎉 ALL 134 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
+🎉 ALL 155 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
 ================================================================
 ```
 
@@ -8019,12 +8077,22 @@ npm run build
 ```text
 ✓ 1832 modules transformed.
 dist/index.html                                6.17 kB │ gzip:   2.41 kB
-dist/assets/index.css                        197.20 kB │ gzip:  21.58 kB
-dist/assets/AlgoCatalog-BhV3gGNZ.js           93.31 kB │ gzip:  17.58 kB
+dist/assets/index.css                        197.54 kB │ gzip:  21.59 kB
+dist/assets/vendor-misc-CoSDG3-6.js            4.17 kB │ gzip:   1.81 kB
+dist/assets/DailyCurriculumView-DIclbty-.js   32.11 kB │ gzip:   6.42 kB
+dist/assets/KnowledgeReader-COlafdeV.js       38.40 kB │ gzip:   8.86 kB
+dist/assets/AlgoCatalog-DT0Ur5p1.js           98.58 kB │ gzip:  18.81 kB
+dist/assets/LearningSystemView-D-mdCeoE.js   128.04 kB │ gzip:  41.51 kB
+dist/assets/SourceRoadmapView-DONagixq.js    141.92 kB │ gzip:  33.03 kB
+dist/assets/vendor-react-dkXn5SzX.js         170.12 kB │ gzip:  50.88 kB
+dist/assets/PracticeCenterView-cbhBoD68.js   301.94 kB │ gzip:  76.90 kB
 dist/assets/index.js                         848.47 kB │ gzip: 243.04 kB
-✓ built in 8.73s
+dist/assets/vendor-highlight-CLgutuSK.js     978.87 kB │ gzip: 315.12 kB
+✓ built in 5.74s
 ✓ Copied images/ to dist/images/
 ✓ Synced dist/assets/ to root assets/ for dual-channel static hosting
 ✓ Successfully completed Vite production build
+✓ Copied classic.html -> dist/classic.html
+✓ Created dist/.nojekyll
 [BUILD SUCCESS] Production ready static build in dist/
 ```

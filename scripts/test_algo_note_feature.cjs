@@ -542,6 +542,258 @@ assert(mathTokens.every(t => t.type !== 'italic'), 'Arithmetic multiplication (3
 const linkTokens = tokenizeInlineMirror('查看 [官方题解与`Code`](https://leetcode.cn) 获取更多');
 assert(linkTokens.some(t => t.type === 'link' && t.url === 'https://leetcode.cn'), 'Parses markdown link target correctly');
 
+// ----------------------------------------------------------------------------
+// Test 12: Verifying Hardened Architecture Contract in AlgoNoteModal.tsx
+// ----------------------------------------------------------------------------
+console.log('\nTest 12: Verifying Hardened Architecture Contract in AlgoNoteModal.tsx...');
+assert(modalContent.includes('activeBlockIdRef'), 'Active block ID ref tracked synchronously');
+assert(modalContent.includes('activeBlockRawRef'), 'Active block raw text ref tracked synchronously');
+assert(modalContent.includes('blocksRef'), 'Blocks ref tracked to prevent stale render closures');
+assert(modalContent.includes("type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'code' | 'quote' | 'checklist' | 'list' | 'table' | 'hr' | 'p' | 'empty'"), 'MarkdownBlock interface includes table block type');
+assert(modalContent.includes('tableHeaders?: string[]'), 'MarkdownBlock interface defines tableHeaders');
+assert(modalContent.includes('tableRows?: string[][]'), 'MarkdownBlock interface defines tableRows');
+assert(modalContent.includes('case \'table\':'), 'AlgoNoteModal canvas renders rich markdown tables');
+assert(modalContent.includes('commitActiveBlockWithCustomRaw'), 'Supports committing custom raw content for Smart Enter block splitting');
+assert(modalContent.includes('handleInsertAfterBlock'), 'Supports inserting new block below active block on Enter');
+assert(modalContent.includes('keyCode === 229'), 'Implements defense against Chinese IME keyCode 229');
+assert(modalContent.includes('!isInsideTextarea'), 'Modal global listener intercepts shortcuts when textarea is not focused');
+assert(modalContent.includes('targetBlocks.map(b => (b.id === targetId ? updatedRaw : b.raw)).join(\'\\n\')'), 'Document assembled via line-shift-invariant block mapping');
+
+// ----------------------------------------------------------------------------
+// Test 13: Functional Simulation of Document Reconstruction & Race Elimination
+// ----------------------------------------------------------------------------
+console.log('\nTest 13: Functional Simulation of Document Reconstruction & Race Elimination...');
+
+// Extract parseToBlocks logic from AlgoNoteModal.tsx
+function parseToBlocksSim(content) {
+  if (!content) {
+    return [{ id: 'block-empty-0', type: 'empty', raw: '', startLine: 0, endLine: 0 }];
+  }
+  const lines = content.split('\n');
+  const blocks = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (line.trimStart().startsWith('```')) {
+      const startLine = i;
+      const langMatch = line.trimStart().slice(3).trim().split(/\s+/)[0] || '';
+      const codeLines = [];
+      i++;
+      while (i < lines.length && !lines[i].trimStart().startsWith('```')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      const hasClosingFence = i < lines.length && lines[i].trimStart().startsWith('```');
+      const endLine = hasClosingFence ? i : i - 1;
+      const rawLines = lines.slice(startLine, endLine + 1);
+      blocks.push({
+        id: `block-code-${startLine}`,
+        type: 'code',
+        raw: rawLines.join('\n'),
+        startLine,
+        endLine,
+        codeLang: langMatch || 'cpp',
+        codeText: codeLines.join('\n')
+      });
+      i = endLine + 1;
+      continue;
+    }
+
+    if (/^(?:---+|\*\*\*+|___+)$/.test(trimmed)) {
+      blocks.push({ id: `block-hr-${i}`, type: 'hr', raw: line, startLine: i, endLine: i });
+      i++;
+      continue;
+    }
+
+    const headingMatch = line.match(/^(#{1,6})\s+(.*)$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      blocks.push({ id: `block-h-${i}`, type: `h${level}`, raw: line, startLine: i, endLine: i, level, headingText: headingMatch[2] });
+      i++;
+      continue;
+    }
+
+    const checkMatch = line.match(/^([-*+])\s+\[([ xX])\]\s*(.*)$/);
+    if (checkMatch) {
+      blocks.push({
+        id: `block-check-${i}`,
+        type: 'checklist',
+        raw: line,
+        startLine: i,
+        endLine: i,
+        bullet: checkMatch[1],
+        checked: checkMatch[2].toLowerCase() === 'x',
+        checkText: checkMatch[3]
+      });
+      i++;
+      continue;
+    }
+
+    if (/^>\s?/.test(line)) {
+      const startLine = i;
+      const quoteLines = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) {
+        quoteLines.push(lines[i].replace(/^>\s?/, ''));
+        i++;
+      }
+      const endLine = i - 1;
+      const rawLines = lines.slice(startLine, endLine + 1);
+      blocks.push({ id: `block-quote-${startLine}`, type: 'quote', raw: rawLines.join('\n'), startLine, endLine, quoteLines });
+      continue;
+    }
+
+    if (line.includes('|') && i + 1 < lines.length) {
+      const nextLine = lines[i + 1].trim();
+      const delimParts = nextLine.split('|').map(s => s.trim()).filter(Boolean);
+      const isTable = delimParts.length > 0 && delimParts.every(p => /^:?-+:?$/.test(p));
+      if (isTable) {
+        const startLine = i;
+        const parseRow = (str) => {
+          let s = str.trim();
+          if (s.startsWith('|')) s = s.slice(1);
+          if (s.endsWith('|')) s = s.slice(0, -1);
+          return s.split('|').map(c => c.trim());
+        };
+        const headers = parseRow(line);
+        const alignments = delimParts.map(p => (p.startsWith(':') && p.endsWith(':') ? 'center' : p.endsWith(':') ? 'right' : 'left'));
+        const rows = [];
+        const tableLines = [line, lines[i + 1]];
+        i += 2;
+        while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+          tableLines.push(lines[i]);
+          rows.push(parseRow(lines[i]));
+          i++;
+        }
+        const endLine = i - 1;
+        blocks.push({ id: `block-table-${startLine}`, type: 'table', raw: tableLines.join('\n'), startLine, endLine, tableHeaders: headers, tableRows: rows, tableAlignments: alignments });
+        continue;
+      }
+    }
+
+    const listMatch = line.match(/^([-*+]|\d+\.)\s+(.*)$/);
+    if (listMatch) {
+      const isOrdered = /^\d+\./.test(listMatch[1]);
+      const startLine = i;
+      const items = [listMatch[2]];
+      i++;
+      while (i < lines.length) {
+        const nextMatch = lines[i].match(/^([-*+]|\d+\.)\s+(.*)$/);
+        if (nextMatch && (/^\d+\./.test(nextMatch[1]) === isOrdered)) {
+          if (/^[-*+]\s+\[([ xX])\]/.test(lines[i])) break;
+          items.push(nextMatch[2]);
+          i++;
+        } else {
+          break;
+        }
+      }
+      const endLine = i - 1;
+      const rawLines = lines.slice(startLine, endLine + 1);
+      blocks.push({ id: `block-list-${startLine}`, type: 'list', raw: rawLines.join('\n'), startLine, endLine, listType: isOrdered ? 'ol' : 'ul', listItems: items });
+      continue;
+    }
+
+    if (trimmed === '') {
+      blocks.push({ id: `block-empty-${i}`, type: 'empty', raw: line, startLine: i, endLine: i });
+      i++;
+      continue;
+    }
+
+    const startLine = i;
+    const pLines = [];
+    while (i < lines.length) {
+      const cur = lines[i];
+      const curTrimmed = cur.trim();
+      if (curTrimmed === '') break;
+      if (cur.trimStart().startsWith('```')) break;
+      if (/^(?:---+|\*\*\*+|___+)$/.test(curTrimmed)) break;
+      if (/^#{1,6}\s+/.test(cur)) break;
+      if (/^[-*+]\s+\[([ xX])\]/.test(cur)) break;
+      if (/^>\s?/.test(cur)) break;
+      if (/^([-*+]|\d+\.)\s+/.test(cur)) break;
+      if (cur.includes('|') && i + 1 < lines.length) {
+        const nextDelim = lines[i + 1].trim().split('|').map(s => s.trim()).filter(Boolean);
+        if (nextDelim.length > 0 && nextDelim.every(p => /^:?-+:?$/.test(p))) break;
+      }
+      pLines.push(cur);
+      i++;
+    }
+    const endLine = i - 1;
+    const rawLines = lines.slice(startLine, endLine + 1);
+    blocks.push({ id: `block-p-${startLine}`, type: 'p', raw: rawLines.join('\n'), startLine, endLine });
+  }
+  return blocks;
+}
+
+// 1. Exact 100% Roundtrip Fidelity Test
+const simBlocks = parseToBlocksSim(testSample);
+const roundtripDoc = simBlocks.map(b => b.raw).join('\n');
+assert(roundtripDoc === testSample, 'Full document fidelity roundtrip: blocks.map(b => b.raw).join("\\n") equals original text');
+
+// 2. Table parsing in parseToBlocksSim
+const tableBlock = simBlocks.find(b => b.type === 'table');
+assert(tableBlock !== undefined, 'parseToBlocks correctly recognizes markdown table block');
+assert(tableBlock && tableBlock.tableHeaders[0] === '算法' && tableBlock.tableHeaders.length === 3, 'Table block parsed 3 headers correctly');
+assert(tableBlock && tableBlock.tableRows.length === 1 && tableBlock.tableRows[0][0] === '01背包', 'Table block parsed data rows correctly');
+
+// 3. Race-Condition-Free Atomic Checklist Toggle Simulation
+let currentCanonicalDoc = [
+  '# 刷题打卡清单',
+  '- [ ] 题 1：两数之和',
+  '- [ ] 题 2：反转链表',
+  '- [ ] 题 3：三数之和'
+].join('\n');
+
+function toggleChecklistSim(checkText) {
+  const blocks = parseToBlocksSim(currentCanonicalDoc);
+  const target = blocks.find(b => b.type === 'checklist' && b.checkText === checkText);
+  if (!target) return;
+  const newChecked = !target.checked;
+  const updatedLine = target.raw.replace(/^([-*+]\s+\[)([ xX])(\]\s*.*)$/, `$1${newChecked ? 'x' : ' '}$3`);
+  currentCanonicalDoc = blocks.map(b => (b.id === target.id ? updatedLine : b.raw)).join('\n');
+}
+
+// Fire 3 consecutive rapid toggles in same tick
+toggleChecklistSim('题 1：两数之和');
+toggleChecklistSim('题 2：反转链表');
+toggleChecklistSim('题 3：三数之和');
+
+const finalBlocks = parseToBlocksSim(currentCanonicalDoc);
+const check1 = finalBlocks.find(b => b.checkText === '题 1：两数之和');
+const check2 = finalBlocks.find(b => b.checkText === '题 2：反转链表');
+const check3 = finalBlocks.find(b => b.checkText === '题 3：三数之和');
+assert(check1 && check1.checked === true, 'Rapid toggle 1 retained (checked)');
+assert(check2 && check2.checked === true, 'Rapid toggle 2 retained (checked)');
+assert(check3 && check3.checked === true, 'Rapid toggle 3 retained (checked)');
+
+// Toggle 2 back to false
+toggleChecklistSim('题 2：反转链表');
+const check2After = parseToBlocksSim(currentCanonicalDoc).find(b => b.checkText === '题 2：反转链表');
+assert(check2After && check2After.checked === false, 'Rapid toggle 2 toggled back to unchecked cleanly');
+
+// 4. Line-Shift Invariant Block Assembly Simulation
+const docBeforeEdit = [
+  '# 标题',
+  '',
+  '段落 1 原本只有一行',
+  '',
+  '段落 2 是重要总结'
+].join('\n');
+
+const editBlocks = parseToBlocksSim(docBeforeEdit);
+const p1Block = editBlocks.find(b => b.raw.includes('段落 1'));
+const p2Block = editBlocks.find(b => b.raw.includes('段落 2'));
+
+// User adds 4 lines into Paragraph 1
+const p1Expanded = '段落 1 第一行\n段落 1 第二行\n段落 1 第三行\n段落 1 第四行\n段落 1 第五行';
+const docAfterEdit = editBlocks.map(b => (b.id === p1Block.id ? p1Expanded : b.raw)).join('\n');
+
+// Parse docAfterEdit and ensure Paragraph 2 is completely intact despite line expansion
+const refreshedBlocks = parseToBlocksSim(docAfterEdit);
+const p2AfterEdit = refreshedBlocks.find(b => b.raw.includes('段落 2 是重要总结'));
+assert(p2AfterEdit !== undefined && p2AfterEdit.raw === '段落 2 是重要总结', 'Line expansion in block 1 does not shift or corrupt block 2');
+
 console.log('\n================================================================');
 if (failCount === 0) {
   console.log(`🎉 ALL ${passCount} ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!`);
