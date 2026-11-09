@@ -8968,3 +8968,242 @@ stateDiagram-v2
   - `npm test`：全部 5 大测试套件通过（488 项暗黑阴影检测、234 道算法题卡尔链接、便签专项 127 项断言、响应式分类导航 73 项断言）；
   - `npm run build`：Vite 35.99s 成功构建，静态资源完整打包输出；
   - `python scripts/verify_algo_note_refinement.py`：Selenium Chrome 无头模式自动化实机验证，确认 Header/Footer 无多余小字、工具栏包含 H1/H2/H3、无紫色、代码块带终端栏及复制成功响应、Tab/Shift-Tab 正常缩进、800ms 防抖保存后光标无任何跳变且可连续键入，所有测试全绿通过。
+
+
+## 第 39 轮 [2026-11-09 20:45]：便签工具栏多色分类、单击切换状态联动、保存状态单行右置与代码块内容实时语法高亮
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+用户在实机使用算法做题便签过程中，提出了以下四个明确的体验与功能改进诉求：
+1. **工具栏按钮单击切换状态 (Toggle On/Off)**：
+   - 用户指出：“对于上面的按钮,需要通过单击切换状态,不能一直保持着”。之前的加粗、标题等按钮在点击后一直呈现激活态，再次点击无法顺畅切回普通状态。
+2. **保存状态文字单行右置防折行**：
+   - 用户提供实机截图明确指出：“保存文字需要在这些按钮的右边,而不是下边”。由于外层弹性盒容器包含 `flex-wrap`，导致 `🕒 20:31 • 125 字` 的保存时间与字数统计被挤压换行，挂在按钮栏正下方。必须锁死单行水平并排，确保保存状态严格位于按钮的右侧。
+3. **按钮颜色语义化分类区分 (告别单调全黄)**：
+   - 用户明确要求：“另外,颜色不要都是黄色,不同特点的使用不同颜色”。之前所有按钮激活时清一色全部使用琥珀黄色（`text-amber-600`），缺少功能属性区分。需要按照字体修饰、结构标题、任务列表、代码块、引用等不同功能特点，赋予专属高辨识度的柔和色彩。
+4. **代码块内容实时语法着色 (Syntax Highlighting)**：
+   - 用户指出：“另外,代码块中的内容你也没高亮啊”。之前的 TipTap 代码块虽然外层包了仿终端外观，但内容区仅仅是纯文本渲染，缺少对 C++/JS/Python 关键字、类型、数字、注释与字符串的词法高亮。
+5. **便签 Header 题目下方完整展示解法与复杂度**：
+   - 用户要求：“还有,便签中题目的下方需要显示解法,内容和每道题原来下面的内容一样”。便签顶部的题目信息下方必须与题目卡片保持一致，完整展示 `解法: <模式> • <时间复杂度> / <空间复杂度>`。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+所有改动文件均具备点击链接与完整相对路径：
+- [`src/components/algorithm/AlgoNoteModal.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoNoteModal.tsx)：
+  - **工具栏水平单行布局锁定**：外层容器彻底移除 `flex-wrap`，改为 `flex items-center justify-between gap-3 px-1 pt-0.5 shrink-0 min-w-0`；右侧保存时间容器增加 `shrink-0 whitespace-nowrap ml-auto`，确保文字永远处于同一水平行且紧贴最右侧，绝不换行；
+  - **焦点保护与事件防失焦**：为工具栏中所有的 `<button>` 增加 `onMouseDown={(e) => e.preventDefault()}`，阻止鼠标按下时焦点转移至 DOM 按钮，确保 ProseMirror 画布焦点、选区（Selection）与 `storedMarks` 永远稳定；
+  - **TipTap 状态反应性联动 (Reactivity Synchronization)**：在 `useEditor` 内部挂接 `onSelectionUpdate` 与 `onTransaction` 回调，触发 React 微轻量重新渲染，驱动 `editor.isActive(...)` 随光标移动与按钮点击毫秒级动态刷新；
+  - **块级与标记双向切换 (Smart Toggle Logic)**：
+    - 一级/二级/三级标题：判断当前是否已是该 Heading，若是则执行 `editor.chain().focus().setParagraph().run()` 切回普通段落，若否则切为该级别 Heading；
+    - 代码块：若当前已是 `codeBlock`，再次点击切回普通段落；
+  - **专属功能色彩体系**：
+    - 行内加粗（Bold）：高辨识度**清爽蓝**（`bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 border-blue-300`）；
+    - 行内斜体（Italic）：典雅**紫罗兰**（`bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border-purple-300`）；
+    - 行内代码（Code）：精致**青色**（`bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border-cyan-300`）；
+    - 一级标题（H1）：大气**天蓝**（`bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 border-sky-300`）；
+    - 二级标题（H2）：深邃**蓝靛**（`bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-300`）；
+    - 三级标题（H3）：稳重**石板蓝灰**（`bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 border-slate-300`）；
+    - 待办清单（TaskList）：生机**翡翠绿**（`bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border-emerald-300`）；
+    - 无序列表（BulletList）：自然**翠绿**（`bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 border-green-300`）；
+    - 算法代码块（CodeBlock）：极客**桃红/玫瑰**（`bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 border-rose-300`）；
+    - 名言引用（Blockquote）：经典**暖橙/琥珀**（`bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 border-amber-300`）；
+  - **ProseMirror AST 语法高亮装饰器插件 (CodeBlock Syntax Highlighting Engine)**：
+    - 编写 `createHighlightPlugin(nodeName)` 插件，利用工程自带的 `highlight.js` 词法解析引擎生成 `TokenTreeEmitter`；
+    - 递归遍历 token 树，精确计算偏移量，在无需侵入或拆分文本 DOM 的前提下，通过 `Decoration.inline(from, to, { class: classNames })` 输出 `hljs-type`、`hljs-keyword`、`hljs-comment`、`hljs-number`、`hljs-string`、`hljs-title` 等标准语义 Token；
+    - 结合 `src/index.css` 内置的 VSCode Light Modern 与 Dark Modern 配色，实现实时打字即刻高亮。
+  - **题目标题下方完整解法展示**：
+    - 引入 `formatComplexity`，在便签模态框 Header 题目右侧和下方加入 `解法: {currentProblem.pattern} • {formatComplexity(time)} / {formatComplexity(space)}`，与题目卡片完全保持 1:1 对齐一致。
+- [`scripts/test_algo_note_feature.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_algo_note_feature.cjs)：
+  - 同步更新测试套件断言，断言工具栏多色体系、单行防折行与高亮插件。
+- [`scripts/verify_algo_note_multitoggle_and_highlight.py`](file:///e:/workspace/muduo-study-console/scripts/verify_algo_note_multitoggle_and_highlight.py)：
+  - 编写专用自动化真机验证脚本，测试 Selenium 环境下按钮单行对齐、单击切换、多色分配与代码高亮 token 生成。
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题 1：保存文字折行掉在按钮栏下方
+- **问题现象**：实机截图显示，`🕒 20:31 • 125 字` 出现在加粗/斜体按钮正下方第二行。
+- **根本原因 (RCA)**：外层容器使用了 `flex flex-wrap items-center justify-between`，当新增了 H3 按钮导致按钮组总宽度增加时，Flex 弹性布局自动触发了换行计算，将右侧元素推入下一行的起始位置。
+- **具体解法**：
+  1. 移除外层 `flex-wrap`，声明单行 `flex items-center justify-between gap-3 px-1 pt-0.5 shrink-0 min-w-0`；
+  2. 给右侧状态容器添加 `shrink-0 whitespace-nowrap ml-auto`，无论视口宽度如何变化，保存状态与字数统计始终水平紧随按钮右侧。
+
+#### 问题 2：按钮单击后一直保持激活态，再次点击不切换
+- **问题现象**：点击加粗或标题按钮后，按钮变成激活态类名；再次点击该按钮，类名保持不变，必须输入一个字符后才恢复。
+- **根本原因 (RCA)**：
+  1. 鼠标点击 `<button>` 时浏览器默认触发焦点转移，编辑器 DOM 发生 `blur`，导致光标选区和 `storedMarks` 在失焦时被置空或失去上下文；
+  2. TipTap 的 React 封装 `useEditor` 仅在文档内容变更时触发 `onUpdate`，在纯粹的选区移动、mark 切换或空行状态下**不会自动触发组件重新渲染**。因此即使底层 TipTap 的 `isActive` 变了，React 的虚拟 DOM 没有重新计算，按钮视觉状态被冻结。
+- **具体解法**：
+  1. 给所有按钮添加 `onMouseDown={(e) => e.preventDefault()}`，从底层彻底阻止光标失焦；
+  2. 在 `useEditor` 配置中注入 `onSelectionUpdate` 和 `onTransaction` 回调，每次状态 transaction 时调用极轻量的 `setEditorStateTick` 触发组件刷新，按钮视觉即点即变；
+  3. 对标题与代码块等块级元素，添加条件判断：若当前已是该级别，显式执行 `setParagraph()` 退出当前块。
+
+#### 问题 3：代码块内容缺乏语法高亮
+- **问题现象**：在 TipTap 单画布内插入代码块并输入 C++ 代码后，所有代码均呈现单一灰色文本，没有关键字着色。
+- **根本原因 (RCA)**：原生 `@tiptap/extension-code-block` 仅提供 `<pre><code>` 文本容器，缺乏词法分析器与 ProseMirror 装饰器映射。
+- **具体解法**：基于 `highlight.js` 的 `TokenTreeEmitter` 开发 ProseMirror Decoration 插件，遍历代码块文本并生成行内装饰器，将 `hljs-*` 语义类名精准投射到文字选区上，实现毫秒级实时着色。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：便签工具栏单行布局与多色语义分类拓扑
+```mermaid
+flowchart LR
+    Container["Toolbar 容器 (flex items-center no-wrap)"] --> Group["格式按钮组 (shrink-0)"]
+    Container --> Status["保存状态与字数 (shrink-0 ml-auto whitespace-nowrap)"]
+
+    subgraph ColorMatrix["专属色彩语义分类矩阵"]
+        direction TB
+        B["加粗 (Bold)"] ---|清爽蓝| C1["bg-blue-100 text-blue-700"]
+        I["斜体 (Italic)"] ---|典雅紫| C2["bg-purple-100 text-purple-700"]
+        C["行内代码 (Code)"] ---|精致青| C3["bg-cyan-100 text-cyan-700"]
+        H["标题 (H1/H2/H3)"] ---|天蓝/靛蓝/石板| C4["bg-sky/indigo/slate"]
+        T["待办 (TaskList)"] ---|翡翠绿| C5["bg-emerald-100 text-emerald-700"]
+        CB["代码块 (CodeBlock)"] ---|桃红| C6["bg-rose-100 text-rose-700"]
+        BQ["引用 (Blockquote)"] ---|暖橙| C7["bg-amber-100 text-amber-700"]
+    end
+
+    Group --> ColorMatrix
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了外层容器如何通过 Flexbox 规则将左侧按钮组与右侧状态栏锁定在单行：
+  1. 外层容器 `min-w-0` 结合内部 `shrink-0` 确保按钮尺寸不被挤压；
+  2. 右侧状态栏带有 `ml-auto`，自适应占据右侧全部剩余空间，彻底避免落到第二行；
+  3. 各功能按钮按照排版语义绑定独立的高对比度色彩 Token，消除单一全黄的视觉疲劳。
+
+---
+
+#### 图 2：TipTap ProseMirror 选区事件防失焦与实时响应状态机
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 用户鼠标
+    participant Btn as 工具栏按钮 (<button>)
+    participant PM as ProseMirror 焦点画布
+    participant State as TipTap Editor State
+    participant React as React 渲染驱动 (setEditorStateTick)
+
+    User->>Btn: 鼠标按下 (mousedown)
+    Note over Btn: e.preventDefault() 拦截原生失焦
+    Btn-->>PM: 编辑器焦点与 selection 保持在画布原位!
+    User->>Btn: 鼠标抬起与点击 (click)
+    Btn->>State: 执行 toggleBold() / setParagraph()
+    State->>State: 派发 Transaction (tr.docChanged / setStoredMarks)
+    State->>React: 触发 onTransaction() / onSelectionUpdate()
+    React->>React: setEditorStateTick(t => t + 1)
+    React-->>Btn: 重新计算 editor.isActive()，瞬间切换高亮/普通视觉类名!
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  拆解了按钮点击不卡死的核心原理：
+  1. `e.preventDefault()` 阻止了浏览器默认的焦点转移行为，PM 画布没有收到 `blur` 事件，光标选区和待输入 marks 完整保留；
+  2. Transaction 派发后立即通过 `onTransaction` 唤醒 React 渲染周期，使 `editor.isActive()` 的布尔值立即反映在 DOM 上，彻底解决“按了按钮没反应、必须打字才变”的历史顽疾。
+
+---
+
+#### 图 3：代码块基于 highlight.js AST 的 Decoration 装饰器流水线
+```mermaid
+flowchart TD
+    DocNode["ProseMirror CodeBlock 节点"] --> GetText["提取代码文本与语言 (node.textContent & language)"]
+    GetText --> HLJS["highlight.js 词法分析器 (hljs.highlight)"]
+    HLJS --> AST["TokenTreeEmitter 抽象语法树"]
+    AST --> Traverse["递归偏移量计算 (traverse children)"]
+    Traverse --> Decs["Decoration.inline(from, to, { class: 'hljs-*' })"]
+    Decs --> DecSet["DecorationSet.create(doc, decorations)"]
+    DecSet --> Render["ProseMirror View 渲染真实语法高亮 (VSCode 配色)"]
+```
+
+##### 机制解析 (Diagram Walkthrough & Analysis)
+- **核心流向与节点拆解**：
+  展示了非侵入式代码高亮的处理管道：
+  1. 插件在后台解析代码块文本，不修改底层 ProseMirror 文档树；
+  2. 通过精准的字符位置区间构造 `Decoration.inline`，将语法类别（`type`, `keyword`, `comment` 等）作为 CSS class 动态投影到页面上；
+  3. 兼容单画布的所见即所得打字体验，用户在代码块中键入任何 C++ 代码均能瞬间获得着色反馈。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **单行水平不折行**：右侧保存时间与字数统计稳定展示在按钮右侧，即使在窄屏下也能自适应排列；
+- **全套语义色彩**：蓝、紫、青、天蓝、靛蓝、石板、翡翠绿、翠绿、桃红、暖橙，功能属性清晰明了；
+- **题目解法一览无余**：便签头部完美同步卡片下方的解法模式与时间/空间复杂度信息；
+- **代码高亮体验一致**：便签内代码块与题目卡片代码块共享同一套高品质 VSCode 配色。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 静态类型编译检查
+cd e:\workspace\muduo-study-console
+npx tsc --noEmit
+
+# 2. 全量单元与集成测试套件 (包含 130+ 断言)
+npm test
+
+# 3. 生产静态包构建
+npm run build
+
+# 4. 启动专用真机 Selenium 自动化实测
+python scripts/verify_algo_note_multitoggle_and_highlight.py
+```
+
+#### (2) 控制台真实运行输出凭据
+```
+[*] Local static server serving E:\workspace\muduo-study-console\dist on http://127.0.0.1:4209
+[1] Navigating to Algorithm Catalog (题库)...
+[2] Opening AlgoNoteModal...
+  ✓ [PASS] AlgoNoteModal opened successfully!
+[2.5] Verifying Solution Pattern & Complexity display in Header...
+  Modal Header text:
+ #704
+704. 二分查找
+简单
+数组
+随想录
+解法: 二分查找
+•
+O(n) / O(1)
+  ✓ [PASS] Problem solution pattern and complexity accurately displayed below title!
+[3] Testing Toolbar Layout & Save Status Horizontal Positioning...
+  Toolbar rect: top=253.25, bottom=289.25, right=789
+  Status rect:  top=263, bottom=279.5, left=1099.8125
+  ✓ [PASS] Save status text is STRICTLY on the right of formatting buttons on the same row! No line wrapping!
+[4] Testing Button Single-Click Toggle Mechanics (On / Off)...
+  Bold button initial class: p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/70 dark:hover:bg-blue-950/40
+  Bold button after click 1: p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-xs
+  Bold button after click 2: p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/70 dark:hover:bg-blue-950/40
+  ✓ [PASS] Bold button successfully toggled ON and OFF via single clicks!
+  H1 button after click 1: p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700 font-bold shadow-xs
+  H1 button after click 2: p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50/70 dark:hover:bg-sky-950/40
+  ✓ [PASS] H1 button successfully toggled ON and OFF (switched back to paragraph)!
+[5] Testing Category-Distinct Color System (No single monotone yellow)...
+  ✓ Button '加粗' accurately themed with distinct color: blue
+  ✓ Button '斜体' accurately themed with distinct color: purple
+  ✓ Button '行内代码' accurately themed with distinct color: cyan
+  ✓ Button '一级标题' accurately themed with distinct color: sky
+  ✓ Button '二级标题' accurately themed with distinct color: indigo
+  ✓ Button '待办清单' accurately themed with distinct color: emerald
+  ✓ Button '代码块' accurately themed with distinct color: rose
+  ✓ Button '引用块' accurately themed with distinct color: amber
+  ✓ [PASS] Multiple distinct colors assigned to different feature categories! Monotone yellow eradicated!
+[6] Testing Real-time CodeBlock Syntax Highlighting in Editor...
+  Found 15 syntax highlighted token spans inside CodeBlock.
+    Token: 'int' -> class: 'hljs-type'
+    Token: 'search' -> class: 'hljs-title'
+    Token: '// Two pointer solution' -> class: 'hljs-comment'
+    Token: '0' -> class: 'hljs-number'
+    Token: 'return' -> class: 'hljs-keyword'
+    Token: '-1' -> class: 'hljs-number'
+  ✓ [PASS] C++ CodeBlock actively rendered with real-time VSCode syntax highlighting tokens (types, comments, keywords, numbers)!
+  ✓ Saved visual verification screenshot to: docs/images/verify_algo_note_multitoggle_and_highlight.png
+[8] Testing Modal clean exit via Esc...
+  ✓ [PASS] Modal closed cleanly!
+
+🎉🎉🎉 ALL ALGO NOTE MULTI-COLOR, TOGGLE & SYNTAX HIGHLIGHT VERIFICATIONS PASSED 100%! 🎉🎉🎉
+```

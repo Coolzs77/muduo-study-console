@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useEditor, EditorContent, NodeViewWrapper, NodeViewContent, ReactNodeViewRenderer } from '@tiptap/react';
 import type { ReactNodeViewProps } from '@tiptap/react';
 import { Extension } from '@tiptap/core';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import hljs from 'highlight.js';
 import StarterKit from '@tiptap/starter-kit';
 import { CodeBlock } from '@tiptap/extension-code-block';
 import TaskList from '@tiptap/extension-task-list';
@@ -9,6 +12,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import TurndownService from 'turndown';
 import { marked } from 'marked';
 import { AlgoProblem, AlgoProblemNote } from '../../types';
+import { formatComplexity } from '../../utils/formatters';
 import {
   StickyNote,
   X,
@@ -187,10 +191,103 @@ export const CodeBlockView: React.FC<ReactNodeViewProps> = ({ node }) => {
   );
 };
 
-// Custom CodeBlock Extension with beautiful Claymorphic Terminal NodeView and tab indentation
+// High-performance Syntax Highlighting Decoration Engine for CodeBlock
+const highlightPluginKey = new PluginKey('codeBlockHighlight');
+
+function getHighlightDecorations(doc: any, name: string): DecorationSet {
+  const decorations: Decoration[] = [];
+
+  doc.descendants((node: any, pos: number) => {
+    if (node.type.name !== name) {
+      return;
+    }
+
+    const language = (node.attrs.language as string) || 'cpp';
+    const rawLang = language.toLowerCase().trim();
+    const cleanLang = rawLang === 'c++' ? 'cpp' : (rawLang === 'js' ? 'javascript' : (rawLang === 'ts' ? 'typescript' : (rawLang === 'py' ? 'python' : rawLang)));
+    const text = node.textContent;
+    if (!text) return;
+
+    try {
+      const result = hljs.getLanguage(cleanLang)
+        ? hljs.highlight(text, { language: cleanLang, ignoreIllegals: true })
+        : hljs.highlightAuto(text);
+
+      const rootNode = (result as any)._emitter?.rootNode;
+      if (!rootNode || !rootNode.children) return;
+
+      let currentOffset = 0;
+
+      function traverse(children: any[], inheritedScope = '') {
+        for (const child of children) {
+          if (typeof child === 'string') {
+            const len = child.length;
+            if (inheritedScope && len > 0) {
+              const from = pos + 1 + currentOffset;
+              const to = from + len;
+              const classNames = inheritedScope
+                .split('.')
+                .map((cls) => `hljs-${cls}`)
+                .join(' ');
+              decorations.push(
+                Decoration.inline(from, to, {
+                  class: classNames,
+                })
+              );
+            }
+            currentOffset += len;
+          } else if (child && child.children) {
+            const scope = child.scope || inheritedScope;
+            traverse(child.children, scope);
+          }
+        }
+      }
+
+      traverse(rootNode.children);
+    } catch {
+      // ignore parsing error gracefully
+    }
+  });
+
+  return DecorationSet.create(doc, decorations);
+}
+
+function createHighlightPlugin(nodeName: string) {
+  return new Plugin({
+    key: highlightPluginKey,
+    state: {
+      init(_, { doc }) {
+        return getHighlightDecorations(doc, nodeName);
+      },
+      apply(tr, decorationSet, oldState, newState) {
+        const oldDoc = oldState.doc;
+        const newDoc = newState.doc;
+
+        if (tr.docChanged || !decorationSet) {
+          return getHighlightDecorations(newDoc, nodeName);
+        }
+
+        return decorationSet.map(tr.mapping, tr.doc);
+      },
+    },
+    props: {
+      decorations(state) {
+        return this.getState(state);
+      },
+    },
+  });
+}
+
+// Custom CodeBlock Extension with beautiful Claymorphic Terminal NodeView, Syntax Highlighting and tab indentation
 const CustomCodeBlock = CodeBlock.extend({
   addNodeView() {
     return ReactNodeViewRenderer(CodeBlockView);
+  },
+  addProseMirrorPlugins() {
+    return [
+      ...(this.parent?.() || []),
+      createHighlightPlugin(this.name),
+    ];
   },
 }).configure({
   enableTabIndentation: true,
@@ -266,6 +363,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   const [lastSavedTime, setLastSavedTime] = useState<string>('');
   const [isManualSavedFeedback, setIsManualSavedFeedback] = useState(false);
   const [wordCount, setWordCount] = useState<number>(0);
+  const [, setEditorStateTick] = useState<number>(0);
 
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resetSaveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -326,6 +424,12 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       attributes: {
         class: 'outline-hidden min-h-[320px] max-h-[58vh] overflow-y-auto px-1 py-1 text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-sans cursor-text'
       }
+    },
+    onSelectionUpdate() {
+      setEditorStateTick((t) => (t + 1) % 1000000);
+    },
+    onTransaction() {
+      setEditorStateTick((t) => (t + 1) % 1000000);
     },
     onUpdate({ editor: currentEditor }) {
       const text = currentEditor.getText();
@@ -656,7 +760,32 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
                     {currentProblem.category || currentProblem.topic}
                   </span>
                 )}
+                {currentProblem.isHot100 && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                    Hot 100
+                  </span>
+                )}
+                {currentProblem.isCarl && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
+                    随想录
+                  </span>
+                )}
               </div>
+
+              {/* Sub-line: Solution Pattern & Complexity (内容和每道题卡片完全一致) */}
+              {(currentProblem.pattern || currentProblem.timeComp || currentProblem.spaceComp) && (
+                <div className="flex flex-wrap items-center gap-2 mt-1 text-slate-500 dark:text-slate-400 text-[11px] font-medium">
+                  {currentProblem.pattern && <span>解法: {currentProblem.pattern}</span>}
+                  {currentProblem.pattern && (currentProblem.timeComp || currentProblem.spaceComp) && (
+                    <span className="text-slate-300 dark:text-slate-600 select-none">•</span>
+                  )}
+                  {(currentProblem.timeComp || currentProblem.spaceComp) && (
+                    <span className="font-mono text-slate-400">
+                      {formatComplexity(currentProblem.timeComp)} / {formatComplexity(currentProblem.spaceComp)}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -673,147 +802,216 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         </div>
 
         {/* Toolbar & Live Status Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 px-1 pt-0.5 shrink-0">
+        <div className="flex items-center justify-between gap-3 px-1 pt-0.5 shrink-0 min-w-0">
           {/* Typora-style Formatting Actions Toolbar with claymorphic groove pill container */}
-          <div className="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+          <div className="flex items-center gap-0.5 sm:gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)] shrink-0">
+            {/* 1. Bold (Blue) */}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleBold().run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('bold')
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/70 dark:hover:bg-blue-950/40'
               }`}
               title="加粗 (Ctrl+B / 键入 **内容**)"
+              aria-label="加粗"
             >
               <Bold size={14} />
             </button>
+
+            {/* 2. Italic (Purple) */}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleItalic().run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('italic')
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50/70 dark:hover:bg-purple-950/40'
               }`}
               title="斜体 (Ctrl+I / 键入 *内容*)"
+              aria-label="斜体"
             >
               <Italic size={14} />
             </button>
+
+            {/* 3. Inline Code (Cyan) */}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleCode().run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('code')
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50/70 dark:hover:bg-cyan-950/40'
               }`}
               title="行内代码 (Ctrl+E / 键入 `code`)"
+              aria-label="行内代码"
             >
               <Code size={14} />
             </button>
 
-            <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5" />
+            <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5 shrink-0" />
 
+            {/* 4. Heading 1 (Sky) */}
             <button
               type="button"
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                if (!editor) return;
+                if (editor.isActive('heading', { level: 1 })) {
+                  editor.chain().focus().setParagraph().run();
+                } else {
+                  editor.chain().focus().toggleHeading({ level: 1 }).run();
+                }
+              }}
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('heading', { level: 1 })
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50/70 dark:hover:bg-sky-950/40'
               }`}
               title="一级标题 (键入 # 内容)"
+              aria-label="一级标题"
             >
               <Heading1 size={14} />
             </button>
+
+            {/* 5. Heading 2 (Indigo) */}
             <button
               type="button"
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                if (!editor) return;
+                if (editor.isActive('heading', { level: 2 })) {
+                  editor.chain().focus().setParagraph().run();
+                } else {
+                  editor.chain().focus().toggleHeading({ level: 2 }).run();
+                }
+              }}
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('heading', { level: 2 })
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40'
               }`}
               title="二级标题 (键入 ## 内容)"
+              aria-label="二级标题"
             >
               <Heading2 size={14} />
             </button>
+
+            {/* 6. Heading 3 (Slate) */}
             <button
               type="button"
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                if (!editor) return;
+                if (editor.isActive('heading', { level: 3 })) {
+                  editor.chain().focus().setParagraph().run();
+                } else {
+                  editor.chain().focus().toggleHeading({ level: 3 }).run();
+                }
+              }}
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('heading', { level: 3 })
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-600 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/60 dark:hover:bg-slate-700/50'
               }`}
               title="三级标题 (键入 ### 内容)"
+              aria-label="三级标题"
             >
               <Heading3 size={14} />
             </button>
 
-            <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5" />
+            <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5 shrink-0" />
 
+            {/* 7. Task List (Emerald) */}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleTaskList().run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('taskList')
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40'
               }`}
               title="待办清单 (键入 - [ ] 内容，鼠标可直接打钩)"
+              aria-label="待办清单"
             >
               <ListCheck size={14} />
             </button>
+
+            {/* 8. Bullet List (Green) */}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleBulletList().run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('bulletList')
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50/70 dark:hover:bg-green-950/40'
               }`}
               title="无序列表 (键入 - 内容)"
+              aria-label="无序列表"
             >
               <List size={14} />
             </button>
+
+            {/* 9. Code Block (Rose) */}
             <button
               type="button"
-              onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                if (!editor) return;
+                if (editor.isActive('codeBlock')) {
+                  editor.chain().focus().setParagraph().run();
+                } else {
+                  editor.chain().focus().toggleCodeBlock().run();
+                }
+              }}
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('codeBlock')
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50/70 dark:hover:bg-rose-950/40'
               }`}
               title="代码块 (键入 ```cpp 并回车)"
+              aria-label="代码块"
             >
               <FileCode2 size={14} />
             </button>
+
+            {/* 10. Blockquote (Amber) */}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleBlockquote().run()}
-              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
                 editor?.isActive('blockquote')
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50/70 dark:hover:bg-amber-950/40'
               }`}
               title="引用块 (键入 > 内容)"
+              aria-label="引用块"
             >
               <Quote size={14} />
             </button>
+
+            {/* 11. Divider Line (Slate) */}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().setHorizontalRule().run()}
-              className="p-1.5 rounded-lg transition-all duration-150 cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50"
+              className="p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/60 dark:hover:bg-slate-700/50"
               title="分割线 (键入 --- 并回车)"
+              aria-label="分割线"
             >
               <Minus size={14} />
             </button>
           </div>
 
-          {/* Right Live Status (Saving / Words / Timestamp) */}
-          <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+          {/* Right Live Status (Saving / Words / Timestamp) - Strictly on the Right, Non-wrapping */}
+          <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-mono shrink-0 whitespace-nowrap ml-auto">
             {saveStatus === 'saving' && (
               <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-sans font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />

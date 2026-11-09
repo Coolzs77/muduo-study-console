@@ -366,8 +366,13 @@ assert(modalContent.includes('TabIndent'), 'Configures TabIndent keyboard shortc
 assert(modalContent.includes('sinkListItem') && modalContent.includes('liftListItem'), 'TabIndent supports list item hierarchy sinking and lifting');
 assert(!modalContent.includes('Typora / Notion 单画布真所见即所得'), 'Superfluous promotional comments removed from Header');
 assert(!modalContent.includes('Ctrl + S 保存 · 800ms 自动保存'), 'Superfluous shortcut hint removed from Footer');
-assert(!modalContent.includes('bg-purple-100') && !modalContent.includes('text-purple-700'), 'Zero purple in Toolbar (unified Amber theme)');
-assert(modalContent.includes('text-amber-600 dark:text-amber-400'), 'Toolbar active state styled with Amber theme');
+assert(modalContent.includes('text-blue-700') && modalContent.includes('text-purple-700'), 'Formatting actions have distinct blue and purple colors');
+assert(modalContent.includes('text-emerald-700'), 'TaskList action has distinct emerald color');
+assert(modalContent.includes('text-rose-700'), 'CodeBlock action has distinct rose color');
+assert(modalContent.includes('text-amber-700'), 'Blockquote action has distinct warm amber color');
+assert(modalContent.includes('onMouseDown={(e) => e.preventDefault()}'), 'Toolbar buttons prevent blur with onMouseDown preventDefault');
+assert(modalContent.includes('createHighlightPlugin') && modalContent.includes('Decoration.inline'), 'CodeBlock integrates syntax highlighting decoration plugin');
+assert(modalContent.includes('shrink-0 whitespace-nowrap ml-auto'), 'Save status text pinned to the right of toolbar buttons without wrapping');
 assert(modalContent.includes('Heading3') && modalContent.includes('三级标题'), 'Toolbar includes Heading3 button');
 assert(modalContent.includes('onSaveRef'), 'Uses onSaveRef to protect debounced auto-save from stale closure');
 assert(modalContent.includes('resetSaveStatusTimerRef'), 'Uses resetSaveStatusTimerRef to relax save status back to idle');
