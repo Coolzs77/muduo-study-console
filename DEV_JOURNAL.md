@@ -8510,3 +8510,294 @@ stateDiagram-v2
     - 浏览器控制台日志：`Browser console logs count: 0`（0 个错误）。
 - **交付凭证截图**：
   - 单画布真所见即所得打字实机截图：[verify_tiptap_typing_and_error_boundary_success.png](file:///C:/Users/86166/.gemini/antigravity/brain/ce427dc2-ed55-4196-a38e-98a9dc8b6fed/verify_tiptap_typing_and_error_boundary_success.png)
+
+
+---
+
+## 第 37 轮 [2026-11-09 19:55]：算法便签精美渲染样式恢复、自动保存光标零打断与 Tab 缩进深度打磨 (v6.18.0)
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与核心痛点**：
+  在完成单画布 TipTap 架构改造后，用户在实机使用中提出了关键且尖锐的操作体验反馈：
+  1. *“你怎么把渲染的样式也给改了,不能不改吗?现在就一个黑框啥也没,样式和原来相比差太多,我想要原来的渲染样式”*：上一轮改造中使用基础 HTML 渲染将代码块变成了生硬的单调黑框（`bg-slate-900`），丢失了原版具备 Terminal 终端头、语言标签、行数统计、一键复制按钮与高光微内凹阴影的精美质感；同时引用块、标题与待办清单的色彩偏离了系统既定的琥珀金（Amber）设计系统。
+  2. *“此外,你自动保存时,希望不要影响我的光标和打断我的输入,你这个自动保存的机制很恶心,总是影响我”*：用户在打字输入过程中，每当触发 800ms 防抖自动保存，输入焦点和光标突然被强制跳跃或中断打字节奏，体验非常不适。
+  3. *“工作栏的样式好像也没有原来的好”*：工具栏样式单调，且上一轮引入了紫色高亮，与 Muduo 控制台原生的琥珀金/天空蓝风格割裂。
+  4. *“现在还没法tab缩进,还有,删除多余的小字注释,不需要这些注释”*：缺乏 Tab 与 Shift+Tab 的快捷缩进支持；Header 与 Footer 处堆砌了多余的宣传小字注释，破坏了沉浸式做题环境。
+- **预期达成指标**：
+  1. **代码块视觉还原**：基于 TipTap 自定义 React NodeView，100% 还原原版 `CodeBlock.tsx` 的 Claymorphism 终端卡片质感（包含 Terminal 终端图标、大写语言名标签、行数统计 `(N 行)` 与一键复制代码按钮及 2 秒绿色勾选反馈）；
+  2. **根除自动保存打断输入与光标跳变**：彻底重构组件生命周期，自动保存仅在后台静默落盘，绝不重新调用 `setContent`，确保光标与正在打字的选区 100% 稳定；
+  3. **新增 Tab 与 Shift+Tab 缩进/反缩进快捷键扩展**：列表项按 Tab 降级为子列表，按 Shift+Tab 反向提升层级；代码块与文本段落中按 Tab 插入规范缩进空格，全面拦截浏览器默认失焦；
+  4. **全套琥珀金主题与排版规范复原**：引用块（Blockquote）复原为暖金左边框（`border-amber-500 bg-amber-50/70`），行内代码采用琥珀微徽章胶囊，H1/H2/H3 层级分明，待办清单呈现微内凹方块与高亮绿底白勾；
+  5. **精简去噪**：彻底删除 Header 中宣传性小字注释（`✨ Typora / Notion 单画布真所见即所得...`）及 Footer 的多余提示文案；
+  6. **工具栏药丸凹槽与琥珀高亮复原**：恢复原版微内凹药丸槽外壳，激活态统一采用琥珀金高亮（`bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs`），彻底移除紫色；
+  7. **全自动化验证与 GitHub Pages 发布**：确保 `tsc`、`npm test`、`npm run build`、Selenium 无头真机实测 100% 通过，并部署到 `gh-pages`。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及文件**：
+  - [`src/components/algorithm/AlgoNoteModal.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoNoteModal.tsx)：
+    - 实现 `CodeBlockView` 并在 `CustomCodeBlock` 中使用 `ReactNodeViewRenderer(CodeBlockView)` 挂载；
+    - 引入 `loadedProblemKeyRef` 生命周期保护机制，将 `initialNote` 移出 `useEffect` 依赖数组，彻底杜绝自动保存重载内容导致光标跳末尾；
+    - 注册 `TabIndent` TipTap 扩展，拦截 Tab 与 Shift+Tab，支持列表层级升降与段落/代码缩进；
+    - 删除 Header 与 Footer 的冗余注释文案；
+    - 工作栏全面切换至药丸微内凹外壳与琥珀金高亮；
+  - [`src/index.css`](file:///e:/workspace/muduo-study-console/src/index.css)：
+    - 调优 `.ProseMirror` 内部层级样式，精准定义琥珀金 H1/H2/H3、引用块、行内代码与任务清单复选框交互样式；
+  - [`scripts/test_algo_note_feature.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_algo_note_feature.cjs)：
+    - 新增 `Test 11` 专项断言，覆盖 CodeBlockView、Terminal 图标、loadedProblemKeyRef 光标防重置、TabIndent、无紫色与文案清理；
+  - [`scripts/verify_algo_note_refinement.py`](file:///e:/workspace/muduo-study-console/scripts/verify_algo_note_refinement.py)：
+    - 编写端到端 Selenium 无头浏览器自动化实测脚本，驱动真机在单画布上输入文本、插入代码块、等待 800ms 防抖存盘、验证光标稳定连打并截屏留存凭据。
+
+- **核心代码改动对比**：
+  ```tsx
+  // 1. TipTap CodeBlockView 恢复原版 Claymorphic 终端卡片外观
+  export const CodeBlockView: React.FC<ReactNodeViewProps> = ({ node }) => {
+    const [copied, setCopied] = useState(false);
+    const lang = (node.attrs?.language || 'cpp').toLowerCase();
+    const codeText = node.textContent || '';
+    const lineCount = codeText ? codeText.split('\n').length : 1;
+
+    const handleCopy = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!codeText) return;
+      navigator.clipboard.writeText(codeText).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    };
+
+    return (
+      <NodeViewWrapper className="my-3 rounded-2xl overflow-hidden border border-white/70 dark:border-white/10 bg-white/90 dark:bg-[#1a1f2c]/90 text-slate-800 dark:text-[#cccccc] shadow-[6px_6px_16px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)] text-[13px] font-mono">
+        <div
+          contentEditable={false}
+          className="flex items-center justify-between px-4 py-2.5 bg-slate-100/70 dark:bg-slate-900/50 border-b border-slate-200/50 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 select-none shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]"
+        >
+          <div className="flex items-center gap-2.5">
+            <Terminal size={14} className="text-sky-600 dark:text-sky-400" />
+            <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 font-mono text-[11px]">
+              {lang}
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">({lineCount} 行)</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-2xl bg-white/90 dark:bg-slate-800/90 hover:bg-white text-slate-700 dark:text-slate-200 border border-white/80 dark:border-white/10 shadow-[2px_2px_5px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] text-xs font-bold cursor-pointer"
+            title="复制代码"
+          >
+            {copied ? (
+              <>
+                <Check size={13} className="text-emerald-500 dark:text-emerald-400 transition-transform scale-110" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">已复制</span>
+              </>
+            ) : (
+              <>
+                <Copy size={13} />
+                <span>复制代码</span>
+              </>
+            )}
+          </button>
+        </div>
+        <div className="p-4 overflow-x-auto leading-relaxed bg-slate-50/50 dark:bg-[#151922]/50 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04)] max-h-[500px]">
+          <pre className="m-0 bg-transparent p-0 font-mono text-[13px] leading-relaxed whitespace-pre hljs">
+            <NodeViewContent<'code'> as="code" className="font-mono text-[13px] leading-relaxed block" />
+          </pre>
+        </div>
+      </NodeViewWrapper>
+    );
+  };
+
+  // 2. 拔除自动保存导致光标跳动的生命周期 Bug
+  const loadedProblemKeyRef = useRef<string>('');
+  useEffect(() => {
+    if (!isOpen || !problem || !editor) {
+      if (!isOpen) {
+        loadedProblemKeyRef.current = '';
+      }
+      return;
+    }
+
+    const currentKey = getAlgoProblemKey(problem);
+    // 仅在首次打开该题目弹窗或题目切换时加载初始内容，绝不被自动保存引发的父组件 re-render 误触发
+    if (loadedProblemKeyRef.current !== currentKey) {
+      loadedProblemKeyRef.current = currentKey;
+      const rawMd = initialNote?.content || '';
+      lastSavedMdRef.current = rawMd.trim();
+      if (rawMd.trim()) {
+        try {
+          const parsedHtml = marked.parse(rawMd, { async: false }) as string;
+          editor.commands.setContent(parsedHtml, { emitUpdate: false });
+        } catch {
+          editor.commands.setContent(`<p>${rawMd}</p>`, { emitUpdate: false });
+        }
+      } else {
+        editor.commands.clearContent(false);
+      }
+      const initialText = editor.getText();
+      setWordCount(initialText.trim() ? initialText.length : 0);
+      setSaveStatus('idle');
+      setIsConfirmingClear(false);
+      setIsCopied(false);
+      // 仅在初始打开时将光标置于末尾
+      setTimeout(() => {
+        editor.commands.focus('end');
+      }, 50);
+    }
+  }, [isOpen, problem, editor]); // 严格排除 initialNote
+  ```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+- **问题一：自动保存触发时光标被强制跳至文末，打断连续输入**：
+  - **问题现象**：用户在便签内连续打字时，每当暂停输入约 800ms，状态提示“已保存”的同时，光标突然瞬间瞬移到笔记最末尾，打断正在打字的思考过程，导致继续键入的内容错乱追加在文末。
+  - **根本原因 (RCA)**：在旧版 `AlgoNoteModal.tsx` 中，`useEffect` 负责同步初始笔记内容，其依赖项数组中误传入了 `[isOpen, problem, initialNote, editor]`。当 800ms 防抖保存触发时，向父组件 `AlgoCatalog` 回传了新笔记内容，父组件通过 `setNotesMap` 刷新 React 状态并下发了新引用的 `initialNote` 对象。子组件接收到新对象后，触发了该 `useEffect`，盲目执行了 `editor.commands.setContent(parsedHtml)` 与 `editor.commands.focus('end')`，导致正在编辑中的 DOM 树被强制销毁重绘、选区强行丢弃！
+  - **具体解法**：引入 `loadedProblemKeyRef = useRef<string>('')`；将 `initialNote` 彻底移出依赖数组。仅当 `isOpen` 且当前题目 Key 与 `loadedProblemKeyRef.current` 不一致时（首次打开该题）执行一次性 `setContent` 与初始聚焦；模态框关闭时清空该 Ref。自动保存完全在后台静默进行，不调用任何破坏编辑器内部状态的命令，ProseMirror 原生光标选区全程零干扰。
+
+- **问题二：代码块在 TipTap 中渲染为粗糙单调的纯黑大方块**：
+  - **问题现象**：旧版使用了 StarterKit 默认的 HTMLAttributes 类名 `bg-slate-900`，只生成了一个普通的 `<pre>` 标签，没有原版的标题栏、语言名、行数统计和一键复制按钮。
+  - **根本原因 (RCA)**：原生 TipTap codeBlock 仅渲染为简陋的 `<pre><code>`，无法承载包含复杂微动效按键与终端栏的 Claymorphic 交互层。
+  - **具体解法**：基于 `@tiptap/react` 的 `NodeViewWrapper` 与 `NodeViewContent` 构建自定义 `CodeBlockView`，在 `CustomCodeBlock` 中通过 `ReactNodeViewRenderer` 接入。通过 `contentEditable={false}` 隔离终端顶部栏与复制按键，而将代码编辑委托给 `<NodeViewContent<'code'> as="code" />`，完美复刻了原版 `CodeBlock.tsx` 的所有质感与功能。
+
+- **问题三：TypeScript 编译报 TS2322 generic 错误**：
+  - **问题现象**：`src/components/algorithm/AlgoNoteModal.tsx(138,28): error TS2322: Type '"code"' is not assignable to type '"div"'`。
+  - **根本原因 (RCA)**：`NodeViewContentProps` 定义为泛型 `T extends keyof React.JSX.IntrinsicElements = 'div'`，其 `as` 属性被包裹在 `NoInfer<T>` 中。当不显式声明泛型时，TypeScript 默认将 `T` 锁定为 `'div'`，拒绝接受 `as="code"`。
+  - **具体解法**：显式声明泛型参数 `<NodeViewContent<'code'> as="code" ... />`，TypeScript 静态类型检查 100% 顺畅通过。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 维度一：光标零打断与后台静默自动保存时序交互图
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 用户打字 (自然键盘/拼音输入)
+    participant Editor as TipTap 单画布 (ProseMirror 核心选区)
+    participant Timer as 800ms 防抖计时器 (autoSaveTimerRef)
+    participant Parent as 父组件 (AlgoCatalog 内存状态)
+    participant Storage as 本地存储 (localStorage)
+
+    Note over User,Editor: 1. 弹窗打开仅执行一次 setContent (loadedProblemKeyRef)
+    User->>Editor: 连续键入中文字符 / 英文代码
+    Editor->>Timer: onUpdate 触发，重置 800ms 防抖时钟
+    Note over Editor: 光标位置由 ProseMirror 原生精确追踪，绝对不重绘 DOM
+    
+    User->>User: 停顿思考超过 800ms
+    Timer->>Editor: 静默获取 HTML (editor.getHTML())
+    Timer->>Storage: Turndown 序列化为 Markdown，安全写入 localStorage
+    Timer->>Parent: 调用 onSave(pKey, md) 同步父组件 notesMap
+    Parent-->>Editor: 传递更新后的 initialNote 对象
+    Note over Editor: 🚨 核心保障：loadedProblemKeyRef 阻断重载！严禁调用 setContent！光标纹丝不动！
+    
+    User->>Editor: 继续打字，输入无缝流畅衔接
+    User->>Editor: 按下 Esc 键退出
+    Editor->>Storage: handleCloseWithFlush 同步终验刷盘，100% 零丢字
+```
+
+> **【架构机制解析 1】**：
+> - **核心流向与节点拆解**：展示了从用户键盘敲击、800ms 防抖计时器静默序列化、后台写入存储到 Esc 离开时 Flush 刷盘的全生命周期闭环。
+> - **光标零打断原理**：通过引入 `loadedProblemKeyRef`，切断了父组件状态回流导致的“重新 setContent -> 重置 ProseMirror DOM -> 光标跳到末尾”的恶性循环，使得自动保存完全在后台隐式完成，用户没有任何被抢走焦点或打断思考的感知。
+
+---
+
+#### 维度二：TipTap 自定义 CodeBlockView NodeView 架构图
+```mermaid
+flowchart TD
+    subgraph RawSource["Markdown 输入源"]
+        MDText["```cpp\n// 冒泡排序实现\nvoid bubbleSort(...) {...}\n```"]
+    end
+
+    subgraph ProseMirrorEngine["TipTap ProseMirror 引擎核心"]
+        MDText --> ParseNode["CodeBlock Node<br/>(attrs: { language: 'cpp' })"]
+        ParseNode --> RendererHook["ReactNodeViewRenderer(CodeBlockView)"]
+    end
+
+    subgraph CustomNodeView["原版精美外观 (CodeBlockView)"]
+        RendererHook --> OuterWrapper["NodeViewWrapper (外层 Claymorphic 卡片外壳)<br/>• 粘土双层阴影 shadow-[6px_6px_16px...]<br/>• 深色自适应 bg-white/90 dark:bg-[#1a1f2c]/90<br/>• 圆润边角 rounded-2xl"]
+        
+        OuterWrapper --> HeaderBar["顶部终端条 (contentEditable=false 隔离交互)<br/>• Terminal 图标 + 语言标签 (CPP)<br/>• 代码行数统计 (N 行)<br/>• 一键复制代码按钮 (Copy/Check 2s 状态反馈)"]
+        
+        OuterWrapper --> CodeBody["代码编辑主画板<br/>• <NodeViewContent<'code'> as='code' /><br/>• 支持光标自由点击与方向键导航<br/>• 支持 Tab 键插入规范 2 空格缩进<br/>• 支持 Shift+Tab 反向缩进<br/>• Enter 回车保持前导空格对齐"]
+    end
+```
+
+> **【架构机制解析 2】**：
+> - **交互与编辑分层隔离**：通过 `NodeViewWrapper` 将外壳 Claymorphic 阴影与内部元素整合，顶部终端栏显式标记 `contentEditable={false}`，避免点击复制按钮或标题栏时误触发 ProseMirror 的光标选择；
+> - **原生代码编辑能力**：`<NodeViewContent<'code'> as="code" />` 作为代码挂载点，享有 ProseMirror 的全部键盘与文本处理能力，既保持了原版 `CodeBlock.tsx` 的高级视觉感，又具备真正的行内编辑体验。
+
+---
+
+#### 维度三：Tab 与 Shift+Tab 多节点自适应缩进决策流向图
+```mermaid
+flowchart TD
+    KeyEvent["用户按下键盘 Tab / Shift+Tab"] --> InterceptCheck["TabIndent 键盘快捷键拦截"]
+    
+    InterceptCheck --> IsCodeBlock{"当前是否处于代码块 (codeBlock)?"}
+    IsCodeBlock -- 是 --> CodeBlockDelegate["放行并交由 CodeBlock 扩展处理<br/>• Tab: 插入 2 个空格缩进<br/>• Shift+Tab: 剔除 2 个前导空格"]
+    
+    IsCodeBlock -- 否 --> IsTaskItem{"当前是否处于待办清单 (taskItem)?"}
+    IsTaskItem -- 是 --> TaskItemAction{"判断按键类型"}
+    TaskItemAction -- "Tab" --> SinkTask["执行 editor.commands.sinkListItem('taskItem')<br/>子级清单缩进降级"]
+    TaskItemAction -- "Shift-Tab" --> LiftTask["执行 editor.commands.liftListItem('taskItem')<br/>父级清单反缩进提升"]
+    
+    IsTaskItem -- 否 --> IsListItem{"当前是否处于无序/有序列表 (listItem)?"}
+    IsListItem -- 是 --> ListItemAction{"判断按键类型"}
+    ListItemAction -- "Tab" --> SinkList["执行 editor.commands.sinkListItem('listItem')<br/>子列表嵌套缩进"]
+    ListItemAction -- "Shift-Tab" --> LiftList["执行 editor.commands.liftListItem('listItem')<br/>列表层级反向提升"]
+    
+    IsListItem -- 否 --> GeneralText{"普通文本段落 (paragraph)?"}
+    GeneralText -- "Tab" --> InsertSpaces["插入 2 个空格字符 (editor.commands.insertContent('  '))<br/>阻止浏览器 Tab 默认跳出焦点"]
+    GeneralText -- "Shift-Tab" --> PreventBlur["阻止默认失焦 (return true)"]
+```
+
+> **【架构机制解析 3】**：
+> - **上下文感知分流**：详细梳理了用户在代码块、待办清单、普通列表以及常规段落中按下 `Tab` 与 `Shift+Tab` 时的条件决策路径；
+> - **防失焦与直觉化体验**：彻底解决了网页编辑器中按下 Tab 键导致浏览器焦点跳到其他按钮的恼人缺陷，同时赋予清单原地降级为子清单的能力，使用体验与专业笔记软件完全一致。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+1. **彻底拔除光标跳跃 Bug**：解除了 `initialNote` 对编辑器的二次重新初始化，打字过程 100% 丝滑无阻断；
+2. **原版精美外观全面复活**：代码块恢复 Terminal 终端图标、语言大写标签、行数统计、一键复制代码；标题 H1 增加底部分割线，H3 恢复经典琥珀色；引用块恢复暖金渐变卡片；行内代码恢复琥珀胶囊徽章；
+3. **工具栏药丸凹槽与色彩统一**：恢复紧凑微内凹药丸槽外框，激活态全部切换为琥珀金（`text-amber-600 dark:text-amber-400`），彻底消除了生硬的紫色；
+4. **清理冗余注释文案**：删除 Header 标题下方的一长串宣传小字与底部的快捷键提示文案，让解题界面保持极简与专注；
+5. **键盘 Tab / Shift+Tab 缩进自由**：代码块、待办清单、列表与文本段落全面支持按键缩进，不跳焦、不失位。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+- **终端可复现测试命令**：
+  ```bash
+  # 1. 严格全工程 TypeScript 类型静态检查 (必须 0 错误)
+  npx tsc --noEmit
+
+  # 2. 运行完整单元与特性回归测试套件 (包含新增 Test 11 便签打磨验证)
+  npm test
+
+  # 3. 运行现代化 Vite 生产静态构建打包
+  npm run build
+
+  # 4. 运行基于 Selenium 的真机无头自动化浏览器实测
+  python scripts/verify_algo_note_refinement.py
+
+  # 5. 部署到生产 GitHub Pages
+  npm run deploy:gh-pages
+  ```
+- **实际测试断言输出**：
+  - `npx tsc --noEmit`：0 错误，类型系统完好；
+  - `npm test`：全部通过！其中 `test_algo_note_feature.cjs` 包含全新的 `Test 11`（12 项新断言，总计 123 项便签专项断言通过）；
+  - `npm run build`：成功输出生产静态资产至 `dist/` 与 `assets/`；
+  - `verify_algo_note_refinement.py`：
+    - 成功定位做题便签按钮并打开弹窗；
+    - 校验 Header 与 Footer 中多余小字已彻底消失；
+    - 校验工具栏为无紫色的琥珀金主题；
+    - 在单画布中键入 H1、引用块、待办清单及代码块，确认渲染出 Terminal 头部、行数与复制代码按钮；
+    - 测试 Tab 缩进成功；
+    - 等待 800ms 防抖存盘，确认“已保存”状态出现后继续键入字符，断言光标未被重置；
+    - 测试 Esc 成功触发 Flush 并安全关闭；
+  - `npm run deploy:gh-pages`：强制推送到 `origin/gh-pages` 成功（`7d2b0b5`）。
+- **实机凭证**：
+  - 便签深度打磨实机截图：[`docs/images/verify_algo_note_refinement.png`](file:///e:/workspace/muduo-study-console/docs/images/verify_algo_note_refinement.png)

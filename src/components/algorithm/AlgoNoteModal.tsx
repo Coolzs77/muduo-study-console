@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, NodeViewWrapper, NodeViewContent, ReactNodeViewRenderer } from '@tiptap/react';
+import type { ReactNodeViewProps } from '@tiptap/react';
+import { Extension } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
+import { CodeBlock } from '@tiptap/extension-code-block';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import TurndownService from 'turndown';
@@ -14,7 +17,6 @@ import {
   Trash2,
   Save,
   Clock,
-  Sparkles,
   Bold,
   Italic,
   Code,
@@ -24,7 +26,8 @@ import {
   Heading1,
   Heading2,
   List,
-  Minus
+  Minus,
+  Terminal
 } from 'lucide-react';
 
 export const getAlgoProblemKey = (problem: AlgoProblem | null | undefined): string => {
@@ -52,7 +55,7 @@ const turndownService = new TurndownService({
 // Configure custom rule for task items to ensure clean `- [ ] ` and `- [x] ` Markdown output
 turndownService.addRule('tiptapTaskList', {
   filter: function (node) {
-    return node.nodeName === 'LI' && (node.getAttribute('data-type') === 'taskItem' || node.classList.contains('task-item'));
+    return node.nodeName === 'LI' && (node.getAttribute('data-type') === 'taskItem' || node.classList.contains('task-item') || !!node.querySelector('input[type="checkbox"]'));
   },
   replacement: function (content, node) {
     const isChecked = node.getAttribute('data-checked') === 'true' || !!node.querySelector('input[type="checkbox"]:checked');
@@ -74,6 +77,117 @@ turndownService.addRule('fencedCodeBlock', {
     const rawCode = codeEl ? codeEl.textContent || '' : content;
     return `\n\`\`\`${lang}\n${rawCode.replace(/\n$/, '')}\n\`\`\`\n\n`;
   }
+});
+
+/**
+ * Custom CodeBlock NodeView component restoring the original Claymorphic Terminal Card style.
+ * Includes Terminal icon, language tag, line count, and one-click copy button.
+ */
+export const CodeBlockView: React.FC<ReactNodeViewProps> = ({ node }) => {
+  const [copied, setCopied] = useState(false);
+  const lang = (node.attrs?.language || 'cpp').toLowerCase();
+  const codeText = node.textContent || '';
+  const lineCount = codeText ? codeText.split('\n').length : 1;
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!codeText) return;
+    navigator.clipboard.writeText(codeText).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <NodeViewWrapper className="my-3 rounded-2xl overflow-hidden border border-white/70 dark:border-white/10 bg-white/90 dark:bg-[#1a1f2c]/90 text-slate-800 dark:text-[#cccccc] shadow-[6px_6px_16px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.08)] text-[13px] font-mono">
+      <div
+        contentEditable={false}
+        className="flex items-center justify-between px-4 py-2.5 bg-slate-100/70 dark:bg-slate-900/50 border-b border-slate-200/50 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 select-none shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)]"
+      >
+        <div className="flex items-center gap-2.5">
+          <Terminal size={14} className="text-sky-600 dark:text-sky-400" />
+          <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 font-mono text-[11px]">
+            {lang}
+          </span>
+          <span className="text-[10px] text-slate-400 font-medium">
+            ({lineCount} 行)
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 px-3 py-1 rounded-2xl bg-white/90 dark:bg-slate-800/90 hover:bg-white text-slate-700 dark:text-slate-200 border border-white/80 dark:border-white/10 shadow-[2px_2px_5px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-x-105 active:scale-y-90 hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] text-xs font-bold cursor-pointer"
+          title="复制代码"
+        >
+          {copied ? (
+            <>
+              <Check size={13} className="text-emerald-500 dark:text-emerald-400 transition-transform scale-110" />
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">已复制</span>
+            </>
+          ) : (
+            <>
+              <Copy size={13} />
+              <span>复制代码</span>
+            </>
+          )}
+        </button>
+      </div>
+      <div className="p-4 overflow-x-auto leading-relaxed bg-slate-50/50 dark:bg-[#151922]/50 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04)] max-h-[500px]">
+        <pre className="m-0 bg-transparent p-0 font-mono text-[13px] leading-relaxed whitespace-pre hljs">
+          <NodeViewContent<'code'> as="code" className="font-mono text-[13px] leading-relaxed block" />
+        </pre>
+      </div>
+    </NodeViewWrapper>
+  );
+};
+
+// Custom CodeBlock Extension with beautiful Claymorphic Terminal NodeView and tab indentation
+const CustomCodeBlock = CodeBlock.extend({
+  addNodeView() {
+    return ReactNodeViewRenderer(CodeBlockView);
+  },
+}).configure({
+  enableTabIndentation: true,
+  tabSize: 2,
+  defaultLanguage: 'cpp',
+});
+
+// Custom TabIndent extension supporting Tab / Shift+Tab for lists, paragraphs, and code blocks
+const TabIndent = Extension.create({
+  name: 'tabIndent',
+  addKeyboardShortcuts() {
+    return {
+      Tab: ({ editor }) => {
+        if (editor.isActive('codeBlock')) {
+          return false;
+        }
+        if (editor.isActive('taskItem')) {
+          editor.commands.sinkListItem('taskItem');
+          return true;
+        }
+        if (editor.isActive('listItem')) {
+          editor.commands.sinkListItem('listItem');
+          return true;
+        }
+        return editor.commands.insertContent('  ');
+      },
+      'Shift-Tab': ({ editor }) => {
+        if (editor.isActive('codeBlock')) {
+          return false;
+        }
+        if (editor.isActive('taskItem')) {
+          editor.commands.liftListItem('taskItem');
+          return true;
+        }
+        if (editor.isActive('listItem')) {
+          editor.commands.liftListItem('listItem');
+          return true;
+        }
+        return true;
+      },
+    };
+  },
 });
 
 export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
@@ -98,6 +212,8 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeProblemRef = useRef<AlgoProblem | null>(problem);
   activeProblemRef.current = problem;
+  const loadedProblemKeyRef = useRef<string>('');
+  const lastSavedMdRef = useRef<string>('');
 
   const currentProblem = problem;
   const problemKey = currentProblem ? getAlgoProblemKey(currentProblem) : '';
@@ -109,11 +225,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         heading: {
           levels: [1, 2, 3]
         },
-        codeBlock: {
-          HTMLAttributes: {
-            class: 'rounded-2xl bg-slate-900 text-slate-100 font-mono text-xs p-4 my-3 border border-slate-700/60 overflow-x-auto shadow-inner leading-relaxed'
-          }
-        },
+        codeBlock: false,
         bulletList: {
           HTMLAttributes: {
             class: 'list-disc list-outside ml-5 space-y-1 my-2 text-slate-800 dark:text-slate-200'
@@ -126,7 +238,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         },
         blockquote: {
           HTMLAttributes: {
-            class: 'border-l-4 border-purple-500/80 bg-purple-50/50 dark:bg-purple-950/20 pl-3.5 py-1.5 my-2.5 rounded-r-xl text-slate-700 dark:text-slate-300 italic'
+            class: 'border-l-4 border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 rounded-r-xl px-3.5 py-2 my-2.5 text-xs sm:text-sm not-italic'
           }
         },
         horizontalRule: {
@@ -135,6 +247,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
           }
         }
       }),
+      CustomCodeBlock,
       TaskList.configure({
         HTMLAttributes: {
           class: 'not-prose pl-0 space-y-1.5 my-2.5'
@@ -145,7 +258,8 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         HTMLAttributes: {
           class: 'flex items-start gap-2.5 my-1 text-slate-800 dark:text-slate-200 group'
         }
-      })
+      }),
+      TabIndent
     ],
     editorProps: {
       attributes: {
@@ -156,7 +270,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       const text = currentEditor.getText();
       setWordCount(text.trim() ? text.length : 0);
 
-      // 800ms debounced auto-save handler
+      // 800ms debounced auto-save handler (silent background saving, zero cursor interference)
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
@@ -167,6 +281,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
           const pKey = getAlgoProblemKey(curProblem);
           const html = currentEditor.getHTML();
           const md = turndownService.turndown(html).trim();
+          lastSavedMdRef.current = md;
           onSave(pKey, md);
         }
         setSaveStatus('saved');
@@ -199,10 +314,21 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     }
   }, [isOpen, problem]);
 
-  // Synchronize initial content whenever a problem is opened
+  // Synchronize initial content ONLY on modal open or when active problem changes
+  // Critical fix: initialNote is intentionally excluded from dependencies to ensure auto-save never wipes out cursor/focus!
   useEffect(() => {
-    if (isOpen && problem && editor) {
+    if (!isOpen || !problem || !editor) {
+      if (!isOpen) {
+        loadedProblemKeyRef.current = '';
+      }
+      return;
+    }
+
+    const currentKey = getAlgoProblemKey(problem);
+    if (loadedProblemKeyRef.current !== currentKey) {
+      loadedProblemKeyRef.current = currentKey;
       const rawMd = initialNote?.content || '';
+      lastSavedMdRef.current = rawMd.trim();
       if (rawMd.trim()) {
         try {
           const parsedHtml = marked.parse(rawMd, { async: false }) as string;
@@ -218,12 +344,12 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       setSaveStatus('idle');
       setIsConfirmingClear(false);
       setIsCopied(false);
-      // Auto-focus the editor surface
+      // Auto-focus the editor surface only on modal open
       setTimeout(() => {
         editor.commands.focus('end');
       }, 50);
     }
-  }, [isOpen, problem, initialNote, editor]);
+  }, [isOpen, problem, editor]);
 
   // Instant Manual Save (Ctrl+S / Ctrl+Enter or Click)
   const handleManualSave = useCallback(() => {
@@ -234,6 +360,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     }
     const html = editor.getHTML();
     const md = turndownService.turndown(html).trim();
+    lastSavedMdRef.current = md;
     if (problemKey) {
       onSave(problemKey, md);
     }
@@ -255,13 +382,13 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     if (editor && problemKey) {
       const html = editor.getHTML();
       const finalMd = turndownService.turndown(html).trim();
-      const prevMd = (initialNote?.content || '').trim();
-      if (finalMd !== prevMd) {
+      if (finalMd !== lastSavedMdRef.current) {
+        lastSavedMdRef.current = finalMd;
         onSave(problemKey, finalMd);
       }
     }
     onClose();
-  }, [editor, problemKey, initialNote, onSave, onClose]);
+  }, [editor, problemKey, onSave, onClose]);
 
   // Copy full note markdown content to clipboard with fallback
   const handleCopy = useCallback(async () => {
@@ -309,6 +436,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     if (editor) {
       editor.commands.clearContent(true);
     }
+    lastSavedMdRef.current = '';
     setIsConfirmingClear(false);
     if (problemKey) {
       onDelete?.(problemKey);
@@ -427,7 +555,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         }}
         className="relative z-10 w-full max-w-3xl bg-white/95 dark:bg-slate-900/95 rounded-3xl p-5 sm:p-7 shadow-[12px_12px_32px_rgba(0,0,0,0.18),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.08)] border border-white/80 dark:border-white/10 flex flex-col space-y-3.5 max-h-[92vh]"
       >
-        {/* Header */}
+        {/* Header - Cleaned without superfluous promotional comments */}
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             {/* Amber Clay Icon Badge */}
@@ -452,10 +580,6 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
                   </span>
                 )}
               </div>
-              <p className="text-[11.5px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5 font-medium">
-                <Sparkles size={12} className="text-amber-500 dark:text-amber-400" />
-                <span>Typora / Notion 单画布真所见即所得 · 整个框直接打字 · 实时渲染</span>
-              </p>
             </div>
           </div>
 
@@ -473,15 +597,15 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
 
         {/* Toolbar & Live Status Bar */}
         <div className="flex flex-wrap items-center justify-between gap-2 px-1 pt-0.5 shrink-0">
-          {/* Typora-style Formatting Actions Toolbar */}
-          <div className="flex flex-wrap items-center gap-1 text-slate-600 dark:text-slate-300">
+          {/* Typora-style Formatting Actions Toolbar with claymorphic groove pill container */}
+          <div className="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleBold().run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('bold')
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
               title="加粗 (Ctrl+B / 键入 **内容**)"
             >
@@ -490,10 +614,10 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleItalic().run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('italic')
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
               title="斜体 (Ctrl+I / 键入 *内容*)"
             >
@@ -502,25 +626,25 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleCode().run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('code')
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
-              title="行内代码 (Ctrl+E / 键入 \`code\`)"
+              title="行内代码 (Ctrl+E / 键入 `code`)"
             >
               <Code size={14} />
             </button>
 
-            <span className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-0.5" />
+            <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5" />
 
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('heading', { level: 1 })
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
               title="一级标题 (键入 # 内容)"
             >
@@ -529,25 +653,25 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('heading', { level: 2 })
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
               title="二级标题 (键入 ## 内容)"
             >
               <Heading2 size={14} />
             </button>
 
-            <span className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-0.5" />
+            <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5" />
 
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleTaskList().run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('taskList')
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
               title="待办清单 (键入 - [ ] 内容，鼠标可直接打钩)"
             >
@@ -556,10 +680,10 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleBulletList().run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('bulletList')
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
               title="无序列表 (键入 - 内容)"
             >
@@ -568,10 +692,10 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('codeBlock')
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
               title="代码块 (键入 ```cpp 并回车)"
             >
@@ -580,10 +704,10 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             <button
               type="button"
               onClick={() => editor?.chain().focus().toggleBlockquote().run()}
-              className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer ${
                 editor?.isActive('blockquote')
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold shadow-inner'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50'
               }`}
               title="引用块 (键入 > 内容)"
             >
@@ -592,7 +716,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             <button
               type="button"
               onClick={() => editor?.chain().focus().setHorizontalRule().run()}
-              className="p-1.5 rounded-xl transition-all duration-150 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+              className="p-1.5 rounded-lg transition-all duration-150 cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/60 dark:hover:bg-slate-700/50"
               title="分割线 (键入 --- 并回车)"
             >
               <Minus size={14} />
@@ -602,15 +726,15 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
           {/* Right Live Status (Saving / Words / Timestamp) */}
           <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
             {saveStatus === 'saving' && (
-              <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-sans font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-ping" />
+              <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-sans font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
                 正在保存...
               </span>
             )}
             {saveStatus === 'saved' && (
               <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-sans font-medium">
                 <Check size={11} />
-                已保存
+                已保存 {lastSavedTime}
               </span>
             )}
             {lastSavedTime && saveStatus === 'idle' && (
@@ -679,10 +803,6 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
 
           {/* Right tools: Save info & Exit */}
           <div className="flex items-center gap-3">
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline font-mono">
-              Ctrl + S 保存 · 800ms 自动保存
-            </span>
-
             <button
               type="button"
               onClick={handleCloseWithFlush}

@@ -309,6 +309,23 @@ assert(roundtripMd.includes('[x]') && roundtripMd.includes('初始化基础状�
 assert(roundtripMd.includes('[ ]') && roundtripMd.includes('确定遍历顺序'), 'Roundtripped markdown preserves unchecked task item');
 assert(roundtripMd.includes('**滚动数组**'), 'Roundtripped markdown preserves bold emphasis');
 
+// ----------------------------------------------------------------------------
+// Test 11: Verifying Note Editor Experience & Style Polish Refinement
+// ----------------------------------------------------------------------------
+console.log('\nTest 11: Verifying Note Editor Experience & Style Polish Refinement...');
+assert(modalContent.includes('CodeBlockView'), 'Implements CodeBlockView custom React NodeView');
+assert(modalContent.includes('ReactNodeViewRenderer(CodeBlockView)'), 'Registers CodeBlockView with ReactNodeViewRenderer');
+assert(modalContent.includes('<Terminal size={14}'), 'CodeBlockView renders Terminal icon');
+assert(modalContent.includes('title="复制代码"'), 'CodeBlockView has dedicated one-click copy button');
+assert(modalContent.includes('loadedProblemKeyRef'), 'Uses loadedProblemKeyRef to prevent auto-save from resetting cursor position');
+assert(!modalContent.match(/\[isOpen,\s*problem,\s*initialNote/), 'initialNote strictly excluded from setContent effect dependencies');
+assert(modalContent.includes('TabIndent'), 'Configures TabIndent keyboard shortcut extension');
+assert(modalContent.includes('sinkListItem') && modalContent.includes('liftListItem'), 'TabIndent supports list item hierarchy sinking and lifting');
+assert(!modalContent.includes('Typora / Notion 单画布真所见即所得'), 'Superfluous promotional comments removed from Header');
+assert(!modalContent.includes('Ctrl + S 保存 · 800ms 自动保存'), 'Superfluous shortcut hint removed from Footer');
+assert(!modalContent.includes('bg-purple-100') && !modalContent.includes('text-purple-700'), 'Zero purple in Toolbar (unified Amber theme)');
+assert(modalContent.includes('text-amber-600 dark:text-amber-400'), 'Toolbar active state styled with Amber theme');
+
 console.log('\n================================================================');
 if (failCount === 0) {
   console.log(`🎉 ALL ${passCount} ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!`);
