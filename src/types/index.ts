@@ -69,6 +69,14 @@ export interface AlgoProblem {
   independent?: boolean;
 }
 
+export interface AlgoProblemNote {
+  content: string;
+  updatedAt: number;
+  createdAt?: number;
+}
+
+export type AlgoProblemNotesMap = Record<string, AlgoProblemNote>;
+
 // ----------------------------------------------------------------------------
 // Daily Routine Tasks
 // ----------------------------------------------------------------------------

@@ -2,7 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { AlgoCard } from './AlgoCard';
 import { CarlReaderDrawer } from './CarlReaderDrawer';
+import { AlgoNoteModal, getAlgoProblemKey } from './AlgoNoteModal';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { AlgoProblemNotesMap } from '../../types';
 import {
   Search,
   CheckCircle2,
@@ -13,7 +15,8 @@ import {
   PanelLeftOpen,
   BookOpen,
   Compass,
-  Code2
+  Code2,
+  StickyNote
 } from 'lucide-react';
 
 export const STANDARD_CATEGORIES = [
@@ -29,10 +32,12 @@ export const CARL_HOT100_CHAPTERS = [
 
 export const AlgoCatalog: React.FC = () => {
   const [carlReaderProblem, setCarlReaderProblem] = useState<typeof ALGORITHM_LAB_CATALOG[0] | null>(null);
+  const [activeNoteProblem, setActiveNoteProblem] = useState<typeof ALGORITHM_LAB_CATALOG[0] | null>(null);
   const [viewTrack, setViewTrack] = useState<'all' | 'hot100' | 'carl'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [diffFilter, setDiffFilter] = useState<'all' | 'Easy' | 'Medium' | 'Hard'>('all');
+  const [onlyNotesFilter, setOnlyNotesFilter] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
     'sidebar_collapsed_algo',
     false
@@ -40,6 +45,11 @@ export const AlgoCatalog: React.FC = () => {
 
   const [completedMap, setCompletedMap] = useLocalStorage<Record<string | number, boolean>>(
     'completedAlgos',
+    {}
+  );
+
+  const [notesMap, setNotesMap] = useLocalStorage<AlgoProblemNotesMap>(
+    'muduo_algo_notes',
     {}
   );
 
@@ -67,6 +77,19 @@ export const AlgoCatalog: React.FC = () => {
       [key]: !current
     }));
   };
+
+  // Check if problem has personal note
+  const hasProblemNote = (p: typeof ALGORITHM_LAB_CATALOG[0]): boolean => {
+    if (!notesMap) return false;
+    const key = getAlgoProblemKey(p);
+    return !!(notesMap[key]?.content && notesMap[key].content.trim().length > 0);
+  };
+
+  // Total notes count in current database
+  const totalNotesCount = useMemo(() => {
+    if (!notesMap) return 0;
+    return Object.values(notesMap).filter(n => n && n.content && n.content.trim().length > 0).length;
+  }, [notesMap]);
 
   // Filter problems based on viewTrack
   const trackProblems = useMemo(() => {
@@ -158,6 +181,9 @@ export const AlgoCatalog: React.FC = () => {
         if (diffFilter === 'Hard' && d !== 'hard' && d !== '困难') return false;
       }
 
+      // Note filter
+      if (onlyNotesFilter && !hasProblemNote(p)) return false;
+
       // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -169,7 +195,7 @@ export const AlgoCatalog: React.FC = () => {
       }
       return true;
     });
-  }, [trackProblems, viewTrack, selectedCategory, diffFilter, searchQuery]);
+  }, [trackProblems, viewTrack, selectedCategory, diffFilter, searchQuery, onlyNotesFilter, notesMap]);
 
   // Difficulty counts
   const diffCounts = useMemo(() => {
@@ -452,6 +478,30 @@ export const AlgoCatalog: React.FC = () => {
                   {df === 'all' ? '全部难度' : df === 'Easy' ? '简单' : df === 'Medium' ? '中等' : '困难'}
                 </button>
               ))}
+
+              {/* Note Filter Toggle */}
+              <button
+                type="button"
+                onClick={() => setOnlyNotesFilter(prev => !prev)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer active:scale-x-105 active:scale-y-90 ${
+                  onlyNotesFilter
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(245,158,11,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] -translate-y-0.5'
+                    : 'bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5'
+                }`}
+                title="仅查看已有做题便签的题目"
+              >
+                <StickyNote size={13} className={onlyNotesFilter ? 'fill-white/30' : ''} />
+                <span>便签</span>
+                {totalNotesCount > 0 && (
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                    onlyNotesFilter
+                      ? 'bg-white/20 text-white'
+                      : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                  }`}>
+                    {totalNotesCount}
+                  </span>
+                )}
+              </button>
             </div>
 
             {/* Search Box (Clay recessed input) */}
@@ -484,6 +534,8 @@ export const AlgoCatalog: React.FC = () => {
               isDone={isProblemDone(problem)}
               onToggleDone={() => handleToggleDone(problem)}
               onOpenCarlReader={(p) => setCarlReaderProblem(p)}
+              hasNote={hasProblemNote(problem)}
+              onOpenNote={(p) => setActiveNoteProblem(p)}
             />
           ))}
 
@@ -598,6 +650,20 @@ export const AlgoCatalog: React.FC = () => {
                 >
                   {isProblemDone(randomProblem) ? '✓ 已完成' : '标记完成'}
                 </button>
+                {/* Random Problem Note Button (ICON ONLY) */}
+                <button
+                  type="button"
+                  onClick={() => setActiveNoteProblem(randomProblem)}
+                  className={`p-2.5 rounded-2xl shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-[0.96] transition-all duration-150 cursor-pointer shrink-0 ${
+                    hasProblemNote(randomProblem)
+                      ? 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-300/60 dark:border-amber-700/60 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
+                      : 'text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 bg-white/80 dark:bg-slate-800/80'
+                  }`}
+                  title={hasProblemNote(randomProblem) ? '做题便签 (已有笔记)' : '做题便签'}
+                >
+                  <StickyNote size={14} className={hasProblemNote(randomProblem) ? 'fill-amber-400/20' : ''} />
+                </button>
+
                 {randomProblem.carlUrl && (
                   <button
                     type="button"
@@ -665,6 +731,41 @@ export const AlgoCatalog: React.FC = () => {
         problem={carlReaderProblem}
         isOpen={!!carlReaderProblem}
         onClose={() => setCarlReaderProblem(null)}
+        hasNote={carlReaderProblem ? hasProblemNote(carlReaderProblem) : false}
+        onOpenNote={(p) => setActiveNoteProblem(p)}
+      />
+
+      {/* Algo Problem Note Modal */}
+      <AlgoNoteModal
+        problem={activeNoteProblem}
+        isOpen={!!activeNoteProblem}
+        initialNote={activeNoteProblem ? notesMap[getAlgoProblemKey(activeNoteProblem)] : null}
+        onClose={() => setActiveNoteProblem(null)}
+        onSave={(problemKey, content) => {
+          setNotesMap((prev) => {
+            const trimmed = content.trim();
+            if (!trimmed) {
+              const next = { ...prev };
+              delete next[problemKey];
+              return next;
+            }
+            return {
+              ...prev,
+              [problemKey]: {
+                content,
+                updatedAt: Date.now(),
+                createdAt: prev?.[problemKey]?.createdAt || Date.now(),
+              }
+            };
+          });
+        }}
+        onDelete={(problemKey) => {
+          setNotesMap((prev) => {
+            const next = { ...prev };
+            delete next[problemKey];
+            return next;
+          });
+        }}
       />
     </div>
   );

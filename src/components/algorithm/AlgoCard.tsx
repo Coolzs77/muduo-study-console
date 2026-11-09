@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlgoProblem } from '../../types';
-import { CheckCircle2, Circle, ExternalLink, BookOpen, Code2 } from 'lucide-react';
+import { CheckCircle2, Circle, ExternalLink, BookOpen, Code2, StickyNote } from 'lucide-react';
 import { formatComplexity } from '../../utils/formatters';
 
 export { formatComplexity };
@@ -10,9 +10,18 @@ interface AlgoCardProps {
   isDone: boolean;
   onToggleDone: () => void;
   onOpenCarlReader?: (problem: AlgoProblem) => void;
+  hasNote?: boolean;
+  onOpenNote?: (problem: AlgoProblem) => void;
 }
 
-export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDone, onOpenCarlReader }) => {
+export const AlgoCard: React.FC<AlgoCardProps> = ({
+  problem,
+  isDone,
+  onToggleDone,
+  onOpenCarlReader,
+  hasNote,
+  onOpenNote
+}) => {
   const getDifficultyBadge = (diff: string) => {
     switch (diff.toLowerCase()) {
       case 'easy':
@@ -126,6 +135,20 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({ problem, isDone, onToggleDon
 
         {/* Right: Actions */}
         <div className="flex items-center gap-1.5 shrink-0">
+          {/* Note Button (ICON ONLY - strictly no text labels) */}
+          <button
+            type="button"
+            onClick={() => onOpenNote?.(problem)}
+            className={`p-2 rounded-2xl shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:border dark:border-white/[0.06] hover:-translate-y-0.5 active:scale-[0.96] transition-all duration-150 cursor-pointer ${
+              hasNote
+                ? 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-300/60 dark:border-amber-700/60 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
+                : 'text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 bg-white/80 dark:bg-slate-800/80'
+            }`}
+            title={hasNote ? '做题便签 (已有笔记)' : '做题便签'}
+          >
+            <StickyNote size={14} className={hasNote ? 'fill-amber-400/20' : ''} />
+          </button>
+
           {problem.carlUrl && (
             <>
               {/* In-app reader drawer button */}
