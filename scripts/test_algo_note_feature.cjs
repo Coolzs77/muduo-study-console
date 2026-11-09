@@ -99,7 +99,7 @@ assert(mockStorage[key70K] !== undefined, 'Problem 70 Knapsack note still intact
 console.log('\nTest 4: Verifying AlgoNoteModal.tsx Component...');
 const modalPath = path.join(__dirname, '../src/components/algorithm/AlgoNoteModal.tsx');
 assert(fs.existsSync(modalPath), 'AlgoNoteModal.tsx file exists');
-const modalContent = fs.readFileSync(modalPath, 'utf8');
+const modalContent = fs.readFileSync(modalPath, 'utf8').replace(/\r\n/g, '\n');
 
 assert(modalContent.includes('export const getAlgoProblemKey'), 'Exports getAlgoProblemKey helper');
 assert(modalContent.includes('export const AlgoNoteModal'), 'Exports AlgoNoteModal component');
@@ -166,7 +166,7 @@ if (drawerNoteBtnMatch) {
 // Test 7: Verify AlgoCatalog.tsx Integration & State Management
 // ----------------------------------------------------------------------------
 console.log('\nTest 7: Verifying AlgoCatalog.tsx State & Integration...');
-const catalogContent = fs.readFileSync(path.join(__dirname, '../src/components/algorithm/AlgoCatalog.tsx'), 'utf8');
+const catalogContent = fs.readFileSync(path.join(__dirname, '../src/components/algorithm/AlgoCatalog.tsx'), 'utf8').replace(/\r\n/g, '\n');
 
 assert(catalogContent.includes('AlgoNoteModal'), 'AlgoCatalog imports AlgoNoteModal');
 assert(catalogContent.includes('useLocalStorage<AlgoProblemNotesMap>(\n    \'muduo_algo_notes\''), 'AlgoCatalog persists notes in localStorage under key muduo_algo_notes');

@@ -21,8 +21,9 @@ import {
 } from 'lucide-react';
 import { CodeBlock } from '../common/CodeBlock';
 
-export const getAlgoProblemKey = (problem: AlgoProblem): string => {
-  return problem.id || (problem.num !== null && problem.num !== undefined ? 'p_' + problem.num : problem.title);
+export const getAlgoProblemKey = (problem: AlgoProblem | null | undefined): string => {
+  if (!problem) return '';
+  return problem.id || (problem.num !== null && problem.num !== undefined ? 'p_' + problem.num : problem.title || '');
 };
 
 export interface AlgoNoteModalProps {
@@ -465,7 +466,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   const activeBlockRawRef = useRef<string>(activeBlockRaw);
   activeBlockRawRef.current = activeBlockRaw;
 
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const currentProblem = problem || activeProblem;
@@ -652,6 +653,62 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     setTimeout(() => setIsManualSavedFeedback(false), 2000);
   }, [problemKey, onSave]);
 
+  // Copy full note markdown content to clipboard with fallback
+  const handleCopy = useCallback(async () => {
+    const cur = contentRef.current;
+    if (!cur) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(cur);
+      } else {
+        throw new Error('Clipboard API unavailable');
+      }
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = cur;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch {
+        // ignore
+      } finally {
+        document.body.removeChild(ta);
+      }
+    }
+  }, []);
+
+  // Clear note with secondary confirmation protection
+  const handleClear = useCallback(() => {
+    if (!isConfirmingClear) {
+      setIsConfirmingClear(true);
+      setTimeout(() => setIsConfirmingClear(false), 3000);
+      return;
+    }
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+    setContent('');
+    contentRef.current = '';
+    setActiveBlockId(null);
+    activeBlockIdRef.current = null;
+    setActiveBlockRaw('');
+    activeBlockRawRef.current = '';
+    setIsConfirmingClear(false);
+    if (problemKey) {
+      onDelete?.(problemKey);
+    }
+    setSaveStatus('saved');
+    setLastSavedTime('');
+  }, [isConfirmingClear, problemKey, onDelete]);
+
   // Flush on Close / Exit: synchronously commit & save before unmounting (100% zero data loss)
   const handleCloseWithFlush = useCallback(() => {
     if (autoSaveTimerRef.current) {
@@ -759,7 +816,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
 
   // Active Block Textarea KeyDown handling: Shortcuts, Tab indentation, Smart Enter, IME protection
   const handleActiveTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.isComposing || (e.nativeEvent as any).isComposing || e.keyCode === 229) return;
+    if (e.nativeEvent.isComposing || (e as any).keyCode === 229) return;
 
     // Smart Enter logic for Obsidian/Typora feeling
     if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -1119,6 +1176,8 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     : isClosing
     ? 'scale(0.98)'
     : 'scale(0.96) translateY(8px)';
+
+  if (!isMounted || !currentProblem) return null;
 
   return (
     <div

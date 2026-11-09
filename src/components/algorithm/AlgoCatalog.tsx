@@ -97,9 +97,10 @@ export const AlgoCatalog: React.FC = () => {
   };
 
   // Check if problem has personal note
-  const hasProblemNote = (p: typeof ALGORITHM_LAB_CATALOG[0]): boolean => {
-    if (!notesMap) return false;
+  const hasProblemNote = (p: typeof ALGORITHM_LAB_CATALOG[0] | null | undefined): boolean => {
+    if (!notesMap || !p) return false;
     const key = getAlgoProblemKey(p);
+    if (!key) return false;
     return !!(notesMap[key]?.content && notesMap[key].content.trim().length > 0);
   };
 
