@@ -139,7 +139,7 @@ export const AlgoCard: React.FC<AlgoCardProps> = ({
           <button
             type="button"
             onClick={() => onOpenNote?.(problem)}
-            className={`p-2 rounded-2xl shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:border dark:border-white/[0.06] hover:-translate-y-0.5 active:scale-[0.96] transition-all duration-150 cursor-pointer ${
+            className={`p-2 rounded-2xl shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:border dark:border-white/[0.06] hover:-translate-y-0.5 active:scale-[0.96] transition-transform duration-100 cursor-pointer ${
               hasNote
                 ? 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-300/60 dark:border-amber-700/60 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
                 : 'text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 bg-white/80 dark:bg-slate-800/80'

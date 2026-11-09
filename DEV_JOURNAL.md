@@ -6388,6 +6388,34 @@ export const getAlgoProblemKey = (problem: AlgoProblem): string => {
 - **根本原因 (RCA)**：GPU 在光栅化极端缩放比例下的文本图层时，抗锯齿算法无法保持亚像素精度，导致字体笔画断裂和重绘抖动。
 - **解决方案**：遵循前端动效大师 Emil Kowalski 的运动曲线规范，入场采用微缩放 `scale(0.96) translateY(8px)` -> `scale(1) translateY(0)`，配合精心调校的自然缓动 `cubic-bezier(0.16, 1, 0.3, 1)`（200ms），退场采用轻微收敛 `scale(0.98)` / `opacity-0`（150ms），全程仅在 `transform` 与 `opacity` 两个合成器独立属性上执行，严禁 `scale(0)`，彻底消除字体闪烁。
 
+#### 问题 3：关闭模态时父级状态置空导致退场动画被提前 unmount 截断
+- **问题现象**：在初版实现中，点击关闭按钮或遮罩后，便签弹窗并没有优雅平滑地按 `150ms cubic-bezier(0.7, 0, 0.84, 0)` 退场，而是瞬间突兀消失（0ms 骤断）。
+- **根本原因 (RCA)**：父组件 `AlgoCatalog` 在 `onClose` 回调中执行了 `setActiveNoteProblem(null)`，导致传给 `AlgoNoteModal` 的 `problem` 属性在关闭帧立即变为 `null`。而在模态组件内部存在短路保护 `if (!isMounted || !problem) return null;`，即便 `isMounted` 还维持在 150ms 定时器内，`!problem` 的判定已导致 React 立即返回 `null`，DOM 节点当场被销毁，退场动画根本没有机会在屏幕上绘制。
+- **解决方案**：在 `AlgoNoteModal` 内部引入 `activeProblem` 镜像状态与 `isClosing` 标识：
+  ```typescript
+  const [activeProblem, setActiveProblem] = useState<AlgoProblem | null>(problem);
+  useEffect(() => { if (problem) setActiveProblem(problem); }, [problem]);
+  const currentProblem = problem || activeProblem;
+  if (!isMounted || !currentProblem) return null;
+  ```
+  在 150ms 退场期间锁定上一有效题目数据，确保 `scale(0.98)` 与透明度渐变完整走完后再卸载 DOM。
+
+#### 问题 4：中文输入法 (IME) 候选框按 Esc 键导致误关模态并丢失未存内容
+- **问题现象**：使用微软拼音、搜狗等中文输入法在便签中输入汉字时，若按下 `Esc` 键试图取消拼音拼写，整个便签弹窗直接被关闭，导致正在构思录入的笔记内容全部丢失。
+- **根本原因 (RCA)**：`keydown` 事件监听器直接在 `window` 上捕获 `e.key === 'Escape'` 并执行了 `onClose()`，未判定当前是否处于拼音合成组合态（IME Composition）。
+- **解决方案**：在快捷键处理器首行加入组合态拦截：
+  `if (e.isComposing) return;`
+  输入法展开选词候选框时，`isComposing` 为 `true`，`Esc` 仅关闭拼音候选框，绝不误触模态关闭。
+
+#### 问题 5：阅读抽屉内唤起便签时 Esc 键冒泡导致抽屉与模态同时双双关闭
+- **问题现象**：在 `CarlReaderDrawer` 随想录精讲抽屉内点击便签图标打开便签，在便签内按下 `Esc` 键，不仅便签模态关闭，底层的随想录抽屉也被同步关闭，用户不得不重新去题库列表中寻找题目并再次打开抽屉。
+- **根本原因 (RCA)**：`CarlReaderDrawer` 在其自身挂载时也在 `window` 上注册了 `keydown` 监听器。当用户在便签内按下 `Esc` 时，由于常规冒泡阶段监听器按注册时间顺序触发，`CarlReaderDrawer` 的监听器被优先执行，直接导致背景抽屉同时被判为关闭。
+- **解决方案**：
+  1. 将 `AlgoNoteModal` 的快捷键监听调整为捕获阶段执行：
+     `window.addEventListener('keydown', handleKeyDown, true);`
+  2. 在捕获 `Escape` 后立即执行 `e.stopImmediatePropagation()` 与 `e.preventDefault()`，彻底斩断事件向底层抽屉的传播链路；
+  3. 将 `AlgoNoteModal` 的层叠上下文提升至 `z-[60]`，高于抽屉的 `z-50`，形成绝对严格的浮层防御体系。
+
 ---
 
 ### 4. 架构与机制演进图 (Architectural Evolution Diagram)
@@ -6609,6 +6637,12 @@ Test 4: Verifying AlgoNoteModal.tsx Component...
   ✅ [PASS] Emil Kowalski entrance curve cubic-bezier(0.16, 1, 0.3, 1) implemented
   ✅ [PASS] Emil Kowalski exit curve cubic-bezier(0.7, 0, 0.84, 0) implemented
   ✅ [PASS] Strictly no scale(0) to avoid GPU artifacting
+  ✅ [PASS] Emil Kowalski exit transform scale(0.98) implemented
+  ✅ [PASS] Retains activeProblem during exit animation to prevent premature unmount
+  ✅ [PASS] Protects Chinese IME composition so Escape does not prematurely close modal
+  ✅ [PASS] High-priority z-[60] stacking context sits safely above drawer
+  ✅ [PASS] Stops immediate propagation so Esc closes modal without closing drawer
+  ✅ [PASS] Strictly no scale(0) to avoid GPU artifacting
   ✅ [PASS] Hardware acceleration declared via willChange
   ✅ [PASS] Recessed clay textarea has inner shadows
 
@@ -6617,7 +6651,7 @@ Test 5: Verifying AlgoCard.tsx Icon-Only Note Button...
   ✅ [PASS] AlgoCardProps includes hasNote
   ✅ [PASS] AlgoCardProps includes onOpenNote
   ✅ [PASS] AlgoCard note button has accurate dynamic title tooltip
-  ✅ [PASS] AlgoCard note button has physical press squash feedback
+  ✅ [PASS] AlgoCard note button has physical press squash feedback (duration-100)
   ✅ [PASS] AlgoCard contains note button action block
   ✅ [PASS] AlgoCard note button renders StickyNote icon
   ✅ [PASS] AlgoCard note button has STRICTLY NO text labels (ICON ONLY constraint met)
@@ -6627,6 +6661,7 @@ Test 6: Verifying CarlReaderDrawer.tsx Icon-Only Note Button...
   ✅ [PASS] CarlReaderDrawer imports StickyNote from lucide-react
   ✅ [PASS] CarlReaderDrawerProps includes hasNote
   ✅ [PASS] CarlReaderDrawerProps includes onOpenNote
+  ✅ [PASS] CarlReaderDrawer note button has duration-100 squash feedback
   ✅ [PASS] CarlReaderDrawer contains note button in action header
   ✅ [PASS] CarlReaderDrawer note button renders StickyNote icon
   ✅ [PASS] CarlReaderDrawer note button has STRICTLY NO text labels (ICON ONLY constraint met)
@@ -6644,6 +6679,6 @@ Test 7: Verifying AlgoCatalog.tsx State & Integration...
   ✅ [PASS] AlgoCatalog mounts AlgoNoteModal
 
 ================================================================
-🎉 ALL 63 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
+🎉 ALL 69 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
 ================================================================
 ```

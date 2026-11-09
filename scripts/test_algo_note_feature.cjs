@@ -112,6 +112,11 @@ assert(modalContent.includes("e.key === 'Escape'"), 'Supports Esc key to close m
 assert(modalContent.includes("(e.ctrlKey || e.metaKey) && e.key === 'Enter'"), 'Supports Ctrl+Enter / Cmd+Enter to quick save');
 assert(modalContent.includes('cubic-bezier(0.16, 1, 0.3, 1)'), 'Emil Kowalski entrance curve cubic-bezier(0.16, 1, 0.3, 1) implemented');
 assert(modalContent.includes('cubic-bezier(0.7, 0, 0.84, 0)'), 'Emil Kowalski exit curve cubic-bezier(0.7, 0, 0.84, 0) implemented');
+assert(modalContent.includes('scale(0.98)'), 'Emil Kowalski exit transform scale(0.98) implemented');
+assert(modalContent.includes('activeProblem'), 'Retains activeProblem during exit animation to prevent premature unmount');
+assert(modalContent.includes('isComposing'), 'Protects Chinese IME composition so Escape does not prematurely close modal');
+assert(modalContent.includes('z-[60]'), 'High-priority z-[60] stacking context sits safely above drawer');
+assert(modalContent.includes('stopImmediatePropagation'), 'Stops immediate propagation so Esc closes modal without closing drawer');
 assert(!modalContent.includes('scale(0)'), 'Strictly no scale(0) to avoid GPU artifacting');
 assert(modalContent.includes('willChange: \'transform, opacity\''), 'Hardware acceleration declared via willChange');
 assert(modalContent.includes('shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06)'), 'Recessed clay textarea has inner shadows');
@@ -126,7 +131,7 @@ assert(cardContent.includes('StickyNote'), 'AlgoCard imports StickyNote from luc
 assert(cardContent.includes('hasNote?: boolean;'), 'AlgoCardProps includes hasNote');
 assert(cardContent.includes('onOpenNote?: (problem: AlgoProblem) => void;'), 'AlgoCardProps includes onOpenNote');
 assert(cardContent.includes('title={hasNote ? \'做题便签 (已有笔记)\' : \'做题便签\'}'), 'AlgoCard note button has accurate dynamic title tooltip');
-assert(cardContent.includes('active:scale-[0.96]'), 'AlgoCard note button has physical press squash feedback');
+assert(cardContent.includes('active:scale-[0.96] transition-transform duration-100'), 'AlgoCard note button has physical press squash feedback (duration-100)');
 
 // Critical constraint: note button must be ICON ONLY without text labels!
 const noteBtnMatch = cardContent.match(/\{\/\* Note Button \(ICON ONLY - strictly no text labels\) \*\/\}\s*<button[\s\S]*?<\/button>/);
@@ -147,6 +152,7 @@ const drawerContent = fs.readFileSync(path.join(__dirname, '../src/components/al
 assert(drawerContent.includes('StickyNote'), 'CarlReaderDrawer imports StickyNote from lucide-react');
 assert(drawerContent.includes('hasNote?: boolean;'), 'CarlReaderDrawerProps includes hasNote');
 assert(drawerContent.includes('onOpenNote?: (problem: AlgoProblem) => void;'), 'CarlReaderDrawerProps includes onOpenNote');
+assert(drawerContent.includes('active:scale-[0.96] transition-transform duration-100'), 'CarlReaderDrawer note button has duration-100 squash feedback');
 
 const drawerNoteBtnMatch = drawerContent.match(/\{\/\* Note Button \(ICON ONLY - strictly no text labels\) \*\/\}\s*<button[\s\S]*?<\/button>/);
 assert(drawerNoteBtnMatch !== null, 'CarlReaderDrawer contains note button in action header');

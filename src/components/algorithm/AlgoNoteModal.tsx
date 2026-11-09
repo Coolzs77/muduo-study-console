@@ -33,16 +33,20 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   onSave,
   onDelete,
 }) => {
+  // Retain the last active problem during exit animations so the modal card can smoothly transition out
+  const [activeProblem, setActiveProblem] = useState<AlgoProblem | null>(problem);
   const [content, setContent] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
   const [isMounted, setIsMounted] = useState(isOpen);
   const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Sync content with initialNote when problem changes
   useEffect(() => {
     if (problem) {
+      setActiveProblem(problem);
       setContent(initialNote?.content || '');
       setIsConfirmingClear(false);
       setIsCopied(false);
@@ -52,6 +56,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   // Emil Kowalski animation mount/unmount cycle
   useEffect(() => {
     if (isOpen && problem) {
+      setIsClosing(false);
       setIsMounted(true);
       const frameId = requestAnimationFrame(() => {
         setIsVisible(true);
@@ -59,8 +64,10 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       return () => cancelAnimationFrame(frameId);
     } else {
       setIsVisible(false);
+      setIsClosing(true);
       const timer = setTimeout(() => {
         setIsMounted(false);
+        setIsClosing(false);
       }, 150);
       return () => clearTimeout(timer);
     }
@@ -76,32 +83,46 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     }
   }, [isVisible]);
 
+  const currentProblem = problem || activeProblem;
+  const problemKey = currentProblem ? getAlgoProblemKey(currentProblem) : '';
+
+  const handleSaveRef = useRef<() => void>(() => {});
+  const onCloseRef = useRef<() => void>(onClose);
+  onCloseRef.current = onClose;
+
+  const handleSave = () => {
+    if (problemKey) {
+      onSave(problemKey, content);
+    }
+    onClose();
+  };
+  handleSaveRef.current = handleSave;
+
   // Keyboard shortcut listener: Esc to close, Ctrl+Enter to save
+  // Guarded against IME composition to protect Chinese pinyin input
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.isComposing) return;
+
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        e.stopImmediatePropagation();
+        onCloseRef.current();
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        handleSave();
+        e.stopImmediatePropagation();
+        handleSaveRef.current();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, problem, content, onClose]);
+    // Use capture phase to intercept Esc before any lower-level drawer/sidebar listeners
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [isOpen]);
 
-  if (!isMounted || !problem) return null;
-
-  const problemKey = getAlgoProblemKey(problem);
-
-  const handleSave = () => {
-    onSave(problemKey, content);
-    onClose();
-  };
+  if (!isMounted || !currentProblem) return null;
 
   const handleCopy = async () => {
     if (!content) return;
@@ -181,9 +202,15 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     }
   };
 
+  const transformStyle = isVisible
+    ? 'scale(1) translateY(0)'
+    : isClosing
+    ? 'scale(0.98)'
+    : 'scale(0.96) translateY(8px)';
+
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 transition-opacity duration-200 select-none ${
+      className={`fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-5 transition-opacity duration-200 select-none ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       aria-modal="true"
@@ -191,14 +218,16 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     >
       {/* Backdrop overlay */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+        className={`fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity ${
+          isVisible ? 'opacity-100 duration-200' : 'opacity-0 duration-150'
+        }`}
         onClick={onClose}
       />
 
       {/* Modal Card with Claymorphic aesthetic and Emil Kowalski hardware-accelerated motion */}
       <div
         style={{
-          transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(8px)',
+          transform: transformStyle,
           opacity: isVisible ? 1 : 0,
           transition: isVisible
             ? 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms cubic-bezier(0.16, 1, 0.3, 1)'
@@ -217,18 +246,18 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                {problem.num !== null && (
+                {currentProblem.num !== null && (
                   <span className="font-mono font-bold text-sky-700 dark:text-sky-400 text-xs">
-                    #{problem.num}
+                    #{currentProblem.num}
                   </span>
                 )}
                 <h3 className="font-bold text-base text-slate-900 dark:text-white truncate">
-                  {problem.title}
+                  {currentProblem.title}
                 </h3>
-                {getDifficultyBadge(problem.difficulty)}
-                {(problem.category || problem.topic) && (
+                {getDifficultyBadge(currentProblem.difficulty)}
+                {(currentProblem.category || currentProblem.topic) && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
-                    {problem.category || problem.topic}
+                    {currentProblem.category || currentProblem.topic}
                   </span>
                 )}
               </div>
