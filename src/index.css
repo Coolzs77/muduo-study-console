@@ -39,6 +39,15 @@
   }
 }
 
+/* 隐藏滚动条实用类 (支持水平胶囊导航栏丝滑滑动) */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* 现代阅读排版优化 */
 .reading-content {
   line-height: 1.8;

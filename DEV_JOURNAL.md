@@ -6682,3 +6682,405 @@ Test 7: Verifying AlgoCatalog.tsx State & Integration...
 🎉 ALL 69 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
 ================================================================
 ```
+---
+
+## 第 32 轮 [2026-11-09 15:30]：算法题库移动端/窄屏响应式专题导航与胶囊抽屉体系 (方案 A 实装)
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求与背景**：在 `AlgoCatalog.tsx`（算法实训台题库）中，当视口宽度进入窄屏范围（移动端智能手机、平板竖屏模式或桌面端双栏分屏窗口时），左侧 320px 宽的桌面专题目录栏被隐藏，或者此前因展开态未添加 `hidden md:flex` 导致整个界面在移动端被强行挤占，造成用户无法自如切换算法专题（如从“数组”切换到“动态规划”或“二叉树”），必须将窗口拉宽至桌面宽度才能切换，严重破坏了移动碎片化学习体验。
+- **方案决策与落实**：用户经评审后正式批准执行 `方案 A (Scheme A)`，确立“横向胶囊药丸即时栏（轨 1） + 全景拟物底栏抽屉（轨 2）”的互补双轨导航体系：
+  1. **轨 1：横向滑动手势粘土药丸栏 (Track 1 Clay Category Bar)**：在移动端/窄屏（`< md`）置于筛选栏顶部，提供“全部”与当前题单各专题胶囊。点击直接切换专题（0 模态阻隔），支持原生惯性触控横向滑动，隐藏原生突兀滚动条，且在选中专题变化时自动以平滑动画将选中药丸居中滚动至视口内；
+  2. **轨 2：移动端/窄屏全景抽屉 (`AlgoCategoryDrawer.tsx`)**：具备双重直观唤起入口（横向栏尾部网格图标 `LayoutGrid` 与工作台顶部的“当前展示: [专题 ▾]”按钮）。内置题单切换（全部/Hot 100/随想录）、当前题单总体刷题进度条、全部专题卡片列表（包含完成度比例、百分比与微型进度条）、代码随想录总路线入口，点击任一专题即生效并自动顺滑关闭抽屉；
+  3. **动效与交互标准（Emil Kowalski 规范）**：严格贯彻硬件加速属性（仅 `transform` 与 `opacity`），坚决杜绝 GPU 渲染模糊的 `scale(0)`；抽屉入场采用 200ms `cubic-bezier(0.16, 1, 0.3, 1)`，出场采用 150ms `cubic-bezier(0.7, 0, 0.84, 0)`；按键均具备 `active:scale-[0.96] duration-100` 拟物微回弹；
+  4. **暗黑模式严格合规（Scheme A）**：零扩散白阴影，所有暗黑高光均采用 `0_0` 零虚化物理内线，WCAG AA 高对比度；
+  5. **彻底根治移动端侧边栏响应式断点非对称缺陷**：确保展开态与折叠态侧边栏在窄屏统一为 `hidden md:flex`，由移动端双轨机制全权接管，无论桌面端折叠状态为何，移动端均保持完整无损的专题导航能力。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及文件**：
+  - [`src/components/algorithm/AlgoCategoryDrawer.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoCategoryDrawer.tsx)：全新创建的移动端/窄屏全景拟物抽屉组件；
+  - [`src/components/algorithm/AlgoCatalog.tsx`](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoCatalog.tsx)：主界面集成横向药丸导航栏、双唤起入口、药丸自动居中滚动与侧边栏响应式断点统一；
+  - [`src/index.css`](file:///e:/workspace/muduo-study-console/src/index.css)：新增 `.scrollbar-none` 跨浏览器隐藏滚动条工具类；
+  - [`package.json`](file:///e:/workspace/muduo-study-console/package.json)：升级版本号至 `v6.15.0`，在 `npm test` 中接入全新自动化测试脚本；
+  - [`scripts/test_responsive_category_navigation.cjs`](file:///e:/workspace/muduo-study-console/scripts/test_responsive_category_navigation.cjs)：全新构建的 61 项端到端覆盖测试套件。
+
+#### 核心代码实现解析
+
+1. **全新全景专题抽屉组件 (`AlgoCategoryDrawer.tsx`)**：
+```tsx
+// 遵循 Emil Kowalski 动效生命周期与硬件加速
+export const AlgoCategoryDrawer: React.FC<AlgoCategoryDrawerProps> = ({
+  isOpen, onClose, viewTrack, onTrackChange, selectedCategory, onSelectCategory,
+  categories, categoryStats, trackCompletedCount, trackTotalCount, trackPct
+}) => {
+  const [isMounted, setIsMounted] = useState(isOpen);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsClosing(false);
+      setIsMounted(true);
+      const frameId = requestAnimationFrame(() => setIsVisible(true));
+      return () => cancelAnimationFrame(frameId);
+    } else {
+      setIsVisible(false);
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setIsMounted(false);
+        setIsClosing(false);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  // Esc 按键捕获监听与中文输入法防误触
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.isComposing || e.key === 'Process') return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        onCloseRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [isOpen]);
+
+  if (!isMounted) return null;
+
+  const transformStyle = isVisible
+    ? 'translateY(0) scale(1)'
+    : isClosing
+    ? 'translateY(12px) scale(0.98)'
+    : 'translateY(16px) scale(0.98)';
+```
+
+2. **横向药丸栏与选中药丸自动居中滚动 (`AlgoCatalog.tsx`)**：
+```tsx
+const pillRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+// 当选中的专题变化时，自动将选中的药丸平滑居中滚动至视口内
+useEffect(() => {
+  const el = pillRefs.current[selectedCategory];
+  if (el) {
+    el.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest' // 仅水平居中，严格杜绝垂直页面异常窜动
+    });
+  }
+}, [selectedCategory]);
+```
+
+3. **双唤起入口与响应式断点统一**：
+- 展开态侧边栏由 `<aside className="... p-4 flex flex-col ...">` 改为 `<aside className="... p-4 hidden md:flex flex-col ...">`，消除移动端强占屏幕问题；
+- 药丸栏尾部配置 `<LayoutGrid size={15} />` 展开按钮；
+- 工作台表头“当前展示: [专题 ▾]”升级为可交互按钮，点击均唤起 `AlgoCategoryDrawer`。
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题 1：桌面侧边栏折叠/展开状态在移动端产生断点非对称异常
+- **问题现象**：在旧版中，当 `isSidebarCollapsed = true` 时，折叠栏有 `hidden md:flex`，移动端看不到侧边栏；但当 `isSidebarCollapsed = false` 时，展开栏直接是 `flex flex-col`，没有 `hidden md:flex`！导致如果用户在桌面端保持展开状态后将窗口缩窄到手机屏幕，一个 320px 的巨大侧边栏强行挤占整个移动端视口；而如果折叠，则整个页面完全找不到任何专题切换入口。
+- **根本原因 (RCA)**：代码在实现 `isSidebarCollapsed` 状态分支时，开发者仅在折叠态的 `<aside>` 添加了 `hidden md:flex`，而展开态分支缺少响应式前缀，导致状态分支与响应式媒体查询耦合错乱。
+- **具体解法**：在展开态分支的 `<aside>` 同样加上 `hidden md:flex`，使桌面侧边栏在屏幕宽度 `< 768px`（`md` 断点）时始终完全隐藏，并将专题导航职责 100% 委托给移动端双轨机制（轨 1 药丸栏 + 轨 2 抽屉），无论用户本地缓存中的折叠标志为何值，移动端皆能优雅展示。
+
+#### 问题 2：移动端横向药丸过多导致激活项滚出视口
+- **问题现象**：代码随想录有 12 个标准专题，Hot 100 有 17 个章节，移动端单屏仅能容纳 3~4 个胶囊。当用户通过抽屉或从其他地方跳转选中了靠后的专题（如“图论”或“多维动态规划”）时，顶部的横向药丸栏仍然停留在最左侧，用户无法直观看到当前处于激活态的胶囊。
+- **根本原因 (RCA)**：原生水平滚动容器不会在状态改变时自发重定位滚动位置，单纯依赖用户手势拖拽成本过高。
+- **具体解法**：使用 `pillRefs` 为每个药丸挂载 DOM 引用，利用 `useEffect` 监听 `selectedCategory`，触发 `el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })`，既实现了激活药丸在水平方向优雅居中，又利用 `block: 'nearest'` 严密防护了垂直方向的滚动抖动。
+
+#### 问题 3：移动端原生滚动条破坏粘土拟物胶囊沉浸感
+- **问题现象**：部分安卓浏览器与 Windows 触控设备在横向滚动区域强制绘制一条细灰滚动条，切断了紫粉色渐变药丸的拟物光晕。
+- **根本原因 (RCA)**：不同渲染引擎（WebKit、Gecko、Trident/Blink）对滚动条隐藏的 CSS 标准属性不一致（需要同时覆盖 `::-webkit-scrollbar`、`scrollbar-width` 与 `-ms-overflow-style`）。
+- **具体解法**：在 `src/index.css` 建立专属 `.scrollbar-none` 工具类并配合 Tailwind 任意属性双重注入，彻底隐藏横向容器的突兀滚动条，同时保留流畅的原生手势滚动惯性。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 图 1：窄屏算法专题双轨响应式导航架构全景图
+```mermaid
+flowchart TD
+    subgraph ViewportRouting ["视口断点与导航路由决策"]
+        VP{"当前视口宽度 >= 768px (md)?"}
+        VP -->|是: 桌面大屏| DesktopLayout["桌面端侧边栏模式 (展开 320px / 折叠 64px)"]
+        VP -->|否: 移动端/窄分屏| MobileDualTrack["移动端双轨响应式导航矩阵"]
+    end
+
+    subgraph MobileDualTrack ["移动端双轨响应式导航矩阵 (方案 A)"]
+        subgraph Track1 ["轨 1: 横向平滑滚动粘土药丸栏 (0-Click 即时切换)"]
+            T1A["全部 (234) 胶囊"]
+            T1B["各专题胶囊 (带完成度/总题数)"]
+            T1C["自动居中滚动引擎 (scrollIntoView: inline center)"]
+            T1A -->|点击| SwitchCatDirect["直接更新 selectedCategory<br/>无需弹窗, 0 点击阻隔"]
+            T1B -->|点击| SwitchCatDirect
+            SwitchCatDirect --> T1C
+        end
+
+        subgraph Triggers ["双向抽屉唤起触发器"]
+            Trig1["药丸栏尾部网格图标 (LayoutGrid)"]
+            Trig2["工作台表头: 当前展示 [专题名称 ▾]"]
+        end
+
+        subgraph Track2 ["轨 2: 全景拟物抽屉 (AlgoCategoryDrawer)"]
+            D1["三题单即时切换: 全部 (234) / Hot 100 / 随想录"]
+            D2["题单总体刷题百分比进度条"]
+            D3["全专题明细卡片 (完成数、百分比、色彩微进度条)"]
+            D4["代码随想录总路线学习指南"]
+            D1 --> D2
+            D2 --> D3
+            D3 -->|点击任一专题| ApplyAndClose["应用专题选择 + 平滑关闭抽屉"]
+        end
+
+        Trig1 -->|触发 isOpen=true| Track2
+        Trig2 -->|触发 isOpen=true| Track2
+    end
+```
+- **图 1 机制深度解析**：
+  1. **核心流向拆解**：系统根据 `md` 媒体查询将桌面大屏与移动窄屏无缝分流。移动端全面激活方案 A 双轨矩阵：轨 1 作为高频轻量入口，直接在表头横向陈列带进度角标的粘土胶囊，点击即可 0-Click 瞬间切题；轨 2 作为全景深度入口，通过药丸栏网格图标与“当前展示: [专题 ▾]”双触发源唤起全量抽屉；
+  2. **条件决策与协同**：当用户在全景抽屉切换不同题单（如从 Hot 100 切换到随想录）并选择某专题后，关闭抽屉并同步刷新主界面与轨 1 药丸栏；选中的新专题通过居中滚动引擎平滑滑动到药丸栏正中，实现双轨数据与视觉的严丝合缝；
+  3. **底层架构收益**：彻底终结了窄屏下算法分类不可用或被排版挤占的痛点，兼顾了高频“随手点”与低频“看全局”的双重学习诉求。
+
+---
+
+#### 图 2：胶囊药丸即时切换与抽屉全景导航时序交互图
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 移动端学员
+    participant PillBar as 轨 1: 水平药丸栏 (AlgoCatalog)
+    participant CenterList as 题单工作区 (AlgoCard 列表)
+    participant Drawer as 轨 2: 全景抽屉 (AlgoCategoryDrawer)
+    participant Storage as 本地存储 (localStorage)
+
+    Note over User, PillBar: 场景 A: 0-Click 即时快速切题
+    User->>PillBar: 左右滑动手势，点击「动态规划」胶囊
+    PillBar->>CenterList: setSelectedCategory('动态规划')
+    PillBar->>PillBar: pillRefs.current['动态规划'].scrollIntoView({ inline: 'center' })
+    CenterList->>CenterList: 瞬时过滤呈现动态规划 52 道题目
+
+    Note over User, Drawer: 场景 B: 打开全景抽屉查看总览并跨题单切题
+    User->>PillBar: 点击尾部 [LayoutGrid] 或表头「当前展示: 动态规划 ▾」
+    PillBar->>Drawer: setIsCategoryDrawerOpen(true)
+    Drawer->>Drawer: 启动 200ms cubic-bezier 入场动效 (translateY 16px -> 0, scale 0.98 -> 1)
+    Drawer-->>User: 呈现题单总体进度 38% 与 12 个专题完成详情
+    User->>Drawer: 点击「Hot 100」题单 Tab
+    Drawer->>Drawer: onTrackChange('hot100') -> 载入 17 个 Hot100 章节
+    User->>Drawer: 点击「滑动窗口」专题
+    Drawer->>PillBar: onSelectCategory('滑动窗口')
+    Drawer->>Drawer: 启动 150ms 出场退场动画 (translateY 0 -> 12px, opacity 0)
+    Drawer-->>User: 抽屉平滑卸载
+    PillBar->>PillBar: 自动居中滚动定位至「滑动窗口」胶囊
+    CenterList->>CenterList: 过滤呈现 Hot 100 滑动窗口真题
+```
+- **图 2 机制深度解析**：
+  1. **核心流向拆解**：时序图清晰展现了场景 A（轻量 0-Click）与场景 B（深度跨题单）两条生命链路。场景 A 中用户触控胶囊即时响应，零开销过滤题表并触发视口居中；场景 B 中用户呼出全景抽屉，完成跨题单多维切换并在关闭瞬间触发居中对齐；
+  2. **状态防抖与事件隔离**：全景抽屉在退场阶段保持挂载（150ms 卸载守护），避免 DOM 突兀消失闪烁；ESC 键在捕获阶段截获并阻断冒泡，杜绝父级弹窗连锁误关；
+  3. **底层架构收益**：完全在纯客户端内存与 React 响应式渲染层闭环，零异步等待，手感丝滑。
+
+---
+
+#### 图 3：Emil Kowalski 硬件加速抽屉生命周期状态机迁移图
+```mermaid
+stateDiagram-v2
+    [*] --> Closed: 初始未挂载 (isMounted=false, isVisible=false)
+
+    Closed --> Entering: 点击药丸栏网格图标 / 当前展示表头 (isOpen=true)
+    
+    state Entering {
+        [*] --> MountDOM: isMounted=true (准备初始帧)
+        MountDOM --> SetupStartStyle: translateY(16px) scale(0.98), opacity=0
+        SetupStartStyle --> RAF: requestAnimationFrame 下一帧
+        RAF --> ActiveTween: 切换至 translateY(0) scale(1), opacity=1
+        ActiveTween --> Settled: 200ms cubic-bezier(0.16, 1, 0.3, 1) 入场完成
+    }
+
+    Entering --> Open: 完全就绪 (交互活跃态)
+
+    state Open {
+        [*] --> Idle: 监听键盘 Esc 与外部点击
+        Idle --> SwitchingTrack: 点击题单 Tab (全部/Hot100/随想录)
+        SwitchingTrack --> Idle: 刷新对应分类进度矩阵
+        Idle --> SelectingCategory: 点击具体分类卡片
+    }
+
+    Open --> Exiting: 点击分类 / 按 Esc / 点击遮罩 / 点击右上角 X
+    
+    state Exiting {
+        [*] --> ExitTween: translateY(12px) scale(0.98), opacity=0
+        ExitTween --> WaitExitTime: 150ms cubic-bezier(0.7, 0, 0.84, 0)
+        WaitExitTime --> CleanupDOM: isMounted=false, 卸载 DOM 节点
+    }
+
+    Exiting --> Closed: 彻底关闭，恢复静止基态
+```
+- **图 3 机制深度解析**：
+  1. **核心流向拆解**：状态机精确定义了抽屉从未挂载、准备首帧、rAF 启动过渡、完全就绪、内部交互、退出过渡到安全卸载的 7 阶段全流程；
+  2. **条件决策与异常分支**：坚决弃用 `scale(0)` 这种会导致 Chromium/WebKit 图层边缘亚像素失真与锯齿的破坏性变换，改用 `translateY(16px) scale(0.98) -> translateY(0) scale(1)` 这一微小且优雅的自然落差；
+  3. **底层架构收益**：通过 `willChange: 'transform, opacity'` 将图层提升至 GPU 独立合成分辨率图层，在 60fps / 120fps 高刷移动端屏幕上实现无掉帧流畅回弹。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+1. **0-Click 即时切换与深度全景抽屉双轨并存**：
+   - 绝大多数碎片化刷题只需横向一划一点，0 模态阻隔，极大提升做题心流效率；
+   - 需要查看整个题单全局进度或跨题单时，全景抽屉提供完整视野，两者互不干扰；
+2. **选中药丸智能居中微导向**：
+   - 解决移动端横向药丸栏“选了后半截专题不知道在哪里”的盲区，任何专题激活均自动平滑移至水平中央；
+3. **触感微回弹 (`active:scale-[0.96] duration-100`)**：
+   - 所有药丸、分类条目与操作按钮均融入细腻的物理按压回弹手感；
+4. **暗黑模式 Scheme A 纯净质感**：
+   - 彻底通过暗黑模式阴影巡检引擎检测，无扩散白色虚化阴影，WCAG AA 高对比度阅读无疲劳感；
+5. **双向无障碍与防误触防护**：
+   - 抽屉采用 `z-[60]` 安全置顶层级；
+   - 捕获阶段拦截 Esc 键并检测 `isComposing`，严密保护中文拼音输入不被意外截断。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### 自动化测试执行命令
+```bash
+# 进入 muduo-study-console 工程目录
+cd e:\workspace\muduo-study-console
+
+# 1. 运行包含全新响应式导航测试脚本的完整工程测试套件 (5 套全量自测)
+npm test
+
+# 2. 独立运行响应式专题导航测试引擎
+node scripts/test_responsive_category_navigation.cjs
+
+# 3. 运行生产静态编译与打包
+npm run build
+
+# 4. 发布至 GitHub Pages
+npm run deploy:gh-pages
+```
+
+#### 控制台真实测试输出断言
+```text
+> muduo-study-console@6.15.0 test
+> node scripts/inspect_dark_shadows.cjs && node scripts/test_carl_integration.cjs && node scripts/test_v6_11_sticky_and_dark_mode.cjs && node scripts/test_algo_note_feature.cjs && node scripts/test_responsive_category_navigation.cjs
+
+================================================================
+🔍 Scheme A Dark Mode High-Precision Shadow Inspection Engine
+================================================================
+Total white shadows found in day mode: 483
+Missing dark:shadow (uncovered day white shadows): 0
+Diffuse white blur (>0px) found in dark:shadow: 0
+
+🎉 ALL SCHEME A SHADOW SPEC CHECKS PASSED (0 missing, 0 diffuse blurs)!
+
+================================================================
+🚀 Running Code Thoughts (代码随想录) Carl Integration Verification
+================================================================
+...
+🎉 ALL 60 VERIFICATION CHECKS PASSED FLAWLESSLY!
+
+================================================================
+🚀 Running v6.11.0 Sticky Sidebars & Dark Mode Test Suite
+================================================================
+...
+🎉 ALL 6 VERIFICATION CHECKS PASSED FLAWLESSLY!
+
+================================================================
+📝 Running Algorithm Problem Note Feature Verification Engine
+================================================================
+...
+🎉 ALL 69 ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!
+
+================================================================
+📱 Running Responsive Category Navigation (Scheme A) Test Engine
+================================================================
+
+  ✅ [PASS] AlgoCatalog.tsx exists
+  ✅ [PASS] AlgoCategoryDrawer.tsx exists
+  ✅ [PASS] src/index.css exists
+
+Test 1: Verifying AlgoCategoryDrawer.tsx Component Architecture & Props...
+  ✅ [PASS] AlgoCategoryDrawerProps interface exported
+  ✅ [PASS] Props includes isOpen
+  ✅ [PASS] Props includes onClose
+  ✅ [PASS] Props includes viewTrack
+  ✅ [PASS] Props includes onTrackChange
+  ✅ [PASS] Props includes selectedCategory
+  ✅ [PASS] Props includes onSelectCategory
+  ✅ [PASS] Props includes categories
+  ✅ [PASS] Props includes categoryStats
+  ✅ [PASS] Props includes trackCompletedCount
+  ✅ [PASS] Props includes trackTotalCount
+  ✅ [PASS] Props includes trackPct
+  ✅ [PASS] AlgoCategoryDrawer component exported
+
+Test 2: Verifying Emil Kowalski Motion Specs & Accessibility in Drawer...
+  ✅ [PASS] High-priority z-[60] stacking context sits safely above app layers
+  ✅ [PASS] STRICTLY NO scale(0) to avoid GPU aliasing artifacts
+  ✅ [PASS] Entrance initial transform translateY(16px) scale(0.98) implemented
+  ✅ [PASS] Entrance resting transform translateY(0) scale(1) implemented
+  ✅ [PASS] Exit transform translateY(12px) scale(0.98) implemented
+  ✅ [PASS] Emil Kowalski entrance curve cubic-bezier(0.16, 1, 0.3, 1) implemented (200ms)
+  ✅ [PASS] Emil Kowalski exit curve cubic-bezier(0.7, 0, 0.84, 0) implemented (150ms)
+  ✅ [PASS] Hardware acceleration declared via willChange
+  ✅ [PASS] Tactile press squash feedback active:scale-[0.96] duration-100 implemented
+  ✅ [PASS] Protects Chinese IME composition so Escape does not prematurely close drawer
+  ✅ [PASS] Uses capture phase event listener to catch Esc key reliably
+  ✅ [PASS] Backdrop overlay handles click to close
+
+Test 3: Verifying Drawer Internal Features...
+  ✅ [PASS] Drawer supports switching to all track (234)
+  ✅ [PASS] Drawer supports switching to hot100 track
+  ✅ [PASS] Drawer supports switching to carl track
+  ✅ [PASS] Drawer includes quick master roadmap link
+  ✅ [PASS] Drawer includes 全部专题 option
+  ✅ [PASS] Drawer closes immediately upon selecting a category
+  ✅ [PASS] Drawer displays live category progress stats
+
+Test 4: Verifying Track 1 Horizontal Category Pill Bar in AlgoCatalog.tsx...
+  ✅ [PASS] Horizontal bar has md:hidden responsive container
+  ✅ [PASS] Horizontal bar has scrollbar-none to hide native scrollbars
+  ✅ [PASS] Horizontal bar has iOS momentum touch scrolling
+  ✅ [PASS] Horizontal bar has smooth scroll behavior
+  ✅ [PASS] Ref attached to 全部 pill for auto-scrolling
+  ✅ [PASS] Ref attached to category pills for auto-scrolling
+  ✅ [PASS] Implements scrollIntoView on selectedCategory change
+  ✅ [PASS] scrollIntoView centers the active pill horizontally
+  ✅ [PASS] scrollIntoView prevents unwanted vertical page displacement
+  ✅ [PASS] Selected pill styled with purple-to-indigo gradient
+  ✅ [PASS] Horizontal bar includes expand grid icon button (LayoutGrid)
+  ✅ [PASS] Grid button triggers category drawer opening
+
+Test 5: Verifying Interactive Drawer Triggers in AlgoCatalog.tsx...
+  ✅ [PASS] Imports ChevronDown icon from lucide-react
+  ✅ [PASS] Displays 当前展示 label
+  ✅ [PASS] Clicking 当前展示 triggers category drawer
+  ✅ [PASS] AlgoCatalog mounts AlgoCategoryDrawer
+
+Test 6: Verifying Mobile Sidebar Responsiveness Bug Fix...
+  ✅ [PASS] Collapsed sidebar has hidden md:flex
+  ✅ [PASS] Expanded sidebar has hidden md:flex (mobile collapse bug resolved!)
+
+Test 7: Verifying CSS Utility Class in src/index.css...
+  ✅ [PASS] .scrollbar-none class defined in src/index.css
+  ✅ [PASS] scrollbar-width: none defined for Firefox
+  ✅ [PASS] -ms-overflow-style: none defined for IE/Edge
+  ✅ [PASS] ::-webkit-scrollbar display: none defined for Chrome/Safari/Blink
+
+Test 8: Simulating Track & Category Selection Lifecycle...
+  ✅ [PASS] Drawer opens upon trigger
+  ✅ [PASS] Track switch in drawer updates track and resets category
+  ✅ [PASS] Selecting category updates selection and closes drawer
+  ✅ [PASS] Tapping horizontal pill immediately updates category with 0 modal opening
+
+================================================================
+🎉 ALL 61 RESPONSIVE CATEGORY NAVIGATION CHECKS PASSED FLAWLESSLY!
+================================================================
+```

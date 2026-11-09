@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ALGORITHM_LAB_CATALOG } from '../../data/algoDataset';
 import { AlgoCard } from './AlgoCard';
 import { CarlReaderDrawer } from './CarlReaderDrawer';
 import { AlgoNoteModal, getAlgoProblemKey } from './AlgoNoteModal';
+import { AlgoCategoryDrawer } from './AlgoCategoryDrawer';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { AlgoProblemNotesMap } from '../../types';
 import {
@@ -16,7 +17,9 @@ import {
   BookOpen,
   Compass,
   Code2,
-  StickyNote
+  StickyNote,
+  LayoutGrid,
+  ChevronDown
 } from 'lucide-react';
 
 export const STANDARD_CATEGORIES = [
@@ -38,6 +41,21 @@ export const AlgoCatalog: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [diffFilter, setDiffFilter] = useState<'all' | 'Easy' | 'Medium' | 'Hard'>('all');
   const [onlyNotesFilter, setOnlyNotesFilter] = useState(false);
+  const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
+  const pillRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  // Auto-scroll selected pill into view in the horizontal category bar
+  useEffect(() => {
+    const el = pillRefs.current[selectedCategory];
+    if (el) {
+      el.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest'
+      });
+    }
+  }, [selectedCategory]);
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>(
     'sidebar_collapsed_algo',
     false
@@ -287,7 +305,7 @@ export const AlgoCatalog: React.FC = () => {
           </div>
         </aside>
       ) : (
-        <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.06)] dark:border dark:border-white/[0.06] p-4 flex flex-col h-[calc(100vh-5.5rem)] sticky top-18 select-none transition-all duration-300 overflow-hidden">
+        <aside className="w-80 shrink-0 self-start rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.06)] dark:border dark:border-white/[0.06] p-4 hidden md:flex flex-col h-[calc(100vh-5.5rem)] sticky top-18 select-none transition-all duration-300 overflow-hidden">
           {/* Header & Track Selector */}
           <div className="pb-3 space-y-3 shrink-0">
             <div className="flex items-center justify-between">
@@ -459,9 +477,79 @@ export const AlgoCatalog: React.FC = () => {
       {/* ==================================================================== */}
       {/* Middle Column: Problem List Canvas with Scroll Container (Workbench) */}
       {/* ==================================================================== */}
-      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-6 sm:p-8 flex flex-col h-[calc(100vh-5.5rem)] w-full overflow-hidden">
+      <main className="flex-1 min-w-0 rounded-3xl bg-[#f4f7fb]/95 dark:bg-[#151922]/95 shadow-[8px_8px_18px_rgba(0,0,0,0.06),inset_4px_4px_8px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 sm:p-6 md:p-8 flex flex-col h-[calc(100vh-5.5rem)] w-full overflow-hidden">
         {/* Search & Filter Toolbar (Fixed Header) */}
         <div className="shrink-0 space-y-3 pb-3 border-b border-slate-200/60 dark:border-slate-800/60">
+          {/* Mobile / Narrow Screen Horizontal Clay Category Pill Bar (Track 1) */}
+          <div className="md:hidden flex items-center gap-2 pb-1 pt-0.5">
+            <div className="flex-1 overflow-x-auto scrollbar-none flex items-center gap-2 py-1 px-0.5 scroll-smooth [-webkit-overflow-scrolling:touch]">
+              {/* All Categories Pill */}
+              <button
+                ref={(el) => { pillRefs.current['all'] = el; }}
+                type="button"
+                onClick={() => setSelectedCategory('all')}
+                className={`px-3 py-1.5 rounded-2xl text-xs font-bold shrink-0 transition-transform duration-100 active:scale-[0.96] cursor-pointer flex items-center gap-1.5 ${
+                  selectedCategory === 'all'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(147,51,234,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(147,51,234,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)]'
+                    : 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <span>全部</span>
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                  selectedCategory === 'all'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400'
+                }`}>
+                  {trackTotalCount}
+                </span>
+              </button>
+
+              {/* Individual Category Pills */}
+              {categories.map((cat) => {
+                const isSelected = selectedCategory === cat;
+                const cStat = categoryStats[cat] || { total: 0, completed: 0, pct: 0 };
+                const isAllDone = cStat.total > 0 && cStat.completed === cStat.total;
+
+                return (
+                  <button
+                    key={cat}
+                    ref={(el) => { pillRefs.current[cat] = el; }}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-3 py-1.5 rounded-2xl text-xs font-bold shrink-0 transition-transform duration-100 active:scale-[0.96] cursor-pointer flex items-center gap-1.5 ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[3px_3px_8px_rgba(147,51,234,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(147,51,234,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)]'
+                        : 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {isAllDone && <CheckCircle2 size={12} className={isSelected ? 'text-white' : 'text-emerald-500'} />}
+                    <span>{cat}</span>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                      isSelected
+                        ? 'bg-white/20 text-white'
+                        : isAllDone
+                        ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400'
+                    }`}>
+                      {cStat.completed}/{cStat.total}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Expand Drawer Button */}
+            <button
+              type="button"
+              onClick={() => setIsCategoryDrawerOpen(true)}
+              className="p-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] active:scale-[0.96] transition-transform duration-100 cursor-pointer shrink-0"
+              title="展开全部分类抽屉"
+              aria-label="展开全部分类抽屉"
+            >
+              <LayoutGrid size={15} />
+            </button>
+          </div>
+
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             {/* Difficulty Chips (Clay Candy Pills) */}
             <div className="flex items-center gap-2 text-xs">
@@ -517,11 +605,20 @@ export const AlgoCatalog: React.FC = () => {
             </div>
           </div>
 
-          {/* Current Active Category Title */}
+          {/* Current Active Category Title & Drawer Trigger */}
           <div className="flex items-center justify-between text-xs text-slate-500 pt-1 font-medium">
-            <span>
-              当前展示: <strong className="text-slate-900 dark:text-white font-bold">{selectedCategory === 'all' ? '全部专题' : selectedCategory}</strong> ({displayedProblems.length} 道题目)
-            </span>
+            <button
+              type="button"
+              onClick={() => setIsCategoryDrawerOpen(true)}
+              className="flex items-center gap-1.5 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer group text-left"
+              title="点击打开全部分类抽屉"
+            >
+              <span>
+                当前展示: <strong className="text-slate-900 dark:text-white font-bold group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">{selectedCategory === 'all' ? '全部专题' : selectedCategory}</strong>
+              </span>
+              <ChevronDown size={14} className="text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-transform group-hover:translate-y-0.5" />
+              <span className="text-slate-400 font-normal">({displayedProblems.length} 道题目)</span>
+            </button>
           </div>
         </div>
 
@@ -766,6 +863,24 @@ export const AlgoCatalog: React.FC = () => {
             return next;
           });
         }}
+      />
+
+      {/* Mobile/Narrow Screen Category Drawer (Track 2) */}
+      <AlgoCategoryDrawer
+        isOpen={isCategoryDrawerOpen}
+        onClose={() => setIsCategoryDrawerOpen(false)}
+        viewTrack={viewTrack}
+        onTrackChange={(track) => {
+          setViewTrack(track);
+          setSelectedCategory('all');
+        }}
+        selectedCategory={selectedCategory}
+        onSelectCategory={(cat) => setSelectedCategory(cat)}
+        categories={categories}
+        categoryStats={categoryStats}
+        trackCompletedCount={trackCompletedCount}
+        trackTotalCount={trackTotalCount}
+        trackPct={trackPct}
       />
     </div>
   );
