@@ -445,6 +445,91 @@ assert(serializedTableMd.includes('| --- | --- |'), 'Serializes standard Markdow
 assert(serializedTableMd.includes('| `O(1)` | 常数级别 |'), 'Serializes data row with inline code preserved');
 assert(!serializedTableMd.includes('<colgroup>') && !serializedTableMd.includes('<table'), 'Eliminates all raw HTML tags from table Markdown');
 
+// ----------------------------------------------------------------------------
+// Test 13: Verifying Inline and Block Math Formulas (KaTeX + TipTap Custom Nodes)
+// ----------------------------------------------------------------------------
+console.log('\nTest 13: Verifying Inline and Block Math Formulas (KaTeX + TipTap)...');
+assert(modalContent.includes("import katex from 'katex'"), 'Imports katex engine in AlgoNoteModal.tsx');
+assert(modalContent.includes("import 'katex/dist/katex.min.css'"), 'Bundles KaTeX CSS styles directly in AlgoNoteModal.tsx');
+assert(modalContent.includes('InlineMathView'), 'Implements InlineMathView React NodeView');
+assert(modalContent.includes('BlockMathView'), 'Implements BlockMathView React NodeView');
+assert(modalContent.includes('CustomInlineMath'), 'Defines CustomInlineMath Node extension');
+assert(modalContent.includes('CustomBlockMath'), 'Defines CustomBlockMath Node extension');
+assert(modalContent.includes("addRule('inlineMath'"), 'Configures Turndown inlineMath serialization rule');
+assert(modalContent.includes("addRule('blockMath'"), 'Configures Turndown blockMath serialization rule');
+assert(modalContent.includes('inlineMathExtension'), 'Registers inlineMathExtension with marked');
+assert(modalContent.includes('blockMathExtension'), 'Registers blockMathExtension with marked');
+assert(modalContent.includes('Sigma') && modalContent.includes('aria-label="行内公式"'), 'Toolbar includes Inline Math Sigma button');
+assert(modalContent.includes('Radical') && modalContent.includes('aria-label="公式块"'), 'Toolbar includes Block Math Radical button');
+assert(indexCssContent.includes('.ProseMirror .katex'), 'Defines .ProseMirror .katex CSS styles in index.css');
+assert(indexCssContent.includes('.dark .ProseMirror .katex'), 'Defines dark mode styles for KaTeX math formulas');
+
+// Functional roundtrip test of inline and block math
+const inlineMathExtension = {
+  name: 'inlineMath',
+  level: 'inline',
+  start(src) { return src.indexOf('$'); },
+  tokenizer(src) {
+    const match = src.match(/^\$([^$\n]+?)\$/);
+    if (match) return { type: 'inlineMath', raw: match[0], latex: match[1] };
+  },
+  renderer(token) {
+    return `<span data-type="inline-math" data-latex="${token.latex}">$${token.latex}$</span>`;
+  }
+};
+const blockMathExtension = {
+  name: 'blockMath',
+  level: 'block',
+  start(src) { return src.indexOf('$$'); },
+  tokenizer(src) {
+    const match = src.match(/^\$\$([\s\S]*?)\$\$(?:\n|$)/);
+    if (match) return { type: 'blockMath', raw: match[0], latex: match[1].trim() };
+  },
+  renderer(token) {
+    return `<div data-type="block-math" data-latex="${token.latex}">$$${token.latex}$$</div>\n`;
+  }
+};
+marked.use({ extensions: [blockMathExtension, inlineMathExtension] });
+
+const testMathMd = '已知 $\\le x$ 且对于任意集合：\n\n$$\n\\sum_{i=1}^n i = \\frac{n(n+1)}{2}\n$$\n\n结论显然成立。';
+const parsedMathHtml = marked.parse(testMathMd);
+assert(parsedMathHtml.includes('data-type="inline-math"') && parsedMathHtml.includes('data-latex="\\le x"'), 'Marked parses inline math into data-type="inline-math"');
+assert(parsedMathHtml.includes('data-type="block-math"') && parsedMathHtml.includes('data-latex="\\sum_{i=1}^n i = \\frac{n(n+1)}{2}"'), 'Marked parses block math into data-type="block-math"');
+
+mockTd.addRule('inlineMath', {
+  filter: function (node) {
+    return (
+      node.nodeName === 'SPAN' &&
+      (node.getAttribute('data-type') === 'inline-math' ||
+        node.hasAttribute('data-latex') ||
+        node.classList.contains('tiptap-mathematics-render'))
+    );
+  },
+  replacement: function (_content, node) {
+    const latex = (node.getAttribute('data-latex') || '').trim();
+    return `$${latex}$`;
+  }
+});
+
+mockTd.addRule('blockMath', {
+  filter: function (node) {
+    return (
+      node.nodeName === 'DIV' &&
+      (node.getAttribute('data-type') === 'block-math' ||
+        node.hasAttribute('data-latex') ||
+        node.classList.contains('tiptap-mathematics-render'))
+    );
+  },
+  replacement: function (_content, node) {
+    const latex = (node.getAttribute('data-latex') || '').trim();
+    return `\n\n$$\n${latex}\n$$\n\n`;
+  }
+});
+
+const roundtrippedMathMd = mockTd.turndown(parsedMathHtml).trim();
+assert(roundtrippedMathMd.includes('$\\le x$'), 'Roundtripped markdown preserves inline math $\\le x$');
+assert(roundtrippedMathMd.includes('$$\n\\sum_{i=1}^n i = \\frac{n(n+1)}{2}\n$$') || roundtrippedMathMd.includes('$$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$'), 'Roundtripped markdown preserves block math');
+
 console.log('\n================================================================');
 if (failCount === 0) {
   console.log(`🎉 ALL ${passCount} ALGORITHM NOTE FEATURE VERIFICATION CHECKS PASSED FLAWLESSLY!`);

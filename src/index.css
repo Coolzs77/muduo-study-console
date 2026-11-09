@@ -560,5 +560,33 @@
   pointer-events: none;
 }
 
+/* ========================================================================== */
+/* KaTeX 数学公式排版规范与暗色模式优化                                       */
+/* ========================================================================== */
+.ProseMirror .katex {
+  font-size: 1.05em;
+  text-rendering: auto;
+}
+
+.dark .ProseMirror .katex {
+  color: #f1f5f9;
+}
+
+.ProseMirror .katex-display {
+  margin: 0.35rem 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+.dark .ProseMirror .katex-display {
+  color: #f8fafc;
+}
+
+.dark .ProseMirror .katex-html {
+  color: #f1f5f9;
+}
+
+
 
 

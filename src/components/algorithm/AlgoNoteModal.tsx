@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useEditor, EditorContent, NodeViewWrapper, NodeViewContent, ReactNodeViewRenderer } from '@tiptap/react';
 import type { ReactNodeViewProps } from '@tiptap/react';
-import { Extension } from '@tiptap/core';
+import { Extension, Node, InputRule, mergeAttributes } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import hljs from 'highlight.js';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 import StarterKit from '@tiptap/starter-kit';
 import { CodeBlock } from '@tiptap/extension-code-block';
 import TaskList from '@tiptap/extension-task-list';
@@ -38,7 +40,10 @@ import {
   List,
   Table as TableIcon,
   Minus,
-  Terminal
+  Terminal,
+  Sigma,
+  Radical,
+  Pencil
 } from 'lucide-react';
 
 export const getAlgoProblemKey = (problem: AlgoProblem | null | undefined): string => {
@@ -104,6 +109,93 @@ turndownService.addRule('tiptapTable', {
     return '\n\n' + lines.join('\n') + '\n\n';
   }
 });
+
+// Configure Inline Math serialization rule ($...$)
+turndownService.addRule('inlineMath', {
+  filter: function (node) {
+    return (
+      node.nodeName === 'SPAN' &&
+      (node.getAttribute('data-type') === 'inline-math' ||
+        node.hasAttribute('data-latex') ||
+        node.classList.contains('tiptap-mathematics-render--inline'))
+    );
+  },
+  replacement: function (_content, node) {
+    const latex = (node.getAttribute('data-latex') || '').trim();
+    return `$${latex}$`;
+  }
+});
+
+// Configure Block Math serialization rule ($$...$$)
+turndownService.addRule('blockMath', {
+  filter: function (node) {
+    return (
+      node.nodeName === 'DIV' &&
+      (node.getAttribute('data-type') === 'block-math' ||
+        node.hasAttribute('data-latex') ||
+        node.classList.contains('tiptap-mathematics-render'))
+    );
+  },
+  replacement: function (_content, node) {
+    const latex = (node.getAttribute('data-latex') || '').trim();
+    return `\n\n$$\n${latex}\n$$\n\n`;
+  }
+});
+
+// Configure marked extensions for inline ($...$) and block ($$...$$) math
+const inlineMathExtension = {
+  name: 'inlineMath',
+  level: 'inline' as const,
+  start(src: string) {
+    return src.indexOf('$');
+  },
+  tokenizer(src: string) {
+    const match = src.match(/^\$([^$\n]+?)\$/);
+    if (match) {
+      return {
+        type: 'inlineMath',
+        raw: match[0],
+        latex: match[1]
+      };
+    }
+  },
+  renderer(token: any) {
+    const escaped = (token.latex || '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return `<span data-type="inline-math" data-latex="${escaped}">$${escaped}$</span>`;
+  }
+};
+
+const blockMathExtension = {
+  name: 'blockMath',
+  level: 'block' as const,
+  start(src: string) {
+    return src.indexOf('$$');
+  },
+  tokenizer(src: string) {
+    const match = src.match(/^\$\$([\s\S]*?)\$\$(?:\n|$)/);
+    if (match) {
+      return {
+        type: 'blockMath',
+        raw: match[0],
+        latex: match[1].trim()
+      };
+    }
+  },
+  renderer(token: any) {
+    const escaped = (token.latex || '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return `<div data-type="block-math" data-latex="${escaped}">$$${escaped}$$</div>\n`;
+  }
+};
+
+marked.use({ extensions: [blockMathExtension, inlineMathExtension] });
 
 /**
  * Normalize code block language tag matching CodeBlock.tsx behavior
@@ -349,7 +441,7 @@ const TabIndent = Extension.create({
   addKeyboardShortcuts() {
     return {
       Tab: ({ editor }) => {
-        if (editor.isActive('codeBlock') || editor.isActive('table')) {
+        if (editor.isActive('codeBlock') || editor.isActive('table') || editor.isActive('blockMath')) {
           return false;
         }
         if (editor.isActive('taskItem')) {
@@ -363,7 +455,7 @@ const TabIndent = Extension.create({
         return editor.commands.insertContent('  ');
       },
       'Shift-Tab': ({ editor }) => {
-        if (editor.isActive('codeBlock') || editor.isActive('table')) {
+        if (editor.isActive('codeBlock') || editor.isActive('table') || editor.isActive('blockMath')) {
           return false;
         }
         if (editor.isActive('taskItem')) {
@@ -391,6 +483,402 @@ const TabIndent = Extension.create({
       },
     };
   },
+});
+
+/**
+ * Custom InlineMath NodeView with interactive click-to-edit LaTeX and real-time KaTeX rendering
+ */
+export const InlineMathView: React.FC<ReactNodeViewProps> = ({
+  node,
+  updateAttributes,
+  deleteNode,
+  selected
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [latexValue, setLatexValue] = useState(node.attrs.latex || '');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setLatexValue(node.attrs.latex || '');
+  }, [node.attrs.latex]);
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
+
+  const handleSave = () => {
+    const trimmed = latexValue.trim();
+    if (!trimmed) {
+      deleteNode();
+    } else {
+      updateAttributes({ latex: trimmed });
+      setIsEditing(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setLatexValue(node.attrs.latex || '');
+      setIsEditing(false);
+    }
+  };
+
+  let renderedKatex = '';
+  try {
+    renderedKatex = katex.renderToString(node.attrs.latex || '', {
+      throwOnError: false,
+      displayMode: false
+    });
+  } catch {
+    renderedKatex = `<span class="text-rose-500 font-mono text-xs">${node.attrs.latex || ''}</span>`;
+  }
+
+  return (
+    <NodeViewWrapper as="span" data-type="inline-math" data-latex={node.attrs.latex} className="inline-flex items-center align-middle mx-1 select-none">
+      {isEditing ? (
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 shadow-xs text-xs font-mono">
+          <span className="text-amber-600 dark:text-amber-400 font-bold select-none">$</span>
+          <input
+            ref={inputRef}
+            type="text"
+            value={latexValue}
+            onChange={(e) => setLatexValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSave}
+            className="bg-transparent border-none outline-none font-mono text-xs text-slate-800 dark:text-slate-100 min-w-[50px] max-w-[240px]"
+            placeholder="LaTeX, 如 \le x"
+          />
+          <span className="text-amber-600 dark:text-amber-400 font-bold select-none">$</span>
+        </span>
+      ) : (
+        <span
+          onClick={() => setIsEditing(true)}
+          title="单击编辑公式 (LaTeX)"
+          className={`inline-flex items-center px-1.5 py-0.5 rounded-md cursor-pointer transition-all duration-150 border ${
+            selected
+              ? 'ring-2 ring-violet-500 border-violet-400 bg-violet-50/80 dark:bg-violet-950/40'
+              : 'border-slate-200/90 dark:border-slate-700/80 hover:border-violet-300 dark:hover:border-violet-600 bg-slate-100/70 dark:bg-slate-800/60 hover:bg-violet-50/50 dark:hover:bg-violet-950/30'
+          }`}
+          dangerouslySetInnerHTML={{ __html: renderedKatex }}
+        />
+      )}
+    </NodeViewWrapper>
+  );
+};
+
+/**
+ * Custom BlockMath NodeView with interactive editing, KaTeX live preview, and one-click copy
+ */
+export const BlockMathView: React.FC<ReactNodeViewProps> = ({
+  node,
+  updateAttributes,
+  deleteNode,
+  selected
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [latexValue, setLatexValue] = useState(node.attrs.latex || '');
+  const [copied, setCopied] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setLatexValue(node.attrs.latex || '');
+  }, [node.attrs.latex]);
+
+  useEffect(() => {
+    if (isEditing) {
+      textareaRef.current?.focus();
+    }
+  }, [isEditing]);
+
+  const handleSave = () => {
+    const trimmed = latexValue.trim();
+    if (!trimmed) {
+      deleteNode();
+    } else {
+      updateAttributes({ latex: trimmed });
+      setIsEditing(false);
+    }
+  };
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const text = node.attrs.latex || '';
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  let renderedKatex = '';
+  try {
+    renderedKatex = katex.renderToString(node.attrs.latex || '', {
+      throwOnError: false,
+      displayMode: true
+    });
+  } catch {
+    renderedKatex = `<div class="text-rose-500 font-mono text-xs py-2 text-center">${node.attrs.latex || ''}</div>`;
+  }
+
+  return (
+    <NodeViewWrapper as="div" data-type="block-math" data-latex={node.attrs.latex} className="my-3.5 group/math">
+      {isEditing ? (
+        <div className="rounded-2xl p-3 bg-slate-50 dark:bg-slate-900 border-2 border-violet-400 dark:border-violet-600 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span className="flex items-center gap-1 text-violet-600 dark:text-violet-400 font-bold">
+              <Sigma size={14} /> LaTeX 公式块编辑 ($$)
+            </span>
+            <span className="text-[11px] text-slate-400 font-mono">Ctrl+Enter 完成 · Esc 取消</span>
+          </div>
+          <textarea
+            ref={textareaRef}
+            rows={3}
+            value={latexValue}
+            onChange={(e) => setLatexValue(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                handleSave();
+              } else if (e.key === 'Escape') {
+                e.preventDefault();
+                setLatexValue(node.attrs.latex || '');
+                setIsEditing(false);
+              }
+            }}
+            className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-950 font-mono text-xs sm:text-sm text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 outline-none focus:ring-1 focus:ring-violet-500 resize-y"
+            placeholder="输入 LaTeX 表达式, 例如: \sum_{i=1}^n i = \frac{n(n+1)}{2}"
+          />
+          {latexValue.trim() && (
+            <div className="pt-1 border-t border-slate-200/80 dark:border-slate-800 overflow-x-auto py-2 text-center">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: (() => {
+                    try {
+                      return katex.renderToString(latexValue.trim(), { throwOnError: false, displayMode: true });
+                    } catch {
+                      return '<span class="text-rose-500 text-xs font-mono">公式语法有误</span>';
+                    }
+                  })()
+                }}
+              />
+            </div>
+          )}
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                setLatexValue(node.attrs.latex || '');
+                setIsEditing(false);
+              }}
+              className="px-2.5 py-1 text-xs rounded-lg text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+            >
+              取消
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              className="px-3 py-1 text-xs font-medium rounded-lg bg-violet-600 hover:bg-violet-700 text-white shadow-xs transition-colors cursor-pointer"
+            >
+              完成
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div
+          onClick={() => setIsEditing(true)}
+          className={`relative rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all duration-200 border bg-slate-50/90 dark:bg-slate-900/80 ${
+            selected
+              ? 'ring-2 ring-violet-500 border-violet-400 shadow-md'
+              : 'border-slate-200/80 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 shadow-xs hover:shadow-sm'
+          }`}
+        >
+          {/* Quick action floating buttons */}
+          <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover/math:opacity-100 transition-opacity duration-150 z-10">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditing(true);
+              }}
+              className="p-1 rounded-md bg-white dark:bg-slate-800 text-slate-500 hover:text-violet-600 border border-slate-200 dark:border-slate-700 shadow-xs cursor-pointer"
+              title="编辑公式"
+            >
+              <Pencil size={12} />
+            </button>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="p-1 rounded-md bg-white dark:bg-slate-800 text-slate-500 hover:text-violet-600 border border-slate-200 dark:border-slate-700 shadow-xs cursor-pointer"
+              title="复制 LaTeX"
+            >
+              {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteNode();
+              }}
+              className="p-1 rounded-md bg-white dark:bg-slate-800 text-slate-500 hover:text-rose-600 border border-slate-200 dark:border-slate-700 shadow-xs cursor-pointer"
+              title="删除公式"
+            >
+              <Trash2 size={12} />
+            </button>
+          </div>
+          <div
+            className="overflow-x-auto py-1 scrollbar-none"
+            dangerouslySetInnerHTML={{ __html: renderedKatex }}
+          />
+        </div>
+      )}
+    </NodeViewWrapper>
+  );
+};
+
+export const CustomInlineMath = Node.create({
+  name: 'inlineMath',
+  group: 'inline',
+  inline: true,
+  atom: true,
+  selectable: true,
+  draggable: false,
+
+  addAttributes() {
+    return {
+      latex: {
+        default: '',
+        parseHTML: (element) => element.getAttribute('data-latex') || '',
+        renderHTML: (attributes) => ({
+          'data-latex': attributes.latex,
+          'data-type': 'inline-math'
+        })
+      }
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'span[data-type="inline-math"]'
+      },
+      {
+        tag: 'span[data-latex]'
+      }
+    ];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    const latex = HTMLAttributes['data-latex'] || '';
+    return [
+      'span',
+      mergeAttributes(HTMLAttributes, { 'data-type': 'inline-math' }),
+      `$${latex}$`
+    ];
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(InlineMathView);
+  },
+
+  addInputRules() {
+    return [
+      new InputRule({
+        find: /(?:^|\s)\$([^$\n]+)\$$/,
+        handler: ({ state, range, match }) => {
+          const latex = match[1];
+          if (!latex || !latex.trim()) return null;
+          const { tr } = state;
+          const fullMatch = match[0];
+          const offset = fullMatch.startsWith(' ') ? 1 : 0;
+          const start = range.from + offset;
+          const end = range.to;
+          tr.replaceWith(start, end, this.type.create({ latex: latex.trim() }));
+        }
+      })
+    ];
+  }
+});
+
+export const CustomBlockMath = Node.create({
+  name: 'blockMath',
+  group: 'block',
+  atom: true,
+  selectable: true,
+  draggable: false,
+
+  addAttributes() {
+    return {
+      latex: {
+        default: '',
+        parseHTML: (element) => element.getAttribute('data-latex') || '',
+        renderHTML: (attributes) => ({
+          'data-latex': attributes.latex,
+          'data-type': 'block-math'
+        })
+      }
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'div[data-type="block-math"]'
+      },
+      {
+        tag: 'div[data-latex]'
+      }
+    ];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    const latex = HTMLAttributes['data-latex'] || '';
+    return [
+      'div',
+      mergeAttributes(HTMLAttributes, { 'data-type': 'block-math' }),
+      `$$${latex}$$`
+    ];
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(BlockMathView);
+  },
+
+  addInputRules() {
+    return [
+      new InputRule({
+        find: /^\$\$([^$]+)\$\$$/,
+        handler: ({ state, range, match }) => {
+          const latex = match[1];
+          if (!latex || !latex.trim()) return null;
+          const { tr } = state;
+          const $from = state.doc.resolve(range.from);
+          const replacementRange =
+            $from.depth > 0 &&
+            $from.parent.isTextblock &&
+            range.from === $from.start() &&
+            range.to === $from.end() &&
+            $from.node(-1).canReplaceWith($from.index(-1), $from.indexAfter(-1), this.type)
+              ? { from: $from.before(), to: $from.after() }
+              : range;
+          tr.replaceWith(replacementRange.from, replacementRange.to, this.type.create({ latex: latex.trim() }));
+        }
+      })
+    ];
+  }
 });
 
 export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
@@ -475,6 +963,8 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       TableRow,
       TableHeader,
       TableCell,
+      CustomInlineMath,
+      CustomBlockMath,
       TabIndent
     ],
     editorProps: {
@@ -1077,7 +1567,51 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
               <TableIcon size={14} />
             </button>
 
-            {/* 12. Divider Line (Slate) */}
+            {/* 12. Inline Math (Violet Sigma) */}
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                if (!editor) return;
+                const { from, to } = editor.state.selection;
+                const selectedText = editor.state.doc.textBetween(from, to).trim();
+                const latex = selectedText || '\\le x';
+                editor.chain().focus().insertContent({ type: 'inlineMath', attrs: { latex } }).run();
+              }}
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
+                editor?.isActive('inlineMath')
+                  ? 'bg-violet-100 dark:bg-violet-900/60 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50/70 dark:hover:bg-violet-950/40'
+              }`}
+              title="行内公式 (LaTeX，快捷键 $公式$ 或单击插入 \le x)"
+              aria-label="行内公式"
+            >
+              <Sigma size={14} />
+            </button>
+
+            {/* 13. Block Math (Purple Radical) */}
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                if (!editor) return;
+                const { from, to } = editor.state.selection;
+                const selectedText = editor.state.doc.textBetween(from, to).trim();
+                const latex = selectedText || '\\sum_{i=1}^n i = \\frac{n(n+1)}{2}';
+                editor.chain().focus().insertContent({ type: 'blockMath', attrs: { latex } }).run();
+              }}
+              className={`p-1.5 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
+                editor?.isActive('blockMath')
+                  ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700 font-bold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50/70 dark:hover:bg-purple-950/40'
+              }`}
+              title="公式块 (独立展示公式，快捷键 $$公式$$ 或单击插入)"
+              aria-label="公式块"
+            >
+              <Radical size={14} />
+            </button>
+
+            {/* 14. Divider Line (Slate) */}
             <button
               type="button"
               onMouseDown={(e) => e.preventDefault()}

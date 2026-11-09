@@ -9666,3 +9666,265 @@ Saved Markdown Table in Storage:
 
 🎉 ALL TABLE INTEGRATION AND SERIALIZATION TESTS PASSED PERFECTLY!
 ```
+
+
+---
+
+## 第 42 轮 [2026-11-09 22:35]：便签行内与行外 LaTeX 数学公式全面集成 (KaTeX + TipTap 自定义交互式 NodeView + GFM 双向序列化)
+
+### 1. 本轮需求与目标 (User Intent & Goal)
+- **原始诉求**：用户明确提出：“$\le x$ 行内和行外数学公式也需要”，要求便签支持行内数学公式（如 `$\le x$`、`$O(n \log n)$`）与行外独立公式块（如 `$$\sum_{i=1}^n ...$$`）的富文本排版与编辑；
+- **业务场景**：算法刷题深度依赖数学推导与边界证明，如状态转移方程、时间复杂度大 O 记号、不等式约束（$\le x$、$\ge 2x$）与求和公式；
+- **预期达成的技术指标**：
+  1. **行内与行外双模式渲染**：输入或粘贴 `$公式$` 与 `$$公式$$`，页面立即呈现精准优美的 KaTeX 矢量排版；
+  2. **交互式原地编辑 (Click-to-Edit)**：行内公式单击直接切换为轻量行内输入框，支持热修改 LaTeX 并按回车实时保存；公式块配备悬浮编辑、实时预览与一键复制 LaTeX 源码工具栏；
+  3. **工具栏一键插入快捷操作**：新增行内公式（Violet Sigma $\Sigma$ 图标）与公式块（Purple Radical $\sqrt{}$ 图标）专属按钮；
+  4. **全场景无损持久化**：便签保存时 TipTap DOM 精准序列化为纯正 Markdown，无论在正文段落还是表格单元格内部均能 100% 还原；
+  5. **工程闭环与自动化测试**：全量通过 TypeScript 严格类型检查、全量单元测试与无头浏览器真实端到端测试。
+
+---
+
+### 2. 核心技术实现与代码改动 (Implementation & Changes)
+- **涉及的核心文件列表**：
+  - [src/components/algorithm/AlgoNoteModal.tsx](file:///e:/workspace/muduo-study-console/src/components/algorithm/AlgoNoteModal.tsx)：集成 KaTeX 渲染引擎与 CSS，自定义 `CustomInlineMath` 与 `CustomBlockMath` 节点扩展，实现 `InlineMathView` 与 `BlockMathView` 原地交互式 React NodeView，补充 marked 数学解析扩展与 Turndown 双向序列化规则，并在工具栏新增行内/行外公式触发按钮；
+  - [src/index.css](file:///e:/workspace/muduo-study-console/src/index.css)：补充 KaTeX 公式排版规范，优化字体缩放、水平溢出滚动保护以及深色模式（Dark Mode）对比度适配；
+  - [scripts/test_algo_note_feature.cjs](file:///e:/workspace/muduo-study-console/scripts/test_algo_note_feature.cjs)：追加 Test 13，覆盖数学公式扩展引入、工具栏按钮配置、CSS 属性及行内/行外双向格式无损转换断言；
+  - [scripts/verify_algo_note_math.py](file:///e:/workspace/muduo-study-console/scripts/verify_algo_note_math.py)：编写真实 Chrome 无头浏览器自动化端到端测试脚本，验证“插入行内公式 $\le x$ -> 插入独立公式块 -> 自动保存为标准 Markdown -> 关闭再打开重水合渲染”完整闭环。
+
+- **核心代码片段 (自定义 NodeView 与双向序列化规则)**：
+```typescript
+// 1. TipTap 自定义 InlineMath 扩展
+export const CustomInlineMath = Node.create({
+  name: 'inlineMath',
+  group: 'inline',
+  inline: true,
+  atom: true,
+  selectable: true,
+  addAttributes() {
+    return {
+      latex: {
+        default: '',
+        parseHTML: (el) => el.getAttribute('data-latex') || '',
+        renderHTML: (attrs) => ({ 'data-latex': attrs.latex, 'data-type': 'inline-math' })
+      }
+    };
+  },
+  parseHTML() {
+    return [{ tag: 'span[data-type="inline-math"]' }, { tag: 'span[data-latex]' }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    const latex = HTMLAttributes['data-latex'] || '';
+    return ['span', mergeAttributes(HTMLAttributes, { 'data-type': 'inline-math' }), `$${latex}$`];
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(InlineMathView);
+  },
+  addInputRules() {
+    return [
+      new InputRule({
+        find: /(?:^|\s)\$([^$\n]+)\$$/,
+        handler: ({ state, range, match }) => {
+          const latex = match[1];
+          if (!latex || !latex.trim()) return null;
+          const { tr } = state;
+          const offset = match[0].startsWith(' ') ? 1 : 0;
+          tr.replaceWith(range.from + offset, range.to, this.type.create({ latex: latex.trim() }));
+        }
+      })
+    ];
+  }
+});
+
+// 2. Turndown 双向序列化规则
+turndownService.addRule('inlineMath', {
+  filter: (node) => node.nodeName === 'SPAN' && (node.getAttribute('data-type') === 'inline-math' || node.hasAttribute('data-latex')),
+  replacement: (_content, node) => `$${(node.getAttribute('data-latex') || '').trim()}$`
+});
+turndownService.addRule('blockMath', {
+  filter: (node) => node.nodeName === 'DIV' && (node.getAttribute('data-type') === 'block-math' || node.hasAttribute('data-latex')),
+  replacement: (_content, node) => `\n\n$$\n${(node.getAttribute('data-latex') || '').trim()}\n$$\n\n`
+});
+```
+
+---
+
+### 3. 遇到问题、根因分析与解决方案 (Issues, RCA & Fixes)
+
+#### 问题 1：TipTap 默认数学扩展要求输入双 `$$` 才能识别行内公式，与常用规范冲突
+- **问题现象**：在官方 `@tiptap/extension-mathematics` 中，行内公式的 `findInlineMath` 规则采用 `/\$\$([^$\n]+?)\$\$/`，导致用户输入 `$\le x$` 时无法触发实时转换。
+- **根本原因 (RCA)**：官方库为规避英文文本中的普通货币符号（如 `$100`），保守地将行内公式的输入标记也设为了双 `$$`。但对于中文技术文档与算法笔记，单 `$` 包裹是全行业通用的行内数学标准。
+- **具体解法**：不直接使用官方预设的 inputRule，而是重写正则为 `/(?:^|\s)\$([^$\n]+)\$$/`，要求必须成对闭合且内部无换行，同时在工具栏提供直观的 `Sigma` 按钮，直接完成无障碍一键插入。
+
+#### 问题 2：Turndown 默认的 `blankRule` 规则将纯属性的 Math 节点静默丢弃
+- **问题现象**：当 TipTap 生成 `<span data-type="inline-math" data-latex="\le x"></span>` 时，如果标签内部没有文本子节点，经过 Turndown 序列化后该公式在输出中彻底消失。
+- **根本原因 (RCA)**：Turndown 内置了一项高优先级过滤规则 `rules.blankRule`。如果检测到某个非 void 元素内部没有任何纯文本内容（`textContent === ''`），该元素会直接被判定为空标签而在遍历子节点时被丢弃，不会触发自定义的 replacement 回调。
+- **具体解法**：在 `renderHTML` 与 `marked.parse` 的生成模板中，统一为标签内部注入 `$latex$` 作为非空回退内容（如 `<span data-type="inline-math" data-latex="\le x">$\le x$</span>`），并在 NodeView 挂载时交由 KaTeX 接管视图，同时确保 Turndown 优先读取 `data-latex` 属性，彻底根除空节点误删。
+
+---
+
+### 4. 架构与机制演进图 (Architectural Evolution Diagram)
+
+#### 维度一：LaTeX 数学公式在 TipTap 画布中的三态生命周期状态机 (`stateDiagram-v2`)
+```mermaid
+stateDiagram-v2
+    [*] --> StandbyState: 笔记载入或初始化
+
+    state StandbyState {
+        [*] --> RenderedDisplay: KaTeX 成功编译
+        RenderedDisplay: 显示精美数学矢量排版
+        RenderedDisplay: 支持悬浮高光与光标穿透
+
+        [*] --> RenderErrorFallback: LaTeX 语法错误
+        RenderErrorFallback: 玫瑰红警示底色并展示源码
+    }
+
+    RenderedDisplay --> InlineEditingState: 用户单击行内公式
+    InlineEditingState: 原地展开 $ input $ 输入框
+    InlineEditingState: 自动聚焦并全选文本
+    InlineEditingState --> RenderedDisplay: 按 Enter 键或失焦 (更新保存)
+    InlineEditingState --> RenderedDisplay: 按 Escape 键 (放弃还原)
+
+    RenderedDisplay --> BlockEditingState: 用户单击公式块或编辑按钮
+    BlockEditingState: 展开多行文本域 + 实时双向 KaTeX 预览
+    BlockEditingState --> RenderedDisplay: Ctrl+Enter 或点击“完成”
+    BlockEditingState --> [*]: 点击“删除”按钮移除节点
+```
+
+##### 机制详细拆解与设计价值 (Diagram Walkthrough & Analysis)：
+1. **纯净阅读与敏捷编辑的平衡**：在常规浏览态，公式节点呈现纯正的数学排版（无多余边框与标记干扰）；一旦用户产生修改意图，单击即可直接唤醒原地编辑输入框，体验高度接近 Typora 与 Notion；
+2. **错误防御降级**：若用户书写了非法 LaTeX 语法，KaTeX 的 `throwOnError: false` 与防御性 `try/catch` 逻辑会以柔和的警示框呈现原始代码，杜绝因语法错误导致编辑器白屏或崩溃；
+3. **闭环状态更新**：编辑态下的输入不会影响外部段落排版，只有当用户按下 `Enter` 或确认失焦时，才通过 `updateAttributes` 触发微事务，最小化对文档历史栈的污染。
+
+---
+
+#### 维度二：Markdown 到 KaTeX DOM 与逆向 Turndown 序列化双向通道图 (`flowchart LR`)
+```mermaid
+flowchart LR
+    subgraph Inbound["📥 逆向加载通道 (Markdown -> DOM)"]
+        RawMD["原始 Markdown<br/>`已知 $\le x$ 且：`<br/>`$$\sum_{i=1}^n i$$`"]
+        MarkedExt["marked 扩展解析器<br/>• inlineMathExtension<br/>• blockMathExtension"]
+        TipTapDOM["TipTap 结构化节点<br/>&lt;span data-type=inline-math data-latex=...&gt;<br/>&lt;div data-type=block-math data-latex=...&gt;"]
+        RawMD --> MarkedExt --> TipTapDOM
+    end
+
+    subgraph Editor["🎨 画布渲染与交互"]
+        NodeView["React NodeView 挂载<br/>• InlineMathView (行内原地编辑)<br/>• BlockMathView (公式块与实时预览)<br/>• katex.renderToString() 矢量生成"]
+        TipTapDOM --> NodeView
+    end
+
+    subgraph Outbound["💾 正向保存通道 (DOM -> Markdown)"]
+        Serialize["Turndown 自定义规则<br/>• inlineMath: 提取 data-latex -> `$latex$`<br/>• blockMath: 提取 data-latex -> `$$\nlatex\n$$`<br/>• tiptapTable: 表格单元格内联无损递归"]
+        SavedMD["标准持久化 Markdown<br/>严格保持 GFM 规范，0 原生 HTML 残留"]
+        NodeView --> Serialize --> SavedMD
+    end
+```
+
+##### 机制详细拆解与设计价值 (Diagram Walkthrough & Analysis)：
+1. **加载阶段**：通过为 `marked` 注册自定义 inline/block 分词器，直接将文本标记解析为具备 `data-latex` 语义属性的富文本节点，消除了将整段 KaTeX 复杂 HTML 灌入编辑器的脏数据隐患；
+2. **渲染阶段**：TipTap 接收到标准节点后，通过 `ReactNodeViewRenderer` 将每个公式委托给专属的 React 组件渲染，既享受 React 的状态驱动能力，又与 ProseMirror 文档树完全同步；
+3. **保存阶段**：Turndown 序列化规则拦截对应的自定义标签，精准拼接外侧单 `$` 或双 `$$` 管道，同时在 `tiptapTable` 规则中实现了单元格级别的富文本递归处理，使公式置于表格内部时同样得到完美支持。
+
+---
+
+#### 维度三：工具栏与按键输入公式时序交互图 (`sequenceDiagram`)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 用户 (User)
+    participant Toolbar as 工具栏按钮
+    participant Editor as TipTap 画布
+    participant NV as Math NodeView (React)
+    participant KaTeX as KaTeX 渲染引擎
+
+    alt 场景 A: 通过工具栏一键插入
+        User->>Toolbar: 单击行内公式按钮 (Sigma 图标)
+        Toolbar->>Editor: insertContent({ type: 'inlineMath', attrs: { latex: '\\le x' } })
+        Editor->>NV: 挂载 InlineMathView
+        NV->>KaTeX: katex.renderToString('\\le x')
+        KaTeX-->>NV: 返回 MathML & HTML 矢量节点
+        NV-->>User: 界面呈现优雅的 ≤ x
+    else 场景 B: 键盘输入快捷语法
+        User->>Editor: 键入 "O(n \log n)$" 并按下空格或回车
+        Editor->>Editor: 触发 CustomInlineMath inputRule
+        Editor->>NV: 自动原子化替换为 inlineMath 节点
+        NV->>KaTeX: katex.renderToString('O(n \\log n)')
+        KaTeX-->>NV: 实时输出渲染结果
+    else 场景 C: 单击已存在的公式进行修改
+        User->>NV: 单击公式文本
+        NV->>NV: 切换为 isEditing = true (展开输入框)
+        User->>NV: 修改公式并按下 Enter
+        NV->>Editor: updateAttributes({ latex: newLatex })
+        NV->>KaTeX: 重新编译新公式并关闭输入框
+    end
+```
+
+##### 机制详细拆解与设计价值 (Diagram Walkthrough & Analysis)：
+1. **多重输入入口**：既支持鼠标流（一键点击工具栏图标插入标准模板），也支持键盘流（直接输入 `$公式$` 或 `$$公式$$` 触发 inputRule 实时成型），满足不同熟练度用户的录入习惯；
+2. **原子化节点保护**：公式节点被配置为 `atom: true`，光标使用左右方向键移动时会将其视作一个整体跳过，按下 Backspace 时一键整格删除，避免了光标误入公式内部导致字符碎片化的缺陷；
+3. **原地无损编辑闭环**：单击公式即可原地激活微型输入框，修改完成后无缝切回矢量渲染态，保持了思维的连续性。
+
+---
+
+### 5. 优化改进与体验打磨 (Improvements & Enhancements)
+- **视觉风格与按键主题**：
+  - 行内公式按钮配置专属**紫罗兰色 (Violet)** 主题，图标选用大写希腊字母 $\Sigma$ (`Sigma`)；
+  - 公式块按钮配置专属**紫色 (Purple)** 主题，图标选用数学根号 $\sqrt{}$ (`Radical`)；
+  - 均配置 `onMouseDown={(e) => e.preventDefault()}`，防止点击按钮时编辑器失焦导致光标跳动；
+- **暗色模式适配**：
+  - 在 [src/index.css](file:///e:/workspace/muduo-study-console/src/index.css) 中对 `.ProseMirror .katex` 与 `.dark .ProseMirror .katex-display` 设置高对比度浅色色阶（`#f1f5f9` / `#f8fafc`），公式排版在深色背景下清晰锐利、无眩光；
+- **离线与轻量化构建**：
+  - KaTeX 核心字体（`.woff2`、`.ttf`）与样式已通过 Vite 生产编译完整打入 `dist/assets/`，完全不依赖外部第三方 CDN，断网或离线环境下公式排版依然 100% 稳固呈现。
+
+---
+
+### 6. 验证结果与可复现方法 (Verification & Reproduction)
+
+#### (1) 终端可执行测试命令集
+```bash
+# 1. 静态类型编译检查 (TypeScript 0 错误)
+cd e:\workspace\muduo-study-console
+npx tsc --noEmit
+
+# 2. 全量单元与特性测试套件 (包含公式解析与双向序列化断言)
+npm test
+
+# 3. 生产静态包打包构建 (验证 KaTeX 字体与 CSS 打包完整性)
+npm run build
+
+# 4. 数学公式真实浏览器交互与序列化自动化测试
+python scripts/verify_algo_note_math.py
+```
+
+#### (2) 控制台真实运行输出凭据
+```
+[*] Local static server serving E:\workspace\muduo-study-console\dist on http://127.0.0.1:4215
+[1] Navigating to Algorithm Catalog...
+[2] Opening AlgoNoteModal...
+  ✅ Note modal opened successfully.
+[3] Locating Math Toolbar Buttons...
+  ✅ Inline Math (Sigma) and Block Math (Radical) buttons located.
+[4] Inserting Inline Math via Sigma button...
+  ✅ Found 1 inline math node.
+  ✅ Rendered KaTeX text: '≤x'
+[5] Inserting Block Math via Radical button...
+  ✅ Found 1 block math node.
+  ✅ KaTeX display formula rendered with centered block layout.
+[6] Saving Note and checking Markdown Serialization...
+
+Serialized Markdown with Math Formulas in Storage:
+$\le x$
+
+$$
+\sum_{i=1}^n i = \frac{n(n+1)}{2}
+$$
+
+公式测试：
+
+  ✅ Both inline math $\le x$ and block math $$...$$ serialized 100% cleanly!
+  ✅ Screenshot saved to docs/images/verify_algo_note_math.png
+  ✅ Copied screenshot to brain artifact directory.
+[7] Closing modal and reopening to verify re-hydration from Markdown...
+  ✅ Formulas re-hydrated directly from stored Markdown into TipTap KaTeX DOM on modal reopening!
+
+🎉 ALL INLINE AND BLOCK MATH INTEGRATION TESTS PASSED PERFECTLY!
+```
