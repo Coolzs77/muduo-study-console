@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AlgoProblem, AlgoProblemNote } from '../../types';
 import {
   StickyNote,
@@ -10,23 +10,21 @@ import {
   Clock,
   Sparkles,
   AlertCircle,
-  Edit3,
-  Eye,
-  Columns2,
   Bold,
   Italic,
   Code,
   FileCode2,
   ListCheck,
-  Quote
+  Quote,
+  Link2,
+  Plus
 } from 'lucide-react';
+import { CodeBlock } from '../common/CodeBlock';
 import { MarkdownView } from '../reader/MarkdownView';
 
 export const getAlgoProblemKey = (problem: AlgoProblem): string => {
   return problem.id || (problem.num !== null && problem.num !== undefined ? 'p_' + problem.num : problem.title);
 };
-
-export type NoteViewMode = 'edit' | 'preview' | 'split';
 
 export interface AlgoNoteModalProps {
   problem: AlgoProblem | null;
@@ -37,6 +35,352 @@ export interface AlgoNoteModalProps {
   onDelete?: (problemKey: string) => void;
 }
 
+export interface MarkdownBlock {
+  id: string;
+  type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'code' | 'quote' | 'checklist' | 'list' | 'hr' | 'p' | 'empty';
+  raw: string;
+  startLine: number;
+  endLine: number;
+  level?: number;
+  headingText?: string;
+  codeLang?: string;
+  codeText?: string;
+  checked?: boolean;
+  bullet?: string;
+  checkText?: string;
+  quoteLines?: string[];
+  listType?: 'ul' | 'ol';
+  listItems?: string[];
+}
+
+export function parseToBlocks(content: string): MarkdownBlock[] {
+  if (!content) {
+    return [{
+      id: 'block-empty-0',
+      type: 'empty',
+      raw: '',
+      startLine: 0,
+      endLine: 0
+    }];
+  }
+
+  const lines = content.split('\n');
+  const blocks: MarkdownBlock[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // 1. Fenced Code Block
+    if (line.trimStart().startsWith('```')) {
+      const startLine = i;
+      const langMatch = line.trimStart().slice(3).trim().split(/\s+/)[0] || '';
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].trimStart().startsWith('```')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      const hasClosingFence = i < lines.length && lines[i].trimStart().startsWith('```');
+      const endLine = hasClosingFence ? i : i - 1;
+      const rawLines = lines.slice(startLine, endLine + 1);
+      blocks.push({
+        id: `block-code-${startLine}`,
+        type: 'code',
+        raw: rawLines.join('\n'),
+        startLine,
+        endLine,
+        codeLang: langMatch || 'cpp',
+        codeText: codeLines.join('\n')
+      });
+      i = endLine + 1;
+      continue;
+    }
+
+    // 2. Horizontal rule: ---, ***, ___
+    if (/^(?:---+|\*\*\*+|___+)$/.test(trimmed)) {
+      blocks.push({
+        id: `block-hr-${i}`,
+        type: 'hr',
+        raw: line,
+        startLine: i,
+        endLine: i
+      });
+      i++;
+      continue;
+    }
+
+    // 3. Headings H1 - H6
+    const headingMatch = line.match(/^(#{1,6})\s+(.*)$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length as 1 | 2 | 3 | 4 | 5 | 6;
+      blocks.push({
+        id: `block-h-${i}`,
+        type: `h${level}` as any,
+        raw: line,
+        startLine: i,
+        endLine: i,
+        level,
+        headingText: headingMatch[2]
+      });
+      i++;
+      continue;
+    }
+
+    // 4. Checklist item: - [ ] or - [x]
+    const checkMatch = line.match(/^([-*+])\s+\[([ xX])\]\s*(.*)$/);
+    if (checkMatch) {
+      blocks.push({
+        id: `block-check-${i}`,
+        type: 'checklist',
+        raw: line,
+        startLine: i,
+        endLine: i,
+        bullet: checkMatch[1],
+        checked: checkMatch[2].toLowerCase() === 'x',
+        checkText: checkMatch[3]
+      });
+      i++;
+      continue;
+    }
+
+    // 5. Blockquote: contiguous lines starting with >
+    if (/^>\s?/.test(line)) {
+      const startLine = i;
+      const quoteLines: string[] = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) {
+        quoteLines.push(lines[i].replace(/^>\s?/, ''));
+        i++;
+      }
+      const endLine = i - 1;
+      const rawLines = lines.slice(startLine, endLine + 1);
+      blocks.push({
+        id: `block-quote-${startLine}`,
+        type: 'quote',
+        raw: rawLines.join('\n'),
+        startLine,
+        endLine,
+        quoteLines
+      });
+      continue;
+    }
+
+    // 6. Unordered or ordered list item
+    const listMatch = line.match(/^([-*+]|\d+\.)\s+(.*)$/);
+    if (listMatch) {
+      const isOrdered = /^\d+\./.test(listMatch[1]);
+      const startLine = i;
+      const items: string[] = [listMatch[2]];
+      i++;
+      while (i < lines.length) {
+        const nextMatch = lines[i].match(/^([-*+]|\d+\.)\s+(.*)$/);
+        if (nextMatch && (/^\d+\./.test(nextMatch[1]) === isOrdered)) {
+          if (/^[-*+]\s+\[([ xX])\]/.test(lines[i])) break;
+          items.push(nextMatch[2]);
+          i++;
+        } else {
+          break;
+        }
+      }
+      const endLine = i - 1;
+      const rawLines = lines.slice(startLine, endLine + 1);
+      blocks.push({
+        id: `block-list-${startLine}`,
+        type: 'list',
+        raw: rawLines.join('\n'),
+        startLine,
+        endLine,
+        listType: isOrdered ? 'ol' : 'ul',
+        listItems: items
+      });
+      continue;
+    }
+
+    // 7. Empty line
+    if (trimmed === '') {
+      blocks.push({
+        id: `block-empty-${i}`,
+        type: 'empty',
+        raw: line,
+        startLine: i,
+        endLine: i
+      });
+      i++;
+      continue;
+    }
+
+    // 8. Normal paragraph
+    const startLine = i;
+    const pLines: string[] = [];
+    while (i < lines.length) {
+      const cur = lines[i];
+      const curTrimmed = cur.trim();
+      if (curTrimmed === '') break;
+      if (cur.trimStart().startsWith('```')) break;
+      if (/^(?:---+|\*\*\*+|___+)$/.test(curTrimmed)) break;
+      if (/^#{1,6}\s+/.test(cur)) break;
+      if (/^[-*+]\s+\[([ xX])\]/.test(cur)) break;
+      if (/^>\s?/.test(cur)) break;
+      if (/^([-*+]|\d+\.)\s+/.test(cur)) break;
+      pLines.push(cur);
+      i++;
+    }
+    const endLine = i - 1;
+    const rawLines = lines.slice(startLine, endLine + 1);
+    blocks.push({
+      id: `block-p-${startLine}`,
+      type: 'p',
+      raw: rawLines.join('\n'),
+      startLine,
+      endLine
+    });
+  }
+
+  return blocks;
+}
+
+// Inline formatting token parser
+function renderInlineContent(text: string): React.ReactNode {
+  if (!text) return null;
+
+  const tokens: Array<
+    | { type: 'code'; content: string }
+    | { type: 'link'; content: string; url: string }
+    | { type: 'bold'; content: string }
+    | { type: 'del'; content: string }
+    | { type: 'italic'; content: string }
+    | { type: 'text'; content: string }
+  > = [];
+
+  let i = 0;
+  while (i < text.length) {
+    if (text[i] === '`') {
+      const end = text.indexOf('`', i + 1);
+      if (end !== -1) {
+        tokens.push({ type: 'code', content: text.slice(i + 1, end) });
+        i = end + 1;
+        continue;
+      }
+    }
+
+    if (text[i] === '[') {
+      const closeBracket = text.indexOf(']', i + 1);
+      if (closeBracket !== -1 && text[closeBracket + 1] === '(') {
+        const closeParen = text.indexOf(')', closeBracket + 2);
+        if (closeParen !== -1) {
+          tokens.push({
+            type: 'link',
+            content: text.slice(i + 1, closeBracket),
+            url: text.slice(closeBracket + 2, closeParen).trim()
+          });
+          i = closeParen + 1;
+          continue;
+        }
+      }
+    }
+
+    if (text.startsWith('**', i)) {
+      const end = text.indexOf('**', i + 2);
+      if (end !== -1 && end > i + 2) {
+        tokens.push({ type: 'bold', content: text.slice(i + 2, end) });
+        i = end + 2;
+        continue;
+      }
+    }
+
+    if (text.startsWith('~~', i)) {
+      const end = text.indexOf('~~', i + 2);
+      if (end !== -1 && end > i + 2) {
+        tokens.push({ type: 'del', content: text.slice(i + 2, end) });
+        i = end + 2;
+        continue;
+      }
+    }
+
+    if (text[i] === '*' || text[i] === '_') {
+      const marker = text[i];
+      const nextChar = text[i + 1];
+      if (nextChar && !/\s/.test(nextChar) && nextChar !== marker) {
+        let end = -1;
+        for (let j = i + 1; j < text.length; j++) {
+          if (text[j] === marker) {
+            const prevChar = text[j - 1];
+            const afterChar = text[j + 1];
+            if (!/\s/.test(prevChar)) {
+              if (marker === '*' && afterChar && /\w/.test(afterChar)) continue;
+              end = j;
+              break;
+            }
+          }
+        }
+        if (end !== -1) {
+          tokens.push({ type: 'italic', content: text.slice(i + 1, end) });
+          i = end + 1;
+          continue;
+        }
+      }
+    }
+
+    let nextSpecial = i + 1;
+    while (nextSpecial < text.length) {
+      const ch = text[nextSpecial];
+      if (ch === '`' || ch === '[' || ch === '~' || ch === '*' || ch === '_') break;
+      nextSpecial++;
+    }
+    tokens.push({ type: 'text', content: text.slice(i, nextSpecial) });
+    i = nextSpecial;
+  }
+
+  return tokens.map((token, idx) => {
+    switch (token.type) {
+      case 'code':
+        return (
+          <code
+            key={idx}
+            className="font-mono text-[12px] bg-slate-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 px-1.5 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_1px_rgba(0,0,0,0.3)]"
+          >
+            {token.content}
+          </code>
+        );
+      case 'bold':
+        return (
+          <strong key={idx} className="font-bold text-slate-900 dark:text-white">
+            {renderInlineContent(token.content)}
+          </strong>
+        );
+      case 'italic':
+        return (
+          <em key={idx} className="italic text-slate-800 dark:text-slate-200">
+            {renderInlineContent(token.content)}
+          </em>
+        );
+      case 'del':
+        return (
+          <del key={idx} className="line-through text-slate-400 dark:text-slate-500">
+            {renderInlineContent(token.content)}
+          </del>
+        );
+      case 'link':
+        return (
+          <a
+            key={idx}
+            href={token.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sky-600 dark:text-sky-400 hover:underline font-medium inline-flex items-center gap-0.5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {token.content}
+          </a>
+        );
+      case 'text':
+      default:
+        return token.content;
+    }
+  });
+}
+
 export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   problem,
   isOpen,
@@ -45,27 +389,52 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
   onSave,
   onDelete,
 }) => {
-  // Retain the last active problem during exit animations so the modal card can smoothly transition out
+  // Retain activeProblem during exit animation to prevent premature unmount
   const [activeProblem, setActiveProblem] = useState<AlgoProblem | null>(problem);
   const [content, setContent] = useState('');
-  const [viewMode, setViewMode] = useState<NoteViewMode>('edit');
   const [isCopied, setIsCopied] = useState(false);
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
   const [isMounted, setIsMounted] = useState(isOpen);
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Sync content with initialNote when problem changes
+  // In-place live preview state: ID of the currently active block being edited directly
+  const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
+  const [activeBlockRaw, setActiveBlockRaw] = useState('');
+  const [isManualSavedFeedback, setIsManualSavedFeedback] = useState(false);
+
+  // Auto-Save debounced architecture state
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [lastSavedTime, setLastSavedTime] = useState<string>('');
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef(content);
+  contentRef.current = content;
+
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const currentProblem = problem || activeProblem;
+  const problemKey = currentProblem ? getAlgoProblemKey(currentProblem) : '';
+
+  // Synchronize initial content when problem or initialNote loads
   useEffect(() => {
     if (problem) {
       setActiveProblem(problem);
-      setContent(initialNote?.content || '');
+      const initialText = initialNote?.content || '';
+      setContent(initialText);
+      contentRef.current = initialText;
       setIsConfirmingClear(false);
       setIsCopied(false);
-      // Auto-switch to edit mode for empty notes so user is not stuck in blank preview
-      if (!initialNote?.content) {
-        setViewMode('edit');
+      setSaveStatus('idle');
+
+      // If note is empty, immediately activate the first empty block for instant typing
+      if (!initialText.trim()) {
+        setActiveBlockId('block-empty-0');
+        setActiveBlockRaw('');
+      } else {
+        setActiveBlockId(null);
+        setActiveBlockRaw('');
       }
     }
   }, [problem, initialNote]);
@@ -90,32 +459,313 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
     }
   }, [isOpen, problem]);
 
-  // Auto-focus textarea on open or when switching to edit/split mode
-  useEffect(() => {
-    if (isVisible && (viewMode === 'edit' || viewMode === 'split') && textareaRef.current) {
-      textareaRef.current.focus();
-      const len = textareaRef.current.value.length;
-      textareaRef.current.setSelectionRange(len, len);
+  // Auto-resize active textarea to fit content without scroll jumps
+  const autoResizeTextarea = useCallback(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight, 32)}px`;
     }
-  }, [isVisible, viewMode]);
+  }, []);
 
-  const currentProblem = problem || activeProblem;
-  const problemKey = currentProblem ? getAlgoProblemKey(currentProblem) : '';
+  useEffect(() => {
+    if (activeBlockId && textareaRef.current) {
+      autoResizeTextarea();
+      textareaRef.current.focus();
+    }
+  }, [activeBlockId, autoResizeTextarea]);
 
-  const handleSaveRef = useRef<() => void>(() => {});
-  const onCloseRef = useRef<() => void>(onClose);
-  onCloseRef.current = onClose;
+  // Parse current markdown document into structured blocks
+  const blocks = useMemo(() => parseToBlocks(content), [content]);
 
-  const handleSave = () => {
+  // 800ms debounced auto-save handler
+  const scheduleAutoSave = useCallback((newContent: string) => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    setSaveStatus('saving');
+    autoSaveTimerRef.current = setTimeout(() => {
+      if (problemKey) {
+        onSave(problemKey, newContent);
+      }
+      setSaveStatus('saved');
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      setLastSavedTime(`${hh}:${mm}`);
+      autoSaveTimerRef.current = null;
+    }, 800);
+  }, [problemKey, onSave]);
+
+  // Helper to reassemble full markdown from blocks and active block edits
+  const assembleContent = useCallback((targetBlocks: MarkdownBlock[], targetId: string, updatedRaw: string) => {
+    const target = targetBlocks.find(b => b.id === targetId);
+    if (!target) return updatedRaw;
+    const lines = content.split('\n');
+    const newLines = [
+      ...lines.slice(0, target.startLine),
+      ...updatedRaw.split('\n'),
+      ...lines.slice(target.endLine + 1)
+    ];
+    return newLines.join('\n');
+  }, [content]);
+
+  // Commit changes from active block to document state
+  const commitActiveBlock = useCallback(() => {
+    if (!activeBlockId) return;
+    const currentBlock = blocks.find(b => b.id === activeBlockId);
+    if (currentBlock && activeBlockRaw !== currentBlock.raw) {
+      const lines = content.split('\n');
+      const newLines = [
+        ...lines.slice(0, currentBlock.startLine),
+        ...activeBlockRaw.split('\n'),
+        ...lines.slice(currentBlock.endLine + 1)
+      ];
+      const newContent = newLines.join('\n');
+      setContent(newContent);
+      contentRef.current = newContent;
+      scheduleAutoSave(newContent);
+    }
+    setActiveBlockId(null);
+  }, [activeBlockId, blocks, content, activeBlockRaw, scheduleAutoSave]);
+
+  // Activate an inactive block for in-place editing
+  const activateBlock = useCallback((block: MarkdownBlock) => {
+    if (activeBlockId === block.id) return;
+    commitActiveBlock();
+    setActiveBlockId(block.id);
+    setActiveBlockRaw(block.raw);
+  }, [activeBlockId, commitActiveBlock]);
+
+  // Interactive Checklist: toggle checkbox directly in-place without opening edit mode
+  const handleToggleChecklist = useCallback((block: MarkdownBlock) => {
+    const lines = content.split('\n');
+    const targetLine = lines[block.startLine];
+    if (targetLine === undefined) return;
+    const newChecked = !block.checked;
+    const updatedLine = targetLine.replace(
+      /^([-*+]\s+\[)([ xX])(\]\s*.*)$/,
+      `$1${newChecked ? 'x' : ' '}$3`
+    );
+    lines[block.startLine] = updatedLine;
+    const newContent = lines.join('\n');
+    setContent(newContent);
+    contentRef.current = newContent;
+    scheduleAutoSave(newContent);
+  }, [content, scheduleAutoSave]);
+
+  // Instant Manual Save (Ctrl+S / Ctrl+Enter or Click)
+  const handleManualSave = useCallback(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+    // Commit any active block edits
+    if (activeBlockId) {
+      const currentBlock = blocks.find(b => b.id === activeBlockId);
+      if (currentBlock) {
+        const lines = content.split('\n');
+        const newLines = [
+          ...lines.slice(0, currentBlock.startLine),
+          ...activeBlockRaw.split('\n'),
+          ...lines.slice(currentBlock.endLine + 1)
+        ];
+        const newContent = newLines.join('\n');
+        setContent(newContent);
+        contentRef.current = newContent;
+      }
+    }
+    const finalContent = contentRef.current;
     if (problemKey) {
-      onSave(problemKey, content);
+      onSave(problemKey, finalContent);
+    }
+    setSaveStatus('saved');
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    setLastSavedTime(`${hh}:${mm}`);
+    setIsManualSavedFeedback(true);
+    setTimeout(() => setIsManualSavedFeedback(false), 2000);
+  }, [activeBlockId, blocks, content, activeBlockRaw, problemKey, onSave]);
+
+  // Flush on Close / Exit: synchronously commit & save before unmounting (100% zero data loss)
+  const handleCloseWithFlush = useCallback(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+    let finalContent = contentRef.current;
+    if (activeBlockId) {
+      const currentBlock = blocks.find(b => b.id === activeBlockId);
+      if (currentBlock) {
+        const lines = content.split('\n');
+        const newLines = [
+          ...lines.slice(0, currentBlock.startLine),
+          ...activeBlockRaw.split('\n'),
+          ...lines.slice(currentBlock.endLine + 1)
+        ];
+        finalContent = newLines.join('\n');
+        setContent(finalContent);
+        contentRef.current = finalContent;
+      }
+    }
+    if (problemKey && finalContent !== initialNote?.content) {
+      onSave(problemKey, finalContent);
     }
     onClose();
-  };
-  handleSaveRef.current = handleSave;
+  }, [activeBlockId, blocks, content, activeBlockRaw, problemKey, initialNote, onSave, onClose]);
 
-  // Keyboard shortcut listener: Esc to close, Ctrl+Enter / Cmd+Enter to save
-  // Guarded against IME composition to protect Chinese pinyin input
+  // Format insertion helper supporting active block selection wrapping or document appending
+  const handleInsertMarkdown = (prefix: string, suffix: string = '', defaultPlaceholder: string = '') => {
+    const el = textareaRef.current;
+    if (activeBlockId && el) {
+      const start = el.selectionStart ?? activeBlockRaw.length;
+      const end = el.selectionEnd ?? activeBlockRaw.length;
+      const hasSel = start !== end;
+      const selected = hasSel ? activeBlockRaw.slice(start, end) : defaultPlaceholder;
+      const replacement = `${prefix}${selected}${suffix}`;
+      const newRaw = activeBlockRaw.slice(0, start) + replacement + activeBlockRaw.slice(end);
+      setActiveBlockRaw(newRaw);
+
+      const updatedDoc = assembleContent(blocks, activeBlockId, newRaw);
+      contentRef.current = updatedDoc;
+      scheduleAutoSave(updatedDoc);
+
+      setTimeout(() => {
+        if (el) {
+          el.focus();
+          const curStart = start + prefix.length;
+          const curEnd = curStart + selected.length;
+          el.setSelectionRange(curStart, curEnd);
+          autoResizeTextarea();
+        }
+      }, 0);
+    } else {
+      commitActiveBlock();
+      const snippet = `${prefix}${defaultPlaceholder}${suffix}`;
+      const newContent = content ? `${content.trimEnd()}\n\n${snippet}` : snippet;
+      setContent(newContent);
+      contentRef.current = newContent;
+      scheduleAutoSave(newContent);
+
+      setTimeout(() => {
+        const newBlocks = parseToBlocks(newContent);
+        const last = newBlocks[newBlocks.length - 1];
+        if (last) {
+          setActiveBlockId(last.id);
+          setActiveBlockRaw(last.raw);
+        }
+      }, 10);
+    }
+  };
+
+  // Active Block Textarea KeyDown handling: Shortcuts, Tab indentation, IME protection
+  const handleActiveTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.isComposing) return;
+
+    // 1. Tab / Shift+Tab indentation (2 spaces)
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const el = e.currentTarget;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = activeBlockRaw;
+
+      if (start === end) {
+        const updated = val.slice(0, start) + '  ' + val.slice(end);
+        setActiveBlockRaw(updated);
+        const updatedDoc = assembleContent(blocks, activeBlockId!, updated);
+        contentRef.current = updatedDoc;
+        scheduleAutoSave(updatedDoc);
+        setTimeout(() => {
+          el.selectionStart = el.selectionEnd = start + 2;
+        }, 0);
+      } else {
+        const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = val.indexOf('\n', end);
+        const effectiveEnd = lineEnd === -1 ? val.length : lineEnd;
+        const selectedBlock = val.slice(lineStart, effectiveEnd);
+        const lines = selectedBlock.split('\n');
+
+        if (e.shiftKey) {
+          const unindented = lines.map(line => line.replace(/^ {1,2}/, '')).join('\n');
+          const updated = val.slice(0, lineStart) + unindented + val.slice(effectiveEnd);
+          setActiveBlockRaw(updated);
+          const updatedDoc = assembleContent(blocks, activeBlockId!, updated);
+          contentRef.current = updatedDoc;
+          scheduleAutoSave(updatedDoc);
+          setTimeout(() => {
+            el.selectionStart = lineStart;
+            el.selectionEnd = lineStart + unindented.length;
+          }, 0);
+        } else {
+          const indented = lines.map(line => '  ' + line).join('\n');
+          const updated = val.slice(0, lineStart) + indented + val.slice(effectiveEnd);
+          setActiveBlockRaw(updated);
+          const updatedDoc = assembleContent(blocks, activeBlockId!, updated);
+          contentRef.current = updatedDoc;
+          scheduleAutoSave(updatedDoc);
+          setTimeout(() => {
+            el.selectionStart = lineStart;
+            el.selectionEnd = lineStart + indented.length;
+          }, 0);
+        }
+      }
+      return;
+    }
+
+    const isMod = e.ctrlKey || e.metaKey;
+
+    // 2. Ctrl+S or Ctrl+Enter: Manual save
+    if (isMod && (e.key.toLowerCase() === 's' || e.key === 'Enter')) {
+      e.preventDefault();
+      handleManualSave();
+      return;
+    }
+
+    // 3. Ctrl+B: Bold
+    if (isMod && !e.shiftKey && e.key.toLowerCase() === 'b') {
+      e.preventDefault();
+      handleInsertMarkdown('**', '**', '重点文本');
+      return;
+    }
+
+    // 4. Ctrl+I: Italic
+    if (isMod && !e.shiftKey && e.key.toLowerCase() === 'i') {
+      e.preventDefault();
+      handleInsertMarkdown('*', '*', '斜体文本');
+      return;
+    }
+
+    // 5. Ctrl+E: Inline code
+    if (isMod && !e.shiftKey && e.key.toLowerCase() === 'e') {
+      e.preventDefault();
+      handleInsertMarkdown('`', '`', 'code');
+      return;
+    }
+
+    // 6. Ctrl+Shift+C: C++ code block
+    if (isMod && e.shiftKey && e.key.toLowerCase() === 'c') {
+      e.preventDefault();
+      handleInsertMarkdown('\n```cpp\n', '\n```\n', '// C++ 核心逻辑\nclass Solution {\npublic:\n    // ...\n};');
+      return;
+    }
+
+    // 7. Ctrl+Shift+L: Checklist item
+    if (isMod && e.shiftKey && e.key.toLowerCase() === 'l') {
+      e.preventDefault();
+      handleInsertMarkdown('\n- [ ] ', '', '待办清单事项');
+      return;
+    }
+
+    // 8. Ctrl+K: Insert link
+    if (isMod && !e.shiftKey && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      handleInsertMarkdown('[', '](https://)', '链接标题');
+      return;
+    }
+  };
+
+  // Global window keyboard listener: Esc to flush & close, Ctrl+Enter / Ctrl+S to save
   useEffect(() => {
     if (!isOpen) return;
 
@@ -125,18 +775,17 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       if (e.key === 'Escape') {
         e.preventDefault();
         e.stopImmediatePropagation();
-        onCloseRef.current();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        handleCloseWithFlush();
+      } else if (((e.ctrlKey || e.metaKey) && e.key === 'Enter') || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's')) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        handleSaveRef.current();
+        handleManualSave();
       }
     };
 
-    // Use capture phase to intercept Esc before any lower-level drawer/sidebar listeners
     window.addEventListener('keydown', handleKeyDown, true);
     return () => window.removeEventListener('keydown', handleKeyDown, true);
-  }, [isOpen]);
+  }, [isOpen, handleCloseWithFlush, handleManualSave]);
 
   if (!isMounted || !currentProblem) return null;
 
@@ -146,12 +795,12 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(content);
       } else {
-        const textArea = document.createElement('textarea');
-        textArea.value = content;
-        document.body.appendChild(textArea);
-        textArea.select();
+        const ta = document.createElement('textarea');
+        ta.value = content;
+        document.body.appendChild(ta);
+        ta.select();
         document.execCommand('copy');
-        document.body.removeChild(textArea);
+        document.body.removeChild(ta);
       }
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
@@ -166,77 +815,36 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
       return;
     }
     setContent('');
+    contentRef.current = '';
+    setActiveBlockId('block-empty-0');
+    setActiveBlockRaw('');
     setIsConfirmingClear(false);
     if (onDelete) {
       onDelete(problemKey);
     } else {
       onSave(problemKey, '');
     }
+    setSaveStatus('saved');
+    setLastSavedTime('已清空');
   };
 
-  // Quick Markdown formatting insertion helper
-  const handleInsertMarkdown = (prefix: string, suffix: string = '', defaultPlaceholder: string = '') => {
-    const el = textareaRef.current;
-    if (!el) return;
-    const start = el.selectionStart ?? content.length;
-    const end = el.selectionEnd ?? content.length;
-    const hasSelection = start !== end;
-    const selectedText = hasSelection ? content.slice(start, end) : defaultPlaceholder;
-    const replacement = `${prefix}${selectedText}${suffix}`;
-    const newContent = content.slice(0, start) + replacement + content.slice(end);
+  // Append new blank line/block at the bottom of the document
+  const handleAppendNewBlock = () => {
+    commitActiveBlock();
+    const newContent = content ? `${content.trimEnd()}\n` : '';
     setContent(newContent);
-    setTimeout(() => {
-      el.focus();
-      const cursorStart = start + prefix.length;
-      const cursorEnd = cursorStart + selectedText.length;
-      el.setSelectionRange(cursorStart, cursorEnd);
-    }, 0);
-  };
-
-  // Support Tab key indentation in textarea (single cursor or multi-line block indent / Shift+Tab unindent)
-  const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const el = textareaRef.current;
-      if (!el) return;
-      const start = el.selectionStart;
-      const end = el.selectionEnd;
-      const val = content;
-
-      if (start === end) {
-        // Single cursor: insert 2 spaces
-        const newContent = val.slice(0, start) + '  ' + val.slice(end);
-        setContent(newContent);
-        setTimeout(() => {
-          el.selectionStart = el.selectionEnd = start + 2;
-        }, 0);
-      } else {
-        // Multi-line selection: indent or Shift+Tab unindent
-        const lineStart = val.lastIndexOf('\n', start - 1) + 1;
-        const lineEnd = val.indexOf('\n', end);
-        const effectiveEnd = lineEnd === -1 ? val.length : lineEnd;
-        const selectedBlock = val.slice(lineStart, effectiveEnd);
-        const lines = selectedBlock.split('\n');
-
-        if (e.shiftKey) {
-          const unindented = lines.map(line => line.replace(/^ {1,2}/, '')).join('\n');
-          const newContent = val.slice(0, lineStart) + unindented + val.slice(effectiveEnd);
-          setContent(newContent);
-          setTimeout(() => {
-            el.selectionStart = lineStart;
-            el.selectionEnd = lineStart + unindented.length;
-          }, 0);
-        } else {
-          const indented = lines.map(line => '  ' + line).join('\n');
-          const newContent = val.slice(0, lineStart) + indented + val.slice(effectiveEnd);
-          setContent(newContent);
-          setTimeout(() => {
-            el.selectionStart = lineStart;
-            el.selectionEnd = lineStart + indented.length;
-          }, 0);
-        }
-      }
+    contentRef.current = newContent;
+    const newBlocks = parseToBlocks(newContent);
+    const last = newBlocks[newBlocks.length - 1];
+    if (last) {
+      setActiveBlockId(last.id);
+      setActiveBlockRaw('');
     }
+    setTimeout(() => {
+      if (canvasRef.current) {
+        canvasRef.current.scrollTop = canvasRef.current.scrollHeight;
+      }
+    }, 10);
   };
 
   const formatTimestamp = (timestamp?: number) => {
@@ -301,7 +909,7 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
         className={`fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity ${
           isVisible ? 'opacity-100 duration-200' : 'opacity-0 duration-150'
         }`}
-        onClick={onClose}
+        onClick={handleCloseWithFlush}
       />
 
       {/* Modal Card with Claymorphic aesthetic and Emil Kowalski hardware-accelerated motion */}
@@ -310,13 +918,11 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
           transform: transformStyle,
           opacity: isVisible ? 1 : 0,
           transition: isVisible
-            ? 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), max-width 200ms ease-out'
+            ? 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms cubic-bezier(0.16, 1, 0.3, 1)'
             : 'transform 150ms cubic-bezier(0.7, 0, 0.84, 0), opacity 150ms cubic-bezier(0.7, 0, 0.84, 0)',
           willChange: 'transform, opacity'
         }}
-        className={`relative z-10 w-full ${
-          viewMode === 'split' ? 'max-w-4xl lg:max-w-5xl' : 'max-w-2xl'
-        } bg-white/95 dark:bg-slate-900/95 rounded-3xl p-5 sm:p-7 shadow-[12px_12px_32px_rgba(0,0,0,0.18),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.08)] border border-white/80 dark:border-white/10 flex flex-col space-y-3.5 max-h-[92vh]`}
+        className="relative z-10 w-full max-w-3xl bg-white/95 dark:bg-slate-900/95 rounded-3xl p-5 sm:p-7 shadow-[12px_12px_32px_rgba(0,0,0,0.18),inset_2px_2px_4px_rgba(255,255,255,0.85)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.08)] border border-white/80 dark:border-white/10 flex flex-col space-y-3.5 max-h-[92vh]"
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3 shrink-0">
@@ -345,234 +951,338 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5 truncate">
                 <Sparkles size={12} className="text-amber-500 shrink-0" />
-                <span>支持 Markdown 语法与代码高亮 · 独立题解备忘录</span>
+                <span>Typora / Obsidian 实时所见即所得渲染 · 点击任意块即可原地编辑</span>
               </p>
             </div>
           </div>
 
-          {/* Close button */}
+          {/* Close button with synchronous flush */}
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCloseWithFlush}
             className="p-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-[0.96] transition-all duration-150 cursor-pointer shrink-0"
-            title="关闭 (Esc)"
+            title="关闭 (Esc 自动保存)"
           >
             <X size={16} />
           </button>
         </div>
 
-        {/* Toolbar: Claymorphic Mode Tabs (Edit / Preview / Split) + Meta Info */}
+        {/* Toolbar: Markdown Quick Insert Format Buttons + Live Auto-Save Status */}
         <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400 px-0.5 shrink-0">
-          {/* Segmented Pill Tabs */}
-          <div className="flex items-center p-0.5 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-white/10 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+          {/* Quick Markdown Formatting Shortcut Buttons */}
+          <div className="flex items-center gap-1 p-0.5 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-white/10 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
             <button
               type="button"
-              onClick={() => setViewMode('edit')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all duration-150 active:scale-[0.96] cursor-pointer ${
-                viewMode === 'edit'
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-[1px_1px_3px_rgba(0,0,0,0.08),inset_1px_1px_1px_rgba(255,255,255,0.8)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)]'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-              title="编辑便签 (Markdown)"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleInsertMarkdown('**', '**', '重点文本')}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
+              title="粗体 (Ctrl+B)"
             >
-              <Edit3 size={13} />
-              <span>编辑</span>
+              <Bold size={13} />
             </button>
-
             <button
               type="button"
-              onClick={() => setViewMode('preview')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all duration-150 active:scale-[0.96] cursor-pointer ${
-                viewMode === 'preview'
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-[1px_1px_3px_rgba(0,0,0,0.08),inset_1px_1px_1px_rgba(255,255,255,0.8)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)]'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-              title="预览 Markdown 渲染效果"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleInsertMarkdown('*', '*', '斜体文本')}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
+              title="斜体 (Ctrl+I)"
             >
-              <Eye size={13} />
-              <span>预览</span>
+              <Italic size={13} />
             </button>
-
             <button
               type="button"
-              onClick={() => setViewMode('split')}
-              className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all duration-150 active:scale-[0.96] cursor-pointer ${
-                viewMode === 'split'
-                  ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-[1px_1px_3px_rgba(0,0,0,0.08),inset_1px_1px_1px_rgba(255,255,255,0.8)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)]'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-              title="双栏分屏 (边写边看)"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleInsertMarkdown('`', '`', 'code')}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
+              title="行内代码 (Ctrl+E)"
             >
-              <Columns2 size={13} />
-              <span>分屏</span>
+              <Code size={13} />
+            </button>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleInsertMarkdown('\n```cpp\n', '\n```\n', '// C++ 优化实现\nclass Solution {\npublic:\n    // ...\n};')}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
+              title="C++ 代码块 (Ctrl+Shift+C)"
+            >
+              <FileCode2 size={13} />
+            </button>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleInsertMarkdown('\n- [ ] ', '', '待办清单事项')}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
+              title="待办清单 (Ctrl+Shift+L)"
+            >
+              <ListCheck size={13} />
+            </button>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleInsertMarkdown('\n> ', '', '解题心得与模式总结')}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
+              title="引用块 (> )"
+            >
+              <Quote size={13} />
+            </button>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleInsertMarkdown('[', '](https://)', '链接说明')}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
+              title="插入链接 (Ctrl+K)"
+            >
+              <Link2 size={13} />
             </button>
           </div>
 
-          {/* Quick Markdown Formatting Shortcut Buttons (Visible in Edit & Split modes) */}
-          {(viewMode === 'edit' || viewMode === 'split') && (
-            <div className="hidden md:flex items-center gap-1 p-0.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-white/5">
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleInsertMarkdown('**', '**', '重点文本')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
-                title="粗体 (**文本**)"
-              >
-                <Bold size={12} />
-              </button>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleInsertMarkdown('*', '*', '斜体文本')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
-                title="斜体 (*文本*)"
-              >
-                <Italic size={12} />
-              </button>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleInsertMarkdown('`', '`', 'code')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
-                title="行内代码 (`code`)"
-              >
-                <Code size={12} />
-              </button>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleInsertMarkdown('\n```cpp\n', '\n```\n', '// C++ 优化实现\nclass Solution {\npublic:\n    // ...\n};')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
-                title="C++ 代码块 (```cpp)"
-              >
-                <FileCode2 size={12} />
-              </button>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleInsertMarkdown('\n- [ ] ', '', '解题任务与边界验证')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
-                title="待办清单 (- [ ])"
-              >
-                <ListCheck size={12} />
-              </button>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleInsertMarkdown('\n> ', '', '解题心得与模式总结')}
-                className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-100 active:scale-[0.96] cursor-pointer"
-                title="引用块 (> )"
-              >
-                <Quote size={12} />
-              </button>
-            </div>
-          )}
-
-          {/* Meta Info */}
-          <div className="flex items-center gap-2 ml-auto">
-            <div className="flex items-center gap-1 text-slate-400">
-              <Clock size={11} />
-              {initialNote?.updatedAt ? (
+          {/* Real-time Save Status & Meta Info */}
+          <div className="flex items-center gap-2.5 ml-auto">
+            {saveStatus === 'saving' ? (
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 animate-pulse">
+                <Clock size={12} className="animate-spin" />
+                <span>编辑中...</span>
+              </span>
+            ) : saveStatus === 'saved' ? (
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <Check size={12} className="stroke-[2.5]" />
+                <span>已自动保存 {lastSavedTime}</span>
+              </span>
+            ) : initialNote?.updatedAt ? (
+              <span className="text-xs text-slate-400 flex items-center gap-1">
+                <Clock size={11} />
                 <span>更新于 {formatTimestamp(initialNote.updatedAt)}</span>
-              ) : (
-                <span>新便签</span>
-              )}
-            </div>
+              </span>
+            ) : (
+              <span className="text-xs text-slate-400">新便签</span>
+            )}
             <span className="text-slate-300 dark:text-slate-600">•</span>
             <span className="font-mono text-slate-600 dark:text-slate-300 font-semibold">{content.length} 字</span>
           </div>
         </div>
 
-        {/* Main Content Area: Edit / Preview / Split */}
-        <div className="relative flex-1 min-h-[250px] sm:min-h-[280px] flex flex-col">
-          {/* Edit Mode */}
-          {viewMode === 'edit' && (
-            <textarea
-              ref={textareaRef}
-              value={content}
-              onChange={(e) => {
-                setContent(e.target.value);
-                if (isConfirmingClear) setIsConfirmingClear(false);
-              }}
-              onKeyDown={handleTextareaKeyDown}
-              placeholder="在此使用 Markdown 记录本题思路、解题套路与关键代码：&#10;&#10;### 💡 核心解法&#10;- 快慢指针 / 滑动窗口边界条件；&#10;- 开闭区间与空节点特判；&#10;&#10;### 💻 C++ 优化实现&#10;```cpp&#10;class Solution {&#10;public:&#10;    int removeElement(vector<int>& nums, int val) {&#10;        // 双指针优化原地覆盖&#10;    }&#10;};&#10;```&#10;&#10;### ✅ 验证清单&#10;- [x] 边界测试用例通过&#10;- [ ] 空间复杂度压至 O(1)"
-              className="w-full flex-1 min-h-[250px] sm:min-h-[280px] max-h-[55vh] p-4 rounded-2xl bg-[#f8fafc] dark:bg-[#0c0f16] text-slate-900 dark:text-slate-100 text-xs sm:text-sm font-mono leading-relaxed shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.85)] dark:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.4)] border border-slate-200/70 dark:border-white/[0.08] focus:border-amber-500/80 dark:focus:border-amber-400/80 focus:outline-hidden transition-all resize-none select-text"
-            />
-          )}
+        {/* Unified Typora / Obsidian Single-Canvas Paper Surface */}
+        <div
+          ref={canvasRef}
+          onClick={(e) => {
+            // If user clicked the blank canvas outside of any block
+            if (e.target === canvasRef.current) {
+              handleAppendNewBlock();
+            }
+          }}
+          className="relative flex-1 min-h-[280px] sm:min-h-[340px] max-h-[58vh] overflow-y-auto p-4 sm:p-6 rounded-2xl bg-[#f8fafc]/90 dark:bg-[#0c0f16]/90 border border-slate-200/70 dark:border-white/[0.08] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.85)] dark:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.4)] select-text leading-relaxed space-y-2 cursor-text"
+        >
+          {blocks.map((block) => {
+            const isActive = activeBlockId === block.id;
 
-          {/* Preview Mode */}
-          {viewMode === 'preview' && (
-            <div className="w-full flex-1 min-h-[250px] sm:min-h-[280px] max-h-[55vh] overflow-y-auto p-4 sm:p-5 rounded-2xl bg-[#f8fafc]/90 dark:bg-[#0c0f16]/90 border border-slate-200/70 dark:border-white/[0.08] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.85)] dark:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.4)] select-text leading-relaxed">
-              {content.trim() ? (
-                <MarkdownView content={content} variant="note" />
-              ) : (
-                <div className="h-full min-h-[220px] flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 dark:text-amber-400 flex items-center justify-center mb-3 shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1px_1px_2px_rgba(255,255,255,0.8)] dark:shadow-[0_2px_4px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-                    <StickyNote size={24} />
+            // When Active: in-place textarea for direct editing without layout shifts
+            if (isActive) {
+              return (
+                <div key={block.id} className="relative group my-1.5">
+                  <textarea
+                    ref={textareaRef}
+                    value={activeBlockRaw}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setActiveBlockRaw(val);
+                      autoResizeTextarea();
+                      const updatedDoc = assembleContent(blocks, block.id, val);
+                      contentRef.current = updatedDoc;
+                      scheduleAutoSave(updatedDoc);
+                    }}
+                    onKeyDown={handleActiveTextareaKeyDown}
+                    onBlur={() => {
+                      commitActiveBlock();
+                    }}
+                    placeholder="在此键入 Markdown 内容..."
+                    className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs sm:text-sm font-mono leading-relaxed border-2 border-amber-500/80 dark:border-amber-400/80 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.85)] dark:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.4)] focus:outline-hidden transition-all resize-none select-text"
+                  />
+                  <div className="absolute right-2.5 bottom-2 pointer-events-none flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50/90 dark:bg-amber-950/80 px-1.5 py-0.5 rounded shadow-xs">
+                    <span>编辑中 · Tab 缩进</span>
                   </div>
-                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">便签内容为空</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-4">
-                    点击下方按钮切换至「编辑」模式，即可输入 Markdown 语法（标题、代码高亮、列表与清单）实时渲染。
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('edit')}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-[2px_2px_6px_rgba(245,158,11,0.3)] hover:-translate-y-0.5 active:scale-[0.96] transition-all duration-150 cursor-pointer"
+                </div>
+              );
+            }
+
+            // When Inactive: In-place rich Markdown rendering
+            switch (block.type) {
+              case 'h1':
+                return (
+                  <h1
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white border-b border-slate-200/80 dark:border-slate-800 pb-2 mb-2 hover:bg-amber-500/5 transition-colors cursor-text rounded-lg px-1.5 -mx-1.5"
+                    title="点击在原地编辑标题"
                   >
-                    <Edit3 size={13} />
-                    <span>立即编辑便签</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Split Mode (Side by Side) */}
-          {viewMode === 'split' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 flex-1 min-h-[250px] sm:min-h-[280px]">
-              {/* Left Column: Markdown Editor */}
-              <div className="flex flex-col h-full min-h-[240px]">
-                <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <Edit3 size={11} className="text-amber-500" />
-                    <span>Markdown 源码</span>
-                  </div>
-                  <span className="text-[10px] text-slate-400 font-mono">Tab 缩进 2 空格</span>
-                </div>
-                <textarea
-                  ref={textareaRef}
-                  value={content}
-                  onChange={(e) => {
-                    setContent(e.target.value);
-                    if (isConfirmingClear) setIsConfirmingClear(false);
-                  }}
-                  onKeyDown={handleTextareaKeyDown}
-                  placeholder="在此输入 Markdown 源码..."
-                  className="w-full flex-1 min-h-[240px] max-h-[52vh] p-3.5 rounded-2xl bg-[#f8fafc] dark:bg-[#0c0f16] text-slate-900 dark:text-slate-100 text-xs sm:text-sm font-mono leading-relaxed shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.85)] dark:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.4)] border border-slate-200/70 dark:border-white/[0.08] focus:border-amber-500/80 dark:focus:border-amber-400/80 focus:outline-hidden transition-all resize-none select-text"
-                />
-              </div>
-
-              {/* Right Column: Live Markdown Preview */}
-              <div className="flex flex-col h-full min-h-[240px]">
-                <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <Eye size={11} className="text-sky-500" />
-                    <span>实时渲染预览</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">即时同步</span>
-                </div>
-                <div className="w-full flex-1 min-h-[240px] max-h-[52vh] overflow-y-auto p-3.5 sm:p-4 rounded-2xl bg-[#f8fafc]/90 dark:bg-[#0c0f16]/90 border border-slate-200/70 dark:border-white/[0.08] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.85)] dark:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.4)] select-text leading-relaxed">
-                  {content.trim() ? (
-                    <MarkdownView content={content} variant="note" />
-                  ) : (
-                    <div className="h-full min-h-[200px] flex items-center justify-center text-xs text-slate-400 dark:text-slate-500 italic">
-                      在左侧输入 Markdown 语法，右侧即时渲染效果...
+                    {renderInlineContent(block.headingText || '')}
+                  </h1>
+                );
+              case 'h2':
+                return (
+                  <h2
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mt-3 mb-1.5 hover:bg-amber-500/5 transition-colors cursor-text rounded-lg px-1.5 -mx-1.5"
+                    title="点击在原地编辑标题"
+                  >
+                    {renderInlineContent(block.headingText || '')}
+                  </h2>
+                );
+              case 'h3':
+                return (
+                  <h3
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-2.5 mb-1 hover:bg-amber-500/5 transition-colors cursor-text rounded-lg px-1.5 -mx-1.5"
+                    title="点击在原地编辑标题"
+                  >
+                    {renderInlineContent(block.headingText || '')}
+                  </h3>
+                );
+              case 'h4':
+              case 'h5':
+              case 'h6':
+                return (
+                  <h4
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mt-2 mb-1 hover:bg-amber-500/5 transition-colors cursor-text rounded-lg px-1.5 -mx-1.5"
+                    title="点击在原地编辑标题"
+                  >
+                    {renderInlineContent(block.headingText || '')}
+                  </h4>
+                );
+              case 'code':
+                return (
+                  <div
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="relative group cursor-pointer"
+                    title="点击直接编辑 C++ 代码"
+                  >
+                    <CodeBlock
+                      code={block.codeText || ''}
+                      language={block.codeLang || 'cpp'}
+                      maxHeight="max-h-[320px]"
+                    />
+                    <div className="absolute top-3 right-28 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-700 pointer-events-none">
+                      点击编辑代码
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+                  </div>
+                );
+              case 'checklist':
+                return (
+                  <div
+                    key={block.id}
+                    className="flex items-start gap-2.5 my-1.5 group rounded-lg px-1.5 -mx-1.5 py-0.5 hover:bg-amber-500/5 transition-colors"
+                  >
+                    {/* Interactive Checkbox toggleable directly without opening edit mode */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleChecklist(block);
+                      }}
+                      className={`inline-flex items-center justify-center w-4 h-4 mt-0.5 rounded-md shrink-0 transition-all cursor-pointer ${
+                        block.checked
+                          ? 'bg-emerald-500 text-white shadow-[0_1px_2px_rgba(0,0,0,0.15)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.4)]'
+                          : 'border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-amber-500 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]'
+                      }`}
+                      title={block.checked ? '标记为未完成' : '标记为已完成'}
+                    >
+                      {block.checked && <Check size={11} strokeWidth={3} />}
+                    </button>
+                    <div
+                      onClick={() => activateBlock(block)}
+                      className={`flex-1 text-xs sm:text-sm cursor-text leading-relaxed select-text ${
+                        block.checked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'
+                      }`}
+                      title="点击编辑清单文字"
+                    >
+                      {renderInlineContent(block.checkText || '')}
+                    </div>
+                  </div>
+                );
+              case 'quote':
+                return (
+                  <blockquote
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="my-2 py-2 px-3.5 border-l-4 border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 rounded-r-xl text-xs sm:text-sm shadow-[inset_1px_1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_0_1px_1px_rgba(0,0,0,0.2)] space-y-1 cursor-text hover:bg-amber-500/10 transition-colors"
+                    title="点击在原地编辑引用"
+                  >
+                    {(block.quoteLines || []).map((line, lIdx) => (
+                      <p key={lIdx} className="leading-relaxed">
+                        {renderInlineContent(line)}
+                      </p>
+                    ))}
+                  </blockquote>
+                );
+              case 'list':
+                return (
+                  <div
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="my-1.5 pl-4 text-xs sm:text-sm text-slate-800 dark:text-slate-200 hover:bg-amber-500/5 transition-colors rounded-lg px-1.5 -mx-1.5 py-0.5 cursor-text"
+                    title="点击编辑列表"
+                  >
+                    {block.listType === 'ol' ? (
+                      <ol className="list-decimal space-y-1">
+                        {(block.listItems || []).map((item, itemIdx) => (
+                          <li key={itemIdx}>{renderInlineContent(item)}</li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <ul className="list-disc space-y-1">
+                        {(block.listItems || []).map((item, itemIdx) => (
+                          <li key={itemIdx}>{renderInlineContent(item)}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                );
+              case 'hr':
+                return (
+                  <hr
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="my-3 border-t border-slate-200 dark:border-slate-800 cursor-pointer hover:border-amber-400 transition-colors"
+                    title="点击编辑分割线"
+                  />
+                );
+              case 'empty':
+                return (
+                  <div
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="h-4 my-1 cursor-text hover:bg-amber-500/5 rounded transition-colors"
+                    title="点击在此键入"
+                  />
+                );
+              case 'p':
+              default:
+                return (
+                  <p
+                    key={block.id}
+                    onClick={() => activateBlock(block)}
+                    className="my-1.5 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed cursor-text hover:bg-amber-500/5 transition-colors rounded-lg px-1.5 -mx-1.5 py-0.5 select-text"
+                    title="点击在原地编辑段落"
+                  >
+                    {renderInlineContent(block.raw)}
+                  </p>
+                );
+            }
+          })}
+
+          {/* Quick Click-to-Append New Line / Block at the Canvas Bottom */}
+          <div
+            onClick={handleAppendNewBlock}
+            className="mt-4 pt-3 pb-2 border-t border-dashed border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer select-none rounded-xl hover:bg-slate-100/50 dark:hover:bg-slate-800/30"
+            title="点击在此处继续书写新行"
+          >
+            <Plus size={13} />
+            <span>点击在此继续键入 Markdown...</span>
+          </div>
         </div>
 
         {/* Footer Actions */}
@@ -610,27 +1320,34 @@ export const AlgoNoteModal: React.FC<AlgoNoteModalProps> = ({
             </button>
           </div>
 
-          {/* Right actions: Shortcut prompt, Cancel, Save */}
+          {/* Right actions: Shortcut prompt, Complete Exit, Immediate Save */}
           <div className="flex items-center gap-2">
-            <span className="hidden sm:inline-block text-[11px] text-slate-400 font-mono pr-1">
-              Ctrl + Enter 保存
-            </span>
+            {saveStatus === 'saving' ? (
+              <span className="hidden sm:flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+                <Clock size={12} className="animate-spin" />
+                <span>800ms 自动保存中...</span>
+              </span>
+            ) : (
+              <span className="hidden sm:inline-block text-[11px] text-slate-400 font-mono pr-1">
+                Ctrl + S 保存 · 800ms 自动保存
+              </span>
+            )}
 
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleCloseWithFlush}
               className="px-3.5 py-1.5 rounded-2xl text-xs font-semibold bg-white/90 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-[2px_2px_5px_rgba(0,0,0,0.04),inset_1.5px_1.5px_3px_rgba(255,255,255,0.85)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 active:scale-[0.96] transition-all duration-150 cursor-pointer"
             >
-              取消
+              完成退出
             </button>
 
             <button
               type="button"
-              onClick={handleSave}
+              onClick={handleManualSave}
               className="flex items-center gap-1.5 px-4 py-1.5 rounded-2xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-[3px_3px_8px_rgba(245,158,11,0.3),inset_2px_2px_4px_rgba(255,255,255,0.6)] dark:shadow-[0_2px_8px_rgba(245,158,11,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:-translate-y-0.5 active:scale-[0.96] transition-all duration-150 cursor-pointer"
             >
               <Save size={13} />
-              <span>保存便签</span>
+              <span>{isManualSavedFeedback ? '已保存!' : '立即保存'}</span>
             </button>
           </div>
         </div>

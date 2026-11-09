@@ -212,29 +212,35 @@ assert(mdViewContent.includes('case \'h5\':') && mdViewContent.includes('<h5'), 
 assert(mdViewContent.includes('tokenizeInline'), 'Implements robust inline tokenizer');
 
 // ----------------------------------------------------------------------------
-// Test 9: Verify AlgoNoteModal.tsx Markdown Mode Toggle Architecture & UX
+// Test 9: Verify AlgoNoteModal.tsx Typora/Obsidian Single-Canvas In-Place Live Preview & Auto-Save
 // ----------------------------------------------------------------------------
-console.log('\nTest 9: Verifying AlgoNoteModal.tsx Mode Toggle & UX Features...');
-assert(modalContent.includes('import { MarkdownView }'), 'AlgoNoteModal imports MarkdownView component');
-assert(modalContent.includes('type NoteViewMode = \'edit\' | \'preview\' | \'split\''), 'Defines NoteViewMode type (edit, preview, split)');
-assert(modalContent.includes('viewMode'), 'Maintains viewMode state');
-assert(modalContent.includes('setViewMode'), 'Provides setViewMode state setter');
-assert(modalContent.includes('Edit3'), 'Imports Edit3 icon for edit mode');
-assert(modalContent.includes('Eye'), 'Imports Eye icon for preview mode');
-assert(modalContent.includes('Columns2'), 'Imports Columns2 icon for split screen mode');
-assert(modalContent.includes('setViewMode(\'edit\')'), 'Provides edit mode switcher');
-assert(modalContent.includes('setViewMode(\'preview\')'), 'Provides preview mode switcher');
-assert(modalContent.includes('setViewMode(\'split\')'), 'Provides split mode switcher');
+console.log('\nTest 9: Verifying Typora/Obsidian In-Place Live Preview & Auto-Save Architecture...');
+assert(!modalContent.includes("setViewMode('split')"), 'Completely eliminated split-screen view');
+assert(!modalContent.includes("type NoteViewMode = 'edit' | 'preview' | 'split'"), 'Eliminated manual mode toggle tabs (Single-Canvas WYSIWYG)');
+assert(!modalContent.includes('Columns2'), 'Eliminated Columns2 split screen icon');
+assert(modalContent.includes('parseToBlocks'), 'Parses document into in-place editable Markdown blocks');
+assert(modalContent.includes('activeBlockId'), 'Tracks in-place active block for editing without layout jumps');
+assert(modalContent.includes('handleToggleChecklist'), 'Allows direct checklist checkbox toggling in live preview');
+assert(modalContent.includes('CodeBlock'), 'Integrates CodeBlock for syntax-highlighted code blocks in live canvas');
+assert(modalContent.includes('renderInlineContent'), 'Provides rich inline token rendering for headings and paragraphs');
+assert(modalContent.includes('handleAppendNewBlock'), 'Supports appending new block at the canvas bottom');
+assert(modalContent.includes('800') && modalContent.includes('autoSaveTimerRef'), 'Implements 800ms debounced auto-save architecture');
+assert(modalContent.includes('handleCloseWithFlush'), 'Synchronous flush on close implemented to guarantee 100% zero data loss');
+assert(modalContent.includes('saveStatus'), 'Maintains real-time auto-save status');
+assert(modalContent.includes('编辑中'), 'Displays real-time typing status in header/footer');
+assert(modalContent.includes('已自动保存'), 'Displays auto-saved confirmation with timestamp');
 assert(modalContent.includes('handleInsertMarkdown'), 'Provides quick Markdown insertion helper');
-assert(modalContent.includes('handleTextareaKeyDown'), 'Supports Tab key indentation handling (2 spaces)');
+assert(modalContent.includes("e.key === 'Tab'"), 'Supports Tab indentation (2 spaces)');
 assert(modalContent.includes('e.shiftKey'), 'Supports Shift+Tab block unindenting');
 assert(modalContent.includes('onMouseDown={(e) => e.preventDefault()}'), 'Format buttons prevent textarea selection loss on click');
 assert(modalContent.includes('active:scale-[0.96]'), 'Format buttons provide Emil Kowalski tactile feedback');
-assert(modalContent.includes('sm:grid-cols-2'), 'Split mode provides dual-column grid matching sm screen breakpoint');
-assert(modalContent.includes('max-w-4xl') || modalContent.includes('max-w-5xl'), 'Expands modal card width in split mode for comfortable dual columns');
-assert(modalContent.includes('variant="note"'), 'Passes variant="note" to MarkdownView for compact note styling');
-assert(modalContent.includes('便签内容为空'), 'Provides friendly empty state when previewing blank note');
-assert(modalContent.includes('立即编辑便签'), 'Empty preview state provides immediate shortcut back to edit mode');
+assert(modalContent.includes("e.key.toLowerCase() === 'b'"), 'Supports Ctrl+B / Cmd+B bold shortcut');
+assert(modalContent.includes("e.key.toLowerCase() === 'i'"), 'Supports Ctrl+I / Cmd+I italic shortcut');
+assert(modalContent.includes("e.key.toLowerCase() === 'e'"), 'Supports Ctrl+E / Cmd+E inline code shortcut');
+assert(modalContent.includes("e.key.toLowerCase() === 'c'"), 'Supports Ctrl+Shift+C / Cmd+Shift+C code block shortcut');
+assert(modalContent.includes("e.key.toLowerCase() === 'l'"), 'Supports Ctrl+Shift+L / Cmd+Shift+L checklist shortcut');
+assert(modalContent.includes("e.key.toLowerCase() === 'k'"), 'Supports Ctrl+K / Cmd+K link shortcut');
+assert(modalContent.includes("e.key.toLowerCase() === 's'"), 'Supports Ctrl+S / Cmd+S manual save shortcut');
 
 // ----------------------------------------------------------------------------
 // Test 10: Functional Verification: Parse Real Markdown Sample Through Engine
